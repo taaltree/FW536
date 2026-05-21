@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Day 4 · Problem Set v3 (marine) | FW 536 · INSTRUCTOR ANSWER KEY</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../_Shared/css/lab.css" />
+<script defer src="../_Shared/js/lab.js"></script>
+<script>MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] } };</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+</head>
+<body>
+<div class="shell">
+
+<aside class="sidebar">
+ <h1><a href="../index.html" title="Back to course home">FW 536 · Day 4</a></h1>
+ <div class="subtitle">Problem Set v3 — Marine / Fisheries</div>
+ <nav>
+ <ul>
+ <li><a href="#p1">1. Red snapper survival MLE</a></li>
+ <li><a href="#p2">2. Krill biomass MLE</a></li>
+ <li><a href="#p3">3. Stock-recruit (Beverton-Holt)</a></li>
+ <li><a href="#p4">4. Bayesian turtle survival</a></li>
+ <li><a href="#p5">5. Bayesian Schaefer biomass</a></li>
+ <li><a href="#p6">6. Bayesian length-weight</a></li>
+ <li><a href="#p7">7. Bayesian shark CPUE</a></li>
+ <li><a href="#p8">8. Prior sensitivity: rockfish r</a></li>
+ <li><a href="#p9">9. BCI vs HPDI for MSY</a></li>
+ <li><a href="#p10">10. Identifiability in q/B</a></li>
+ </ul>
+ <div class="section">Day 4 docs</div>
+ <ul>
+ <li><a href="lab.html">Main lab</a></li>
+ <li><a class="featured" href="plain_language_summary.html">Plain-language summary</a></li>
+ <li><a href="answer_key.html">Lab answer key</a></li>
+ <li><a href="problem_set_v2.html">Problem set v2 (songbirds)</a></li>
+ </ul>
+ </nav>
+</aside>
+
+<main class="content">
+<header class="lab-header">
+ <div class="eyebrow">Day 4 · Alternate Problem Set v3 — Marine / Fisheries</div>
+ <h1>Ten problems on likelihood and Bayes — marine ecology and stock assessment</h1>
+ <p class="lede">Same skill coverage as the songbird set (problem set v2), but set in marine and fisheries contexts: snapper assessments, krill surveys, sea-turtle vital rates, fish length-weight, shark CPUE. Solutions sketched at the end.</p>
+</header>
+
+<section><p>Problems 1–3 are MLE-by-hand derivations. Problems 4–7 are Bayesian fits in <span class="pill nimble">Nimble</span>. Problems 8–10 are conceptual.</p></section>
+
+<!-- ============ MLE-BY-HAND ============ -->
+
+<div class="exercise" id="p1">
+<span class="ex-tag">Problem 1</span><span class="difficulty medium"> · MLE by hand · Binomial · 25 min</span>
+<h3>Red snapper post-release survival</h3>
+<p>You released 80 red snapper after barotrauma treatment and tracked them with acoustic tags; 47 were detected alive after 7 days. Treat each fish's outcome as Bernoulli($\phi$) with $\phi$ = post-release survival.</p>
+<ol type="a">
+<li>Write the joint likelihood. Solve algebraically for $\hat\phi$.</li>
+<li>Compute the observed Fisher information at $\hat\phi$ and the Wald 95% CI.</li>
+<li>Use <code>mle()</code> + <code>confint()</code> to get the profile-likelihood 95% CI. Compare.</li>
+<li>Suppose the manager wants $\Pr(\phi \ge 0.5 \mid \text{data})$. Can MLE alone deliver that? Why might Bayes be the natural framework for this question?</li>
+</ol>
+</div>
+
+<div class="exercise" id="p2">
+<span class="ex-tag">Problem 2</span><span class="difficulty medium"> · MLE by hand · Log-Normal · 30 min</span>
+<h3>Antarctic krill biomass MLE (log-Normal)</h3>
+<p>An acoustic survey gives $n = 18$ density estimates (g/m$^3$) that are strictly positive and right-skewed. You model them as iid Log-Normal: $\log Y_i \sim \mathcal{N}(\mu, \sigma^2)$.</p>
+<ol type="a">
+<li>Write the log-likelihood in terms of $\mu, \sigma$, and the $\log y_i$.</li>
+<li>Derive the MLEs $\hat\mu = \overline{\log y}$ and $\hat\sigma^2 = \tfrac{1}{n}\sum(\log y_i - \hat\mu)^2$.</li>
+<li>Show that the MLE of the mean of $Y$ (not $\log Y$) is $\exp(\hat\mu + \hat\sigma^2/2)$, by invariance of the MLE.</li>
+<li>Why is the simple MLE of $\sigma^2$ biased? What correction (REML-like) would you use?</li>
+</ol>
+</div>
+
+<div class="exercise" id="p3">
+<span class="ex-tag">Problem 3</span><span class="difficulty hard"> · MLE by hand + numerical · 40 min</span>
+<h3>Beverton–Holt stock–recruitment</h3>
+<p>The Beverton–Holt stock-recruitment model is $R = \dfrac{a S}{1 + b S}$ with log-Normal observation error, $\log R_i \sim \mathcal{N}(\log[aS_i/(1+bS_i)], \sigma^2)$. You have 20 (S, R) pairs from a long-term survey.</p>
+<ol type="a">
+<li>Write the negative log-likelihood as a function of $a$, $b$, $\sigma$.</li>
+<li>Why is this likelihood much harder to maximize than the Schaefer (linear) form $R = aS - bS^2$? Comment on parameter correlation and on why <code>L-BFGS-B</code> with sensible bounds is essential.</li>
+<li>Simulate 20 (S, R) pairs with $a=4$, $b=0.001$, $\sigma=0.3$, $S \in U(50, 1000)$. Fit using <code>mle()</code> from 5 random starts. How often does it converge to the true answer?</li>
+<li>Reparameterize using "steepness" $h \in (0.2, 1)$ and unfished recruitment $R_0$. Show that the steepness parameterization is much better-conditioned for MLE.</li>
+</ol>
+</div>
+
+<!-- ============ BAYESIAN IN NIMBLE ============ -->
+
+<div class="exercise" id="p4">
+<span class="ex-tag">Problem 4</span><span class="difficulty medium"> · Bayesian · Nimble · 30 min</span>
+<h3>Bayesian green sea turtle hatchling survival</h3>
+<p>From a single nesting beach you released 200 marked green sea turtle hatchlings; underwater video and re-encounter surveys give a (rough) re-encounter count of 12 after 30 days. Prior literature on hatchling survival is sparse; treat it as $\phi \sim$ Beta(2, 18) (mean 0.10).</p>
+<ol type="a">
+<li>Write the model in <span class="pill nimble">Nimble</span> with $y \sim$ Bin$(n=200, \phi)$.</li>
+<li>Fit and report posterior summaries.</li>
+<li>Compute $\Pr(\phi < 0.05 \mid \text{data})$.</li>
+<li>If a colleague used Beta(1, 1) instead, how does the posterior change?</li>
+</ol>
+</div>
+
+<div class="exercise" id="p5">
+<span class="ex-tag">Problem 5</span><span class="difficulty hard"> · Bayesian biomass dynamics · Nimble · 45 min</span>
+<h3>Bayesian Schaefer biomass-dynamic model for a Pacific snapper</h3>
+<p>You have $T = 15$ years of catch ($C_t$) and a CPUE index ($I_t$). The state-space Schaefer model is:</p>
+<div class="eq-block">$B_{t+1} = B_t + r B_t \!\left(1 - \tfrac{B_t}{K}\right) - C_t, \quad I_t \sim \text{LogNormal}\!\left(\log(q B_t), \sigma^2\right).$</div>
+
+<ol type="a">
+<li>Translate this state-space model into <span class="pill nimble">Nimble</span>. Use priors: $r \sim$ Beta(2, 8), $K \sim$ Log-Normal($\log 10{,}000$, 1), $q \sim$ Log-Normal($-5$, 1), $\sigma \sim$ Uniform(0, 2). Initialize $B_1 = K$.</li>
+<li>Simulate data with $r=0.3$, $K=10{,}000$, $q=0.01$, $\sigma=0.2$, and a catch series that increases from 200 to 1500 over 15 years.</li>
+<li>Fit and recover the parameters. What does the posterior on MSY = $rK/4$ look like?</li>
+<li>Why is the joint posterior of $r$ and $K$ likely to be strongly negatively correlated? Make a scatter plot of posterior samples.</li>
+</ol>
+<div class="callout bio">This is the simplest production stock assessment that practising fisheries scientists fit. Everything more sophisticated (Pella–Tomlinson, age-structured, statistical catch-at-age) is built on top of this skeleton.</div>
+</div>
+
+<div class="exercise" id="p6">
+<span class="ex-tag">Problem 6</span><span class="difficulty medium"> · Bayesian regression · Nimble · 30 min</span>
+<h3>Bayesian length-weight regression for Pacific cod</h3>
+<p>The classical length-weight relationship is $W = a L^b$, fit on the log scale: $\log W_i \sim \mathcal{N}(\log a + b \log L_i, \sigma^2)$. Simulate 100 cod with $a = 0.01$, $b = 3.05$, $L \in U(20, 100)$ cm, $\sigma = 0.10$.</p>
+<ol type="a">
+<li>Fit the model in <span class="pill nimble">Nimble</span> with priors $\log a \sim \mathcal{N}(0, 10)$, $b \sim \mathcal{N}(3, 0.5)$, $\sigma \sim$ half-Normal(0, 1).</li>
+<li>Are the true values inside the 95% BCIs?</li>
+<li>Compute $\Pr(b > 3 \mid \text{data})$. Why is $b \approx 3$ biologically meaningful?</li>
+<li>Add posterior predictive checks: simulate replicate $W$'s and compare the SD of residuals.</li>
+</ol>
+</div>
+
+<div class="exercise" id="p7">
+<span class="ex-tag">Problem 7</span><span class="difficulty hard"> · Bayesian · Nimble · 40 min</span>
+<h3>Bayesian zero-inflated negative binomial CPUE for blue shark</h3>
+<p>A bycatch dataset of blue sharks on longline trips contains $n = 200$ trips with very many zeros and a long tail of large catches. Fit a Bayesian zero-inflated NB in <span class="pill nimble">Nimble</span>.</p>
+<ol type="a">
+<li>Write the ZINB model: $y_i = 0$ with probability $\pi + (1-\pi)\text{NB}(0; \mu, k)$; $y_i = k$ with probability $(1-\pi)\text{NB}(k; \mu, k)$ for $k \ge 1$.</li>
+<li>Place priors $\pi \sim$ Beta(1, 1), $\mu \sim$ Log-Normal(0, 2), $k \sim$ Gamma(2, 0.5).</li>
+<li>Simulate 200 trips with $\pi = 0.30$, $\mu = 5$, $k = 0.5$. Fit and recover. Compute the posterior of "expected catch per trip" $= (1-\pi)\mu$.</li>
+<li>What identifiability concern exists between $\pi$ (structural zeros) and small $\mu$ (Poisson/NB zeros)? Use posterior correlations to discuss.</li>
+</ol>
+</div>
+
+<!-- ============ CONCEPTUAL ============ -->
+
+<div class="exercise" id="p8">
+<span class="ex-tag">Problem 8</span><span class="difficulty medium"> · Conceptual · 20 min</span>
+<h3>Prior sensitivity on intrinsic growth rate $r$ for a long-lived rockfish</h3>
+<p>Yelloweye rockfish are long-lived and slow-growing; biologists suspect $r$ is small. You have catch-and-index data but it is essentially uninformative for $r$ on its own.</p>
+<ol type="a">
+<li>Compare three priors: $r \sim$ Uniform(0, 1), $r \sim$ Beta(2, 30) (prior mean ≈ 0.06), $r \sim$ Beta(8, 2) (mean 0.8).</li>
+<li>Without re-running MCMC, predict qualitatively how the posterior of MSY $=rK/4$ moves under each prior.</li>
+<li>Which prior would you defend in front of a stock-assessment review panel, and how would you defend it?</li>
+</ol>
+</div>
+
+<div class="exercise" id="p9">
+<span class="ex-tag">Problem 9</span><span class="difficulty easy"> · Conceptual · 15 min</span>
+<h3>BCI vs HPDI for MSY</h3>
+<p>Suppose your posterior of MSY from Problem 5 is right-skewed (long upper tail). You want to communicate one number plus an interval to a fisheries manager.</p>
+<ol type="a">
+<li>Sketch (in words) the BCI and HPDI of a right-skewed posterior. Which is shorter?</li>
+<li>If the manager will use the lower bound as a "precautionary" quota cap, which interval would you report and why?</li>
+<li>Is there a setting in which the BCI <em>upper</em> bound is more appropriate than the HPDI upper bound? Give an example.</li>
+</ol>
+</div>
+
+<div class="exercise" id="p10">
+<span class="ex-tag">Problem 10</span><span class="difficulty hard"> · Conceptual · identifiability · 25 min</span>
+<h3>Identifiability of catchability $q$ and biomass $B$</h3>
+<p>The CPUE equation $I_t = q B_t$ means only the <em>product</em> $qB_t$ is identified from a single index. If you double $q$ and halve $B_t$, the model fits the data equally well.</p>
+<ol type="a">
+<li>Show algebraically that the likelihood of the data is invariant under the transformation $(q, B_t) \to (cq, B_t/c)$ for any $c > 0$ (and a corresponding $K \to K/c$).</li>
+<li>What aspect of the prior breaks this invariance in the Bayesian model?</li>
+<li>Posterior pairs plot: in your Schaefer fit (Problem 5), what does the joint posterior $(\log q, \log K)$ look like, and why?</li>
+<li>Two practical fixes used in real stock assessments: (i) put a strong prior on $q$ (informed by a tag-recovery study), (ii) use a second index with known $q$. Sketch why either resolves the non-identifiability.</li>
+</ol>
+</div>
+
+<!-- ============ SOLUTION SKETCHES ============ -->
+<section style="margin-top: 60px;">
+<h2>Solution sketches</h2>
+
+<details class="answer" id="s1"><summary>Problem 1 sketch</summary><div class="answer-body">
+<p>(a) $L(\phi) = \phi^{47}(1-\phi)^{33}$; $\hat\phi = 47/80 = 0.5875$.</p>
+<p>(b) $I = 80/[\hat\phi(1-\hat\phi)] \approx 329.9$; SE $\approx 0.055$; Wald 95% CI $\approx (0.480, 0.695)$.</p>
+<p>(c) Profile CI similar but slightly asymmetric.</p>
+<p>(d) MLE alone delivers point estimate + CI; the probability $\Pr(\phi \ge 0.5 \mid \text{data})$ is a Bayesian quantity. With a Beta(1,1) prior, posterior is Beta(48, 34); $\Pr(\phi \ge 0.5) =$ 1 − pbeta(0.5, 48, 34) ≈ 0.94.</p>
+</div></details>
+
+<details class="answer" id="s2"><summary>Problem 2 sketch</summary><div class="answer-body">
+<p>(a) $\ell = -\sum \log y_i - \tfrac{n}{2}\log(2\pi\sigma^2) - \tfrac{1}{2\sigma^2}\sum(\log y_i - \mu)^2$.</p>
+<p>(b) Set $\partial\ell/\partial\mu = 0 \Rightarrow \hat\mu = \overline{\log y}$. Set $\partial\ell/\partial\sigma^2 = 0 \Rightarrow \hat\sigma^2 = \tfrac{1}{n}\sum(\log y_i - \hat\mu)^2$.</p>
+<p>(c) By invariance, MLE of $E(Y) = \exp(\mu + \sigma^2/2)$ is $\exp(\hat\mu + \hat\sigma^2/2)$.</p>
+<p>(d) MLE divides by $n$; unbiased estimator divides by $n-1$ (Bessel correction). REML applied here recovers the same correction in the simple iid case.</p>
+</div></details>
+
+<details class="answer" id="s3"><summary>Problem 3 sketch</summary><div class="answer-body">
+<p>(a) $-\ell = \tfrac{n}{2}\log(2\pi\sigma^2) + \tfrac{1}{2\sigma^2}\sum(\log R_i - \log[aS_i/(1+bS_i)])^2$.</p>
+<p>(b) The Beverton-Holt is nonlinear in $a, b$ and the parameters are <em>strongly correlated</em> — increasing $a$ and $b$ proportionally barely changes the predicted curve at observed $S$. Optimizers oscillate or stick.</p>
+<p>(c) Random starts converge to the same neighborhood with care; many simulations show 60–80% convergence to the global from naive starts.</p>
+<p>(d) Steepness $h = a R_0 \alpha/(b\alpha + 1/\bar\beta)$ — (details vary; many parameterizations exist). Reparameterizing with $(h, R_0)$ keeps the parameters approximately orthogonal in the likelihood and dramatically improves convergence — this is why every modern stock assessment uses $(h, R_0)$, not $(a, b)$.</p>
+</div></details>
+
+<details class="answer" id="s4"><summary>Problem 4 sketch</summary><div class="answer-body">
+<p>Posterior Beta(2 + 12, 18 + 188) = Beta(14, 206). Mean ≈ 0.0636, BCI ≈ (0.036, 0.099).</p>
+<p>$\Pr(\phi &lt; 0.05) =$ pbeta(0.05, 14, 206) ≈ 0.26.</p>
+<p>With Beta(1, 1): posterior Beta(13, 189), mean ≈ 0.064, very similar. With 200 trials the prior has limited influence.</p>
+<pre><code>code &lt;- nimbleCode({ phi ~ dbeta(<span class="nu">2</span>, <span class="nu">18</span>); y ~ dbinom(phi, n) })
+out &lt;- nimbleMCMC(code, constants = list(n = <span class="nu">200</span>), data = list(y = <span class="nu">12</span>),
+ inits = list(phi = <span class="nu">0.1</span>), monitors = <span class="st">"phi"</span>,
+ nchains = <span class="nu">3</span>, nburnin = <span class="nu">2000</span>, niter = <span class="nu">12000</span>,
+ samplesAsCodaMCMC = <span class="kw">TRUE</span>)</code></pre>
+</div></details>
+
+<details class="answer" id="s5"><summary>Problem 5 sketch</summary><div class="answer-body">
+<pre><code><span class="kw">library</span>(nimble); <span class="kw">library</span>(MCMCvis)
+T &lt;- <span class="nu">15</span>
+set.seed(<span class="nu">7</span>)
+true &lt;- list(r = <span class="nu">0.3</span>, K = <span class="nu">10000</span>, q = <span class="nu">0.01</span>, sigma = <span class="nu">0.2</span>)
+C &lt;- seq(<span class="nu">200</span>, <span class="nu">1500</span>, length.out = T)
+B &lt;- numeric(T); B[<span class="nu">1</span>] &lt;- true$K
+for (t in <span class="nu">2</span>:T) B[t] &lt;- max(B[t-<span class="nu">1</span>] + true$r * B[t-<span class="nu">1</span>] * (<span class="nu">1</span> - B[t-<span class="nu">1</span>] / true$K) - C[t-<span class="nu">1</span>], <span class="nu">10</span>)
+I &lt;- exp(log(true$q * B) + rnorm(T, <span class="nu">0</span>, true$sigma))
+
+schaefer &lt;- nimbleCode({
+ r ~ dbeta(<span class="nu">2</span>, <span class="nu">8</span>)
+ K ~ dlnorm(log(<span class="nu">10000</span>), sd = <span class="nu">1</span>)
+ q ~ dlnorm(-<span class="nu">5</span>, sd = <span class="nu">1</span>)
+ sigma ~ dunif(<span class="nu">0</span>, <span class="nu">2</span>)
+ B[<span class="nu">1</span>] &lt;- K
+ for (t in <span class="nu">2</span>:T) {
+ Bdet[t] &lt;- max(B[t-<span class="nu">1</span>] + r * B[t-<span class="nu">1</span>] * (<span class="nu">1</span> - B[t-<span class="nu">1</span>] / K) - C[t-<span class="nu">1</span>], <span class="nu">10</span>)
+ B[t] &lt;- Bdet[t]
+ }
+ for (t in <span class="nu">1</span>:T) {
+ log(I[t]) ~ dnorm(log(q * B[t]), sd = sigma) <span class="cm"># simplification</span>
+ }
+ MSY &lt;- r * K / <span class="nu">4</span>
+})
+constants &lt;- list(T = T, C = C)
+data &lt;- list(I = I)
+out &lt;- nimbleMCMC(schaefer, constants = constants, data = data,
+ inits = list(r = <span class="nu">0.3</span>, K = <span class="nu">10000</span>, q = <span class="nu">0.01</span>, sigma = <span class="nu">0.2</span>),
+ monitors = c(<span class="st">"r"</span>,<span class="st">"K"</span>,<span class="st">"q"</span>,<span class="st">"sigma"</span>,<span class="st">"MSY"</span>),
+ nchains = <span class="nu">3</span>, nburnin = <span class="nu">3000</span>, niter = <span class="nu">15000</span>,
+ samplesAsCodaMCMC = <span class="kw">TRUE</span>)
+MCMCsummary(out)</code></pre>
+<p>$r$ and $K$ are strongly negatively correlated in the posterior because the product $rK$ is well-identified by the data (controls equilibrium yield) but each individually is not without informative priors.</p>
+</div></details>
+
+<details class="answer" id="s6"><summary>Problem 6 sketch</summary><div class="answer-body">
+<pre><code><span class="kw">library</span>(nimble); <span class="kw">library</span>(MCMCvis)
+set.seed(<span class="nu">2</span>)
+n &lt;- <span class="nu">100</span>; L &lt;- runif(n, <span class="nu">20</span>, <span class="nu">100</span>)
+W &lt;- exp(log(<span class="nu">0.01</span>) + <span class="nu">3.05</span> * log(L) + rnorm(n, <span class="nu">0</span>, <span class="nu">0.10</span>))
+
+lw &lt;- nimbleCode({
+ log_a ~ dnorm(<span class="nu">0</span>, sd = <span class="nu">10</span>)
+ b ~ dnorm(<span class="nu">3</span>, sd = <span class="nu">0.5</span>)
+ sigma ~ T(dnorm(<span class="nu">0</span>, sd = <span class="nu">1</span>), <span class="nu">0</span>, )
+ for (i in <span class="nu">1</span>:n) {
+ log(W[i]) ~ dnorm(log_a + b * log(L[i]), sd = sigma)
+ }
+})
+out &lt;- nimbleMCMC(lw, constants = list(n = n, L = L), data = list(W = W),
+ inits = list(log_a = <span class="nu">0</span>, b = <span class="nu">3</span>, sigma = <span class="nu">0.5</span>),
+ monitors = c(<span class="st">"log_a"</span>, <span class="st">"b"</span>, <span class="st">"sigma"</span>),
+ nchains = <span class="nu">3</span>, nburnin = <span class="nu">2000</span>, niter = <span class="nu">12000</span>,
+ samplesAsCodaMCMC = <span class="kw">TRUE</span>)
+MCMCsummary(out)
+mean(MCMCchains(out, <span class="st">"b"</span>) &gt; <span class="nu">3</span>)</code></pre>
+<p>$b = 3$ means weight scales with the cube of length — isometric (no shape change with size). $b > 3$ means fish get "stockier" with size; $b < 3$ means more elongate.</p>
+</div></details>
+
+<details class="answer" id="s7"><summary>Problem 7 sketch</summary><div class="answer-body">
+<pre><code><span class="kw">library</span>(nimble); <span class="kw">library</span>(MCMCvis)
+set.seed(<span class="nu">9</span>)
+n &lt;- <span class="nu">200</span>; pi_t &lt;- <span class="nu">0.30</span>; mu_t &lt;- <span class="nu">5</span>; k_t &lt;- <span class="nu">0.5</span>
+z &lt;- rbinom(n, <span class="nu">1</span>, pi_t)
+y &lt;- ifelse(z == <span class="nu">1</span>, <span class="nu">0</span>, rnbinom(n, mu = mu_t, size = k_t))
+
+zinb &lt;- nimbleCode({
+ pi ~ dbeta(<span class="nu">1</span>, <span class="nu">1</span>)
+ mu ~ dlnorm(<span class="nu">0</span>, sd = <span class="nu">2</span>)
+ k ~ dgamma(<span class="nu">2</span>, <span class="nu">0.5</span>)
+ for (i in <span class="nu">1</span>:n) {
+ p[i] &lt;- pi + (<span class="nu">1</span> - pi) * exp(-k * log(<span class="nu">1</span> + mu/k))
+ <span class="cm"># Use the nimble dnbinom (size, prob) parameterization; for clarity, students may use a custom dist.</span>
+ }
+})
+<span class="cm"># Note: a clean implementation uses a custom distribution via nimbleFunction.</span></code></pre>
+<p>Identifiability: when $\mu$ is small, the NB itself produces many zeros, so $\pi$ and $\mu$ trade off. Posterior correlation between $\pi$ and $1/\mu$ is typically &gt; 0.4 in these problems. Solutions: large sample sizes, covariate-informed $\pi$ (e.g. depth, season), or a separate dataset that constrains $\mu$.</p>
+</div></details>
+
+<details class="answer" id="s8"><summary>Problem 8 sketch</summary><div class="answer-body">
+<p>(a) Uniform(0,1) is "agnostic"; Beta(2, 30) encodes "long-lived life-history" knowledge; Beta(8,2) is biologically implausible for a rockfish (would imply fast growth).</p>
+<p>(b) Posterior MSY moves with $r$: Beta(2,30) prior → posterior MSY shrinks toward small values; Uniform → wider, possibly bimodal; Beta(8,2) → MSY shifts unrealistically high.</p>
+<p>(c) The Beta(2,30) prior is defensible if you can cite life-history data (e.g. Myers et al. meta-analyses) showing that long-lived rockfish have $r$ in this range. The Uniform is hard to defend in a data-poor assessment — it gives the optimizer license to land anywhere.</p>
+</div></details>
+
+<details class="answer" id="s9"><summary>Problem 9 sketch</summary><div class="answer-body">
+<p>(a) HPDI is shorter; BCI extends further into the upper tail.</p>
+<p>(b) HPDI lower bound is the same as (or slightly higher than) the BCI lower bound for right-skewed posteriors — both are reasonable; HPDI is more "honest" about which values are <em>most credible</em>. For precautionary quota, the HPDI lower bound or even the 5%-percentile is appropriate.</p>
+<p>(c) Yes — if you're communicating "what value should I plan for under a bad scenario", the BCI upper bound is more conservative because it captures more tail mass.</p>
+</div></details>
+
+<details class="answer" id="s10"><summary>Problem 10 sketch</summary><div class="answer-body">
+<p>(a) $I_t = q B_t = (cq)(B_t/c)$ for any $c > 0$. Same predicted $I_t$, same likelihood.</p>
+<p>(b) Priors on $q$ and/or $K$ break the invariance: under the transformation $K \to K/c$, the prior density on $K$ changes. So the posterior locates the (q, K) pair within the ridge using prior information.</p>
+<p>(c) Posterior pairs plot of $(\log q, \log K)$ shows a nearly perfect anti-diagonal ridge with slope −1 — the data only identify $\log(qK)$.</p>
+<p>(d) Strong prior on $q$ pins one axis of the ridge. A second independent index with known catchability does the same — it adds a constraint perpendicular to the ridge.</p>
+</div></details>
+
+</section>
+
+</main>
+</div>
+
+<footer>
+ FW 536 · Statistical Modeling for Ecology and Conservation · Oregon State University · Day 4 problem set v3 (marine)
+</footer>
+</body>
+</html>

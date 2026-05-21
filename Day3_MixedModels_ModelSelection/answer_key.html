@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Day 3 · Answer key | FW 536</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../_Shared/css/lab.css" />
+<script defer src="../_Shared/js/lab.js"></script>
+<script>MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] } };</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+</head>
+<body>
+<div class="shell">
+
+<aside class="sidebar">
+ <h1><a href="../index.html" title="Back to course home">FW 536 · Day 3</a></h1>
+ <div class="subtitle">Answer key</div>
+ <nav>
+ <ul>
+ <li><a href="#a1">Ex 1 — streams (pooling)</a></li>
+ <li><a href="#a2">Ex 2 — length-weight</a></li>
+ <li><a href="#a3">Ex 3 — von Bertalanffy NL mixed</a></li>
+ <li><a href="#a4">Ex 4 — trophic position</a></li>
+ <li><a href="#a5">Ex 5 — ML vs REML in action</a></li>
+ <li><a href="#a6">Ex 6 — mixed-model diagnostics</a></li>
+ <li><a href="#a7">Ex 7 — ΔAIC &lt; 2 myth</a></li>
+ <li><a href="#a8">Ex 8 — Type I error simulation</a></li>
+ <li><a href="#a9">Ex 9 — Type II error simulation</a></li>
+ <li><a href="#a10">Ex 10 — LOOCV vs AIC</a></li>
+ <li><a href="#a11">Ex 11 — LRT vs AICc</a></li>
+ </ul>
+ <div class="section">Day 3 docs</div>
+ <ul>
+ <li><a href="lab.html">Main lab</a></li>
+ <li><a class="featured" href="plain_language_summary.html">Plain-language summary</a></li>
+ <li><a href="problem_set_v2.html">Problem set v2</a></li>
+ <li><a href="problem_set_v3.html">Problem set v3</a></li>
+ </ul>
+ </nav>
+</aside>
+
+<main class="content">
+<header class="lab-header">
+ <div class="eyebrow">Day 3 · Answer Key (instructor)</div>
+ <h1>Worked solutions — Mixed Models &amp; Model Selection</h1>
+ <p class="lede">Full numeric and conceptual answers to every Day 3 exercise. Each answer includes R code, expected output (approximate), biological interpretation, and notes on what to look for in a student response.</p>
+</header>
+
+<!-- =========================== EX 1 =========================== -->
+<section id="a1">
+<h2>Exercise 1 — Streams: complete pooling vs no pooling vs partial pooling</h2>
+
+<p><strong>(a) Equations and parameter counts.</strong></p>
+<ul>
+<li><code>lm1</code>: $y_{ij} = \beta_0 + \varepsilon_{ij}$, $\varepsilon \sim \mathcal{N}(0, \sigma^2)$. Two parameters: $\beta_0, \sigma^2$.</li>
+<li><code>lm2</code>: $y_{ij} = \alpha_j + \varepsilon_{ij}$ with $j = 1, \ldots, 18$ and a free $\alpha_j$ per stream. 19 parameters (18 means + $\sigma^2$).</li>
+<li><code>lm3</code>: $y_{ij} = \beta_0 + b_{0,j} + \varepsilon_{ij}$, $b_{0,j} \sim \mathcal{N}(0, \sigma_\text{stream}^2)$. Just 3 parameters regardless of the number of streams ($\beta_0, \sigma_\text{stream}^2, \sigma^2$).</li>
+</ul>
+
+<p><strong>(b) Boxplot of residuals from <code>lm1</code> by stream.</strong> Entire streams sit systematically above or below zero. That is the visual fingerprint of a violated independence assumption — the three replicate observations within a stream are far more similar to each other than to observations in other streams.</p>
+
+<pre><code>boxplot(split(resid(lm1), Streams$Stream), ylab="Residual", xlab="Stream")
+abline(0, 0, lwd=3)</code></pre>
+
+<p><strong>(c) Shrinkage in action.</strong> Comparing <code>fixef(lm2)</code> with <code>coef(lm3)</code> stream by stream, every <code>lm3</code> estimate is shifted slightly toward the grand mean (~60.4). With only 3 observations per stream, the data have moderate leverage, so the shrinkage is modest — typically a few percent of the deviation. The most extreme stream (Stream 11 at ~12) gets pulled toward the grand mean by ~3–5%.</p>
+
+<pre><code># Compare side by side
+data.frame(
+ noPool = fixef(lm(Density ~ Stream - 1, data=Streams)),
+ partPool = coef(lm3)$"(Intercept)"
+)</code></pre>
+
+<p><strong>(d) Variance components.</strong> Approximate output:</p>
+<pre><code>Random effects:
+ Formula: ~1 | Stream
+ (Intercept) Residual
+StdDev: 24.9 4.6
+
+intervals(lm3)
+ lower est. upper
+sd((Intercept)) 17.8 24.9 34.9
+sigma 3.6 4.6 5.8</code></pre>
+<p>ICC = $24.9^2 / (24.9^2 + 4.6^2) \approx 0.97$. <strong>97% of the variance is between streams</strong>; only 3% is the within-stream replicate noise. Ignoring the random effect (using <code>lm1</code>) would give standard errors that are far too small — the effective sample size is closer to 18 (streams) than to 54 (observations).</p>
+
+<div class="callout key"><strong>What to look for:</strong> students explicitly counting parameters in each model; recognizing that residual clustering by group is the diagnostic that motivates a random effect; computing ICC as an interpretable summary. Bonus: noticing that with only 3 observations per stream, the partial-pool shrinkage is small — and articulating why.</div>
+</section>
+
+<!-- =========================== EX 2 =========================== -->
+<section id="a2">
+<h2>Exercise 2 — Length–weight random-intercept model</h2>
+
+<p><strong>(a) Equation.</strong> $W_{ij} = \beta_0 + b_{0,j} + \beta_1 L_{ij} + \varepsilon_{ij}$, $b_{0,j} \sim \mathcal{N}(0, \sigma_S^2)$, $\varepsilon_{ij} \sim \mathcal{N}(0, \sigma^2)$. Biologically: $\beta_1$ is the population-average slope of weight on length; $\beta_0$ is the population-average intercept; $b_{0,j}$ is how much subject $j$'s expected weight at $L=0$ deviates from the population mean (a "scale" effect of subject identity).</p>
+
+<p><strong>(b) Fixed effects from <code>summary(m1)</code>.</strong> Approximate:</p>
+<pre><code>Fixed effects: Weight ~ Length
+ Value Std.Error DF t-value
+(Intercept) 1.30 2.1 94 0.62
+Length 0.96 0.03 94 31.5</code></pre>
+<p>Population-average slope $\approx 0.96$ g per unit length; the CI excludes zero comfortably. The intercept itself is biologically peculiar (length = 0) — don't over-interpret it.</p>
+
+<p><strong>(c) Among-subject SD.</strong> ~1.6 g. So two subjects of the same length are expected to differ in weight by about $\pm 1.6$ g (1 SD), or roughly $\pm 3.2$ g (2 SD covers most of the population).</p>
+
+<p><strong>(d) Within-subject residual SD.</strong> ~4.5 g. ICC = $1.6^2 / (1.6^2 + 4.5^2) \approx 0.11$. After accounting for length, only ~11% of remaining variation in weight is between subjects — much less than in the streams example, because the length covariate explains most of the among-subject variation.</p>
+
+<p><strong>(e) Random-slope test.</strong></p>
+<pre><code>m_slope &lt;- lmer(Weight ~ Length + (1 + Length | Subject), data=LenW)
+anova(m1b, m_slope, refit=FALSE) # REML LRT on random structure</code></pre>
+<p>Typical output shows a small LRT statistic (often $\chi^2 &lt; 1$ on 2 df), $p$-value &gt; 0.5, AND a singular-fit warning indicating the slope variance is at the boundary. The data don't support a random slope. We use <code>refit = FALSE</code> because we're comparing models that differ in random structure only, with identical fixed effects — REML log-likelihoods are valid for that comparison.</p>
+
+<div class="callout key"><strong>What to look for:</strong> students translating the fitted SDs into biological language ("subjects of the same length differ by ± X g"); using the REML LRT rule correctly; recognizing the singular-fit warning as a signal that the random structure is too complex for the data.</div>
+</section>
+
+<!-- =========================== EX 3 =========================== -->
+<section id="a3">
+<h2>Exercise 3 — Von Bertalanffy nonlinear mixed model</h2>
+
+<p><strong>(a) Why expect $L_\infty$ to vary?</strong> Asymptotic body size is heritable and depends on individual conditions across life history — food, water temperature, parasites, genetics. Forcing all individuals to share the same $L_\infty$ is the same mistake as forcing all streams to share the same mean density.</p>
+
+<p><strong>(b) Diagnostic.</strong> <code>boxplot(split(residuals(m_fixed), AgeLen$Subject))</code> shows whole subjects sitting consistently above or below the zero line — the within-subject residuals are <em>not</em> independent. Same diagnostic as the streams example.</p>
+
+<p><strong>(c) Residual SE comparison.</strong></p>
+<pre><code>summary(m_fixed)$sigma # ~ 9.5 (made-up but typical)
+summary(m_nlme)$sigma # ~ 3.5
+VarCorr(m_nlme) # SD(Linf | Subject) ~ 8.5</code></pre>
+<p>The within-subject residual SE of <code>m_nlme</code> (≈ 3.5) is much smaller than the <code>nls</code> residual SE (≈ 9.5) because the random effect absorbed the among-subject variation in $L_\infty$. By the variance partition $\sigma^2_\text{nls} \approx \sigma_{L_\infty}^2 + \sigma^2_\text{within}$, the within-subject residual <em>has to</em> be smaller — that is the whole point of accounting for the random effect.</p>
+
+<p><strong>(d) What does <code>m_nlme$coefficients$fixed[1] + m_nlme$coefficients$random$Subject</code> produce?</strong> The BLUP of each subject's $L_\infty$: the population mean plus the partially-pooled subject-specific deviation. Equivalent to the BLUPs you'd get from <code>coef(m_nlme)</code> for the $L_\infty$ component.</p>
+
+<p>Compared with running <code>nls</code> separately per subject, the BLUPs:</p>
+<ul>
+<li>Stabilize estimates for subjects with sparse age coverage by borrowing strength from the rest.</li>
+<li>Use a Normal prior on $L_\infty$ implicitly (the random-effects distribution).</li>
+<li>Give consistent uncertainty bounds and let you do further inference (predict for a new individual, etc.).</li>
+</ul>
+
+<div class="callout key"><strong>What to look for:</strong> understanding that <em>shrinkage is just regularization</em>; explaining why pooled variance partitions matter; being able to articulate why a separate <code>nls</code> per subject (no pooling) is worse for subjects with few data points.</div>
+</section>
+
+<!-- =========================== EX 4 =========================== -->
+<section id="a4">
+<h2>Exercise 4 — Trophic position with crossed random effects</h2>
+
+<p><strong>(a) Random vs fixed for Lake and Fish_Species.</strong> Both are exchangeable groupings of observations (multiple fish per lake; multiple fish per species). If the goal is to generalize the length-trophic-position relationship to <em>other</em> lakes or <em>other</em> species, random effects are appropriate. Counter-argument: only 3 species and 6 lakes is on the edge of identifiability for a random-effect variance; species-specific feeding ecologies (Bluegill vs Walleye) are biologically distinct enough that we may care about them by name — a case for fixed effects on species and possibly on lake.</p>
+
+<p><strong>(b) Bivariate Normal interpretation.</strong></p>
+<div class="eq-block">$\begin{pmatrix} b_{0,j} \\ b_{1,j} \end{pmatrix} \sim \mathcal{N}\!\left(\mathbf{0},\; \begin{pmatrix} \sigma_0^2 &amp; \rho\sigma_0\sigma_1 \\ \rho\sigma_0\sigma_1 &amp; \sigma_1^2 \end{pmatrix}\right)$</div>
+<p>Each species draws both an intercept deviation and a slope deviation from this distribution; they can be correlated.</p>
+
+<p><strong>(c) AICc table and interpretation of M8.</strong></p>
+<pre><code>aictab(list(M1=M1,M2=M2,M3=M3,M4=M4,M5=M5,M6=M6,M7=M7,M8=M8))
+# Approximate ordering: M8 &lt; M2 &lt; M7 &lt; M5 &lt; ...
+
+summary(M8)
+Random effects:
+ Groups Name Variance Std.Dev. Corr
+ Lake (Intercept) 0.046 0.214
+ Fish_Species (Intercept) 0.286 0.535
+ Z_Length 0.075 0.273 -0.99
+ Residual 0.040 0.200
+Fixed effects:
+ Estimate Std.Error
+(Intercept) -0.0009 0.32
+Z_Length 0.422 0.17</code></pre>
+<p>Almost all the slope variability lives across species (different feeding ecologies → different length-TP slopes). Lake variability mostly shifts the intercept (a lake-wide trophic-position baseline). Within-fish residual is small. <strong>Note the correlation of −0.99</strong> for the species (intercept, slope) — a singular fit, unsurprising given only 3 species.</p>
+
+<p><strong>(d) Practical risk with few levels.</strong> Variance components are essentially unidentifiable, singular fits are common, and any inference about the variance (CIs, LRTs) is poorly calibrated. Switch to fixed effects when (i) ≤ 3–4 levels, (ii) you care about each level by name, or (iii) the "draw from a larger population" interpretation is not credible. In this dataset, a model with fixed effects for Species and an interaction Length × Species — with Lake either fixed or random depending on the science question — would be very defensible.</p>
+
+<div class="callout key"><strong>What to look for:</strong> students recognizing that "random effect" is partly a choice about what to generalize to; students explicitly flagging the singular-fit correlation; students being able to defend either a fixed or random treatment for Species depending on the scientific question.</div>
+</section>
+
+<!-- =========================== EX 5 =========================== -->
+<section id="a5">
+<h2>Exercise 5 — ML vs REML for fixed-effect comparison</h2>
+
+<p><strong>(a) Why <code>REML = FALSE</code>?</strong> We are comparing models that differ in <em>fixed effects</em>. REML log-likelihoods are computed on data with the fixed effects partialed out — they are not comparable across different fixed-effect specifications. Use ML.</p>
+
+<p><strong>(b) LRT result.</strong></p>
+<pre><code>anova(fit_no_x, fit_with_x)
+# Df AIC BIC logLik deviance Chisq Chi Df Pr(&gt;Chisq)
+# 4 ... ... ... ...
+# 5 ... ... ... ... ~6-8 1 ~0.005-0.01</code></pre>
+<p>$\chi^2 \approx 6$–$8$ on 1 df, $p \approx 0.005$–$0.01$. Body length is supported as a predictor of trophic position even after accounting for lake and species.</p>
+
+<p><strong>(c) Refitting with REML for reporting.</strong> Variance components estimated by ML are biased downward (they ignore the df consumed by the fixed effects). REML corrects that bias. The fixed-effect point estimates barely change, but the random-effect SDs and the SEs that depend on them are more honest under REML.</p>
+
+<div class="callout key"><strong>What to look for:</strong> students explicitly distinguishing the two comparisons; students reporting the chosen model with REML in their writeup but performing the test in ML; recognition that <code>anova()</code> on REML-fit lmer objects will silently refit them in ML by default — useful, but worth knowing about.</div>
+</section>
+
+<!-- =========================== EX 6 =========================== -->
+<section id="a6">
+<h2>Exercise 6 — Mixed-model diagnostics</h2>
+
+<p><strong>(a) What each plot checks.</strong></p>
+<table>
+<tr><th>Plot</th><th>Looking for</th><th>Problem signal</th></tr>
+<tr><td>Fitted vs Pearson residual</td><td>Random scatter around 0 with constant spread</td><td>Funnel (heteroscedasticity), curvature (mean structure missing)</td></tr>
+<tr><td>Covariate vs residual</td><td>Random scatter</td><td>Curvature ⇒ a nonlinearity is missing; trend ⇒ omitted interaction</td></tr>
+<tr><td>Residual boxplot by grouping</td><td>All boxes centered on 0, similar spread</td><td>A group sitting away from 0 ⇒ random intercept not absorbing the effect; uneven spread ⇒ group-level heteroscedasticity</td></tr>
+<tr><td>Q-Q of random effects</td><td>Random-effect BLUPs roughly Normal</td><td>Heavy tails or skew ⇒ a few groups are wildly different and the Normal assumption is bad</td></tr>
+</table>
+
+<p><strong>(b) Why Q-Q the random effects?</strong> The model explicitly assumes the random effects are Normal. The raw residuals are a mixture of within-group residuals and random-effect deviations; their distribution is harder to interpret. Q-Q-plotting the BLUPs directly checks the assumption that was made.</p>
+
+<p><strong>(c) If residual variance scales with fitted values.</strong> Options in rough order:</p>
+<ol>
+<li>Try a log-transform of the response (if it's positive).</li>
+<li>Fit a Gamma or Lognormal GLMM (<code>glmmTMB</code>, <code>lme4::glmer</code> with appropriate family).</li>
+<li>Allow a variance function: <code>nlme::lme(weights = varPower())</code> models residual SD as a power of fitted value.</li>
+<li>If the response is a count or proportion, use a distribution with a built-in mean-variance relationship (Poisson/NB or Binomial/Beta-Binomial).</li>
+</ol>
+
+<div class="callout key"><strong>What to look for:</strong> students reading diagnostic plots actively, not just including them; students suggesting concrete fixes rather than just naming the problem.</div>
+</section>
+
+<!-- =========================== EX 7 =========================== -->
+<section id="a7">
+<h2>Exercise 7 — The "$\Delta\text{AIC} &lt; 2$" misconception</h2>
+
+<p><strong>(a) Single-run experience.</strong> Running the code a few times shows the model with the noise predictor is "competitive" most of the time — often $\Delta\text{AIC}$ is in the range 0.0–1.9, occasionally 2.5+ when the noise variable's coefficient is unusually large in absolute value.</p>
+
+<p><strong>(b) Formal simulation.</strong></p>
+<pre><code>set.seed(20260516); reps &lt;- 1000
+within2 &lt;- replicate(reps, {
+ n &lt;- 1000; x &lt;- runif(n); x2 &lt;- rnorm(n)
+ y &lt;- 2 + 3*x + rnorm(n, 0, 0.2)
+ d &lt;- AIC(lm(y ~ x + x2)) - AIC(lm(y ~ x))
+ d &lt; 2
+})
+mean(within2) # typically 0.85 - 0.90</code></pre>
+
+<p>The fraction is consistently above 0.80. <strong>Reason:</strong> the AIC penalty for one parameter is exactly 2. The noise predictor's extra parameter contributes a small (and on average ~1-unit, by half-the-difference-of-deviances logic) decrease in $-2\ell$ compared to the simpler model, leaving a $\Delta\text{AIC}$ near 1 — well under 2.</p>
+
+<div class="callout key"><strong>Instructor takeaway:</strong> drive home that "$\Delta\text{AIC} &lt; 2$" includes models that have to be there structurally, not models for which there is real evidence. Better: report the coefficient and its CI, and argue from the size and uncertainty of the effect.</div>
+</section>
+
+<!-- =========================== EX 8 =========================== -->
+<section id="a8">
+<h2>Exercise 8 — Type I error simulation</h2>
+
+<p><strong>(a) Prediction.</strong> AIC will be the worst offender — its penalty (2 per parameter) is small enough that noise predictors easily slip into the top model.</p>
+
+<p><strong>(b) Numbers.</strong> Approximate results across 500 reps:</p>
+<table>
+<tr><th>Criterion</th><th>Fraction of replicates whose top model includes ≥ 1 noise variable</th></tr>
+<tr><td>p &lt; 0.05 (any of 3 predictors)</td><td>~0.14</td></tr>
+<tr><td>AIC</td><td>~0.55</td></tr>
+<tr><td>AICc</td><td>~0.50</td></tr>
+<tr><td>BIC</td><td>~0.08</td></tr>
+</table>
+
+<p>The p-value approach has family-wise Type I error $\approx 1 - (1-0.05)^3 = 0.14$ as predicted. AIC is much more permissive. BIC's heavy $\ln n = \ln 50 \approx 3.9$ penalty makes it the most conservative.</p>
+
+<p><strong>(c) Why BIC outperforms here.</strong> BIC's penalty grows with $n$, so for $n = 50$ it's ≈ 3.9 per parameter — almost twice AIC's. When effects are truly zero, this extra penalty drops noise predictors. <strong>Backfires when:</strong> real effects are weak. BIC will miss them (next exercise).</p>
+
+<div class="callout key"><strong>What to look for:</strong> students recognizing that the result is not a quirk but a structural property of the penalties. Bonus: students who notice that "Type I error rate" for AIC is not the same notion as for p-values — there is no test or null being defined, just the question "did a junk predictor end up in the top model?".</div>
+</section>
+
+<!-- =========================== EX 9 =========================== -->
+<section id="a9">
+<h2>Exercise 9 — Type II error simulation (weak true effects)</h2>
+
+<p><strong>(a) Average number of missed real effects (out of 3):</strong></p>
+<table>
+<tr><th>Criterion</th><th>Mean # of dropped real effects</th></tr>
+<tr><td>p &gt; 0.05 (variables not flagged significant)</td><td>~1.4</td></tr>
+<tr><td>AIC</td><td>~0.8</td></tr>
+<tr><td>AICc</td><td>~0.9</td></tr>
+<tr><td>BIC</td><td>~1.3</td></tr>
+</table>
+<p>BIC and p-values miss ~1.3–1.4 of the 3 real effects on average; AIC misses ~0.8.</p>
+
+<p><strong>(b) Implication for BIC.</strong> If your science cares about weak effects (subtle population trends, small treatment differences), BIC will under-detect them. Pick AIC/AICc — or, better, don't reduce the question to a single criterion. Look at the coefficient and its CI.</p>
+
+<p><strong>(c) Sample-size sweep.</strong> Rerunning with $n = 500$ should show all criteria detecting the strong effect (x1, true coefficient 1) reliably; AIC/AICc start picking up x2 (coefficient -0.1); only at much larger $n$ does anything reliably detect x3 (coefficient 0.01). BIC needs the largest $n$ before retaining each effect — its sample-size-dependent penalty trades off precisely against detection of weak effects.</p>
+
+<div class="callout key"><strong>What to look for:</strong> students articulating the trade-off explicitly (Type I and Type II are linked through the penalty strength); students understanding that AIC's "permissiveness" is exactly what gives it better detection of weak signals.</div>
+</section>
+
+<!-- =========================== EX 10 =========================== -->
+<section id="a10">
+<h2>Exercise 10 — LOOCV vs AIC for noise data</h2>
+
+<p><strong>(a) Single seed (set.seed(126), n=50, y unrelated to x1, x2, x3).</strong></p>
+<pre><code>sort(sapply(forms, cvmse))
+# m0 m3 m1 m2 m13 m23 m12 m123
+# 8.5 8.8 9.0 9.2 9.3 9.4 9.5 9.7</code></pre>
+<p>Intercept-only (m0) wins on LOOCV. AIC on the same data often picks a one- or two-predictor model — illustrating the same "junk slips in" behavior as Exercise 8.</p>
+
+<p><strong>(b) 100-replication summary.</strong></p>
+<pre><code>set.seed(1)
+res &lt;- replicate(100, {
+ y &lt;- rnorm(50, 5, 3); x1 &lt;- runif(50); x2 &lt;- runif(50); x3 &lt;- runif(50)
+ d &lt;- data.frame(y, x1, x2, x3)
+ forms &lt;- list(m0 = y~1, m1=y~x1, m2=y~x2, m3=y~x3,
+ m12=y~x1+x2, m13=y~x1+x3, m23=y~x2+x3, m123=y~x1+x2+x3)
+ cv &lt;- sapply(forms, function(f) cv.glm(d, glm(f, data=d))$delta[1])
+ aic &lt;- sapply(forms, function(f) AIC(glm(f, data=d)))
+ c(cv_intercept_best = which.min(cv) == 1,
+ aic_intercept_best = which.min(aic) == 1)
+})
+rowMeans(res)
+# cv_intercept_best aic_intercept_best
+# ~0.60 ~0.35</code></pre>
+
+<p><strong>(c) Why LOOCV is better behaved here.</strong> CV measures out-of-sample prediction error directly. AIC is an approximation to CV under regularity conditions; the approximation underweights the penalty so AIC tilts toward including extra predictors. For prediction questions, CV is the gold standard.</p>
+
+<div class="callout key"><strong>What to look for:</strong> students noting that CV is not infallible (the within-100-replicate variance is real, and CV itself can pick a wrong model in any given run), and that CV vs AIC alignment depends on the true effect sizes and sample size. The honest message: <em>use both, and report both, especially when they disagree.</em></div>
+</section>
+
+<!-- =========================== EX 11 =========================== -->
+<section id="a11">
+<h2>Exercise 11 — LRT vs AICc for a random-slope decision</h2>
+
+<p><strong>(a) Why <code>refit = FALSE</code>?</strong> Both models share the same fixed-effect specification but differ in random-effect structure. REML log-likelihoods are comparable in that setting and give less-biased variance components. <code>refit = FALSE</code> tells <code>anova</code> not to refit them under ML.</p>
+
+<p><strong>(b) Disagreement scenario.</strong> AICc and the REML LRT often agree, but not always. Each statistic answers a different question:</p>
+<ul>
+<li><strong>LRT:</strong> "Is the larger model significantly better at maximizing likelihood (given the asymptotic null distribution)?"</li>
+<li><strong>AICc:</strong> "Is the larger model expected to predict better, after a parsimony penalty?"</li>
+</ul>
+<p>For an inference question about whether the random slope matters biologically, the LRT plus the CI on the slope variance is the cleanest evidence. For a prediction question, prefer AICc (and ideally cross-validation).</p>
+
+<p><strong>(c) Boundary-test conservatism.</strong> Testing whether a variance component is zero puts the null on the boundary of the parameter space (variances cannot be negative). The classical $\chi^2_1$ null distribution overstates uncertainty in that case. The correct asymptotic null is a 50:50 mixture $\tfrac{1}{2}\chi^2_0 + \tfrac{1}{2}\chi^2_1$. Practical fix: divide the reported $p$-value by 2, or use simulation-based tests (e.g., <code>RLRsim::exactRLRT</code>).</p>
+
+<div class="callout key"><strong>What to look for:</strong> students articulating the difference between "inference" and "prediction" claims; students aware of the boundary-test issue and at least mentioning the halve-the-p-value heuristic.</div>
+</section>
+
+<div style="margin-top:60px;">
+<button id="reveal-all" style="background:var(--accent); color:white; border:none; padding:10px 20px; border-radius:4px; cursor:pointer;">Expand all</button>
+<a href="lab.html" style="background:var(--osu-orange); color:white; padding:10px 20px; border-radius:4px; text-decoration:none; margin-left:8px;">← Back to lab</a>
+</div>
+
+</main>
+</div>
+
+<footer>FW 536 · Statistical Modeling for Ecology and Conservation · Oregon State University</footer>
+</body>
+</html>

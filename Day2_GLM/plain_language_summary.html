@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Day 2 · Plain-language summary | FW 536</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../_Shared/css/lab.css" />
+<script defer src="../_Shared/js/lab.js"></script>
+<script>MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] } };</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+</head>
+<body>
+<div class="shell">
+<aside class="sidebar">
+ <h1><a href="../index.html" title="Back to course home">FW 536 · Day 2</a></h1>
+ <div class="subtitle">Plain-language summary</div>
+ <nav>
+ <ul>
+ <li><a href="#big">The big idea</a></li>
+ <li><a href="#cont">Continuous distributions</a></li>
+ <li><a href="#lm">What a linear model actually does</a></li>
+ <li><a href="#glm">Generalized linear models</a></li>
+ <li><a href="#links">Picking the right link</a></li>
+ <li><a href="#diagnose">When to switch distributions</a></li>
+ <li><a href="#mistakes">Common mistakes</a></li>
+ </ul>
+ <div class="section">Day 2 docs</div>
+ <ul>
+ <li><a href="lab.html">Main lab</a></li>
+ <li><a href="log_logit_intuition.html">Log/logit intuition</a></li>
+ <li><a href="answer_key.html">Answer key</a></li>
+ <li><a href="problem_set_v2.html">Problem set v2</a></li>
+ <li><a href="problem_set_v3.html">Problem set v3</a></li>
+ </ul>
+ </nav>
+</aside>
+
+<main class="content">
+<header class="lab-header">
+ <div class="eyebrow">Day 2 · Plain-language summary</div>
+ <h1>Linear models, link functions, and the GLM family</h1>
+ <p class="lede">Read this before doing the lab to set up the conceptual scaffolding.</p>
+</header>
+
+<section id="big">
+<h2>The big idea</h2>
+<div class="callout plain">
+<p>Yesterday you learned that data come from a distribution. Today you learn how to <em>connect a distribution to a predictor</em>. That's all a regression is: a recipe that says "if the predictor is $x$, the expected response is $\mu(x)$, and observations vary around $\mu$ according to some distribution."</p>
+<p>The traditional linear regression you've seen ($y = a + bx + \text{noise}$) assumes the response is Normal and unbounded. But ecological responses are usually counts, proportions, or strictly positive — none of which are Normal. So we generalize.</p>
+</div>
+</section>
+
+<section id="cont">
+<h2>Continuous distributions: the morning's cast</h2>
+<ul>
+<li><strong>Normal</strong> — symmetric, unbounded. Workhorse for measurements like temperatures, fish lengths, residuals.</li>
+<li><strong>Lognormal</strong> — log(Y) is Normal. Always positive, right-skewed. Use for abundances, concentrations, body sizes.</li>
+<li><strong>Gamma</strong> — flexible positive continuous. Use when variance grows with the mean (common in biology).</li>
+<li><strong>Beta</strong> — for proportions strictly between 0 and 1 (not derived from a count).</li>
+<li><strong>Exponential</strong> — time between events in a Poisson process. Use for survival times, time-to-first-detection.</li>
+</ul>
+</section>
+
+<section id="lm">
+<h2>What a linear model actually does</h2>
+<p>A linear model is the recipe</p>
+<div class="eq-block">$\mu_i = \beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \dots$</div>
+<p>plus an assumption that observations $y_i$ are independently drawn from a distribution centered at $\mu_i$.</p>
+<p>"Linear" refers to the <em>coefficients</em>, not the predictors. <code>y ~ x + I(x^2)</code> is still a linear model. <code>y ~ sin(beta * x)</code> is not.</p>
+</section>
+
+<section id="glm">
+<h2>Generalized linear models — three ingredients</h2>
+<ol>
+<li><strong>The linear predictor:</strong> $\eta_i = \beta_0 + \beta_1 x_{i1} + \dots$ — same as before.</li>
+<li><strong>The link function:</strong> $g(\mu_i) = \eta_i$. Transforms the mean onto an unbounded scale so a line makes sense.</li>
+<li><strong>The distribution:</strong> $y_i \sim D(\mu_i, \theta)$. Says how observations vary.</li>
+</ol>
+<p>R syntax: <code>glm(y ~ x, family = D(link = "link_function"))</code>.</p>
+</section>
+
+<section id="links">
+<h2>How to pick the right link function</h2>
+<p>The link should match the range of the mean:</p>
+<table>
+<tr><th>If the mean lives on…</th><th>Use link…</th><th>Example</th></tr>
+<tr><td>All real numbers</td><td>identity</td><td>Normal regression</td></tr>
+<tr><td>Positive numbers only</td><td>log</td><td>Poisson, NB, Gamma regression</td></tr>
+<tr><td>Between 0 and 1</td><td>logit</td><td>Logistic regression</td></tr>
+</table>
+<p>The choice isn't arbitrary — it's about making sure the model doesn't predict impossible values (negative counts, probabilities &gt; 1).</p>
+
+<div class="callout key">
+<strong>The biology hook:</strong> a log link encodes the assumption that effects are <em>multiplicative</em>. A logit link encodes the assumption that effects are multiplicative <em>on the odds</em>. Both match how biology actually works far better than the additive assumption baked into a plain Normal regression. See the <a href="log_logit_intuition.html">log/logit intuition guide</a> for many worked examples.
+</div>
+</section>
+
+<section id="diagnose">
+<h2>When to switch distributions</h2>
+<p>A simple checklist:</p>
+<ol>
+<li><strong>Is the response a count?</strong> Start with Poisson. If residual deviance / df &gt;&gt; 1, switch to Negative Binomial.</li>
+<li><strong>Is the response binary or proportion-of-fixed-n?</strong> Binomial/logistic. Always.</li>
+<li><strong>Is the response strictly positive and continuous?</strong> Try Gamma with log link, or a Normal on log(y).</li>
+<li><strong>Is the response a proportion not built from a count?</strong> Beta regression (<code>betareg</code> package).</li>
+<li><strong>None of the above?</strong> Plot the residuals from a Normal fit. If they look symmetric and homoscedastic, the Normal might be fine.</li>
+</ol>
+</section>
+
+<section id="mistakes">
+<h2>Common mistakes</h2>
+<div class="callout warn"><strong>Fitting a Normal to count data.</strong> Predicts negative counts; variance assumption usually wrong. Use a Poisson or NB instead.</div>
+<div class="callout warn"><strong>Forgetting to back-transform.</strong> A log-link coefficient of 0.5 is not "a 0.5 increase in response per unit x" — it's "a $\times e^{0.5} = \times 1.65$ multiplicative effect." Always exponentiate.</div>
+<div class="callout warn"><strong>Trusting Poisson SEs when overdispersed.</strong> Overdispersion makes Poisson SEs too small. Switch to NB (or quasipoisson if you only need point estimates).</div>
+<div class="callout warn"><strong>Treating interactions as one-size-fits-all.</strong> An interaction that looks important on the log scale might disappear on the natural scale, and vice versa. Always state which scale you're talking about.</div>
+</section>
+
+</main>
+</div>
+<footer>FW 536 · Statistical Modeling for Ecology and Conservation · Oregon State University</footer>
+</body>
+</html>

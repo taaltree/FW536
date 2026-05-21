@@ -1,0 +1,135 @@
+---
+title: "FW 536 — Day 2 morning lab (v3 · aquatic & fisheries) — Your Name"
+author: "Your Name Here"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    self_contained: true
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    code_folding: show
+    theme: cosmo
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+# Day 2 morning lab — Continuous distributions problem set
+
+**Problem set version:** **v3 — aquatic & fisheries theme**.
+(The companion version is [v2 — forest & songbird](problem_set_v2.html); you choose whichever theme fits your interests.)
+
+This template matches [`problem_set_v3.html`](problem_set_v3.html). Read each problem statement there, write your work below, **Knit** to HTML, and upload the `.html` to the matching Canvas assignment.
+
+For setup help see the [R Markdown tutorial](../rmarkdown_tutorial.html).
+
+---
+
+# Setup
+
+```{r}
+# Load packages you'll need. Add or remove as appropriate.
+library(ggplot2)
+library(dplyr)
+library(MASS)        # for glm.nb
+library(effects)
+library(emmeans)
+```
+
+---
+
+# Problem 1 — Distribution of fish weights in a creel survey
+
+> You record body weight (g) for every fish kept in a 30-day creel survey on a coastal river. Most fish are sub-legal-size cutthroat (small), with a long right tail of large hatchery steelhead retained in the same fishery. The distribution is strongly right-skewed.
+
+**My work:**
+
+```{r}
+# Your R code here
+```
+
+**Answer / biological interpretation:**
+
+
+---
+
+# Problem 2 — Length-weight allometry of Chinook salmon
+
+> For 200 Chinook salmon you have fork length (cm) and weight (g). Lengths range 30–110 cm; weights range 250 g to 18 kg.
+
+**My work:**
+
+```{r}
+# Your R code here
+```
+
+**Answer / biological interpretation:**
+
+
+---
+
+# Problem 3 — Juvenile coho counts in snorkel surveys
+
+> From 80 pool surveys, juvenile coho counts are modeled as
+
+**My work:**
+
+```{r}
+# Your R code here
+```
+
+**Answer / biological interpretation:**
+
+
+---
+
+# Problem 4 — Smolt survival through a hydro reach vs. temperature
+
+> Acoustic-tagged Chinook smolts tracked through an 80-km reach: outcome is survived (1) or not (0). Predictor is river temperature (°C) at release. Logistic regression returns intercept $+2.20$ and slope $-0.18$ per °C.
+
+**My work:**
+
+```{r}
+# Your R code here
+```
+
+**Answer / biological interpretation:**
+
+
+---
+
+# Problem 5 — Pink shrimp catch per tow
+
+> For 120 standard 30-minute trawl tows, shrimp catch has mean 80 individuals and variance 1200.
+
+**My work:**
+
+```{r}
+# Your R code here
+```
+
+**Answer / biological interpretation:**
+
+
+---
+
+# (Optional) Embed a photo of hand-written work
+
+For problems easier to do on paper, photograph and embed:
+
+```{r, echo=FALSE, eval=FALSE, out.width="60%", fig.cap="Hand-derivation for Problem N"}
+knitr::include_graphics("images/problemN_derivation.jpg")
+```
+
+(Change `eval=FALSE` to `eval=TRUE` after saving an image. See the [R Markdown tutorial](../rmarkdown_tutorial.html) for details.)
+
+---
+
+# Submission checklist
+
+- [ ] Answered every morning problem from `problem_set_v3.html`.
+- [ ] Knitted to HTML without errors.
+- [ ] Photos (if any) embedded with `self_contained: true` in the YAML.
+- [ ] Uploaded the `.html` to the matching Canvas assignment.

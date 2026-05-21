@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Day 1 lab — Probability & Discrete Distributions | FW 536</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../_Shared/css/lab.css" />
+<script defer src="../_Shared/js/lab.js"></script>
+<script>MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] } };</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+</head>
+<body>
+<div class="shell">
+
+<aside class="sidebar">
+ <h1><a href="../index.html" title="Back to course home">FW 536 · Day 1</a></h1>
+ <div class="subtitle">Probability & Discrete Distributions</div>
+ <nav>
+ <div class="section">Lab</div>
+ <ul>
+ <li><a href="#orient">Why we start here</a></li>
+ <li><a href="#big-picture">Plain-language overview</a></li>
+ <li><a href="#concepts">Core concepts</a></li>
+ <li><a href="#morning">Morning · probability</a></li>
+ <li><a href="#afternoon">Afternoon · distributions</a></li>
+ <li><a href="#challenge">Stretch problems</a></li>
+ <li><a href="#cheatsheet">R cheat sheet</a></li>
+ </ul>
+ <div class="section">Other docs</div>
+ <ul>
+ <li><a class="featured" href="plain_language_summary.html">Plain-language summary</a></li>
+ <li><a href="answer_key.html">Answer key</a></li>
+ <li><a href="problem_set_v2.html">Problem set · v2</a></li>
+ <li><a href="problem_set_v3.html">Problem set · v3</a></li>
+ </ul>
+ <div class="section">Course</div>
+ <ul>
+ <li><a href="../index.html">All days</a></li>
+ </ul>
+ </nav>
+</aside>
+
+<main class="content">
+
+<header class="lab-header">
+ <div class="eyebrow">Day 1 · Lab</div>
+ <h1>Probability, randomness, and the discrete distributions that show up everywhere in ecology</h1>
+ <p class="lede">A guided walk from "what is a probability" to "which distribution describes my data" — using whales, martens, salmon, deer, and elk as the running examples.</p>
+</header>
+
+<div class="lab-toc" id="lab-toc">
+  <h2>What's in this lab and what to hand in</h2>
+  <p class="toc-intro">This page is your <strong>in-class practice</strong> problem set — worked examples with visible answers. Your <strong>graded 20-point assignment</strong> is a separate problem set (v2 or v3); write up your answers in the matching R Markdown template and submit on Canvas.</p>
+  
+<div class="session">
+  <div class="session-label">Morning · 20 pts</div>
+  <div>
+    <div class="session-title">Probability problem set</div>
+    <div class="row"><span class="tag practice">Practice</span>
+      <span><a href="#morning">Walk through the morning problems on this page</a> <span class="note">— answers visible, in-class</span></span></div>
+    <div class="row"><span class="tag assessed">Assessed</span>
+      <span><a href="problem_set_v2.html#morning">Assessed v2 &middot; marine &amp; fisheries</a> &nbsp;or&nbsp; <a href="problem_set_v3.html#morning">Assessed v3 &middot; terrestrial wildlife &amp; disease</a>
+            <span class="note">— answers NOT shown; choose whichever theme fits your interests</span></span></div>
+    <div class="row"><span class="tag template">Hand-in</span><span>Choose template matching your theme: <a href="morning_lab_template_v2.Rmd">morning v2 (marine &amp; fisheries).Rmd</a> <span class="note">or</span> <a href="morning_lab_template_v3.Rmd">morning v3 (terrestrial wildlife &amp; disease).Rmd</a> <span class="note">— knit to HTML and upload to Canvas</span></span></div>
+    <div class="row"><span class="tag lecture">Lecture</span>
+      <span><a href="FW536_Day1_Morning_intro%20to%20probability.pptx">Morning lecture · intro to probability</a></span></div>
+  </div>
+</div>
+
+<div class="session">
+  <div class="session-label">Afternoon · 20 pts</div>
+  <div>
+    <div class="session-title">Discrete distributions problem set</div>
+    <div class="row"><span class="tag practice">Practice</span>
+      <span><a href="#afternoon">Walk through the afternoon problems on this page</a> <span class="note">— answers visible, in-class</span></span></div>
+    <div class="row"><span class="tag assessed">Assessed</span>
+      <span><a href="problem_set_v2.html#afternoon">Assessed v2 &middot; marine &amp; fisheries</a> &nbsp;or&nbsp; <a href="problem_set_v3.html#afternoon">Assessed v3 &middot; terrestrial wildlife &amp; disease</a>
+            <span class="note">— answers NOT shown; choose whichever theme fits your interests</span></span></div>
+    <div class="row"><span class="tag template">Hand-in</span><span>Choose template matching your theme: <a href="afternoon_lab_template_v2.Rmd">afternoon v2 (marine &amp; fisheries).Rmd</a> <span class="note">or</span> <a href="afternoon_lab_template_v3.Rmd">afternoon v3 (terrestrial wildlife &amp; disease).Rmd</a> <span class="note">— knit to HTML and upload to Canvas</span></span></div>
+    <div class="row"><span class="tag lecture">Lecture</span>
+      <span><a href="FW536_Day1_Afternoon%20Distributions%20I.pptx">Afternoon lecture · discrete distributions</a></span></div>
+  </div>
+</div>
+
+  <p style="font-size:13px; color:var(--muted); margin: 18px 0 0 0;">
+    Need help with R Markdown? See the <a href="../rmarkdown_tutorial.html">R Markdown tutorial</a>.
+    Other docs for this day: <a href="plain_language_summary.html">plain-language summary</a> &middot;
+    <a href="answer_key.html">practice answer key</a>.
+  </p>
+</div>
+
+
+
+
+
+<section id="orient">
+<h2>Why we start with probability</h2>
+<p>Every statistical model you will fit this week — t-tests, GLMs, mixed models, MLE, Bayesian models — is, underneath, a <strong>probability statement about how the data were generated</strong>. The model says: "if nature behaves like this, with these unknown parameters, then the observations should look like that." Inference is then about working backward from the observations to the parameters.</p>
+<p>If you understand probability deeply, every model in the rest of the course feels like a natural extension. If you don't, the rest of the week will feel like memorizing R function names. So today is the most important day of the workshop.</p>
+
+<div class="callout key">
+<p>Three habits we want you to start today and use all week:</p>
+<ol>
+<li><strong>Name the random variable.</strong> What is varying? Over what sample space?</li>
+<li><strong>Name the data-generating process.</strong> What story produced the data?</li>
+<li><strong>Name the distribution that matches that story.</strong> Bernoulli? Poisson? Beta-binomial? The story should pick the distribution, not convenience.</li>
+</ol>
+</div>
+</section>
+
+<section id="big-picture">
+<h2>Plain-language overview</h2>
+<div class="callout plain">
+<p><strong>Probability</strong> is the math of "how often would this happen if we ran the world many times." A <strong>random variable</strong> is a number that comes out of one of those runs (e.g., the count of martens detected on a camera, or whether a deer is infected). A <strong>distribution</strong> is the full menu of what that number could be and how often each value would show up.</p>
+<p>This morning we build the math of probability from first principles. This afternoon we meet the four discrete distributions that cover ~80% of count data in wildlife science: <strong>Bernoulli, Binomial, Poisson, Negative Binomial,</strong> plus the <strong>Multinomial</strong> for multi-category data.</p>
+<p>You will leave today able to look at a dataset and say, "the story here is X, so the natural distribution is Y." That sentence is most of statistical modeling.</p>
+</div>
+</section>
+
+<section id="concepts">
+<h2>Core concepts (the conceptual scaffolding)</h2>
+
+<h3>1. Probability axioms (Kolmogorov, in plain English)</h3>
+<ul>
+<li><strong>Non-negativity:</strong> $P(A) \ge 0$ for every event $A$. Probabilities cannot be negative.</li>
+<li><strong>Normalization:</strong> $P(\Omega) = 1$. Something in the sample space happens.</li>
+<li><strong>Additivity:</strong> If $A$ and $B$ are mutually exclusive, $P(A \cup B) = P(A) + P(B)$.</li>
+</ul>
+
+<h3>2. Conditional probability and independence</h3>
+<div class="eq-block">$P(A \mid B) = \dfrac{P(A \cap B)}{P(B)}, \qquad P(A \cap B) = P(A \mid B)\, P(B)$</div>
+<p>Events are <strong>independent</strong> when $P(A \mid B) = P(A)$ — knowing $B$ tells you nothing about $A$. Almost nothing in ecology is fully independent; recognizing that drives the whole rest of the course (mixed models, autocorrelation, beta-binomial...).</p>
+
+<h3>3. Bayes' rule (preview of Day 4–5)</h3>
+<div class="eq-block">$P(A \mid B) = \dfrac{P(B \mid A)\, P(A)}{P(B)}$</div>
+<p>Read it as <em>"reverse a conditional."</em> If you know how often the test is positive given disease, you can flip that around to get the probability of disease given a positive test — once you account for how common the disease is to begin with.</p>
+
+<h3>4. Random variables, PMF, CDF</h3>
+<p>A <strong>random variable</strong> $X$ is a function that assigns a number to each possible outcome. Its <strong>probability mass function</strong> $p(x) = P(X = x)$ tells you the probability of each specific value (discrete case). Its <strong>cumulative distribution function</strong> $F(x) = P(X \le x)$ adds up the probabilities up to and including $x$.</p>
+
+<h3>5. Expected value and variance</h3>
+<div class="eq-block">$E[X] = \sum_x x\, p(x), \quad \mathrm{Var}(X) = E[(X-E[X])^2] = E[X^2] - (E[X])^2$</div>
+<p>Two algebra rules you will use constantly:</p>
+<ul>
+<li>$E[aX + b] = aE[X] + b$</li>
+<li>$\mathrm{Var}(aX + b) = a^2 \mathrm{Var}(X)$ &nbsp;— note the constant disappears, and $a$ is squared.</li>
+</ul>
+
+<h3>6. The discrete distribution decision tree</h3>
+<table>
+<tr><th>Your data look like…</th><th>Use…</th><th>Parameters</th></tr>
+<tr><td>A single yes/no</td><td>Bernoulli</td><td>$p$</td></tr>
+<tr><td>Number of successes in $n$ independent trials, fixed $p$</td><td>Binomial</td><td>$n, p$</td></tr>
+<tr><td>Counts of rare independent events in a unit of time/space</td><td>Poisson</td><td>$\lambda$</td></tr>
+<tr><td>Counts that are over-dispersed (variance > mean)</td><td>Negative Binomial</td><td>$\mu, k$ (or $r, p$)</td></tr>
+<tr><td>Counts across $k$ mutually exclusive categories, fixed $n$ total</td><td>Multinomial</td><td>$n, (p_1, \dots, p_k)$</td></tr>
+</table>
+</section>
+
+<!-- ================================================================== -->
+<div class="practice-banner"><div class="label">Practice — answers visible</div><h3>Morning practice problems</h3><p>The exercises below are walk-through practice. Your graded morning assignment (Probability problem set) uses a separate, novel problem set &mdash; <strong>choose either theme below</strong> and write your answers in the matching theme template (<code>morning_lab_template_v2.Rmd</code> or <code>morning_lab_template_v3.Rmd</code>).</p><p style="margin: 8px 0 0 0;"><a class="hand-in" href="problem_set_v2.html#morning">v2 &middot; marine &amp; fisheries &rarr;</a> &nbsp;or&nbsp; <a class="hand-in" href="problem_set_v3.html#morning">v3 &middot; terrestrial wildlife &amp; disease &rarr;</a> &nbsp;&nbsp; <a class="hand-in" href="morning_lab_template_v2.Rmd" style="background:#1C638A; color:white; border-color:#1C638A;">v2 template &darr;</a> <a class="hand-in" href="morning_lab_template_v3.Rmd" style="background:#1C638A; color:white; border-color:#1C638A;">v3 template &darr;</a></p></div>
+<section id="morning">
+<h2>Morning lab · Probability puzzles</h2>
+<p>Work each problem with pencil and paper first. Then check your numerical answer in R. Each problem comes with a hint, a short worked solution you can reveal, and a <em>"why this matters"</em> note linking the puzzle back to ecology.</p>
+
+<!-- Problem 1 -->
+<div class="exercise" id="ex-1">
+<span class="ex-tag">Exercise 1</span><span class="difficulty easy"> · 10 min · pencil/paper</span>
+<h3>The boy-or-girl paradox</h3>
+<p>A family has two children. Assume independent 50/50 sexes and equal birth-order probabilities.</p>
+<ol type="a">
+<li>You are told at least one child is a girl. What is the probability both are girls?</li>
+<li>You are told the older child is a girl. What is the probability both are girls?</li>
+<li>Why are the answers different? Write one or two sentences in plain English.</li>
+</ol>
+
+<div class="callout bio">This is exactly the structure of <em>"I detected the species on at least one of two camera visits — what is the probability of presence at the site?"</em> The sample space you condition on (which "at least one" event you take seriously) changes the answer.</div>
+
+<details class="answer"><summary>Reveal worked solution</summary><div class="answer-body">
+<p><strong>Sample space:</strong> the four equally likely birth orders are {BB, BG, GB, GG}, each with probability 1/4.</p>
+<p><strong>(a)</strong> "At least one girl" rules out BB. We are left with {BG, GB, GG}, three equally likely outcomes. Only GG is "both girls". So $P(\text{both} \mid \text{at least one girl}) = \tfrac{1}{3}$.</p>
+<p><strong>(b)</strong> "Older child is a girl" rules out BB and GB. We are left with {BG, GG}, two equally likely outcomes. So $P(\text{both} \mid \text{older is girl}) = \tfrac{1}{2}$.</p>
+<p><strong>(c)</strong> Knowing <em>which</em> child is a girl (a more specific piece of information) shrinks the sample space more than just knowing one of them is.</p>
+<p><strong>Check in R:</strong></p>
+<pre><code><span class="cm"># Monte Carlo check</span>
+set.seed(1)
+fams &lt;- matrix(sample(c("B","G"), 2*1e6, replace=TRUE), ncol=2)
+mean(rowSums(fams=="G")==2 &amp; rowSums(fams=="G")&gt;=1) /
+ mean(rowSums(fams=="G")&gt;=1) <span class="cm"># ~ 1/3</span>
+mean(fams[,1]=="G" &amp; fams[,2]=="G") /
+ mean(fams[,1]=="G") <span class="cm"># ~ 1/2</span></code></pre>
+</div></details>
+</div>
+
+<!-- Problem 2 -->
+<div class="exercise" id="ex-2">
+<span class="ex-tag">Exercise 2</span><span class="difficulty medium"> · 15 min · Bayes' rule</span>
+<h3>Taal's taxi (Bayes for camera traps)</h3>
+<p>A city has 1 blue taxi and 99 green taxis (100 total). A witness identifies a hit-and-run taxi as <em>blue</em>. In a controlled vision test, the witness correctly identifies blue taxis 99% of the time and green taxis 95% of the time. Given the witness called it blue, what is the probability the taxi really was blue?</p>
+
+<div class="callout bio">Swap "blue taxi" for "rare cryptic species" and "witness" for "AI-classified camera trap image." Base rates dominate. If the species is rare, even a very accurate classifier produces mostly false positives.</div>
+
+<details class="answer"><summary>Reveal worked solution</summary><div class="answer-body">
+<p>Let $B$ = "taxi is blue", $W_B$ = "witness says blue".</p>
+<ul>
+<li>$P(B) = 0.01$, $P(\bar B) = 0.99$</li>
+<li>$P(W_B \mid B) = 0.99$</li>
+<li>$P(W_B \mid \bar B) = 0.05$ (the 5% misclassification of green)</li>
+</ul>
+<p>Total probability of "says blue":</p>
+<div class="eq">$P(W_B) = 0.99\cdot 0.01 + 0.05\cdot 0.99 = 0.0099 + 0.0495 = 0.0594$</div>
+<p>Bayes:</p>
+<div class="eq">$P(B \mid W_B) = \dfrac{0.99 \cdot 0.01}{0.0594} \approx 0.167$</div>
+<p>So <strong>only ~17%</strong> — even though the witness is "99% reliable" on blue taxis.</p>
+<pre><code>p_B &lt;- 0.01; p_W_B &lt;- 0.99; p_W_notB &lt;- 0.05
+(p_W_B * p_B) / (p_W_B * p_B + p_W_notB * (1 - p_B)) <span class="cm"># 0.1667</span></code></pre>
+</div></details>
+</div>
+
+<!-- Problem 3 -->
+<div class="exercise" id="ex-3">
+<span class="ex-tag">Exercise 3</span><span class="difficulty medium"> · 15 min · expected value</span>
+<h3>Tallest among neighbors</h3>
+<p>$n$ people of distinct heights sit at a round table in random order. What is the expected number of people who are shorter than both of their immediate neighbors?</p>
+
+<div class="callout bio">This same indicator-variable trick gives "expected number of male-male-male triplets in an elk harem", "expected number of nests at the local maximum of a microhabitat gradient", and many other ecological counts.</div>
+
+<details class="answer"><summary>Reveal worked solution</summary><div class="answer-body">
+<p>Let $X_i$ be 1 if person $i$ is shorter than both neighbors, else 0. The total count is $X = \sum X_i$. By linearity of expectation, $E[X] = \sum E[X_i] = n \cdot P(\text{person 1 shorter than both neighbors})$.</p>
+<p>Among any three people, each ordering of their heights is equally likely (1/3! = 1/6 each). Two of the six orderings put the middle person as the minimum (S–M–L and L–M–S do <em>not</em>; we need the middle to be smallest, which happens in the 2 orderings: small–middle, big–middle, big or big–middle, big–middle, small). Actually: for the middle to be smaller than both, we need 2 of 6 orderings. So $P = 2/6 = 1/3$.</p>
+<p>Therefore $E[X] = n/3$.</p>
+<pre><code>n &lt;- 50; reps &lt;- 1e5
+sapply(1:reps, function(i){
+ h &lt;- sample(n) <span class="cm"># distinct heights at table positions</span>
+ sum(h &lt; c(h[n], h[-n]) &amp; h &lt; c(h[-1], h[1]))
+}) |&gt; mean() <span class="cm"># ~ 16.67 = 50/3</span></code></pre>
+</div></details>
+</div>
+
+<!-- Problem 4 -->
+<div class="exercise" id="ex-4">
+<span class="ex-tag">Exercise 4</span><span class="difficulty easy"> · 10 min · Punnett square</span>
+<h3>Cystic fibrosis (addition & multiplication rules)</h3>
+<p>Cystic fibrosis is autosomal recessive. Both parents are heterozygous carriers (Cc). A child is unaffected if at least one C allele is inherited.</p>
+<ol type="a">
+<li>What is the probability that any one child is unaffected? (Use the addition rule on the Punnett square.)</li>
+<li>If they have four children, what is the probability all four are unaffected? (Multiplication rule.)</li>
+</ol>
+
+<details class="answer"><summary>Reveal worked solution</summary><div class="answer-body">
+<p>Punnett: CC : Cc : Cc : cc = 1:1:1:1, each with probability 1/4. <em>Unaffected</em> = CC, Cc, or Cc.</p>
+<p>(a) $P(\text{unaffected}) = 1/4 + 1/4 + 1/4 = 3/4$. (Or just $1 - P(cc) = 1 - 1/4 = 3/4$.)</p>
+<p>(b) Children are independent: $(3/4)^4 = 81/256 \approx 0.316$.</p>
+<pre><code>(3/4)^4 <span class="cm"># 0.3164</span>
+dbinom(0, size=4, prob=1/4) <span class="cm"># same thing</span></code></pre>
+</div></details>
+</div>
+
+</section>
+
+<!-- ================================================================== -->
+<div class="practice-banner"><div class="label">Practice — answers visible</div><h3>Afternoon practice problems</h3><p>The exercises below are walk-through practice. Your graded afternoon assignment (Discrete distributions problem set) uses a separate, novel problem set &mdash; <strong>choose either theme below</strong> and write your answers in the matching theme template (<code>afternoon_lab_template_v2.Rmd</code> or <code>afternoon_lab_template_v3.Rmd</code>).</p><p style="margin: 8px 0 0 0;"><a class="hand-in" href="problem_set_v2.html#afternoon">v2 &middot; marine &amp; fisheries &rarr;</a> &nbsp;or&nbsp; <a class="hand-in" href="problem_set_v3.html#afternoon">v3 &middot; terrestrial wildlife &amp; disease &rarr;</a> &nbsp;&nbsp; <a class="hand-in" href="afternoon_lab_template_v2.Rmd" style="background:#1C638A; color:white; border-color:#1C638A;">v2 template &darr;</a> <a class="hand-in" href="afternoon_lab_template_v3.Rmd" style="background:#1C638A; color:white; border-color:#1C638A;">v3 template &darr;</a></p></div>
+<section id="afternoon">
+<h2>Afternoon lab · Discrete distributions in R</h2>
+
+<div class="callout plain">
+<p>Each of the named distributions below is a <em>story</em> about how data are generated. The afternoon work pairs the story with R code so you start to associate the function name (<code>dpois</code>, <code>dnbinom</code>, <code>dmultinom</code>) with a generative process, not just a formula.</p>
+</div>
+
+<!-- Problem 5 (Poisson vs NB) -->
+<div class="exercise" id="ex-5">
+<span class="ex-tag">Exercise 5</span><span class="difficulty medium"> · 30 min · R · core lab problem</span>
+<h3>Whale transect counts: Poisson vs. Negative Binomial</h3>
+<p>A humpback whale survey expects $\lambda = 10$ whales per transect. We will draw 1000 transects under four models: Poisson($\lambda=10$), and Negative Binomial with mean 10 and dispersion parameter (R's <code>size</code>) $k = 5,\, 1,\, 0.5$. Recall that for NB, $\mathrm{Var}(Y) = \mu + \mu^2/k$, so smaller $k$ = more variance.</p>
+
+<p>For each of the four distributions:</p>
+<ol type="a">
+<li>Draw 1000 values. Compute the empirical mean and variance.</li>
+<li>Plot a histogram and the ECDF.</li>
+<li>Compute $P(Y = 0)$ and $P(Y &gt; 20)$.</li>
+<li>Which model would best describe a sample where most transects have zero whales but a few have huge counts?</li>
+</ol>
+
+<div class="callout bio">In real wildlife counts, animals cluster (schools, herds, family groups, microhabitat preferences). That clustering inflates variance above what Poisson predicts. The Negative Binomial is the "Poisson with a built-in mechanism for clustering" — and recognizing this is one of the most common diagnoses you'll do in this course.</div>
+
+<div class="code-label">Scaffolding code</div>
+<pre><code><span class="kw">library</span>(ggplot2); <span class="kw">library</span>(dplyr); <span class="kw">library</span>(tidyr)
+set.seed(2025)
+
+n &lt;- <span class="nu">1000</span>; lambda &lt;- <span class="nu">10</span>
+sims &lt;- <span class="kw">tibble</span>(
+ pois = <span class="fn">rpois</span>(n, lambda),
+ nb_k5 = <span class="fn">rnbinom</span>(n, mu=lambda, size=<span class="nu">5</span>),
+ nb_k1 = <span class="fn">rnbinom</span>(n, mu=lambda, size=<span class="nu">1</span>),
+ nb_kp5= <span class="fn">rnbinom</span>(n, mu=lambda, size=<span class="nu">0.5</span>)
+)
+
+sims |&gt; <span class="fn">summarise</span>(<span class="fn">across</span>(<span class="fn">everything</span>(), <span class="kw">list</span>(mean=mean, var=var, p0=~mean(.==<span class="nu">0</span>), pgt20=~mean(.&gt;<span class="nu">20</span>))))
+
+sims |&gt; <span class="fn">pivot_longer</span>(<span class="fn">everything</span>()) |&gt;
+ <span class="fn">ggplot</span>(<span class="fn">aes</span>(value, fill=name)) +
+ <span class="fn">geom_histogram</span>(binwidth=<span class="nu">1</span>) + <span class="fn">facet_wrap</span>(~name, scales=<span class="st">"free_y"</span>) +
+ <span class="fn">theme_minimal</span>()</code></pre>
+
+<details class="answer"><summary>Reveal expected output and discussion</summary><div class="answer-body">
+<p>Approximate values (one seed) — yours will be close:</p>
+<table>
+<tr><th>Distribution</th><th>Mean</th><th>Variance</th><th>P(Y=0)</th><th>P(Y&gt;20)</th></tr>
+<tr><td>Pois(10)</td><td>~10.0</td><td>~10.0</td><td>~0.000</td><td>~0.003</td></tr>
+<tr><td>NB(μ=10, k=5)</td><td>~10.0</td><td>~30</td><td>~0.02</td><td>~0.06</td></tr>
+<tr><td>NB(μ=10, k=1)</td><td>~10.0</td><td>~110</td><td>~0.09</td><td>~0.16</td></tr>
+<tr><td>NB(μ=10, k=0.5)</td><td>~10.0</td><td>~210</td><td>~0.18</td><td>~0.21</td></tr>
+</table>
+<p>(d) The dataset described (many zeros, a few huge counts) matches NB with small $k$ — most ecological count data are like this.</p>
+<p><strong>Conceptual takeaway:</strong> the Poisson is a one-parameter distribution and is <em>forced</em> to have variance equal to its mean. Real ecological counts almost never satisfy that. Use the negative binomial unless you have a specific reason not to.</p>
+</div></details>
+</div>
+
+<!-- Problem 6 (Binomial) -->
+<div class="exercise" id="ex-6">
+<span class="ex-tag">Exercise 6</span><span class="difficulty easy"> · 10 min · Binomial</span>
+<h3>Humboldt marten survival</h3>
+<p>Five GPS-collared Humboldt martens each have probability $p = 0.7$ of surviving to the next month, independently.</p>
+<ol type="a">
+<li>What is the probability that exactly $k$ of them survive, for $k = 0, 1, 2, 3, 4, 5$?</li>
+<li>Sketch the resulting bar plot of probabilities.</li>
+<li>What is the name of this distribution?</li>
+</ol>
+
+<details class="answer"><summary>Reveal worked solution</summary><div class="answer-body">
+<pre><code>k &lt;- <span class="nu">0</span>:<span class="nu">5</span>
+probs &lt;- <span class="fn">dbinom</span>(k, size=<span class="nu">5</span>, prob=<span class="nu">0.7</span>)
+<span class="fn">round</span>(probs, <span class="nu">3</span>)
+<span class="cm"># 0.002 0.028 0.132 0.309 0.360 0.168</span>
+<span class="fn">barplot</span>(probs, names.arg=k, ylab=<span class="st">"P(survivors)"</span>)</code></pre>
+<p>This is the <strong>Binomial</strong> distribution, $X \sim \text{Bin}(n=5, p=0.7)$. Note the peak is at $k=4$, which equals $\lfloor (n+1)p \rfloor$.</p>
+</div></details>
+</div>
+
+<!-- Problem 7 (CWD) -->
+<div class="exercise" id="ex-7">
+<span class="ex-tag">Exercise 7</span><span class="difficulty medium"> · 15 min · Binomial + writing the model</span>
+<h3>Chronic wasting disease in mule deer</h3>
+<p>A herd has a true CWD prevalence of $p = 0.12$. You sample $n = 24$ deer independently.</p>
+<ol type="a">
+<li>Write the data-generating model in mathematical notation.</li>
+<li>What is the probability that exactly 3 of the 24 are infected?</li>
+<li>What is the probability that 4 or fewer are infected?</li>
+<li>What is the probability that no infections are detected (and what does that say about surveillance design)?</li>
+</ol>
+
+<details class="answer"><summary>Reveal worked solution</summary><div class="answer-body">
+<p>(a) $Y \sim \text{Bin}(n=24, p=0.12)$.</p>
+<pre><code><span class="fn">dbinom</span>(<span class="nu">3</span>, <span class="nu">24</span>, <span class="nu">0.12</span>) <span class="cm"># P(Y=3) = 0.243</span>
+<span class="fn">pbinom</span>(<span class="nu">4</span>, <span class="nu">24</span>, <span class="nu">0.12</span>) <span class="cm"># P(Y<=4) = 0.872</span>
+<span class="fn">dbinom</span>(<span class="nu">0</span>, <span class="nu">24</span>, <span class="nu">0.12</span>) <span class="cm"># P(Y=0) = 0.048</span></code></pre>
+<p>(d) Even with 12% prevalence, there is roughly a 5% chance of seeing zero cases in $n=24$. Surveillance programs need to think explicitly about the binomial probability of detecting at least one case — this is the basis of "freedom from disease" sample-size calculations.</p>
+</div></details>
+</div>
+
+<!-- Problem 8 Multinomial elk -->
+<div class="exercise" id="ex-8">
+<span class="ex-tag">Exercise 8</span><span class="difficulty medium"> · 20 min · Multinomial</span>
+<h3>Elk age-sex classification</h3>
+<p>In Rocky Mountain National Park, the population mix is roughly: bulls 0.20, cows 0.45, calves 0.25, yearlings 0.10. A classification flight observes $n = 80$ elk and records each one's class.</p>
+<ol type="a">
+<li>What is the probability of observing exactly (18, 38, 18, 6)?</li>
+<li>Simulate 5000 flights and plot the marginal distribution of "calves observed".</li>
+<li>What distribution is each <em>marginal</em> from a multinomial?</li>
+</ol>
+
+<details class="answer"><summary>Reveal worked solution</summary><div class="answer-body">
+<pre><code>p &lt;- <span class="kw">c</span>(<span class="nu">0.20</span>, <span class="nu">0.45</span>, <span class="nu">0.25</span>, <span class="nu">0.10</span>)
+<span class="fn">dmultinom</span>(<span class="kw">c</span>(<span class="nu">18</span>, <span class="nu">38</span>, <span class="nu">18</span>, <span class="nu">6</span>), prob=p) <span class="cm"># ~0.0011</span>
+
+set.seed(1)
+flights &lt;- <span class="fn">rmultinom</span>(<span class="nu">5000</span>, size=<span class="nu">80</span>, prob=p)
+<span class="fn">hist</span>(flights[<span class="nu">3</span>,], main=<span class="st">"Calves out of 80"</span>, xlab=<span class="st">"count"</span>)</code></pre>
+<p>Any single category of a Multinomial is itself <strong>Binomial</strong>: calves ~ Bin(80, 0.25), with mean 20 and variance $80 \cdot 0.25 \cdot 0.75 = 15$.</p>
+</div></details>
+</div>
+
+<!-- Problem 9 Likert -->
+<div class="exercise" id="ex-9">
+<span class="ex-tag">Exercise 9</span><span class="difficulty easy"> · 10 min · Multinomial</span>
+<h3>Likert-scale survey simulation</h3>
+<p>You survey $n=80$ commercial fishers about a new regulation, with prior expected responses: strongly oppose 0.30, oppose 0.20, neutral 0.15, support 0.20, strongly support 0.15.</p>
+<ol type="a">
+<li>Simulate one survey.</li>
+<li>Repeat 500 times and look at the variability of "strongly support."</li>
+</ol>
+
+<details class="answer"><summary>Reveal worked solution</summary><div class="answer-body">
+<pre><code>p &lt;- <span class="kw">c</span>(.30, .20, .15, .20, .15)
+<span class="fn">rmultinom</span>(<span class="nu">1</span>, <span class="nu">80</span>, p)
+sims &lt;- <span class="fn">rmultinom</span>(<span class="nu">500</span>, <span class="nu">80</span>, p)
+<span class="fn">summary</span>(sims[<span class="nu">5</span>,])</code></pre>
+<p>The marginal "strongly support" is Bin(80, 0.15). The sample-to-sample range is large compared to the point estimate — useful for thinking about how informative a single survey actually is.</p>
+</div></details>
+</div>
+
+<!-- Problem 10 CF generalized -->
+<div class="exercise" id="ex-10">
+<span class="ex-tag">Exercise 10</span><span class="difficulty medium"> · 15 min · Binomial generalization</span>
+<h3>Cystic fibrosis generalized (back to Punnett, with R)</h3>
+<p>Two Cc parents will have $n$ children. Affected = cc.</p>
+<ol type="a">
+<li>Write the data-generating model.</li>
+<li>What is the probability that <em>at least one</em> child of $n=5$ is affected?</li>
+<li>For what number of children does that probability cross 50%?</li>
+</ol>
+
+<details class="answer"><summary>Reveal worked solution</summary><div class="answer-body">
+<p>(a) $K \sim \text{Bin}(n, 0.25)$.</p>
+<pre><code><span class="nu">1</span> - <span class="fn">dbinom</span>(<span class="nu">0</span>, <span class="nu">5</span>, <span class="nu">0.25</span>) <span class="cm"># 0.7627</span>
+<span class="cm"># smallest n with P(>=1) >= 0.5</span>
+which(<span class="nu">1</span> - <span class="fn">dbinom</span>(<span class="nu">0</span>, <span class="nu">1</span>:<span class="nu">10</span>, <span class="nu">0.25</span>) &gt;= <span class="nu">0.5</span>)[<span class="nu">1</span>] <span class="cm"># 3</span></code></pre>
+<p>With probability of being affected = 0.25 per child, you only need <strong>3 children</strong> for the chance of seeing at least one affected to exceed 50% — illustrates how <em>P(at least one)</em> grows quickly under independence.</p>
+</div></details>
+</div>
+
+</section>
+
+<!-- ================================================================== -->
+<section id="challenge">
+<h2>Stretch problems (optional)</h2>
+
+<div class="exercise" id="ex-11">
+<span class="ex-tag">Stretch 11</span><span class="difficulty hard"> · 25 min · expected value + variance</span>
+<h3>Connecting Bernoulli and Binomial via expectation algebra</h3>
+<p>Let $Y_1, \dots, Y_n$ be independent Bernoulli($p$). Let $X = \sum_{i=1}^n Y_i$. Using only $E[Y_i] = p$, $\mathrm{Var}(Y_i) = p(1-p)$, and the linearity rules, prove:</p>
+<ol type="a">
+<li>$E[X] = np$.</li>
+<li>$\mathrm{Var}(X) = np(1-p)$.</li>
+<li>Why does <em>independence</em> matter for (b) but not (a)?</li>
+</ol>
+<details class="answer"><summary>Reveal solution</summary><div class="answer-body">
+<p>(a) $E[X] = E[\sum Y_i] = \sum E[Y_i] = np$. Linearity of expectation holds <em>even without independence</em>.</p>
+<p>(b) $\mathrm{Var}(X) = \mathrm{Var}(\sum Y_i)$. Under independence, variances add: $= \sum \mathrm{Var}(Y_i) = np(1-p)$.</p>
+<p>(c) If the $Y_i$ were correlated, you would pick up covariance terms: $\mathrm{Var}(\sum Y_i) = \sum \mathrm{Var}(Y_i) + 2\sum_{i&lt;j}\mathrm{Cov}(Y_i,Y_j)$. Positive correlation (the rule in ecology — birds in flocks, deer in herds) <em>inflates</em> the variance — this is exactly why over-dispersed count distributions exist.</p>
+</div></details>
+</div>
+
+<div class="exercise" id="ex-12">
+<span class="ex-tag">Stretch 12</span><span class="difficulty hard"> · 25 min · Poisson</span>
+<h3>Poisson as a limit of the Binomial</h3>
+<p>Show that if $X \sim \text{Bin}(n, p)$ with $n \to \infty$ and $p \to 0$ in such a way that $np \to \lambda$, then $P(X = k) \to e^{-\lambda} \lambda^k / k!$.</p>
+<p>Then use simulation to demonstrate this with $\lambda = 4$: draw 10,000 values from each of Bin(20, 0.2), Bin(100, 0.04), Bin(1000, 0.004), and Pois(4). Compare histograms and means/variances.</p>
+
+<details class="answer"><summary>Reveal sketch</summary><div class="answer-body">
+<p><strong>Math.</strong> Write $P(X=k) = \binom{n}{k} p^k (1-p)^{n-k}$. Substitute $p = \lambda/n$. The combinatorial part $\binom{n}{k}/n^k \to 1/k!$, the $(1-\lambda/n)^{n-k} \to e^{-\lambda}$, and $\lambda^k$ comes from $(np)^k$. Combining gives the Poisson pmf.</p>
+<p><strong>Conceptual takeaway.</strong> Poisson is the natural distribution for many independent <em>rare</em> events occurring in a fixed window of time/space, whose rate aggregates to $\lambda$. Whale sightings per transect, salmon redds per km, parasites per host (if independent) — all natural Poisson stories.</p>
+<pre><code><span class="kw">for</span>(<span class="kw">params</span> <span class="kw">in</span> <span class="kw">list</span>(<span class="kw">c</span>(<span class="nu">20</span>,<span class="nu">0.2</span>), <span class="kw">c</span>(<span class="nu">100</span>,<span class="nu">0.04</span>), <span class="kw">c</span>(<span class="nu">1000</span>,<span class="nu">0.004</span>))) {
+ x &lt;- <span class="fn">rbinom</span>(<span class="nu">1e4</span>, params[<span class="nu">1</span>], params[<span class="nu">2</span>])
+ <span class="fn">cat</span>(<span class="st">"n="</span>, params[<span class="nu">1</span>], <span class="st">" mean="</span>, mean(x), <span class="st">" var="</span>, var(x), <span class="st">"\n"</span>)
+}
+y &lt;- <span class="fn">rpois</span>(<span class="nu">1e4</span>, <span class="nu">4</span>); <span class="fn">cat</span>(<span class="st">"Pois mean="</span>, mean(y), <span class="st">" var="</span>, var(y))</code></pre>
+</div></details>
+</div>
+
+<div class="exercise" id="ex-13">
+<span class="ex-tag">Stretch 13</span><span class="difficulty hard"> · 25 min · conditional probability + simulation</span>
+<h3>The Monty Hall problem (for camera-trap analogy)</h3>
+<p>Three trail cameras: a marten was photographed by exactly one of them, with equal prior probability (1/3 each). You guess Camera A. The technician (who knows which camera holds the marten) opens Camera C, which shows nothing. Should you switch to Camera B?</p>
+<ol type="a">
+<li>Reason out the answer using conditional probability.</li>
+<li>Simulate 100,000 trials to verify.</li>
+</ol>
+
+<details class="answer"><summary>Reveal solution</summary><div class="answer-body">
+<p><strong>Switch.</strong> The unconditional probability your initial guess (A) was right is 1/3. The technician's reveal of C does not change the probability your initial guess was right — but it does collapse the remaining 2/3 probability mass onto B. So P(B has the marten | reveal C) = 2/3.</p>
+<pre><code>set.seed(1)
+trials &lt;- <span class="nu">1e5</span>
+truth &lt;- <span class="fn">sample</span>(<span class="nu">1</span>:<span class="nu">3</span>, trials, replace=TRUE)
+guess &lt;- <span class="nu">1</span> <span class="cm"># always pick A</span>
+mean(truth != guess) <span class="cm"># switching wins ~ 2/3</span></code></pre>
+</div></details>
+</div>
+
+</section>
+
+<section id="cheatsheet">
+<h2>R cheat sheet (distribution functions)</h2>
+<table>
+<tr><th>Distribution</th><th>Density / PMF</th><th>CDF</th><th>Quantile</th><th>Random draw</th></tr>
+<tr><td>Bernoulli/Binomial</td><td><code>dbinom</code></td><td><code>pbinom</code></td><td><code>qbinom</code></td><td><code>rbinom</code></td></tr>
+<tr><td>Poisson</td><td><code>dpois</code></td><td><code>ppois</code></td><td><code>qpois</code></td><td><code>rpois</code></td></tr>
+<tr><td>Negative Binomial</td><td><code>dnbinom</code></td><td><code>pnbinom</code></td><td><code>qnbinom</code></td><td><code>rnbinom</code></td></tr>
+<tr><td>Geometric</td><td><code>dgeom</code></td><td><code>pgeom</code></td><td><code>qgeom</code></td><td><code>rgeom</code></td></tr>
+<tr><td>Multinomial</td><td><code>dmultinom</code></td><td>—</td><td>—</td><td><code>rmultinom</code></td></tr>
+</table>
+
+<div class="callout warn">
+<p><strong>Two common parameterization gotchas:</strong></p>
+<ul>
+<li><code>rnbinom(n, mu=, size=)</code> uses the ecological "mean-and-dispersion" form: variance is $\mu + \mu^2/\text{size}$. Smaller <code>size</code> → more clumping.</li>
+<li><code>rbinom(n, size, prob)</code> takes <em>size = number of trials</em>, but JAGS/Nimble write <code>dbinom(prob, size)</code>. Always check argument order when switching between R, JAGS, and Nimble — this single mismatch causes more bugs than any other.</li>
+</ul>
+</div>
+
+</section>
+
+<div style="margin-top:50px; display:flex; gap:12px;">
+ <button id="reveal-all" style="background:var(--accent); color:white; border:none; padding:10px 20px; border-radius:4px; cursor:pointer; font-family:'Helvetica Neue',Arial,sans-serif; font-size:14px;">Reveal all answers</button>
+ <button id="hide-all" style="background:var(--osu-stone); color:white; border:none; padding:10px 20px; border-radius:4px; cursor:pointer; font-family:'Helvetica Neue',Arial,sans-serif; font-size:14px;">Hide all answers</button>
+ <a href="answer_key.html" style="background:var(--osu-orange); color:white; padding:10px 20px; border-radius:4px; text-decoration:none; font-family:'Helvetica Neue',Arial,sans-serif; font-size:14px;">Open full answer key →</a>
+</div>
+
+</main>
+</div>
+
+<footer>
+ FW 536 · Statistical Modeling for Ecology and Conservation · Oregon State University
+</footer>
+</body>
+</html>

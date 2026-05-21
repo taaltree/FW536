@@ -1,0 +1,19 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+
+# Office / temp lock files
+~$*
+*.tmp
+
+# R
+.Rhistory
+.RData
+.Rproj.user/
+.Ruserdata
+
+# Editor cruft
+*.swp
+*~

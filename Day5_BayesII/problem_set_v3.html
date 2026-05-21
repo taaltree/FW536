@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Day 5 · Problem Set v3 — Anadromous Fish &amp; Freshwater | FW 536 · Student copy (no answers)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../_Shared/css/lab.css" />
+<script defer src="../_Shared/js/lab.js"></script>
+<script>MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] } };</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+</head>
+<body>
+<div class="shell">
+
+<aside class="sidebar">
+ <h1><a href="../index.html" title="Back to course home">FW 536 · Day 5</a></h1>
+ <div class="subtitle">Problem Set v3 — Anadromous Fish</div>
+ <nav>
+ <ul>
+ <li><a href="#p1">1. Steelhead redd counts</a></li>
+ <li><a href="#p2">2. Salmon spawner-recruit + Smsy</a></li>
+ <li><a href="#p3">3. Sockeye stock prior sensitivity</a></li>
+ <li><a href="#p4">4. Bull trout occupancy (logistic + RE)</a></li>
+ <li><a href="#p5">5. Chinook smolt N-mixture</a></li>
+ <li><a href="#p6">6. Dynamic occupancy: coho recolonization</a></li>
+ <li><a href="#p7">7. Hierarchical CJS survival</a></li>
+ <li><a href="#p8">8. Egg-to-fry survival, derived $\phi$</a></li>
+ <li><a href="#p9">9. Bayesian p-value on redd model</a></li>
+ <li><a href="#p10">10. Population viability derived quantities</a></li>
+ </ul>
+ <div class="section">Day 5 docs</div>
+ <ul>
+ <li><a href="lab.html">Main lab</a></li>
+ <li><a class="featured" href="plain_language_summary.html">Plain-language summary</a></li>
+ <li><a href="answer_key.html">Answer key</a></li>
+ <li><a href="problem_set_v2.html">Problem set v2 (carnivores)</a></li>
+ </ul>
+ </nav>
+</aside>
+
+<main class="content">
+<header class="lab-header">
+ <div class="eyebrow">Day 5 · Problem Set v3</div>
+ <h1>Anadromous fish &amp; freshwater ecology — steelhead, sockeye, bull trout, salmon redds</h1>
+ <p class="lede">Ten Bayesian problems in <span class="pill nimble">NIMBLE</span> applied to fish: spawner-recruit, redd-based abundance, dynamic occupancy, hierarchical survival, derived viability quantities. Reveal the answers as you go.</p>
+</header>
+
+<section class="callout warn" style="margin-top:24px;"><p><strong>Assessed problem set (v3) &middot; anadromous fish &amp; freshwater theme.</strong> Answers are <em>not</em> shown here. Write your work in the template tailored to this version: <a href="morning_lab_template_v3.Rmd"><code>morning_lab_template_v3.Rmd</code></a>. Knit to HTML, then upload to the Canvas assignment.</p><p><strong>Pick whichever theme fits your interests.</strong> The companion version is <a href="problem_set_v2.html">v2 &middot; forest carnivore</a> &mdash; they cover the same statistical concepts with different ecological scenarios.</p><p>For worked-example study with visible answers, see <a href="lab.html">the practice problem set</a>.</p></section>
+
+
+<section>
+<div class="callout plain">
+<p>Salmonid management is essentially a series of derived-quantity questions: how many spawners produce maximum sustained yield, how likely is the population to fall below 100 spawners in 20 years, what is the recovery time for a recolonising tributary. Bayesian models with latent biological states and explicit derived quantities map onto these decisions far better than point-estimate frequentist fits.</p>
+</div>
+</section>
+
+<!-- Problem 1 -->
+<a id="morning"></a>
+<div class="exercise" id="p1">
+<span class="ex-tag">Problem 1</span><span class="difficulty easy"> · 20 min · hierarchical Poisson</span>
+<h3>Steelhead redd counts across 15 tributaries</h3>
+<p>Total redds counted per tributary in a single survey year are modeled as:</p>
+<div class="eq-block">$y_j \sim \text{Poisson}(L_j \cdot \rho_j), \quad \log \rho_j \sim \mathcal{N}(\mu, \sigma^2)$</div>
+<p>where $L_j$ = surveyed stream length (km) and $\rho_j$ = redds per km in tributary $j$. Fit in <span class="pill nimble">NIMBLE</span>.</p>
+
+<div class="callout try" style="margin-top: 12px;"><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
+</div>
+
+<!-- Problem 2 -->
+<div class="exercise" id="p2">
+<span class="ex-tag">Problem 2</span><span class="difficulty medium"> · 30 min · Beverton-Holt + derived Smsy</span>
+<h3>Sockeye spawner-recruit, harvest at 95% confidence</h3>
+<p>You have 25 years of $(S_t, R_t)$ for a Bristol Bay sockeye stock. Fit Beverton-Holt and report $S_\text{msy}$, $H_\text{msy}$ posteriors. Then compute the 5th percentile harvest rate (the "precautionary" $H_\text{msy}$).</p>
+
+<div class="callout try" style="margin-top: 12px;"><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
+</div>
+
+<!-- Problem 3 -->
+<div class="exercise" id="p3">
+<span class="ex-tag">Problem 3</span><span class="difficulty medium"> · 25 min · prior sensitivity</span>
+<h3>Sockeye $a$ prior: does it change Smsy?</h3>
+<p>Re-fit Problem 2 with two different priors on $a$:</p>
+<ol type="a">
+ <li>Vague: $a \sim \text{Uniform}(1, 15)$ (the default)</li>
+ <li>Informative: $a \sim \text{Lognormal}(\log 4, 0.3)$ (centered on 4, tight)</li>
+</ol>
+<p>Compare posterior of $H_\text{msy}$. Comment on when the informative prior would and wouldn't be defensible.</p>
+
+<div class="callout try" style="margin-top: 12px;"><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
+</div>
+
+<!-- Problem 4 -->
+<div class="exercise" id="p4">
+<span class="ex-tag">Problem 4</span><span class="difficulty medium"> · 30 min · hierarchical logistic</span>
+<h3>Bull trout occupancy across 8 basins</h3>
+<p>320 stream reaches in 8 basins, presence/absence data plus temperature (scaled). Model:</p>
+<div class="eq-block">$\text{logit}\,p_i = \alpha_{j[i]} + \beta \cdot \text{temp}_i, \quad \alpha_j \sim \mathcal{N}(\mu_\alpha, \sigma_\alpha^2)$</div>
+<p>Bull trout are temperature-limited; the slope $\beta$ should be negative.</p>
+
+<div class="callout try" style="margin-top: 12px;"><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
+</div>
+
+<!-- Problem 5 -->
+<div class="exercise" id="p5">
+<span class="ex-tag">Problem 5</span><span class="difficulty medium"> · 30 min · N-mixture</span>
+<h3>Chinook smolt counts at screw traps</h3>
+<p>15 screw-trap sites, each operated nightly for 7 nights. Each night's count $y[i,j]$ is a binomial draw from latent nightly abundance $N_i$ (assumed constant within the week) with capture probability $p$.</p>
+
+<div class="callout try" style="margin-top: 12px;"><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
+</div>
+
+<!-- Problem 6 -->
+<div class="exercise" id="p6">
+<span class="ex-tag">Problem 6</span><span class="difficulty hard"> · 40 min · dynamic occupancy</span>
+<h3>Coho salmon recolonization after dam removal</h3>
+<p>45 reaches above a removed dam, surveyed for 5 years post-removal (3 replicate snorkels per year). You expect colonization $\gamma_t$ to rise as fish access new habitat. Persistence $\phi$ is high (coho return reliably once established).</p>
+
+<div class="callout try" style="margin-top: 12px;"><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
+</div>
+
+<!-- Problem 7 -->
+<div class="exercise" id="p7">
+<span class="ex-tag">Problem 7</span><span class="difficulty hard"> · 40 min · hierarchical CJS</span>
+<h3>PIT-tag survival of steelhead smolts across years</h3>
+<p>10 release years; in each year, 500 smolts are tagged and survival to adult return is observed. Tag-recovery data summarised as $r_y / R_y$ (recoveries over releases). Fit a binomial model with annual random effects on survival:</p>
+<div class="eq-block">$r_y \sim \text{Binomial}(R_y, \phi_y), \quad \text{logit}\,\phi_y \sim \mathcal{N}(\mu, \sigma^2)$</div>
+
+<div class="callout try" style="margin-top: 12px;"><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
+</div>
+
+<!-- Problem 8 -->
+<div class="exercise" id="p8">
+<span class="ex-tag">Problem 8</span><span class="difficulty medium"> · 25 min · derived quantity</span>
+<h3>Egg-to-fry survival from staged binomial</h3>
+<p>You released 5,000 eggs in each of 20 redds; in fall, you sampled emergence traps and observed $f_j$ fry per redd. Survival per egg is the latent quantity; model fry as binomial with hierarchical survival.</p>
+<div class="eq-block">$f_j \sim \text{Binomial}(5000, s_j), \quad \text{logit}\,s_j \sim \mathcal{N}(\mu, \sigma^2)$</div>
+<p>Derive the posterior of mean egg-to-fry survival $\bar s = \text{ilogit}(\mu)$.</p>
+
+<div class="callout try" style="margin-top: 12px;"><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
+</div>
+
+<!-- Problem 9 -->
+<div class="exercise" id="p9">
+<span class="ex-tag">Problem 9</span><span class="difficulty hard"> · 35 min · Bayesian p-value</span>
+<h3>Does the basic redd Poisson fit?</h3>
+<p>Take Problem 1's redd model and add posterior-predictive Bayesian p-value checks. Compare $T(y) = \text{var}(y)/\text{mean}(y)$ between data and posterior replicates &mdash; if the data are overdispersed, this ratio will exceed 1 (Poisson predicts 1).</p>
+
+<div class="callout try" style="margin-top: 12px;"><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
+</div>
+
+<!-- Problem 10 -->
+<div class="exercise" id="p10">
+<span class="ex-tag">Problem 10</span><span class="difficulty hard"> · 45 min · viability derived quantity</span>
+<h3>Probability of quasi-extinction in 20 years</h3>
+<p>Combining the spawner-recruit fit from Problem 2 and the hierarchical SAR fit from Problem 7, propagate posterior uncertainty through a 20-year forward population projection. Report $P(N_{t=20} &lt; 100)$ assuming current spawners $S_0 = 500$.</p>
+
+<div class="callout try" style="margin-top: 12px;"><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
+</div>
+
+</main>
+</div>
+<footer>FW 536 · Statistical Modeling for Ecology and Conservation · Oregon State University</footer>
+</body>
+</html>

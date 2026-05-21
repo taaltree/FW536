@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Day 5 · Problem Set v3 — Anadromous Fish &amp; Freshwater | FW 536 · INSTRUCTOR ANSWER KEY</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../_Shared/css/lab.css" />
+<script defer src="../_Shared/js/lab.js"></script>
+<script>MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] } };</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+</head>
+<body>
+<div class="shell">
+
+<aside class="sidebar">
+ <h1><a href="../index.html" title="Back to course home">FW 536 · Day 5</a></h1>
+ <div class="subtitle">Problem Set v3 — Anadromous Fish</div>
+ <nav>
+ <ul>
+ <li><a href="#p1">1. Steelhead redd counts</a></li>
+ <li><a href="#p2">2. Salmon spawner-recruit + Smsy</a></li>
+ <li><a href="#p3">3. Sockeye stock prior sensitivity</a></li>
+ <li><a href="#p4">4. Bull trout occupancy (logistic + RE)</a></li>
+ <li><a href="#p5">5. Chinook smolt N-mixture</a></li>
+ <li><a href="#p6">6. Dynamic occupancy: coho recolonization</a></li>
+ <li><a href="#p7">7. Hierarchical CJS survival</a></li>
+ <li><a href="#p8">8. Egg-to-fry survival, derived $\phi$</a></li>
+ <li><a href="#p9">9. Bayesian p-value on redd model</a></li>
+ <li><a href="#p10">10. Population viability derived quantities</a></li>
+ </ul>
+ <div class="section">Day 5 docs</div>
+ <ul>
+ <li><a href="lab.html">Main lab</a></li>
+ <li><a class="featured" href="plain_language_summary.html">Plain-language summary</a></li>
+ <li><a href="answer_key.html">Answer key</a></li>
+ <li><a href="problem_set_v2.html">Problem set v2 (carnivores)</a></li>
+ </ul>
+ </nav>
+</aside>
+
+<main class="content">
+<header class="lab-header">
+ <div class="eyebrow">Day 5 · Problem Set v3</div>
+ <h1>Anadromous fish &amp; freshwater ecology — steelhead, sockeye, bull trout, salmon redds</h1>
+ <p class="lede">Ten Bayesian problems in <span class="pill nimble">NIMBLE</span> applied to fish: spawner-recruit, redd-based abundance, dynamic occupancy, hierarchical survival, derived viability quantities. Reveal the answers as you go.</p>
+</header>
+
+<section>
+<div class="callout plain">
+<p>Salmonid management is essentially a series of derived-quantity questions: how many spawners produce maximum sustained yield, how likely is the population to fall below 100 spawners in 20 years, what is the recovery time for a recolonising tributary. Bayesian models with latent biological states and explicit derived quantities map onto these decisions far better than point-estimate frequentist fits.</p>
+</div>
+</section>
+
+<!-- Problem 1 -->
+<div class="exercise" id="p1">
+<span class="ex-tag">Problem 1</span><span class="difficulty easy"> · 20 min · hierarchical Poisson</span>
+<h3>Steelhead redd counts across 15 tributaries</h3>
+<p>Total redds counted per tributary in a single survey year are modeled as:</p>
+<div class="eq-block">$y_j \sim \text{Poisson}(L_j \cdot \rho_j), \quad \log \rho_j \sim \mathcal{N}(\mu, \sigma^2)$</div>
+<p>where $L_j$ = surveyed stream length (km) and $\rho_j$ = redds per km in tributary $j$. Fit in <span class="pill nimble">NIMBLE</span>.</p>
+
+<details class="answer" open><summary>Reveal solution and code</summary><div class="answer-body">
+<pre><code><span class="kw">library</span>(nimble); <span class="kw">library</span>(MCMCvis); <span class="kw">library</span>(coda)
+set.seed(<span class="nu">11</span>)
+nT &lt;- <span class="nu">15</span>
+L &lt;- <span class="fn">runif</span>(nT, <span class="nu">2</span>, <span class="nu">20</span>)
+mu.t &lt;- <span class="fn">log</span>(<span class="nu">3</span>); sd.t &lt;- <span class="nu">0.6</span>
+log.rho &lt;- <span class="fn">rnorm</span>(nT, mu.t, sd.t)
+y &lt;- <span class="fn">rpois</span>(nT, L * <span class="fn">exp</span>(log.rho))
+
+reddCode &lt;- <span class="fn">nimbleCode</span>({
+ <span class="kw">for</span> (j <span class="kw">in</span> <span class="nu">1</span>:nT) {
+ log.rho[j] ~ <span class="fn">dnorm</span>(mu, tau)
+ y[j] ~ <span class="fn">dpois</span>(L[j] * <span class="fn">exp</span>(log.rho[j]))
+ }
+ mu ~ <span class="fn">dnorm</span>(<span class="nu">0</span>, <span class="nu">1</span>/<span class="nu">4</span>)
+ sigma ~ <span class="fn">dunif</span>(<span class="nu">0</span>, <span class="nu">5</span>); tau &lt;- <span class="nu">1</span>/sigma^<span class="nu">2</span>
+})
+inits &lt;- <span class="fn">rep</span>(<span class="fn">list</span>(<span class="fn">list</span>(mu=<span class="nu">1</span>, sigma=<span class="nu">0.5</span>, log.rho=<span class="fn">rep</span>(<span class="nu">1</span>, nT))), <span class="nu">3</span>)
+samp &lt;- <span class="fn">nimbleMCMC</span>(reddCode, constants=<span class="fn">list</span>(nT=nT, L=L), data=<span class="fn">list</span>(y=y),
+ inits=inits,
+ monitors=<span class="fn">c</span>(<span class="st">"mu"</span>,<span class="st">"sigma"</span>,<span class="st">"log.rho"</span>),
+ nchains=<span class="nu">3</span>, niter=<span class="nu">10000</span>, nburnin=<span class="nu">1000</span>,
+ samplesAsCodaMCMC=<span class="kw">TRUE</span>)
+<span class="fn">MCMCsummary</span>(samp, params=<span class="fn">c</span>(<span class="st">"mu"</span>,<span class="st">"sigma"</span>), round=<span class="nu">3</span>)</code></pre>
+<p><strong>Interpretation.</strong> Population-level mean log-density $\mu$ and between-tributary SD $\sigma$ are recovered. Tributary-specific $\rho_j$ are pulled toward $\exp(\mu)$ for low-survey-length tributaries (the offset structure means short surveys have little information). This is the classic offset-Poisson hierarchical model used in CTUIR, ODFW, and WDFW redd reporting.</p>
+</div></details>
+</div>
+
+<!-- Problem 2 -->
+<div class="exercise" id="p2">
+<span class="ex-tag">Problem 2</span><span class="difficulty medium"> · 30 min · Beverton-Holt + derived Smsy</span>
+<h3>Sockeye spawner-recruit, harvest at 95% confidence</h3>
+<p>You have 25 years of $(S_t, R_t)$ for a Bristol Bay sockeye stock. Fit Beverton-Holt and report $S_\text{msy}$, $H_\text{msy}$ posteriors. Then compute the 5th percentile harvest rate (the "precautionary" $H_\text{msy}$).</p>
+
+<details class="answer" open><summary>Reveal solution and code</summary><div class="answer-body">
+<pre><code>set.seed(<span class="nu">12</span>)
+Nyr &lt;- <span class="nu">25</span>; a.t &lt;- <span class="nu">4</span>; b.t &lt;- <span class="nu">8000</span>; sig.t &lt;- <span class="nu">0.3</span>
+S &lt;- <span class="fn">rlnorm</span>(Nyr, <span class="nu">8</span>, <span class="nu">0.6</span>)
+R &lt;- <span class="fn">numeric</span>(Nyr)
+<span class="kw">for</span> (t <span class="kw">in</span> <span class="nu">1</span>:Nyr) R[t] &lt;- (a.t*S[t])/(<span class="nu">1</span>+a.t/b.t*S[t]) * <span class="fn">exp</span>(<span class="fn">rnorm</span>(<span class="nu">1</span>,<span class="nu">0</span>,sig.t))
+
+bhCode &lt;- <span class="fn">nimbleCode</span>({
+ <span class="kw">for</span> (t <span class="kw">in</span> <span class="nu">1</span>:Nyr) {
+ log.mu[t] &lt;- <span class="fn">log</span>(a) + <span class="fn">log</span>(S[t]) - <span class="fn">log</span>(<span class="nu">1</span> + (a/b)*S[t])
+ log.R[t] ~ <span class="fn">dnorm</span>(log.mu[t], tau)
+ }
+ a ~ <span class="fn">dunif</span>(<span class="nu">1</span>, <span class="nu">15</span>); b ~ <span class="fn">dunif</span>(<span class="nu">1000</span>, <span class="nu">20000</span>)
+ sigma ~ <span class="fn">dunif</span>(<span class="nu">0</span>,<span class="nu">2</span>); tau &lt;- <span class="nu">1</span>/sigma^<span class="nu">2</span>
+ Smsy &lt;- b*<span class="fn">sqrt</span>(<span class="nu">1</span>/a) - b/a
+ Hmsy &lt;- <span class="nu">1</span> - <span class="fn">sqrt</span>(<span class="nu">1</span>/a)
+})
+inits &lt;- <span class="fn">rep</span>(<span class="fn">list</span>(<span class="fn">list</span>(a=<span class="nu">3</span>, b=<span class="nu">8000</span>, sigma=<span class="nu">0.3</span>)), <span class="nu">3</span>)
+samp &lt;- <span class="fn">nimbleMCMC</span>(bhCode, constants=<span class="fn">list</span>(Nyr=Nyr, S=S),
+ data=<span class="fn">list</span>(log.R=<span class="fn">log</span>(R)), inits=inits,
+ monitors=<span class="fn">c</span>(<span class="st">"a"</span>,<span class="st">"b"</span>,<span class="st">"sigma"</span>,<span class="st">"Smsy"</span>,<span class="st">"Hmsy"</span>),
+ nchains=<span class="nu">3</span>, niter=<span class="nu">20000</span>, nburnin=<span class="nu">2000</span>,
+ samplesAsCodaMCMC=<span class="kw">TRUE</span>)
+<span class="fn">MCMCsummary</span>(samp, round=<span class="nu">3</span>)
+post &lt;- <span class="fn">as.matrix</span>(samp)
+<span class="fn">quantile</span>(post[, <span class="st">"Hmsy"</span>], <span class="fn">c</span>(<span class="nu">0.05</span>, <span class="nu">0.5</span>, <span class="nu">0.95</span>))</code></pre>
+<p><strong>Interpretation.</strong> The "5th-percentile $H_\text{msy}$" is the harvest rate you'd allow if you wanted only a 5% chance of overfishing. With $a_\text{true}=4$, the posterior median should be about 0.5; the 5th percentile around 0.4. Managers in Alaska use this exact computation for forecasting season targets.</p>
+</div></details>
+</div>
+
+<!-- Problem 3 -->
+<div class="exercise" id="p3">
+<span class="ex-tag">Problem 3</span><span class="difficulty medium"> · 25 min · prior sensitivity</span>
+<h3>Sockeye $a$ prior: does it change Smsy?</h3>
+<p>Re-fit Problem 2 with two different priors on $a$:</p>
+<ol type="a">
+ <li>Vague: $a \sim \text{Uniform}(1, 15)$ (the default)</li>
+ <li>Informative: $a \sim \text{Lognormal}(\log 4, 0.3)$ (centered on 4, tight)</li>
+</ol>
+<p>Compare posterior of $H_\text{msy}$. Comment on when the informative prior would and wouldn't be defensible.</p>
+
+<details class="answer" open><summary>Reveal solution and code</summary><div class="answer-body">
+<pre><code>bhCode2 &lt;- <span class="fn">nimbleCode</span>({
+ <span class="kw">for</span> (t <span class="kw">in</span> <span class="nu">1</span>:Nyr) {
+ log.mu[t] &lt;- <span class="fn">log</span>(a) + <span class="fn">log</span>(S[t]) - <span class="fn">log</span>(<span class="nu">1</span> + (a/b)*S[t])
+ log.R[t] ~ <span class="fn">dnorm</span>(log.mu[t], tau)
+ }
+ a ~ <span class="fn">dlnorm</span>(<span class="fn">log</span>(<span class="nu">4</span>), <span class="nu">1</span>/<span class="nu">0.09</span>) <span class="cm"># tighter: lognormal(log(4), 0.3)</span>
+ b ~ <span class="fn">dunif</span>(<span class="nu">1000</span>, <span class="nu">20000</span>)
+ sigma ~ <span class="fn">dunif</span>(<span class="nu">0</span>,<span class="nu">2</span>); tau &lt;- <span class="nu">1</span>/sigma^<span class="nu">2</span>
+ Smsy &lt;- b*<span class="fn">sqrt</span>(<span class="nu">1</span>/a) - b/a
+ Hmsy &lt;- <span class="nu">1</span> - <span class="fn">sqrt</span>(<span class="nu">1</span>/a)
+})
+samp2 &lt;- <span class="fn">nimbleMCMC</span>(bhCode2, constants=<span class="fn">list</span>(Nyr=Nyr, S=S),
+ data=<span class="fn">list</span>(log.R=<span class="fn">log</span>(R)), inits=inits,
+ monitors=<span class="fn">c</span>(<span class="st">"a"</span>,<span class="st">"b"</span>,<span class="st">"Hmsy"</span>),
+ nchains=<span class="nu">3</span>, niter=<span class="nu">20000</span>, nburnin=<span class="nu">2000</span>,
+ samplesAsCodaMCMC=<span class="kw">TRUE</span>)
+<span class="fn">summary</span>(<span class="fn">as.matrix</span>(samp)[, <span class="st">"Hmsy"</span>])
+<span class="fn">summary</span>(<span class="fn">as.matrix</span>(samp2)[, <span class="st">"Hmsy"</span>])</code></pre>
+<p><strong>Interpretation.</strong> The informative prior tightens the $H_\text{msy}$ posterior. <em>When defensible:</em> if meta-analysis of similar sockeye stocks gives you $a$ between 3-5 with high confidence. <em>When NOT defensible:</em> if the stock you're modeling is unique or the meta-analysis isn't trustworthy. Always pair an informative prior with a sensitivity analysis like this one.</p>
+</div></details>
+</div>
+
+<!-- Problem 4 -->
+<div class="exercise" id="p4">
+<span class="ex-tag">Problem 4</span><span class="difficulty medium"> · 30 min · hierarchical logistic</span>
+<h3>Bull trout occupancy across 8 basins</h3>
+<p>320 stream reaches in 8 basins, presence/absence data plus temperature (scaled). Model:</p>
+<div class="eq-block">$\text{logit}\,p_i = \alpha_{j[i]} + \beta \cdot \text{temp}_i, \quad \alpha_j \sim \mathcal{N}(\mu_\alpha, \sigma_\alpha^2)$</div>
+<p>Bull trout are temperature-limited; the slope $\beta$ should be negative.</p>
+
+<details class="answer" open><summary>Reveal solution and code</summary><div class="answer-body">
+<pre><code>set.seed(<span class="nu">14</span>)
+n &lt;- <span class="nu">320</span>; nB &lt;- <span class="nu">8</span>
+basin &lt;- <span class="fn">sample</span>(<span class="nu">1</span>:nB, n, replace=<span class="kw">TRUE</span>)
+mu.a.t &lt;- <span class="nu">-0.5</span>; sd.a.t &lt;- <span class="nu">0.6</span>; b.t &lt;- <span class="nu">-1.2</span>
+alpha.t &lt;- <span class="fn">rnorm</span>(nB, mu.a.t, sd.a.t)
+temp &lt;- <span class="fn">rnorm</span>(n)
+p.t &lt;- <span class="fn">plogis</span>(alpha.t[basin] + b.t*temp)
+y &lt;- <span class="fn">rbinom</span>(n, <span class="nu">1</span>, p.t)
+
+bullCode &lt;- <span class="fn">nimbleCode</span>({
+ <span class="kw">for</span> (j <span class="kw">in</span> <span class="nu">1</span>:nB) alpha[j] ~ <span class="fn">dnorm</span>(mu.a, tau.a)
+ mu.a ~ <span class="fn">dnorm</span>(<span class="nu">0</span>, <span class="nu">1</span>/<span class="nu">2.71</span>)
+ sigma.a ~ <span class="fn">dunif</span>(<span class="nu">0</span>, <span class="nu">5</span>); tau.a &lt;- <span class="nu">1</span>/sigma.a^<span class="nu">2</span>
+ beta ~ <span class="fn">dnorm</span>(<span class="nu">0</span>, <span class="nu">1</span>/<span class="nu">2.71</span>)
+ <span class="kw">for</span> (i <span class="kw">in</span> <span class="nu">1</span>:n) {
+ <span class="fn">logit</span>(p[i]) &lt;- alpha[basin[i]] + beta*temp[i]
+ y[i] ~ <span class="fn">dbern</span>(p[i])
+ }
+})
+inits &lt;- <span class="fn">rep</span>(<span class="fn">list</span>(<span class="fn">list</span>(mu.a=<span class="nu">0</span>, sigma.a=<span class="nu">1</span>, beta=<span class="nu">0</span>, alpha=<span class="fn">rep</span>(<span class="nu">0</span>, nB))), <span class="nu">3</span>)
+samp &lt;- <span class="fn">nimbleMCMC</span>(bullCode, constants=<span class="fn">list</span>(n=n, nB=nB, basin=basin, temp=temp),
+ data=<span class="fn">list</span>(y=y), inits=inits,
+ monitors=<span class="fn">c</span>(<span class="st">"mu.a"</span>,<span class="st">"sigma.a"</span>,<span class="st">"beta"</span>,<span class="st">"alpha"</span>),
+ nchains=<span class="nu">3</span>, niter=<span class="nu">10000</span>, nburnin=<span class="nu">2000</span>,
+ samplesAsCodaMCMC=<span class="kw">TRUE</span>)
+<span class="fn">MCMCsummary</span>(samp, params=<span class="fn">c</span>(<span class="st">"mu.a"</span>,<span class="st">"sigma.a"</span>,<span class="st">"beta"</span>), round=<span class="nu">3</span>)</code></pre>
+<p><strong>Interpretation.</strong> $\beta &lt; 0$ with high confidence: warmer streams less likely to host bull trout. The basin-level random intercept controls for landscape-scale factors you didn't measure (geology, fragmentation history). Per-basin $\alpha_j$ posteriors are shrunk toward $\mu_\alpha$ for basins with fewer reaches.</p>
+</div></details>
+</div>
+
+<!-- Problem 5 -->
+<div class="exercise" id="p5">
+<span class="ex-tag">Problem 5</span><span class="difficulty medium"> · 30 min · N-mixture</span>
+<h3>Chinook smolt counts at screw traps</h3>
+<p>15 screw-trap sites, each operated nightly for 7 nights. Each night's count $y[i,j]$ is a binomial draw from latent nightly abundance $N_i$ (assumed constant within the week) with capture probability $p$.</p>
+
+<details class="answer" open><summary>Reveal solution and code</summary><div class="answer-body">
+<pre><code>set.seed(<span class="nu">15</span>)
+nS &lt;- <span class="nu">15</span>; reps &lt;- <span class="nu">7</span>
+lam.t &lt;- <span class="nu">50</span>; p.t &lt;- <span class="nu">0.15</span>
+N.t &lt;- <span class="fn">rpois</span>(nS, lam.t)
+y &lt;- <span class="fn">matrix</span>(<span class="kw">NA</span>, nS, reps)
+<span class="kw">for</span> (i <span class="kw">in</span> <span class="nu">1</span>:nS) y[i, ] &lt;- <span class="fn">rbinom</span>(reps, N.t[i], p.t)
+
+smoltCode &lt;- <span class="fn">nimbleCode</span>({
+ <span class="kw">for</span> (i <span class="kw">in</span> <span class="nu">1</span>:nS) {
+ N[i] ~ <span class="fn">dpois</span>(lambda)
+ <span class="kw">for</span> (j <span class="kw">in</span> <span class="nu">1</span>:reps) {
+ y[i,j] ~ <span class="fn">dbinom</span>(prob=p, size=N[i])
+ }
+ }
+ lambda ~ <span class="fn">dgamma</span>(<span class="nu">0.01</span>, <span class="nu">0.01</span>)
+ p ~ <span class="fn">dbeta</span>(<span class="nu">1</span>, <span class="nu">1</span>)
+})
+Ninit &lt;- <span class="fn">apply</span>(y, <span class="nu">1</span>, max)
+inits &lt;- <span class="fn">rep</span>(<span class="fn">list</span>(<span class="fn">list</span>(N=Ninit, lambda=<span class="nu">30</span>, p=<span class="nu">0.2</span>)), <span class="nu">3</span>)
+samp &lt;- <span class="fn">nimbleMCMC</span>(smoltCode, constants=<span class="fn">list</span>(nS=nS, reps=reps),
+ data=<span class="fn">list</span>(y=y), inits=inits,
+ monitors=<span class="fn">c</span>(<span class="st">"lambda"</span>,<span class="st">"p"</span>),
+ nchains=<span class="nu">3</span>, niter=<span class="nu">15000</span>, nburnin=<span class="nu">3000</span>,
+ samplesAsCodaMCMC=<span class="kw">TRUE</span>)
+<span class="fn">MCMCsummary</span>(samp, round=<span class="nu">3</span>)</code></pre>
+<p><strong>Interpretation.</strong> Recovered $\lambda \approx 50$, $p \approx 0.15$. Compare to a simple "mean $\times$ correction-factor" approach &mdash; the Bayesian fit gives you a full uncertainty distribution on both abundance and capture probability without assuming the correction factor is known.</p>
+</div></details>
+</div>
+
+<!-- Problem 6 -->
+<div class="exercise" id="p6">
+<span class="ex-tag">Problem 6</span><span class="difficulty hard"> · 40 min · dynamic occupancy</span>
+<h3>Coho salmon recolonization after dam removal</h3>
+<p>45 reaches above a removed dam, surveyed for 5 years post-removal (3 replicate snorkels per year). You expect colonization $\gamma_t$ to rise as fish access new habitat. Persistence $\phi$ is high (coho return reliably once established).</p>
+
+<details class="answer" open><summary>Reveal solution and code</summary><div class="answer-body">
+<pre><code>set.seed(<span class="nu">16</span>)
+nS &lt;- <span class="nu">45</span>; nY &lt;- <span class="nu">5</span>; nR &lt;- <span class="nu">3</span>; p.t &lt;- <span class="nu">0.55</span>
+phi.t &lt;- <span class="fn">c</span>(<span class="nu">0.85</span>,<span class="nu">0.85</span>,<span class="nu">0.85</span>,<span class="nu">0.85</span>)
+gam.t &lt;- <span class="fn">c</span>(<span class="nu">0.10</span>,<span class="nu">0.25</span>,<span class="nu">0.35</span>,<span class="nu">0.40</span>)
+z &lt;- <span class="fn">matrix</span>(<span class="kw">NA</span>, nS, nY); z[,<span class="nu">1</span>] &lt;- <span class="fn">rbinom</span>(nS, <span class="nu">1</span>, <span class="nu">0.05</span>)
+<span class="kw">for</span> (i <span class="kw">in</span> <span class="nu">1</span>:nS) <span class="kw">for</span> (t <span class="kw">in</span> <span class="nu">2</span>:nY)
+ z[i,t] &lt;- <span class="fn">rbinom</span>(<span class="nu">1</span>, <span class="nu">1</span>, z[i,t-<span class="nu">1</span>]*phi.t[t-<span class="nu">1</span>] + (<span class="nu">1</span>-z[i,t-<span class="nu">1</span>])*gam.t[t-<span class="nu">1</span>])
+y &lt;- <span class="fn">array</span>(<span class="kw">NA</span>, <span class="fn">c</span>(nS,nR,nY))
+<span class="kw">for</span> (t <span class="kw">in</span> <span class="nu">1</span>:nY) <span class="kw">for</span> (i <span class="kw">in</span> <span class="nu">1</span>:nS) <span class="kw">for</span> (j <span class="kw">in</span> <span class="nu">1</span>:nR)
+ y[i,j,t] &lt;- <span class="fn">rbinom</span>(<span class="nu">1</span>, <span class="nu">1</span>, p.t)*z[i,t]
+
+cohoCode &lt;- <span class="fn">nimbleCode</span>({
+ <span class="kw">for</span> (i <span class="kw">in</span> <span class="nu">1</span>:nS) {
+ z[i,<span class="nu">1</span>] ~ <span class="fn">dbern</span>(psi)
+ <span class="kw">for</span> (t <span class="kw">in</span> <span class="nu">2</span>:nY) {
+ muZ[i,t] &lt;- z[i,t-<span class="nu">1</span>]*phi[t-<span class="nu">1</span>] + (<span class="nu">1</span>-z[i,t-<span class="nu">1</span>])*gam[t-<span class="nu">1</span>]
+ z[i,t] ~ <span class="fn">dbern</span>(muZ[i,t])
+ }
+ }
+ <span class="kw">for</span> (t <span class="kw">in</span> <span class="nu">1</span>:nY) <span class="kw">for</span> (i <span class="kw">in</span> <span class="nu">1</span>:nS) <span class="kw">for</span> (j <span class="kw">in</span> <span class="nu">1</span>:nR) {
+ Py[i,j,t] &lt;- z[i,t]*p
+ y[i,j,t] ~ <span class="fn">dbern</span>(Py[i,j,t])
+ }
+ psi ~ <span class="fn">dunif</span>(<span class="nu">0</span>,<span class="nu">1</span>); p ~ <span class="fn">dunif</span>(<span class="nu">0</span>,<span class="nu">1</span>)
+ <span class="kw">for</span> (t <span class="kw">in</span> <span class="nu">1</span>:(nY-<span class="nu">1</span>)) { phi[t] ~ <span class="fn">dunif</span>(<span class="nu">0</span>,<span class="nu">1</span>); gam[t] ~ <span class="fn">dunif</span>(<span class="nu">0</span>,<span class="nu">1</span>) }
+})
+zst &lt;- <span class="fn">matrix</span>(<span class="nu">1L</span>, nS, nY)
+inits &lt;- <span class="fn">rep</span>(<span class="fn">list</span>(<span class="fn">list</span>(z=zst, phi=<span class="fn">runif</span>(nY-<span class="nu">1</span>,.<span class="nu">5</span>,.<span class="nu">9</span>),
+ gam=<span class="fn">runif</span>(nY-<span class="nu">1</span>,.<span class="nu">1</span>,.<span class="nu">5</span>), p=.<span class="nu">5</span>, psi=.<span class="nu">1</span>)), <span class="nu">3</span>)
+samp &lt;- <span class="fn">nimbleMCMC</span>(cohoCode, constants=<span class="fn">list</span>(nS=nS, nY=nY, nR=nR),
+ data=<span class="fn">list</span>(y=y), inits=inits,
+ monitors=<span class="fn">c</span>(<span class="st">"phi"</span>,<span class="st">"gam"</span>,<span class="st">"p"</span>,<span class="st">"psi"</span>),
+ nchains=<span class="nu">3</span>, niter=<span class="nu">20000</span>, nburnin=<span class="nu">5000</span>,
+ samplesAsCodaMCMC=<span class="kw">TRUE</span>)
+<span class="fn">MCMCsummary</span>(samp, round=<span class="nu">3</span>)</code></pre>
+<p><strong>Interpretation.</strong> The fitted $\gamma_t$ posterior medians should rise across years &mdash; the recolonization signal. Even with only 45 reaches and 5 years, the upward trend in $\gamma$ is detectable. Pair this with covariates (distance from dam, stream gradient) for a publishable analysis.</p>
+</div></details>
+</div>
+
+<!-- Problem 7 -->
+<div class="exercise" id="p7">
+<span class="ex-tag">Problem 7</span><span class="difficulty hard"> · 40 min · hierarchical CJS</span>
+<h3>PIT-tag survival of steelhead smolts across years</h3>
+<p>10 release years; in each year, 500 smolts are tagged and survival to adult return is observed. Tag-recovery data summarised as $r_y / R_y$ (recoveries over releases). Fit a binomial model with annual random effects on survival:</p>
+<div class="eq-block">$r_y \sim \text{Binomial}(R_y, \phi_y), \quad \text{logit}\,\phi_y \sim \mathcal{N}(\mu, \sigma^2)$</div>
+
+<details class="answer" open><summary>Reveal solution and code</summary><div class="answer-body">
+<pre><code>set.seed(<span class="nu">17</span>)
+nY &lt;- <span class="nu">10</span>
+R &lt;- <span class="fn">rep</span>(<span class="nu">500</span>, nY)
+mu.t &lt;- <span class="fn">qlogis</span>(<span class="nu">0.04</span>); sd.t &lt;- <span class="nu">0.5</span> <span class="cm"># ~4% SAR with year variation</span>
+logit.phi.t &lt;- <span class="fn">rnorm</span>(nY, mu.t, sd.t)
+phi.t &lt;- <span class="fn">plogis</span>(logit.phi.t)
+r &lt;- <span class="fn">rbinom</span>(nY, R, phi.t)
+
+sarCode &lt;- <span class="fn">nimbleCode</span>({
+ <span class="kw">for</span> (y <span class="kw">in</span> <span class="nu">1</span>:nY) {
+ logit.phi[y] ~ <span class="fn">dnorm</span>(mu, tau)
+ phi[y] &lt;- <span class="fn">ilogit</span>(logit.phi[y])
+ r[y] ~ <span class="fn">dbinom</span>(prob=phi[y], size=R[y])
+ }
+ mu ~ <span class="fn">dnorm</span>(<span class="nu">0</span>, <span class="nu">1</span>/<span class="nu">2.71</span>)
+ sigma ~ <span class="fn">dunif</span>(<span class="nu">0</span>, <span class="nu">5</span>); tau &lt;- <span class="nu">1</span>/sigma^<span class="nu">2</span>
+ phi.mean &lt;- <span class="fn">ilogit</span>(mu) <span class="cm"># derived population-mean SAR</span>
+})
+inits &lt;- <span class="fn">rep</span>(<span class="fn">list</span>(<span class="fn">list</span>(mu=-<span class="nu">3</span>, sigma=<span class="nu">0.5</span>, logit.phi=<span class="fn">rep</span>(-<span class="nu">3</span>, nY))), <span class="nu">3</span>)
+samp &lt;- <span class="fn">nimbleMCMC</span>(sarCode, constants=<span class="fn">list</span>(nY=nY, R=R),
+ data=<span class="fn">list</span>(r=r), inits=inits,
+ monitors=<span class="fn">c</span>(<span class="st">"mu"</span>,<span class="st">"sigma"</span>,<span class="st">"phi"</span>,<span class="st">"phi.mean"</span>),
+ nchains=<span class="nu">3</span>, niter=<span class="nu">10000</span>, nburnin=<span class="nu">2000</span>,
+ samplesAsCodaMCMC=<span class="kw">TRUE</span>)
+<span class="fn">MCMCsummary</span>(samp, params=<span class="fn">c</span>(<span class="st">"mu"</span>,<span class="st">"sigma"</span>,<span class="st">"phi.mean"</span>), round=<span class="nu">3</span>)</code></pre>
+<p><strong>Interpretation.</strong> Hierarchical SAR (smolt-to-adult return) estimation is the standard tool in CBR/BPA reports. $\phi_\text{mean} \approx 0.04$ with annual variation $\sigma \approx 0.5$ on logit scale. Year-specific $\phi_y$ are shrunk slightly toward $\phi_\text{mean}$, which dampens noise in years with few returns.</p>
+</div></details>
+</div>
+
+<!-- Problem 8 -->
+<div class="exercise" id="p8">
+<span class="ex-tag">Problem 8</span><span class="difficulty medium"> · 25 min · derived quantity</span>
+<h3>Egg-to-fry survival from staged binomial</h3>
+<p>You released 5,000 eggs in each of 20 redds; in fall, you sampled emergence traps and observed $f_j$ fry per redd. Survival per egg is the latent quantity; model fry as binomial with hierarchical survival.</p>
+<div class="eq-block">$f_j \sim \text{Binomial}(5000, s_j), \quad \text{logit}\,s_j \sim \mathcal{N}(\mu, \sigma^2)$</div>
+<p>Derive the posterior of mean egg-to-fry survival $\bar s = \text{ilogit}(\mu)$.</p>
+
+<details class="answer" open><summary>Reveal solution and code</summary><div class="answer-body">
+<pre><code>set.seed(<span class="nu">18</span>)
+nR &lt;- <span class="nu">20</span>; eggs &lt;- <span class="fn">rep</span>(<span class="nu">5000</span>, nR)
+mu.t &lt;- <span class="fn">qlogis</span>(<span class="nu">0.10</span>); sd.t &lt;- <span class="nu">0.6</span>
+logit.s.t &lt;- <span class="fn">rnorm</span>(nR, mu.t, sd.t)
+s.t &lt;- <span class="fn">plogis</span>(logit.s.t)
+fry &lt;- <span class="fn">rbinom</span>(nR, eggs, s.t)
+
+eggCode &lt;- <span class="fn">nimbleCode</span>({
+ <span class="kw">for</span> (j <span class="kw">in</span> <span class="nu">1</span>:nR) {
+ logit.s[j] ~ <span class="fn">dnorm</span>(mu, tau)
+ s[j] &lt;- <span class="fn">ilogit</span>(logit.s[j])
+ fry[j] ~ <span class="fn">dbinom</span>(prob=s[j], size=eggs[j])
+ }
+ mu ~ <span class="fn">dnorm</span>(<span class="nu">0</span>, <span class="nu">1</span>/<span class="nu">2.71</span>)
+ sigma ~ <span class="fn">dunif</span>(<span class="nu">0</span>, <span class="nu">5</span>); tau &lt;- <span class="nu">1</span>/sigma^<span class="nu">2</span>
+ s.mean &lt;- <span class="fn">ilogit</span>(mu)
+})
+inits &lt;- <span class="fn">rep</span>(<span class="fn">list</span>(<span class="fn">list</span>(mu=-<span class="nu">2</span>, sigma=<span class="nu">0.5</span>, logit.s=<span class="fn">rep</span>(-<span class="nu">2</span>, nR))), <span class="nu">3</span>)
+samp &lt;- <span class="fn">nimbleMCMC</span>(eggCode, constants=<span class="fn">list</span>(nR=nR, eggs=eggs),
+ data=<span class="fn">list</span>(fry=fry), inits=inits,
+ monitors=<span class="fn">c</span>(<span class="st">"mu"</span>,<span class="st">"sigma"</span>,<span class="st">"s.mean"</span>),
+ nchains=<span class="nu">3</span>, niter=<span class="nu">8000</span>, nburnin=<span class="nu">1000</span>,
+ samplesAsCodaMCMC=<span class="kw">TRUE</span>)
+<span class="fn">MCMCsummary</span>(samp, round=<span class="nu">3</span>)</code></pre>
+<p><strong>Interpretation.</strong> Recovered $\bar s \approx 0.10$ with much tighter CI than any single-redd estimate would give. The hierarchical structure absorbs the redd-to-redd variability and reports the population-level survival with the right uncertainty.</p>
+</div></details>
+</div>
+
+<!-- Problem 9 -->
+<div class="exercise" id="p9">
+<span class="ex-tag">Problem 9</span><span class="difficulty hard"> · 35 min · Bayesian p-value</span>
+<h3>Does the basic redd Poisson fit?</h3>
+<p>Take Problem 1's redd model and add posterior-predictive Bayesian p-value checks. Compare $T(y) = \text{var}(y)/\text{mean}(y)$ between data and posterior replicates &mdash; if the data are overdispersed, this ratio will exceed 1 (Poisson predicts 1).</p>
+
+<details class="answer" open><summary>Reveal solution and code</summary><div class="answer-body">
+<pre><code><span class="cm"># Simulate clearly overdispersed redd data</span>
+set.seed(<span class="nu">19</span>)
+nT &lt;- <span class="nu">15</span>; L &lt;- <span class="fn">runif</span>(nT, <span class="nu">2</span>, <span class="nu">20</span>)
+<span class="kw">library</span>(MASS)
+y &lt;- <span class="fn">rnegbin</span>(nT, mu=L*<span class="nu">5</span>, theta=<span class="nu">1.5</span>)
+
+reddGOFCode &lt;- <span class="fn">nimbleCode</span>({
+ <span class="kw">for</span> (j <span class="kw">in</span> <span class="nu">1</span>:nT) {
+ log.rho[j] ~ <span class="fn">dnorm</span>(mu, tau)
+ y[j] ~ <span class="fn">dpois</span>(L[j] * <span class="fn">exp</span>(log.rho[j]))
+ y.pred[j] ~ <span class="fn">dpois</span>(L[j] * <span class="fn">exp</span>(log.rho[j]))
+ }
+ mu ~ <span class="fn">dnorm</span>(<span class="nu">0</span>, <span class="nu">1</span>/<span class="nu">4</span>)
+ sigma ~ <span class="fn">dunif</span>(<span class="nu">0</span>, <span class="nu">5</span>); tau &lt;- <span class="nu">1</span>/sigma^<span class="nu">2</span>
+
+ mean.y &lt;- <span class="fn">mean</span>(y[<span class="nu">1</span>:nT])
+ var.y &lt;- <span class="fn">sd</span>(y[<span class="nu">1</span>:nT])^<span class="nu">2</span>
+ mean.y.pr &lt;- <span class="fn">mean</span>(y.pred[<span class="nu">1</span>:nT])
+ var.y.pr &lt;- <span class="fn">sd</span>(y.pred[<span class="nu">1</span>:nT])^<span class="nu">2</span>
+
+ T.data &lt;- var.y / mean.y
+ T.pred &lt;- var.y.pr / mean.y.pr
+})
+inits &lt;- <span class="fn">rep</span>(<span class="fn">list</span>(<span class="fn">list</span>(mu=<span class="nu">1</span>, sigma=<span class="nu">0.5</span>, log.rho=<span class="fn">rep</span>(<span class="nu">1</span>, nT))), <span class="nu">3</span>)
+samp &lt;- <span class="fn">nimbleMCMC</span>(reddGOFCode, constants=<span class="fn">list</span>(nT=nT, L=L),
+ data=<span class="fn">list</span>(y=y), inits=inits,
+ monitors=<span class="fn">c</span>(<span class="st">"mu"</span>,<span class="st">"sigma"</span>,<span class="st">"T.data"</span>,<span class="st">"T.pred"</span>),
+ nchains=<span class="nu">3</span>, niter=<span class="nu">10000</span>, nburnin=<span class="nu">2000</span>,
+ samplesAsCodaMCMC=<span class="kw">TRUE</span>)
+post &lt;- <span class="fn">as.matrix</span>(samp)
+bayes.p &lt;- <span class="fn">mean</span>(post[, <span class="st">"T.pred"</span>] &gt; post[, <span class="st">"T.data"</span>])
+<span class="fn">cat</span>(<span class="st">"Bayesian p-value:"</span>, <span class="fn">round</span>(bayes.p, <span class="nu">3</span>))</code></pre>
+<p><strong>Interpretation.</strong> If the data come from a NB (as simulated here), the Bayesian p-value will be near 0 (most posterior replicates are <em>less</em> variable than the observed data). Reject Poisson; refit with $\log \rho_j \sim \mathcal{N}(\mu, \sigma^2)$ at the OBSERVATION level (Poisson-lognormal) or with a negative-binomial likelihood.</p>
+</div></details>
+</div>
+
+<!-- Problem 10 -->
+<div class="exercise" id="p10">
+<span class="ex-tag">Problem 10</span><span class="difficulty hard"> · 45 min · viability derived quantity</span>
+<h3>Probability of quasi-extinction in 20 years</h3>
+<p>Combining the spawner-recruit fit from Problem 2 and the hierarchical SAR fit from Problem 7, propagate posterior uncertainty through a 20-year forward population projection. Report $P(N_{t=20} &lt; 100)$ assuming current spawners $S_0 = 500$.</p>
+
+<details class="answer" open><summary>Reveal solution and code</summary><div class="answer-body">
+<pre><code><span class="cm"># Use posterior draws from Problem 2 fit (samp_sr) and Problem 7 (samp_sar).</span>
+<span class="cm"># For this exercise, generate a quick BH fit again and a quick SAR fit;</span>
+<span class="cm"># then simulate forward.</span>
+set.seed(<span class="nu">20</span>)
+sr.post &lt;- <span class="fn">as.matrix</span>(samp) <span class="cm"># reuse last fit, or fit a quick BH</span>
+<span class="cm"># Suppose we have draws of a, b, sigma from Problem 2 in post.bh</span>
+<span class="cm"># and draws of phi.mean from Problem 7 in post.sar.</span>
+<span class="cm"># For demonstration assume we sampled in lab as:</span>
+<span class="cm"># post.bh <- as.matrix(samp.from.problem2)[, c("a","b","sigma")]</span>
+<span class="cm"># post.sar <- as.matrix(samp.from.problem7)[, "phi.mean"]</span>
+<span class="cm"># Substitute synthetic posteriors here so the code is runnable standalone:</span>
+n.draw &lt;- <span class="nu">2000</span>
+post.bh &lt;- <span class="fn">cbind</span>(a=<span class="fn">rnorm</span>(n.draw, <span class="nu">4</span>, <span class="nu">0.6</span>),
+ b=<span class="fn">rnorm</span>(n.draw, <span class="nu">8000</span>, <span class="nu">1500</span>),
+ sigma=<span class="fn">runif</span>(n.draw, <span class="nu">0.2</span>, <span class="nu">0.4</span>))
+post.sar &lt;- <span class="fn">rbeta</span>(n.draw, <span class="nu">15</span>, <span class="nu">300</span>) <span class="cm"># ~0.05 SAR</span>
+
+S0 &lt;- <span class="nu">500</span>; Tyr &lt;- <span class="nu">20</span>; H &lt;- <span class="nu">0.3</span> <span class="cm"># harvest rate scenario</span>
+N.tr &lt;- <span class="fn">numeric</span>(n.draw)
+<span class="kw">for</span> (k <span class="kw">in</span> <span class="nu">1</span>:n.draw) {
+ ak &lt;- post.bh[k,<span class="st">"a"</span>]; bk &lt;- post.bh[k,<span class="st">"b"</span>]; sk &lt;- post.bh[k,<span class="st">"sigma"</span>]
+ phk &lt;- post.sar[k]
+ S &lt;- S0
+ <span class="kw">for</span> (t <span class="kw">in</span> <span class="nu">1</span>:Tyr) {
+ R &lt;- (ak*S)/(<span class="nu">1</span>+ak/bk*S) * <span class="fn">exp</span>(<span class="fn">rnorm</span>(<span class="nu">1</span>, <span class="nu">0</span>, sk))
+ adults &lt;- R * phk <span class="cm"># cohort survives to return</span>
+ S &lt;- adults * (<span class="nu">1</span> - H) <span class="cm"># after harvest</span>
+ }
+ N.tr[k] &lt;- S
+}
+<span class="fn">mean</span>(N.tr &lt; <span class="nu">100</span>) <span class="cm"># P(quasi-extinction)</span>
+<span class="fn">hist</span>(N.tr, breaks=<span class="nu">40</span>, main=<span class="st">"Spawners after 20 yrs at H=0.3"</span>,
+ xlab=<span class="st">"Spawners year 20"</span>)
+<span class="fn">abline</span>(v=<span class="nu">100</span>, lwd=<span class="nu">2</span>, lty=<span class="nu">2</span>, col=<span class="st">"red"</span>)</code></pre>
+<p><strong>Interpretation.</strong> This is a posterior-driven Population Viability Analysis (PVA). Every quantity entering the projection (productivity $a$, capacity $b$, process noise $\sigma$, marine survival $\phi$) carries its full posterior uncertainty into the 20-year forecast. The reported $P(\text{quasi-extinction})$ is the kind of probability that the ESA listings actually require &mdash; and Bayes makes it natural.</p>
+<p><em>Extensions:</em> add scenarios with different harvest rates $H$ and find the largest $H$ for which $P(\text{quasi-extinction}) &lt; 0.05$ &mdash; that is your "risk-based" harvest target. Most modern salmon recovery plans have this structure underneath.</p>
+</div></details>
+</div>
+
+</main>
+</div>
+<footer>FW 536 · Statistical Modeling for Ecology and Conservation · Oregon State University</footer>
+</body>
+</html>

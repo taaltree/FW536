@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Day 2 · Problem Set v2 (Forest & Songbird) | FW 536 · INSTRUCTOR ANSWER KEY</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../_Shared/css/lab.css" />
+<script defer src="../_Shared/js/lab.js"></script>
+<script>MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] } };</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+</head>
+<body>
+<div class="shell">
+
+<aside class="sidebar">
+ <h1><a href="../index.html" title="Back to course home">FW 536 · Day 2</a></h1>
+ <div class="subtitle">Problem Set v2 — Forest & Songbird</div>
+ <nav>
+ <ul>
+ <li><a href="#p1">1. Tree DBH distribution</a></li>
+ <li><a href="#p2">2. Lognormal vs Normal biomass</a></li>
+ <li><a href="#p3">3. Warbler counts (Poisson)</a></li>
+ <li><a href="#p4">4. Nest success (logit)</a></li>
+ <li><a href="#p5">5. Acorn masts: NB vs Poisson</a></li>
+ <li><a href="#p6">6. Stand age × management</a></li>
+ <li><a href="#p7">7. Point-count offsets</a></li>
+ <li><a href="#p8">8. Owl occupancy (probability scale)</a></li>
+ <li><a href="#p9">9. Cone production back-transform</a></li>
+ <li><a href="#p10">10. Logistic threshold for thrush</a></li>
+ </ul>
+ <div class="section">Day 2 docs</div>
+ <ul>
+ <li><a href="lab.html">Main lab</a></li>
+ <li><a class="featured" href="plain_language_summary.html">Plain-language summary</a></li>
+ <li><a href="log_logit_intuition.html">Log/logit intuition guide</a></li>
+ <li><a href="answer_key.html">Lab answer key</a></li>
+ <li><a href="problem_set_v3.html">Problem set v3 (aquatic)</a></li>
+ </ul>
+ </nav>
+</aside>
+
+<main class="content">
+<header class="lab-header">
+ <div class="eyebrow">Day 2 · Alternate Problem Set v2</div>
+ <h1>Forest and songbird themed problems</h1>
+ <p class="lede">Ten novel problems covering continuous distribution choice, Normal vs lognormal regression, Poisson with log-link interpretation, logistic regression with odds-ratio interpretation, NB vs Poisson, interaction terms, and offsets — all set in temperate-forest and songbird-ecology systems. Heavy emphasis on translating coefficients into biology you would put in a manuscript.</p>
+</header>
+
+<section><p>Work each problem before opening the answer. The biological-interpretation sentence is the assessment, not the numeric output. Every answer below ends with a "say it as biology" line — use those as a checklist of how to communicate.</p></section>
+
+<!-- =========================== PROBLEM 1 =========================== -->
+<div class="exercise" id="p1">
+<span class="ex-tag">Problem 1</span><span class="difficulty easy"> · continuous distribution choice</span>
+<h3>Tree DBH on a 1-hectare plot</h3>
+<p>You map every stem &gt; 5 cm DBH on a hectare of mixed Douglas-fir / western hemlock forest. The empirical DBH distribution is strongly right-skewed: many small understory stems, a few enormous overstory trees, with a long right tail.</p>
+<ol type="a">
+<li>Which of {Normal, Lognormal, Gamma, Exponential, Beta} would you choose for DBH? Why?</li>
+<li>If $\log(\text{DBH}) \sim \mathcal{N}(3.0, 0.6^2)$, what is the expected DBH on the raw scale? (Hint: lognormal mean is $e^{\mu + \sigma^2/2}$.)</li>
+<li>What is the median DBH? Why does it differ from the mean?</li>
+</ol>
+</div>
+
+<!-- =========================== PROBLEM 2 =========================== -->
+<div class="exercise" id="p2">
+<span class="ex-tag">Problem 2</span><span class="difficulty medium"> · Normal vs lognormal regression</span>
+<h3>Aboveground biomass vs basal area</h3>
+<p>For 60 forested plots you have aboveground biomass (Mg/ha) and basal area (m²/ha). Biomass spans 5 to 800 Mg/ha. Two analysts fit:</p>
+<ul>
+<li>Analyst A: <code>lm(biomass ~ basal_area)</code></li>
+<li>Analyst B: <code>lm(log(biomass) ~ log(basal_area))</code></li>
+</ul>
+<ol type="a">
+<li>Why is Analyst A likely to get heteroskedastic residuals?</li>
+<li>If Analyst B's slope is $\hat\beta_1 = 1.10$, what does this mean ecologically? (Power law.)</li>
+<li>What multiplicative effect on biomass corresponds to a doubling of basal area, under Analyst B's model?</li>
+<li>If you wanted Analyst A's identity-link <em>mean</em> of biomass at a basal area of 40 m²/ha, what is wrong with simply exponentiating $\hat\beta_0 + \hat\beta_1 \log(40)$?</li>
+</ol>
+</div>
+
+<!-- =========================== PROBLEM 3 =========================== -->
+<div class="exercise" id="p3">
+<span class="ex-tag">Problem 3</span><span class="difficulty medium"> · Poisson regression, log-link interpretation</span>
+<h3>Black-throated gray warbler counts on point counts</h3>
+<p>From 120 ten-minute point counts in oak woodland, you fit</p>
+<pre><code>glm(warblers ~ canopy_oak + elev_km, family = poisson, data = pc)</code></pre>
+<p>and get $\hat\beta_{\text{oak}} = +0.020$ per percent canopy oak, $\hat\beta_{\text{elev}} = -0.55$ per km elevation. Intercept $\hat\beta_0 = +0.10$.</p>
+<ol type="a">
+<li>What is the predicted mean count at oak = 0% canopy, elev = 0 km?</li>
+<li>What is the multiplicative effect of going from 10% to 60% oak canopy?</li>
+<li>What is the elevation half-decay (elevation at which expected count is half the sea-level expectation)?</li>
+<li>Write the one-sentence biology summary you would put in a manuscript.</li>
+</ol>
+</div>
+
+<!-- =========================== PROBLEM 4 =========================== -->
+<div class="exercise" id="p4">
+<span class="ex-tag">Problem 4</span><span class="difficulty medium"> · binomial logistic, logit interpretation</span>
+<h3>Nest success of song sparrow vs nest height</h3>
+<p>250 monitored song-sparrow nests; outcome is fledged (1) or failed (0). Predictor: nest height in cm. Logistic regression returns intercept $-0.50$ and slope $+0.025$ per cm.</p>
+<ol type="a">
+<li>What is the predicted probability of success at the ground (height = 0)?</li>
+<li>At what height does predicted probability equal 0.5?</li>
+<li>What is the odds ratio for a 100 cm increase in nest height? Translate to plain English.</li>
+<li>Use the divide-by-4 rule to estimate the per-cm probability change at the inflection point. Compare to the formal marginal effect $\beta p (1-p)$.</li>
+</ol>
+</div>
+
+<!-- =========================== PROBLEM 5 =========================== -->
+<div class="exercise" id="p5">
+<span class="ex-tag">Problem 5</span><span class="difficulty medium"> · NB vs Poisson</span>
+<h3>Acorn mast counts from individual oaks</h3>
+<p>You collect acorn counts from 80 individual white oaks over one fall. Mean = 350, variance = 18,000. Both fits use a single intercept (no predictors).</p>
+<ol type="a">
+<li>What is the dispersion ratio? Does the Poisson assumption hold?</li>
+<li>Find the NB <code>size</code> parameter $k$ such that variance = $\mu + \mu^2/k$ matches the data.</li>
+<li>Simulate 1000 oaks under both Poisson(350) and NB($\mu = 350, k$). Compare P(count = 0) and P(count &gt; 1500).</li>
+<li>What is the biological mechanism producing this overdispersion in mast counts?</li>
+</ol>
+</div>
+
+<!-- =========================== PROBLEM 6 =========================== -->
+<div class="exercise" id="p6">
+<span class="ex-tag">Problem 6</span><span class="difficulty hard"> · interaction</span>
+<h3>Stand age × management interaction on bird species richness</h3>
+<p>Forty-eight stands; species richness (a count) modeled as Poisson with predictors stand age (years, continuous) and management (factor: <em>unmanaged</em>, <em>thinned</em>). Fit</p>
+<pre><code>glm(richness ~ age * management, family = poisson, data = stands)</code></pre>
+<p>Coefficients: intercept = 1.50, age = +0.005, managementThinned = +0.30, age:managementThinned = $-0.010$.</p>
+<ol type="a">
+<li>What is the age slope on unmanaged stands? Translate to a per-decade percent change.</li>
+<li>What is the age slope on thinned stands?</li>
+<li>At age 0, what is the multiplicative effect of thinning?</li>
+<li>At what stand age do thinned and unmanaged stands have equal expected richness? Interpret this crossover biologically.</li>
+</ol>
+</div>
+
+<!-- =========================== PROBLEM 7 =========================== -->
+<div class="exercise" id="p7">
+<span class="ex-tag">Problem 7</span><span class="difficulty hard"> · offsets</span>
+<h3>Detection rate of pileated woodpeckers — variable point-count duration</h3>
+<p>Across 90 stations, point counts ranged from 5 to 25 minutes (not all the same). You record total detections per station. Two analysts:</p>
+<ul>
+<li>Analyst A: <code>glm(detections ~ forest_age, family = poisson)</code></li>
+<li>Analyst B: <code>glm(detections ~ forest_age + offset(log(minutes)), family = poisson)</code></li>
+</ul>
+<ol type="a">
+<li>What is Analyst B's intercept reporting that Analyst A's intercept is <em>not</em>?</li>
+<li>Why is the offset on the log scale, not the raw scale?</li>
+<li>If Analyst B's forest_age coefficient is $+0.04$ per decade, write the one-sentence biology statement.</li>
+<li>What kind of bias would Analyst A introduce if longer counts happened to be conducted preferentially in old-growth stands?</li>
+</ol>
+</div>
+
+<!-- =========================== PROBLEM 8 =========================== -->
+<div class="exercise" id="p8">
+<span class="ex-tag">Problem 8</span><span class="difficulty medium"> · probability ↔ odds ↔ log-odds</span>
+<h3>Northern spotted owl occupancy from canopy cover</h3>
+<p>Logistic regression of site-occupancy on percent canopy cover. Intercept = $-2.0$, slope = $+0.05$ per percent canopy.</p>
+<ol type="a">
+<li>Compute fitted $p$ at canopy = 0, 40, 70, and 100%.</li>
+<li>Express the slope as an odds ratio per 1% canopy and per 20% canopy.</li>
+<li>For a manager comparing a 40% canopy stand to a 70% canopy stand, what is the difference in occupancy probability?</li>
+<li>Why is the same 30-point canopy change worth more "probability" near 40% than near 90%?</li>
+</ol>
+</div>
+
+<!-- =========================== PROBLEM 9 =========================== -->
+<div class="exercise" id="p9">
+<span class="ex-tag">Problem 9</span><span class="difficulty hard"> · back-transform with CI</span>
+<h3>Cone production vs crown class</h3>
+<p>A Gamma GLM with log link gives, for the contrast "dominant vs codominant trees", a coefficient $\hat\beta = +0.55$ with 95% CI $(0.32, 0.78)$ on the log scale.</p>
+<ol type="a">
+<li>Back-transform the point estimate. What multiplicative effect does that represent?</li>
+<li>Back-transform the CI. Is it symmetric?</li>
+<li>Why is exponentiating each endpoint correct, and exponentiating the midpoint wrong?</li>
+<li>One-sentence biology, suitable for a results section.</li>
+</ol>
+</div>
+
+<!-- =========================== PROBLEM 10 =========================== -->
+<div class="exercise" id="p10">
+<span class="ex-tag">Problem 10</span><span class="difficulty hard"> · logistic threshold + marginal effects</span>
+<h3>Hermit thrush habitat threshold</h3>
+<p>Presence/absence of hermit thrush at 300 sites. Model: <code>glm(present ~ basal_area + shrub_cover, family = binomial)</code>. Intercept $-3.0$; basal-area slope $+0.08$ per m²/ha; shrub slope $+0.04$ per percent shrub.</p>
+<ol type="a">
+<li>For a site with shrub cover = 25%, at what basal area does predicted occupancy probability equal 0.5?</li>
+<li>For a site with shrub cover = 50%, what is the new "threshold" basal area?</li>
+<li>Compute the marginal effect of basal area on probability at the 0.5 inflection.</li>
+<li>If a manager can either raise basal area by 5 m²/ha or shrub cover by 10 percentage points, which intervention has the larger predicted effect at a site currently at $p = 0.3$?</li>
+</ol>
+</div>
+
+<!-- =================== ANSWERS =================== -->
+<section>
+<h2 style="margin-top:80px;">Answers (with R)</h2>
+
+<details class="answer" open><summary>Problem 1 — Tree DBH distribution</summary><div class="answer-body">
+<p>(a) <strong>Lognormal</strong> is the natural choice: stems are strictly positive, the distribution is right-skewed, and the data-generating process (growth = product of many small annual proportional increments) is exactly the lognormal story. Gamma is a viable second choice but lacks the multiplicative-growth motivation.</p>
+<p>(b) Mean = $e^{\mu + \sigma^2/2} = e^{3.0 + 0.18} = e^{3.18} = 24.0$ cm DBH.</p>
+<p>(c) Median = $e^{\mu} = e^{3} = 20.1$ cm. The mean &gt; median because the distribution is right-skewed; a few giant overstory trees pull the mean up.</p>
+<pre><code>mu &lt;- 3.0; sig &lt;- 0.6
+exp(mu + sig^2/2) # 24.05
+exp(mu) # 20.09
+set.seed(1)
+hist(rlnorm(1e4, mu, sig), breaks = 100, xlab = "DBH (cm)")</code></pre>
+<p><strong>Say it as biology:</strong> "The DBH distribution is lognormal because tree size is the cumulative product of many proportional growth increments. The mean DBH (24 cm) exceeds the median (20 cm) by about 20% — a reminder that average-DBH summaries overstate the size of a typical stem in a structurally diverse forest."</p>
+</div></details>
+
+<details class="answer" open><summary>Problem 2 — Normal vs lognormal regression</summary><div class="answer-body">
+<p>(a) Heteroskedasticity is the natural consequence of multiplicative processes. Biomass varies by 2 orders of magnitude across plots; under a Normal model, the residual SD is forced to be constant — so heavy plots get residuals near $\pm 100$ Mg/ha and light plots get residuals that <em>could not possibly</em> be that large. Residuals vs fitted will form the classic megaphone.</p>
+<p>(b) Slope of 1.10 on the log-log scale means biomass scales as basal_area$^{1.10}$ — a near-isometric power law, with very slightly greater-than-proportional scaling (taller-on-average trees in stands with high basal area carry disproportionately more biomass).</p>
+<p>(c) Doubling basal area: $e^{1.10 \cdot \ln 2} = 2^{1.10} = 2.14$. Doubling basal area is associated with a 2.14× increase in expected biomass.</p>
+<p>(d) Exponentiating $\hat\beta_0 + \hat\beta_1 \log(40)$ gives the <em>median</em> biomass on the raw scale, not the mean. The mean on the raw scale is $\exp(\hat\mu + \hat\sigma^2/2)$ — you need to add the half-variance correction (the "Duan smearing" or lognormal mean adjustment).</p>
+<pre><code># suppose hat_beta0 = -1.5, hat_beta1 = 1.10, sigma^2 = 0.3
+exp(-1.5 + 1.10*log(40)) # 137 (= median biomass)
+exp(-1.5 + 1.10*log(40) + 0.3/2) # 159 (= mean biomass)</code></pre>
+<p><strong>Say it as biology:</strong> "Biomass scales as basal_area<sup>1.10</sup> — a power law with near-isometric exponent — so a doubling of basal area roughly doubles biomass. Use the lognormal mean correction when predicting on the raw scale; the back-transformed line gives the median, not the mean."</p>
+</div></details>
+
+<details class="answer" open><summary>Problem 3 — Warbler counts (Poisson, log link)</summary><div class="answer-body">
+<p>(a) $\exp(0.10) = 1.11$ warblers expected.</p>
+<p>(b) $\exp(0.020 \cdot 50) = \exp(1.0) = 2.72$ — going from 10 to 60% oak canopy multiplies expected count by 2.7.</p>
+<p>(c) Half-decay elevation: $-\ln 2 / -0.55 = 1.26$ km.</p>
+<pre><code>exp(0.10) # 1.105
+exp(0.020 * 50) # 2.718
+-log(2) / -0.55 # 1.26 km</code></pre>
+<p><strong>(d) Say it as biology:</strong> "Black-throated gray warbler abundance on point counts increased ~2.7× as oak canopy cover increased from 10% to 60%, and fell by half for every 1.26 km of elevation — patterns consistent with this species' oak-savanna affinity and lowland distribution."</p>
+</div></details>
+
+<details class="answer" open><summary>Problem 4 — Song sparrow nest success (logit)</summary><div class="answer-body">
+<p>(a) $\text{plogis}(-0.50) = 0.378$. Ground nests have ~38% predicted success.</p>
+<p>(b) Solve $-0.50 + 0.025 h = 0 \Rightarrow h = 20$ cm.</p>
+<p>(c) Odds ratio per 100 cm = $\exp(0.025 \cdot 100) = \exp(2.5) = 12.2$. Each 1-m rise in nest height multiplies the odds of success by ~12 — a dramatic predator-avoidance effect.</p>
+<p>(d) Divide-by-4: $0.025/4 = 0.0063$ probability per cm at the inflection. Formal: $\beta p(1-p) = 0.025 \cdot 0.5 \cdot 0.5 = 0.00625$. Matches.</p>
+<pre><code>plogis(-0.50) # 0.378
+-(-0.50)/0.025 # 20 cm
+exp(0.025 * 100) # 12.18
+0.025 / 4; 0.025 * 0.5 * 0.5 # 0.00625 0.00625</code></pre>
+<p><strong>Say it as biology:</strong> "Nest height was a strong predictor of song-sparrow nest survival: odds of fledging rose 12-fold for every 1 m of nest elevation, with the 50% success threshold at ~20 cm. The pattern is consistent with ground-predator avoidance in shrub-nesting passerines."</p>
+</div></details>
+
+<details class="answer" open><summary>Problem 5 — Acorn masts: NB vs Poisson</summary><div class="answer-body">
+<p>(a) Dispersion ratio = 18,000 / 350 = 51. Poisson is wildly inappropriate.</p>
+<p>(b) $\mu + \mu^2/k = 18000 \Rightarrow 350 + 122500/k = 18000 \Rightarrow k = 122500/17650 = 6.94$.</p>
+<pre><code>set.seed(1); n &lt;- 1000
+pois &lt;- rpois(n, 350)
+nb &lt;- rnbinom(n, mu = 350, size = 6.94)
+mean(pois == 0); mean(nb == 0) # ~ 0 vs ~ 0.001 (very few)
+mean(pois &gt; 1500); mean(nb &gt; 1500) # ~ 0 vs ~ 0.05
+var(pois); var(nb) # ~ 350 vs ~ 18000</code></pre>
+<p>(c) Poisson assigns essentially zero probability to crops &gt; 1500 acorns; NB puts about 5% there — matching the long upper tail observed in real mast data.</p>
+<p>(d) <strong>Biological mechanism.</strong> Individual oaks vary enormously in vigor, age, and crown size, and mast years synchronize at the population level (weather-cued masting). Both forces add gamma-like variation onto a Poisson production process — exactly the NB story. The "mast" pattern of years with near-zero production interspersed with bumper crops is the population-level analog.</p>
+<p><strong>Say it as biology:</strong> "Per-tree acorn counts are over-dispersed roughly 50× relative to Poisson, consistent with strong individual-tree heterogeneity in mast production. A negative binomial with $k \approx 7$ captured the long upper tail of bumper-mast trees that the Poisson model placed essentially impossible probability on."</p>
+</div></details>
+
+<details class="answer" open><summary>Problem 6 — Stand age × management interaction</summary><div class="answer-body">
+<p>(a) Unmanaged slope = $+0.005$ /yr. Per-decade multiplicative effect: $e^{0.05} = 1.051$ → about a 5% increase in expected richness per decade.</p>
+<p>(b) Thinned slope = $0.005 - 0.010 = -0.005$ /yr → $e^{-0.05} = 0.951$ → a 5% decrease per decade.</p>
+<p>(c) Effect of thinning at age 0: $e^{0.30} = 1.35$ → thinning raises expected richness by 35% in very young stands.</p>
+<p>(d) Crossover where the management effect = 0: $0.30 + (-0.010) \cdot \text{age} = 0 \Rightarrow$ age = 30 yrs.</p>
+<pre><code>exp(0.005 * 10) # 1.051
+exp(-0.005 * 10) # 0.951
+exp(0.30) # 1.350
+0.30 / 0.010 # 30 yrs</code></pre>
+<p><strong>Say it as biology:</strong> "Thinning boosts bird species richness in young stands by ~35% but the effect erodes with stand age; by ~30 years, unmanaged stands match the thinned ones, and beyond that age unmanaged stands accumulate richness faster. The interaction encodes the trade-off between early-successional structure (favored by thinning) and the structural complexity that accumulates in undisturbed mature forest."</p>
+</div></details>
+
+<details class="answer" open><summary>Problem 7 — Pileated woodpecker offsets</summary><div class="answer-body">
+<p>(a) Analyst B's intercept is the <em>per-minute log-rate</em> at forest_age = 0. Analyst A's intercept is a <em>total-count</em> mean at forest_age = 0 — confounded with however long counts happened to last at age-zero stations.</p>
+<p>(b) The offset goes on the log scale because the linear predictor is on the log scale. We want $\log(\mu) = \log(\text{minutes}) + \beta_0 + \beta_1 x$, equivalently $\mu / \text{minutes} = \exp(\beta_0 + \beta_1 x)$: a per-minute rate. Putting effort on the raw scale would not produce this clean rate interpretation.</p>
+<p>(c) <strong>Say it as biology:</strong> "Each decade of forest age was associated with a 4% increase in the per-minute pileated detection rate ($e^{0.04 \cdot 1} = 1.041$, or $e^{0.4} = 1.49$ per 10-decade century of stand development)."</p>
+<p>(d) Without an offset, count is a function of (per-minute rate) × (minutes). If long counts cluster in old growth, Analyst A's forest_age coefficient absorbs both biology and effort — inflating the apparent old-growth effect. The offset disentangles them.</p>
+<pre><code>m &lt;- glm(detections ~ forest_age + offset(log(minutes)),
+ family = poisson, data = pc)
+summary(m)
+# the forest_age slope is now a per-minute rate effect</code></pre>
+</div></details>
+
+<details class="answer" open><summary>Problem 8 — Spotted owl occupancy probabilities</summary><div class="answer-body">
+<table>
+<tr><th>Canopy %</th><th>Linear predictor</th><th>Odds</th><th>$\hat p$</th></tr>
+<tr><td>0</td><td>−2.0</td><td>0.135</td><td>0.119</td></tr>
+<tr><td>40</td><td>0.0</td><td>1.000</td><td>0.500</td></tr>
+<tr><td>70</td><td>+1.5</td><td>4.482</td><td>0.818</td></tr>
+<tr><td>100</td><td>+3.0</td><td>20.09</td><td>0.953</td></tr>
+</table>
+<p>(b) OR per 1% = $e^{0.05} = 1.051$; OR per 20% = $e^{1.0} = 2.72$.</p>
+<p>(c) $p(70) - p(40) = 0.818 - 0.500 = 0.318$ → about 32 percentage points.</p>
+<pre><code>plogis(-2 + 0.05 * c(0, 40, 70, 100))
+# 0.119 0.500 0.818 0.953
+exp(0.05); exp(0.05 * 20) # 1.051 2.718</code></pre>
+<p>(d) The logistic curve is steepest at $p = 0.5$ (linear predictor = 0) and flattens out as $p$ approaches 0 or 1. A 30-point canopy change near 40% canopy moves you through the steep middle of the curve; the same change near 90% moves you along the flattening tail.</p>
+<p><strong>Say it as biology:</strong> "Canopy cover dominates predicted spotted owl occupancy: each 20-point canopy increase nearly triples the odds of occupancy. A 40-to-70% canopy improvement raises occupancy probability from 50% to 82% — but the same 30-point improvement above 70% buys far less, because the curve is saturating."</p>
+</div></details>
+
+<details class="answer" open><summary>Problem 9 — Cone production back-transform with CI</summary><div class="answer-body">
+<p>(a) $\exp(0.55) = 1.733$. Dominant trees produce 73% more cones than codominant trees on average.</p>
+<p>(b) CI on multiplicative scale: $(\exp(0.32), \exp(0.78)) = (1.377, 2.181)$. Asymmetric on the multiplicative scale — the upper arm is longer in absolute terms (since exp is convex).</p>
+<p>(c) Exponentiating the midpoint produces $\exp((0.32 + 0.78)/2) = \exp(0.55) = 1.73$ — by chance the same as the point estimate here because the CI was constructed symmetrically on the log scale (Wald). But this only works because Wald is symmetric in log-space; in general the correct procedure is to back-transform each endpoint. If the CI had been built with a non-symmetric method (likelihood, bootstrap), exponentiating the midpoint would be biased.</p>
+<pre><code>exp(0.55) # 1.733
+exp(c(0.32, 0.78)) # 1.377 2.181
+# Asymmetry:
+1.733 - 1.377 # 0.356 (lower arm)
+2.181 - 1.733 # 0.448 (upper arm)</code></pre>
+<p><strong>(d) Say it as biology:</strong> "Dominant trees produced 1.73× the cones of codominant trees (95% CI 1.38× to 2.18×), confirming the well-documented crown-class control of reproductive output in shade-tolerant conifers."</p>
+</div></details>
+
+<details class="answer" open><summary>Problem 10 — Hermit thrush threshold</summary><div class="answer-body">
+<p>(a) At shrub = 25%: $-3.0 + 0.08 \cdot \text{BA} + 0.04 \cdot 25 = 0 \Rightarrow \text{BA} = 25$ m²/ha.</p>
+<p>(b) At shrub = 50%: $-3.0 + 0.08 \cdot \text{BA} + 0.04 \cdot 50 = 0 \Rightarrow \text{BA} = 12.5$ m²/ha.</p>
+<p>(c) At $p = 0.5$, marginal effect of BA = $0.08 \cdot 0.5 \cdot 0.5 = 0.020$ per m²/ha — about 2 percentage points of occupancy per m²/ha.</p>
+<p>(d) At $p = 0.3$, marginal effects per unit of <em>x</em>:
+<ul>
+<li>basal area: $0.08 \cdot 0.3 \cdot 0.7 = 0.0168$ per m²/ha → 5 m²/ha gives $\approx +0.084$ probability.</li>
+<li>shrub: $0.04 \cdot 0.3 \cdot 0.7 = 0.0084$ per % → 10% gives $\approx +0.084$ probability.</li>
+</ul>
+Both interventions yield about the same predicted probability gain — but the basal-area gain comes from twice the per-unit coefficient on half the unit change.</p>
+<pre><code># exact computation at p = 0.3
+plogis(qlogis(0.3) + 0.08 * 5) # ~ 0.39
+plogis(qlogis(0.3) + 0.04 * 10) # ~ 0.39</code></pre>
+<p><strong>Say it as biology:</strong> "Hermit thrush occupancy thresholds are joint functions of basal area and shrub cover: doubling shrub cover from 25% to 50% halves the basal area required to reach 50% occupancy. From a management standpoint, raising basal area by 5 m²/ha and raising shrub cover by 10 points produce equivalent marginal occupancy gains at a typical low-suitability site — so the choice should be made on cost, not on ecological impact."</p>
+</div></details>
+
+</section>
+</main>
+</div>
+<footer>FW 536 · Statistical Modeling for Ecology and Conservation · Oregon State University</footer>
+</body>
+</html>

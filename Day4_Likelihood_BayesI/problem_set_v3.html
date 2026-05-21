@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Day 4 · Problem Set v3 (marine) | FW 536 · Student copy (no answers)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../_Shared/css/lab.css" />
+<script defer src="../_Shared/js/lab.js"></script>
+<script>MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] } };</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+</head>
+<body>
+<div class="shell">
+
+<aside class="sidebar">
+ <h1><a href="../index.html" title="Back to course home">FW 536 · Day 4</a></h1>
+ <div class="subtitle">Problem Set v3 — Marine / Fisheries</div>
+ <nav>
+ <ul>
+ <li><a href="#p1">1. Red snapper survival MLE</a></li>
+ <li><a href="#p2">2. Krill biomass MLE</a></li>
+ <li><a href="#p3">3. Stock-recruit (Beverton-Holt)</a></li>
+ <li><a href="#p4">4. Bayesian turtle survival</a></li>
+ <li><a href="#p5">5. Bayesian Schaefer biomass</a></li>
+ <li><a href="#p6">6. Bayesian length-weight</a></li>
+ <li><a href="#p7">7. Bayesian shark CPUE</a></li>
+ <li><a href="#p8">8. Prior sensitivity: rockfish r</a></li>
+ <li><a href="#p9">9. BCI vs HPDI for MSY</a></li>
+ <li><a href="#p10">10. Identifiability in q/B</a></li>
+ </ul>
+ <div class="section">Day 4 docs</div>
+ <ul>
+ <li><a href="lab.html">Main lab</a></li>
+ <li><a class="featured" href="plain_language_summary.html">Plain-language summary</a></li>
+ <li><a href="answer_key.html">Lab answer key</a></li>
+ <li><a href="problem_set_v2.html">Problem set v2 (songbirds)</a></li>
+ </ul>
+ </nav>
+</aside>
+
+<main class="content">
+<header class="lab-header">
+ <div class="eyebrow">Day 4 · Alternate Problem Set v3 — Marine / Fisheries</div>
+ <h1>Ten problems on likelihood and Bayes — marine ecology and stock assessment</h1>
+ <p class="lede">Same skill coverage as the songbird set (problem set v2), but set in marine and fisheries contexts: snapper assessments, krill surveys, sea-turtle vital rates, fish length-weight, shark CPUE. Solutions sketched at the end.</p>
+</header>
+
+<section class="callout warn" style="margin-top:24px;"><p><strong>Assessed problem set (v3) &middot; marine &amp; stock assessment theme.</strong> Answers are <em>not</em> shown here. Write your work in the template tailored to this version: <a href="morning_lab_template_v3.Rmd"><code>morning_lab_template_v3.Rmd</code></a> for morning problems, <a href="afternoon_lab_template_v3.Rmd"><code>afternoon_lab_template_v3.Rmd</code></a> for afternoon problems. Knit to HTML, then upload to the matching Canvas assignment.</p><p><strong>Pick whichever theme fits your interests.</strong> The companion version is <a href="problem_set_v2.html">v2 &middot; avian / songbird</a> &mdash; they cover the same statistical concepts with different ecological scenarios.</p><p><strong>Topic scope:</strong> the morning lab covers the first <strong>3 problems (MLE only)</strong>; the afternoon lab covers the remaining <strong>7 problems (Bayesian)</strong>. Use the matching template for each session.</p><p>For worked-example study with visible answers, see <a href="lab.html">the practice problem set</a>.</p></section>
+
+
+<section><p>Problems 1–3 are MLE-by-hand derivations. Problems 4–7 are Bayesian fits in <span class="pill nimble">Nimble</span>. Problems 8–10 are conceptual.</p></section>
+
+<!-- ============ MLE-BY-HAND ============ -->
+
+<a id="morning"></a>
+<div class="exercise" id="p1">
+<span class="ex-tag">Problem 1</span><span class="difficulty medium"> · MLE by hand · Binomial · 25 min</span>
+<h3>Red snapper post-release survival</h3>
+<p>You released 80 red snapper after barotrauma treatment and tracked them with acoustic tags; 47 were detected alive after 7 days. Treat each fish's outcome as Bernoulli($\phi$) with $\phi$ = post-release survival.</p>
+<ol type="a">
+<li>Write the joint likelihood. Solve algebraically for $\hat\phi$.</li>
+<li>Compute the observed Fisher information at $\hat\phi$ and the Wald 95% CI.</li>
+<li>Use <code>mle()</code> + <code>confint()</code> to get the profile-likelihood 95% CI. Compare.</li>
+<li>Suppose the manager wants $\Pr(\phi \ge 0.5 \mid \text{data})$. Can MLE alone deliver that? Why might Bayes be the natural framework for this question?</li>
+</ol>
+</div>
+
+<div class="exercise" id="p2">
+<span class="ex-tag">Problem 2</span><span class="difficulty medium"> · MLE by hand · Log-Normal · 30 min</span>
+<h3>Antarctic krill biomass MLE (log-Normal)</h3>
+<p>An acoustic survey gives $n = 18$ density estimates (g/m$^3$) that are strictly positive and right-skewed. You model them as iid Log-Normal: $\log Y_i \sim \mathcal{N}(\mu, \sigma^2)$.</p>
+<ol type="a">
+<li>Write the log-likelihood in terms of $\mu, \sigma$, and the $\log y_i$.</li>
+<li>Derive the MLEs $\hat\mu = \overline{\log y}$ and $\hat\sigma^2 = \tfrac{1}{n}\sum(\log y_i - \hat\mu)^2$.</li>
+<li>Show that the MLE of the mean of $Y$ (not $\log Y$) is $\exp(\hat\mu + \hat\sigma^2/2)$, by invariance of the MLE.</li>
+<li>Why is the simple MLE of $\sigma^2$ biased? What correction (REML-like) would you use?</li>
+</ol>
+</div>
+
+<div class="exercise" id="p3">
+<span class="ex-tag">Problem 3</span><span class="difficulty hard"> · MLE by hand + numerical · 40 min</span>
+<h3>Beverton–Holt stock–recruitment</h3>
+<p>The Beverton–Holt stock-recruitment model is $R = \dfrac{a S}{1 + b S}$ with log-Normal observation error, $\log R_i \sim \mathcal{N}(\log[aS_i/(1+bS_i)], \sigma^2)$. You have 20 (S, R) pairs from a long-term survey.</p>
+<ol type="a">
+<li>Write the negative log-likelihood as a function of $a$, $b$, $\sigma$.</li>
+<li>Why is this likelihood much harder to maximize than the Schaefer (linear) form $R = aS - bS^2$? Comment on parameter correlation and on why <code>L-BFGS-B</code> with sensible bounds is essential.</li>
+<li>Simulate 20 (S, R) pairs with $a=4$, $b=0.001$, $\sigma=0.3$, $S \in U(50, 1000)$. Fit using <code>mle()</code> from 5 random starts. How often does it converge to the true answer?</li>
+<li>Reparameterize using "steepness" $h \in (0.2, 1)$ and unfished recruitment $R_0$. Show that the steepness parameterization is much better-conditioned for MLE.</li>
+</ol>
+</div>
+
+<!-- ============ BAYESIAN IN NIMBLE ============ -->
+
+<a id="afternoon"></a>
+<div class="exercise" id="p4">
+<span class="ex-tag">Problem 4</span><span class="difficulty medium"> · Bayesian · Nimble · 30 min</span>
+<h3>Bayesian green sea turtle hatchling survival</h3>
+<p>From a single nesting beach you released 200 marked green sea turtle hatchlings; underwater video and re-encounter surveys give a (rough) re-encounter count of 12 after 30 days. Prior literature on hatchling survival is sparse; treat it as $\phi \sim$ Beta(2, 18) (mean 0.10).</p>
+<ol type="a">
+<li>Write the model in <span class="pill nimble">Nimble</span> with $y \sim$ Bin$(n=200, \phi)$.</li>
+<li>Fit and report posterior summaries.</li>
+<li>Compute $\Pr(\phi < 0.05 \mid \text{data})$.</li>
+<li>If a colleague used Beta(1, 1) instead, how does the posterior change?</li>
+</ol>
+</div>
+
+<div class="exercise" id="p5">
+<span class="ex-tag">Problem 5</span><span class="difficulty hard"> · Bayesian biomass dynamics · Nimble · 45 min</span>
+<h3>Bayesian Schaefer biomass-dynamic model for a Pacific snapper</h3>
+<p>You have $T = 15$ years of catch ($C_t$) and a CPUE index ($I_t$). The state-space Schaefer model is:</p>
+<div class="eq-block">$B_{t+1} = B_t + r B_t \!\left(1 - \tfrac{B_t}{K}\right) - C_t, \quad I_t \sim \text{LogNormal}\!\left(\log(q B_t), \sigma^2\right).$</div>
+
+<ol type="a">
+<li>Translate this state-space model into <span class="pill nimble">Nimble</span>. Use priors: $r \sim$ Beta(2, 8), $K \sim$ Log-Normal($\log 10{,}000$, 1), $q \sim$ Log-Normal($-5$, 1), $\sigma \sim$ Uniform(0, 2). Initialize $B_1 = K$.</li>
+<li>Simulate data with $r=0.3$, $K=10{,}000$, $q=0.01$, $\sigma=0.2$, and a catch series that increases from 200 to 1500 over 15 years.</li>
+<li>Fit and recover the parameters. What does the posterior on MSY = $rK/4$ look like?</li>
+<li>Why is the joint posterior of $r$ and $K$ likely to be strongly negatively correlated? Make a scatter plot of posterior samples.</li>
+</ol>
+<div class="callout bio">This is the simplest production stock assessment that practising fisheries scientists fit. Everything more sophisticated (Pella–Tomlinson, age-structured, statistical catch-at-age) is built on top of this skeleton.</div>
+</div>
+
+<div class="exercise" id="p6">
+<span class="ex-tag">Problem 6</span><span class="difficulty medium"> · Bayesian regression · Nimble · 30 min</span>
+<h3>Bayesian length-weight regression for Pacific cod</h3>
+<p>The classical length-weight relationship is $W = a L^b$, fit on the log scale: $\log W_i \sim \mathcal{N}(\log a + b \log L_i, \sigma^2)$. Simulate 100 cod with $a = 0.01$, $b = 3.05$, $L \in U(20, 100)$ cm, $\sigma = 0.10$.</p>
+<ol type="a">
+<li>Fit the model in <span class="pill nimble">Nimble</span> with priors $\log a \sim \mathcal{N}(0, 10)$, $b \sim \mathcal{N}(3, 0.5)$, $\sigma \sim$ half-Normal(0, 1).</li>
+<li>Are the true values inside the 95% BCIs?</li>
+<li>Compute $\Pr(b > 3 \mid \text{data})$. Why is $b \approx 3$ biologically meaningful?</li>
+<li>Add posterior predictive checks: simulate replicate $W$'s and compare the SD of residuals.</li>
+</ol>
+</div>
+
+<div class="exercise" id="p7">
+<span class="ex-tag">Problem 7</span><span class="difficulty hard"> · Bayesian · Nimble · 40 min</span>
+<h3>Bayesian zero-inflated negative binomial CPUE for blue shark</h3>
+<p>A bycatch dataset of blue sharks on longline trips contains $n = 200$ trips with very many zeros and a long tail of large catches. Fit a Bayesian zero-inflated NB in <span class="pill nimble">Nimble</span>.</p>
+<ol type="a">
+<li>Write the ZINB model: $y_i = 0$ with probability $\pi + (1-\pi)\text{NB}(0; \mu, k)$; $y_i = k$ with probability $(1-\pi)\text{NB}(k; \mu, k)$ for $k \ge 1$.</li>
+<li>Place priors $\pi \sim$ Beta(1, 1), $\mu \sim$ Log-Normal(0, 2), $k \sim$ Gamma(2, 0.5).</li>
+<li>Simulate 200 trips with $\pi = 0.30$, $\mu = 5$, $k = 0.5$. Fit and recover. Compute the posterior of "expected catch per trip" $= (1-\pi)\mu$.</li>
+<li>What identifiability concern exists between $\pi$ (structural zeros) and small $\mu$ (Poisson/NB zeros)? Use posterior correlations to discuss.</li>
+</ol>
+</div>
+
+<!-- ============ CONCEPTUAL ============ -->
+
+<div class="exercise" id="p8">
+<span class="ex-tag">Problem 8</span><span class="difficulty medium"> · Conceptual · 20 min</span>
+<h3>Prior sensitivity on intrinsic growth rate $r$ for a long-lived rockfish</h3>
+<p>Yelloweye rockfish are long-lived and slow-growing; biologists suspect $r$ is small. You have catch-and-index data but it is essentially uninformative for $r$ on its own.</p>
+<ol type="a">
+<li>Compare three priors: $r \sim$ Uniform(0, 1), $r \sim$ Beta(2, 30) (prior mean ≈ 0.06), $r \sim$ Beta(8, 2) (mean 0.8).</li>
+<li>Without re-running MCMC, predict qualitatively how the posterior of MSY $=rK/4$ moves under each prior.</li>
+<li>Which prior would you defend in front of a stock-assessment review panel, and how would you defend it?</li>
+</ol>
+</div>
+
+<div class="exercise" id="p9">
+<span class="ex-tag">Problem 9</span><span class="difficulty easy"> · Conceptual · 15 min</span>
+<h3>BCI vs HPDI for MSY</h3>
+<p>Suppose your posterior of MSY from Problem 5 is right-skewed (long upper tail). You want to communicate one number plus an interval to a fisheries manager.</p>
+<ol type="a">
+<li>Sketch (in words) the BCI and HPDI of a right-skewed posterior. Which is shorter?</li>
+<li>If the manager will use the lower bound as a "precautionary" quota cap, which interval would you report and why?</li>
+<li>Is there a setting in which the BCI <em>upper</em> bound is more appropriate than the HPDI upper bound? Give an example.</li>
+</ol>
+</div>
+
+<div class="exercise" id="p10">
+<span class="ex-tag">Problem 10</span><span class="difficulty hard"> · Conceptual · identifiability · 25 min</span>
+<h3>Identifiability of catchability $q$ and biomass $B$</h3>
+<p>The CPUE equation $I_t = q B_t$ means only the <em>product</em> $qB_t$ is identified from a single index. If you double $q$ and halve $B_t$, the model fits the data equally well.</p>
+<ol type="a">
+<li>Show algebraically that the likelihood of the data is invariant under the transformation $(q, B_t) \to (cq, B_t/c)$ for any $c > 0$ (and a corresponding $K \to K/c$).</li>
+<li>What aspect of the prior breaks this invariance in the Bayesian model?</li>
+<li>Posterior pairs plot: in your Schaefer fit (Problem 5), what does the joint posterior $(\log q, \log K)$ look like, and why?</li>
+<li>Two practical fixes used in real stock assessments: (i) put a strong prior on $q$ (informed by a tag-recovery study), (ii) use a second index with known $q$. Sketch why either resolves the non-identifiability.</li>
+</ol>
+</div>
+</main>
+</div>
+
+<footer>
+ FW 536 · Statistical Modeling for Ecology and Conservation · Oregon State University · Day 4 problem set v3 (marine)
+</footer>
+</body>
+</html>

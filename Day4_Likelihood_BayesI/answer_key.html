@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Day 4 · Answer key | FW 536</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../_Shared/css/lab.css" />
+<script defer src="../_Shared/js/lab.js"></script>
+<script>MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] } };</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+</head>
+<body>
+<div class="shell">
+
+<aside class="sidebar">
+ <h1><a href="../index.html" title="Back to course home">FW 536 · Day 4</a></h1>
+ <div class="subtitle">Answer key</div>
+ <nav>
+ <ul>
+ <li><a href="#a1">Ex 1 · Bernoulli MLE</a></li>
+ <li><a href="#a2">Ex 2 · Profile likelihood for κ</a></li>
+ <li><a href="#a3">Ex 3 · Sex-specific VBGF / LRT</a></li>
+ <li><a href="#a4">Ex 4 · Zero-inflated Poisson</a></li>
+ <li><a href="#a5">Ex 5 · Beta–Binomial</a></li>
+ <li><a href="#a6">Ex 6 · Metropolis for λ</a></li>
+ <li><a href="#a7">Ex 7 · Logistic growth in Nimble</a></li>
+ <li><a href="#a8">Ex 8 · Bayesian survival</a></li>
+ </ul>
+ <div class="section">Day 4 docs</div>
+ <ul>
+ <li><a href="lab.html">Main lab</a></li>
+ <li><a class="featured" href="plain_language_summary.html">Plain-language summary</a></li>
+ <li><a href="problem_set_v2.html">Problem set v2 (songbirds)</a></li>
+ <li><a href="problem_set_v3.html">Problem set v3 (marine)</a></li>
+ </ul>
+ </nav>
+</aside>
+
+<main class="content">
+<header class="lab-header">
+ <div class="eyebrow">Day 4 · Answer Key (instructor)</div>
+ <h1>Worked solutions — Maximum Likelihood &amp; Bayesian I</h1>
+ <p class="lede">Full numeric and conceptual answers to every Day 4 exercise. Each answer includes the underlying logic, the R / <span class="pill nimble">Nimble</span> verification, and a short "what to look for in a student response" note for instructors.</p>
+</header>
+
+<!-- ============== EX 1 ============== -->
+<section id="a1">
+<h2>Exercise 1 — Bernoulli MLE</h2>
+
+<p>$y_i \sim \text{Bernoulli}(p)$ independently, $s = \sum y_i$, $n$ trials.</p>
+
+<p><strong>(a) Likelihood.</strong> Since the $y_i$ are independent,</p>
+<div class="eq-block">$L(p) = \prod_{i=1}^n p^{y_i}(1-p)^{1-y_i} = p^s (1-p)^{n-s}.$</div>
+
+<p><strong>(b) MLE.</strong> Log-likelihood: $\ell(p) = s\log p + (n-s)\log(1-p)$. Then</p>
+<div class="eq-block">$\ell'(p) = \dfrac{s}{p} - \dfrac{n-s}{1-p} = 0 \;\Rightarrow\; s(1-p) = p(n-s) \;\Rightarrow\; \hat p = s/n.$</div>
+
+<p><strong>(c) Fisher information.</strong> $\ell''(p) = -s/p^2 - (n-s)/(1-p)^2$. At $\hat p = s/n$,</p>
+<div class="eq-block">$-\ell''(\hat p) = \dfrac{n}{\hat p} + \dfrac{n}{1-\hat p} = \dfrac{n}{\hat p (1 - \hat p)}.$</div>
+<p>So Fisher information is $I(\hat p) = n/[\hat p(1-\hat p)]$, and Wald SE is $1/\sqrt{I(\hat p)} = \sqrt{\hat p(1-\hat p)/n}$.</p>
+
+<p><strong>(d) Red-light data.</strong> $s=30, n=50$. $\hat p = 0.6$; Wald SE $= \sqrt{0.6 \cdot 0.4/50} \approx 0.0693$; Wald 95% CI $\approx (0.464, 0.736)$; profile 95% CI $\approx (0.461, 0.726)$ from <code>confint(mle(...))</code>.</p>
+
+<pre><code><span class="kw">library</span>(stats4)
+nll &lt;- function(p) -(<span class="nu">30</span> * log(p) + <span class="nu">20</span> * log(<span class="nu">1</span> - p))
+fit &lt;- mle(nll, start = list(p = <span class="nu">0.5</span>), method = <span class="st">"L-BFGS-B"</span>,
+ lower = <span class="nu">0.001</span>, upper = <span class="nu">0.999</span>)
+summary(fit)
+confint(fit) <span class="cm"># profile-likelihood CI: (0.461, 0.726)</span></code></pre>
+
+<div class="callout key"><strong>What to look for:</strong> Students should set the derivative to zero <em>by hand</em>, not just quote the answer. The Fisher-information step is where the connection between curvature and SE clicks; if they skip it, walk them back through it.</div>
+</section>
+
+<!-- ============== EX 2 ============== -->
+<section id="a2">
+<h2>Exercise 2 — Profile likelihood for κ</h2>
+
+<p>The profile-likelihood for $\kappa$ is built by holding $\kappa$ fixed at each grid point and optimizing the other two parameters; the resulting curve has its minimum at the joint MLE.</p>
+
+<pre><code><span class="kw">library</span>(stats4)
+TheData &lt;- matrix(scan(<span class="st">"Vonbert.dat"</span>, skip = <span class="nu">1</span>), byrow = <span class="kw">TRUE</span>, ncol = <span class="nu">3</span>)
+Age &lt;- TheData[, <span class="nu">2</span>]; Len &lt;- TheData[, <span class="nu">3</span>]
+
+profile_kappa &lt;- function(k) {
+ nll &lt;- function(Linf, sigma) {
+ pred &lt;- Linf * (<span class="nu">1</span> - exp(-k * Age))
+ -sum(dnorm(Len, pred, sigma, log = <span class="kw">TRUE</span>))
+ }
+ fit &lt;- mle(nll, start = list(Linf = <span class="nu">100</span>, sigma = <span class="nu">10</span>),
+ method = <span class="st">"L-BFGS-B"</span>, lower = c(<span class="nu">10</span>, <span class="nu">0.01</span>))
+ -logLik(fit)[<span class="nu">1</span>]
+}
+grid &lt;- seq(<span class="nu">0.05</span>, <span class="nu">0.45</span>, by = <span class="nu">0.005</span>)
+prof &lt;- sapply(grid, profile_kappa)
+best &lt;- min(prof)
+
+plot(grid, prof - best, type = <span class="st">"l"</span>, lwd = <span class="nu">2</span>,
+ xlab = expression(kappa), ylab = expression(-Delta * log~L))
+abline(h = <span class="nu">1.92</span>, lty = <span class="nu">2</span>, col = <span class="st">"red"</span>)
+abline(v = grid[which.min(prof)], col = <span class="st">"grey"</span>)
+
+ci &lt;- range(grid[(prof - best) &lt;= <span class="nu">1.92</span>])
+cat(<span class="st">"Profile 95% CI for kappa:"</span>, round(ci, <span class="nu">3</span>), <span class="st">"\n"</span>)</code></pre>
+
+<p>Typical result: $\hat\kappa \approx 0.18$–0.22 (pooled across sexes), CI roughly (0.15, 0.26). The curve is clearly asymmetric — Wald would have given a symmetric (and slightly wrong) CI.</p>
+
+<div class="callout key"><strong>What to look for:</strong> Common bug — students forget to <em>re-optimize $L_\infty$ and $\sigma$ at each $\kappa$</em> and just plug in their joint-MLE values. That gives a slice of the surface, not the profile. The profile is always shallower (wider 1.92 region) than the slice.</div>
+</section>
+
+<!-- ============== EX 3 ============== -->
+<section id="a3">
+<h2>Exercise 3 — Sex-specific VBGF revisited</h2>
+
+<p>(a) From the lab walk-through code (Model A = shared, Model B = full sex-specific):</p>
+<pre><code>LRT &lt;- <span class="nu">2</span> * (-logLik(fitA)[<span class="nu">1</span>] - (-logLik(fitB)[<span class="nu">1</span>]))
+pval &lt;- pchisq(LRT, df = <span class="nu">2</span>, lower.tail = <span class="kw">FALSE</span>)
+c(LRT = LRT, p_value = pval)
+AIC(fitA, fitB)</code></pre>
+
+<p>For this dataset typical numbers: $\Lambda \approx 8$–12, $p \approx 0.002$–0.02. Both LRT and AIC favor Model B.</p>
+
+<p>(b) Intermediate model: shared $L_\infty$, sex-specific $\kappa$. Fit it the same way with 4 parameters. Result typically has lower AIC than both Model A and Model B — the sex effect is concentrated in $\kappa$ (growth rate), while asymptotic length is similar.</p>
+
+<p>(c) Conclusion: females and males grow toward similar maximum sizes but at different rates. AIC will sometimes favor the intermediate model; LRT (which insists on a $\chi^2$ test) will reject Model A in favor of Model B but cannot directly compare the non-nested intermediate without an extra LRT against Model B.</p>
+
+<div class="callout key"><strong>What to look for:</strong> Comfort with both LRT and AIC. Reinforce: LRT requires nesting; AIC does not. LRT delivers a p-value; AIC delivers a ranking, not a test.</div>
+</section>
+
+<!-- ============== EX 4 ============== -->
+<section id="a4">
+<h2>Exercise 4 — Zero-inflated Poisson</h2>
+
+<pre><code><span class="kw">library</span>(stats4)
+fit_zip_and_pois &lt;- function(lambda_true) {
+ set.seed(<span class="nu">99</span>)
+ n &lt;- <span class="nu">300</span>; pi_true &lt;- <span class="nu">0.35</span>
+ z &lt;- rbinom(n, <span class="nu">1</span>, pi_true)
+ y &lt;- ifelse(z == <span class="nu">1</span>, <span class="nu">0</span>, rpois(n, lambda_true))
+
+ nll_pois &lt;- function(lam) -sum(dpois(y, lam, log = <span class="kw">TRUE</span>))
+ nll_zip &lt;- function(p, lam) {
+ if (p &lt;= <span class="nu">0</span> || p &gt;= <span class="nu">1</span> || lam &lt;= <span class="nu">0</span>) return(<span class="nu">1e10</span>)
+ pz &lt;- p + (<span class="nu">1</span> - p) * exp(-lam)
+ ll &lt;- ifelse(y == <span class="nu">0</span>, log(pz), log(<span class="nu">1</span> - p) + dpois(y, lam, log = <span class="kw">TRUE</span>))
+ -sum(ll)
+ }
+ fp &lt;- mle(nll_pois, start = list(lam = mean(y)), method = <span class="st">"L-BFGS-B"</span>, lower = <span class="nu">0.001</span>)
+ fz &lt;- mle(nll_zip, start = list(p = <span class="nu">0.2</span>, lam = <span class="nu">1</span>), method = <span class="st">"L-BFGS-B"</span>,
+ lower = c(<span class="nu">0.001</span>, <span class="nu">0.001</span>), upper = c(<span class="nu">0.999</span>, <span class="nu">50</span>))
+ data.frame(lambda_true = lambda_true,
+ obs_p0 = mean(y == <span class="nu">0</span>),
+ pois_p0 = exp(-coef(fp)),
+ zip_p0 = coef(fz)[<span class="st">"p"</span>] + (<span class="nu">1</span> - coef(fz)[<span class="st">"p"</span>]) * exp(-coef(fz)[<span class="st">"lam"</span>]),
+ AIC_pois = AIC(fp),
+ AIC_zip = AIC(fz))
+}
+do.call(rbind, lapply(c(<span class="nu">1</span>, <span class="nu">2.5</span>, <span class="nu">8</span>), fit_zip_and_pois))</code></pre>
+
+<p>Expected pattern:</p>
+<table>
+<tr><th>$\lambda$</th><th>Observed P(Y=0)</th><th>Poisson-predicted P(Y=0)</th><th>ZIP-predicted P(Y=0)</th><th>$\Delta$ AIC (Pois − ZIP)</th></tr>
+<tr><td>1</td><td>~0.59</td><td>~0.45</td><td>~0.59</td><td>~10</td></tr>
+<tr><td>2.5</td><td>~0.40</td><td>~0.13</td><td>~0.40</td><td>~70</td></tr>
+<tr><td>8</td><td>~0.35</td><td>~0.0001</td><td>~0.35</td><td>~1000</td></tr>
+</table>
+
+<p>(c) Why the small-$\lambda$ case is hardest: at $\lambda=1$ a plain Poisson already produces P(Y=0) $= e^{-1} \approx 0.37$, similar to the inflated proportion of 0.59. The likelihood signal that distinguishes Poisson from ZIP is weak. At $\lambda = 8$, plain Poisson predicts essentially zero zeros; any zero inflation is unmistakable.</p>
+</section>
+
+<!-- ============== EX 5 ============== -->
+<section id="a5">
+<h2>Exercise 5 — Beta–Binomial posterior arithmetic</h2>
+
+<p>(a) Prior Beta(3, 7), data $y=22$, $n=40$. Posterior is Beta(3+22, 7+(40−22)) = <strong>Beta(25, 25)</strong>.</p>
+
+<pre><code><span class="kw">library</span>(HDInterval)
+post &lt;- rbeta(<span class="nu">2e5</span>, <span class="nu">25</span>, <span class="nu">25</span>)
+c(mean = mean(post),
+ median = median(post),
+ BCI = quantile(post, c(<span class="nu">.025</span>, <span class="nu">.975</span>)),
+ HPDI = hdi(post, <span class="nu">.95</span>))</code></pre>
+
+<p>(b) Posterior mean = 0.5, median = 0.5, BCI ≈ (0.36, 0.64), HPDI ≈ (0.36, 0.64). Symmetric posterior, so BCI ≈ HPDI.</p>
+
+<p>(c) Beta(1, 1) prior + same data → Beta(23, 19), mean $\approx 0.548$, BCI ≈ (0.40, 0.70). The flat prior makes the posterior mean equal the sample mean shifted up by one in numerator and denominator. The skeptical prior pulled the posterior down toward 0.30; the flat prior didn't pull at all.</p>
+
+<div class="callout key"><strong>What to look for:</strong> Recognition that the posterior is exact (no simulation needed for closed-form Beta). Students often run MCMC when they don't need to — push them to recognize conjugacy.</div>
+</section>
+
+<!-- ============== EX 6 ============== -->
+<section id="a6">
+<h2>Exercise 6 — Metropolis for Gamma–Poisson</h2>
+
+<p>(a) Working in $\log\lambda$ ensures (i) the proposal is symmetric in the unconstrained space, (ii) you can't propose a negative $\lambda$, and (iii) tail behavior is well-handled. The Jacobian of the transformation contributes a $+\log\lambda$ term to the log-density (because $d\lambda/d(\log\lambda) = \lambda$).</p>
+
+<p>(b–c) Code:</p>
+<pre><code>y &lt;- c(<span class="nu">3</span>,<span class="nu">1</span>,<span class="nu">4</span>,<span class="nu">2</span>,<span class="nu">0</span>,<span class="nu">5</span>,<span class="nu">2</span>,<span class="nu">3</span>,<span class="nu">1</span>,<span class="nu">4</span>)
+log_post &lt;- function(log_lam) {
+ lam &lt;- exp(log_lam)
+ dgamma(lam, <span class="nu">2</span>, <span class="nu">1</span>, log = <span class="kw">TRUE</span>) + sum(dpois(y, lam, log = <span class="kw">TRUE</span>)) + log_lam
+}
+set.seed(<span class="nu">3</span>)
+ll &lt;- numeric(<span class="nu">3e4</span>); ll[<span class="nu">1</span>] &lt;- log(<span class="nu">2</span>); acc &lt;- <span class="nu">0</span>; s &lt;- <span class="nu">0.30</span>
+for (i in <span class="nu">2</span>:length(ll)) {
+ prop &lt;- rnorm(<span class="nu">1</span>, ll[i - <span class="nu">1</span>], s)
+ if (log(runif(<span class="nu">1</span>)) &lt; log_post(prop) - log_post(ll[i - <span class="nu">1</span>])) {
+ ll[i] &lt;- prop; acc &lt;- acc + <span class="nu">1</span>
+ } else ll[i] &lt;- ll[i - <span class="nu">1</span>]
+}
+cat(<span class="st">"acceptance ="</span>, round(acc / length(ll), <span class="nu">3</span>), <span class="st">"\n"</span>)
+
+lam &lt;- exp(ll[-(<span class="nu">1</span>:<span class="nu">3000</span>)])
+hist(lam, breaks = <span class="nu">60</span>, freq = <span class="kw">FALSE</span>, main = <span class="st">""</span>, xlab = expression(lambda))
+curve(dgamma(x, <span class="nu">2</span> + sum(y), <span class="nu">1</span> + length(y)), add = <span class="kw">TRUE</span>, lwd = <span class="nu">2</span>, col = <span class="st">"red"</span>)</code></pre>
+
+<p>Acceptance with $s = 0.30$ is typically ~35–45%. Posterior approximation matches the closed-form Gamma(27, 11) (mean 2.45) to within MCMC noise.</p>
+</section>
+
+<!-- ============== EX 7 ============== -->
+<section id="a7">
+<h2>Exercise 7 — Logistic growth in <span class="pill nimble">Nimble</span></h2>
+
+<p>The full code is in <code>Logistic_BayesianGrowth_Nimble.R</code>. Typical posterior summaries (rounded; will vary by seed):</p>
+
+<table>
+<tr><th>parameter</th><th>median</th><th>95% BCI</th><th>95% HPDI</th></tr>
+<tr><td>$r$</td><td>~0.20</td><td>(0.16, 0.24)</td><td>(0.16, 0.24)</td></tr>
+<tr><td>$K$</td><td>~1180</td><td>(950, 1500)</td><td>(940, 1490)</td></tr>
+<tr><td>$\sigma$</td><td>~0.014</td><td>(0.010, 0.020)</td><td>(0.009, 0.019)</td></tr>
+<tr><td>$N_{\max\,dN/dt}=K/2$</td><td>~590</td><td>(475, 750)</td><td>(470, 745)</td></tr>
+<tr><td>$\text{MSY}=rK/4$</td><td>~59</td><td>(48, 73)</td><td>(48, 72)</td></tr>
+</table>
+
+<p>(c) $\Pr(r > 0.22 \mid \text{data}) \approx 0.10$–0.20 depending on seed.</p>
+<p>(d) $\Pr(\text{MSY} > 50 \mid \text{data}) \approx 0.85$–0.95.</p>
+<p>(e) The clearest BCI–HPDI separation is on $\sigma$: $\sigma$ is bounded below by zero and the posterior piles up toward the lower bound, so HPDI extends further left and the upper bound is shorter. <em>Why:</em> equal-tail intervals split the 5% miscoverage symmetrically by quantile; HPDI captures the densest 95% of mass, which for a right-skewed distribution shifts the interval toward (but not past) the lower bound.</p>
+
+<div class="callout key"><strong>What to look for:</strong> Students should monitor <em>derived quantities</em> directly (MSY, K/2, dNdt) inside the Nimble code, not compute them externally from $r$ and $K$ samples (though that works too — make sure they understand the equivalence: any function of monitored RVs has a posterior that's just the function applied draw-by-draw).</div>
+</section>
+
+<!-- ============== EX 8 ============== -->
+<section id="a8">
+<h2>Exercise 8 — Bayesian bluebird survival</h2>
+
+<p>Prior pseudo-sample sizes: Beta(1,1) = 2, Beta(9,11) = 20, Beta(50,50) = 100. Data: $y=18, n=25$.</p>
+
+<table>
+<tr><th>Prior</th><th>Posterior</th><th>Posterior mean</th><th>95% BCI</th><th>$\Pr(\phi > 0.5)$</th></tr>
+<tr><td>Beta(1, 1)</td><td>Beta(19, 8)</td><td>0.704</td><td>(0.53, 0.85)</td><td>~0.98</td></tr>
+<tr><td>Beta(9, 11)</td><td>Beta(27, 18)</td><td>0.600</td><td>(0.45, 0.74)</td><td>~0.91</td></tr>
+<tr><td>Beta(50, 50)</td><td>Beta(68, 57)</td><td>0.544</td><td>(0.46, 0.63)</td><td>~0.83</td></tr>
+</table>
+
+<pre><code><span class="kw">library</span>(nimble); <span class="kw">library</span>(MCMCvis)
+fit_one &lt;- function(a, b) {
+ code &lt;- nimbleCode({ phi ~ dbeta(a, b); y ~ dbinom(phi, n) })
+ out &lt;- nimbleMCMC(code = code,
+ constants = list(n = <span class="nu">25</span>, a = a, b = b),
+ data = list(y = <span class="nu">18</span>),
+ inits = list(phi = <span class="nu">0.5</span>),
+ monitors = <span class="st">"phi"</span>,
+ nchains = <span class="nu">1</span>, nburnin = <span class="nu">2000</span>, niter = <span class="nu">12000</span>,
+ samplesAsCodaMCMC = <span class="kw">TRUE</span>)
+ list(mean = mean(MCMCchains(out, <span class="st">"phi"</span>)),
+ BCI = quantile(MCMCchains(out, <span class="st">"phi"</span>), c(<span class="nu">.025</span>, <span class="nu">.975</span>)),
+ p05 = mean(MCMCchains(out, <span class="st">"phi"</span>) &gt; <span class="nu">0.5</span>))
+}
+lapply(list(c(<span class="nu">1</span>,<span class="nu">1</span>), c(<span class="nu">9</span>,<span class="nu">11</span>), c(<span class="nu">50</span>,<span class="nu">50</span>)), function(p) fit_one(p[<span class="nu">1</span>], p[<span class="nu">2</span>]))</code></pre>
+
+<p>(c) The data have $n = 25$ trials. A Beta($\alpha,\beta$) prior is worth $\alpha+\beta$ trials' worth of information. So:</p>
+<ul>
+<li>Beta(1,1) is essentially weightless (2 vs 25) — posterior mirrors the MLE 18/25 = 0.72.</li>
+<li>Beta(9,11) is worth 20 trials, comparable to the data; the posterior splits the difference between 0.45 (prior mean) and 0.72.</li>
+<li>Beta(50,50) is worth 100 trials, 4× the data; the posterior is yanked strongly toward 0.50.</li>
+</ul>
+
+<div class="callout key"><strong>What to look for:</strong> Students should articulate the "prior pseudo-sample size" idea verbatim. This is the single best mental model for prior strength.</div>
+</section>
+
+</main>
+</div>
+
+<footer>
+ FW 536 · Statistical Modeling for Ecology and Conservation · Oregon State University · Day 4 answer key
+</footer>
+</body>
+</html>

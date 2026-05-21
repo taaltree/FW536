@@ -1,0 +1,640 @@
+/* FW599 Enhanced Lab Stylesheet
+ * Used by all lab pages in Fall2025_Enhanced.
+ */
+
+:root {
+  --osu-orange: #D73F09;
+  --osu-orange-dark: #B33107;
+  --osu-black: #000000;
+  --osu-stone: #4A4A4A;
+  --osu-cream: #F4ECD8;
+  --bg: #FBFAF6;
+  --panel: #FFFFFF;
+  --panel-alt: #F1EFE8;
+  --border: #DDD7C7;
+  --text: #1B1B1B;
+  --muted: #6B6B6B;
+  --accent: #2B6E61;
+  --warn: #B47B00;
+  --bad: #A22020;
+  --good: #2E6B2A;
+  --code-bg: #1E1E1E;
+  --code-fg: #E8E8E8;
+  --code-comment: #8FA08F;
+  --code-string: #E5A66B;
+  --code-keyword: #C586C0;
+  --code-number: #B5CEA8;
+  --code-fn: #DCDCAA;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Charter', 'Iowan Old Style', Georgia, 'Times New Roman', serif;
+  font-size: 17px;
+  line-height: 1.65;
+  color: var(--text);
+  background: var(--bg);
+  margin: 0;
+  padding: 0;
+}
+
+/* Layout */
+.shell { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; }
+.sidebar {
+  background: var(--osu-black);
+  color: #fff;
+  padding: 24px 18px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  border-right: 6px solid var(--osu-orange);
+}
+.sidebar h1 {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 18px;
+  margin: 0 0 4px 0;
+  color: #fff;
+  letter-spacing: 0.5px;
+}
+.sidebar h1 a {
+  color: #fff;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 5px;
+  border-left: 3px solid var(--osu-orange);
+  background: rgba(215,63,9,0.10);
+}
+.sidebar h1 a::before {
+  content: "\2190";
+  font-size: 14px;
+  color: var(--osu-orange);
+  font-weight: bold;
+}
+.sidebar h1 a:hover {
+  background: var(--osu-orange);
+  color: #fff;
+}
+.sidebar h1 a:hover::before { color: #fff; }
+.sidebar .subtitle { color: #c8c8c8; font-size: 12px; margin: 6px 0 24px 0; padding: 0 10px; }
+.sidebar nav ul { list-style: none; padding: 0; margin: 0; }
+.sidebar nav li { margin: 6px 0; }
+.sidebar nav a {
+  color: #e8e8e8;
+  text-decoration: none;
+  font-size: 14px;
+  padding: 6px 10px;
+  display: block;
+  border-radius: 4px;
+  border-left: 3px solid transparent;
+}
+.sidebar nav a:hover { background: rgba(215,63,9,0.18); border-left-color: var(--osu-orange); color: #fff; }
+.sidebar nav a.featured {
+  font-size: 16px;
+  font-weight: 600;
+  background: rgba(255,255,255,0.07);
+  border-left-color: var(--osu-orange);
+  padding: 9px 10px;
+}
+.sidebar nav a.featured:hover { background: rgba(215,63,9,0.30); color: #fff; }
+.sidebar nav .section { color: var(--osu-orange); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin: 18px 0 4px 10px; }
+
+.content { padding: 40px 60px 120px 60px; max-width: 1100px; }
+
+/* Header */
+.lab-header {
+  border-bottom: 4px solid var(--osu-orange);
+  padding-bottom: 18px;
+  margin-bottom: 32px;
+}
+.lab-header .eyebrow {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: 12px;
+  color: var(--osu-orange);
+  font-weight: 700;
+}
+.lab-header h1 {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 36px;
+  margin: 4px 0 6px 0;
+  color: var(--osu-black);
+  line-height: 1.15;
+}
+.lab-header .lede {
+  font-size: 19px;
+  color: var(--osu-stone);
+  font-style: italic;
+}
+
+/* Sections */
+section { margin: 40px 0; }
+h2 {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 26px;
+  border-bottom: 2px solid var(--border);
+  padding-bottom: 6px;
+  color: var(--osu-black);
+}
+h3 {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  color: var(--osu-orange-dark);
+  font-size: 20px;
+  margin-top: 28px;
+}
+h4 {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  color: var(--osu-stone);
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Callouts */
+.callout {
+  border-left: 5px solid var(--accent);
+  background: var(--panel);
+  padding: 16px 22px;
+  margin: 24px 0;
+  border-radius: 0 8px 8px 0;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+.callout.plain {
+  border-left-color: var(--osu-orange);
+  background: #FFF9F2;
+}
+.callout.plain::before {
+  content: "Plain-language summary";
+  display: block;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--osu-orange);
+  margin-bottom: 6px;
+  font-weight: 700;
+}
+.callout.bio {
+  border-left-color: #4A8C3A;
+  background: #F4FAF1;
+}
+.callout.bio::before {
+  content: "Biological intuition";
+  display: block;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #2E6B2A;
+  margin-bottom: 6px;
+  font-weight: 700;
+}
+.callout.warn {
+  border-left-color: var(--warn);
+  background: #FFF8E5;
+}
+.callout.warn::before {
+  content: "Watch out";
+  display: block;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--warn);
+  margin-bottom: 6px;
+  font-weight: 700;
+}
+.callout.key {
+  border-left-color: var(--osu-orange);
+  background: #F8F4E8;
+}
+.callout.key::before {
+  content: "Key idea";
+  display: block;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--osu-orange);
+  margin-bottom: 6px;
+  font-weight: 700;
+}
+.callout.try {
+  border-left-color: var(--accent);
+  background: #EAF4F2;
+}
+.callout.try::before {
+  content: "Try it yourself";
+  display: block;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 6px;
+  font-weight: 700;
+}
+
+/* Lab navigation / table of contents card (appears at top of each lab.html) */
+.lab-toc {
+  background: white;
+  border-radius: 14px;
+  padding: 28px 32px;
+  margin: 24px 0 40px 0;
+  box-shadow: 0 4px 22px rgba(0,0,0,0.08);
+  border: 2px solid var(--osu-orange);
+}
+.lab-toc h2 {
+  border: none;
+  font-size: 22px;
+  margin: 0 0 8px 0;
+  padding: 0;
+  color: var(--osu-black);
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+}
+.lab-toc .toc-intro {
+  color: var(--osu-stone);
+  margin: 0 0 22px 0;
+  font-size: 15px;
+  line-height: 1.5;
+}
+.lab-toc .session {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  gap: 18px;
+  padding: 18px 0;
+  border-top: 1px solid var(--border);
+}
+.lab-toc .session:first-of-type { border-top: none; padding-top: 8px; }
+.lab-toc .session-label {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--osu-orange);
+  padding-top: 4px;
+}
+.lab-toc .session-title {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--osu-black);
+  margin-bottom: 10px;
+}
+.lab-toc .row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 6px 0;
+  font-size: 14px;
+}
+.lab-toc .row .tag {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 12px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.lab-toc .tag.practice { background: #E8F2D9; color: #3F6B2A; }
+.lab-toc .tag.assessed { background: #FBE3DD; color: #A22020; }
+.lab-toc .tag.template { background: #E1ECF7; color: #1C638A; }
+.lab-toc .tag.lecture  { background: #F4ECD8; color: #6A3F22; }
+.lab-toc .row a {
+  color: var(--osu-orange-dark);
+  text-decoration: none;
+  font-weight: 600;
+}
+.lab-toc .row a:hover { color: var(--osu-orange); text-decoration: underline; }
+.lab-toc .row .note { color: var(--muted); font-size: 13px; margin-left: 4px; }
+
+/* Banner that goes ABOVE the practice problems making it clear they are
+   practice and not the hand-in. */
+.practice-banner {
+  background: linear-gradient(90deg, #E8F2D9, #F4FAF1);
+  border-left: 6px solid #4A8C3A;
+  padding: 16px 22px;
+  margin: 30px 0;
+  border-radius: 0 10px 10px 0;
+}
+.practice-banner .label {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #2E6B2A;
+}
+.practice-banner h3 {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 18px;
+  color: #1B4B1B;
+  margin: 4px 0 6px 0;
+}
+.practice-banner p { margin: 4px 0; font-size: 14px; }
+.practice-banner .hand-in {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 4px 10px;
+  border-radius: 4px;
+  background: white;
+  border: 1px solid #A22020;
+  color: #A22020;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+}
+.practice-banner .hand-in:hover { background: #A22020; color: white; }
+
+/* Exercises */
+.exercise {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 22px 26px;
+  margin: 28px 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.exercise .ex-tag {
+  display: inline-block;
+  background: var(--osu-orange);
+  color: white;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  padding: 4px 10px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+.exercise h3 { margin-top: 8px; color: var(--osu-black); }
+.exercise .difficulty {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 12px;
+  color: var(--muted);
+  margin-left: 12px;
+}
+.exercise .difficulty.easy { color: var(--good); }
+.exercise .difficulty.medium { color: var(--warn); }
+.exercise .difficulty.hard { color: var(--bad); }
+
+/* Reveal answer */
+details.answer {
+  margin: 16px 0 0 0;
+  background: var(--panel-alt);
+  border-radius: 8px;
+  padding: 0;
+  border: 1px dashed var(--border);
+}
+details.answer > summary {
+  cursor: pointer;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--osu-orange-dark);
+  list-style: none;
+  padding: 12px 18px;
+  user-select: none;
+}
+details.answer > summary::-webkit-details-marker { display: none; }
+details.answer > summary::before {
+  content: "▶ ";
+  display: inline-block;
+  transform-origin: 50% 50%;
+  transition: transform 0.15s ease;
+  margin-right: 6px;
+}
+details.answer[open] > summary::before { transform: rotate(90deg); }
+details.answer > summary:hover { background: #E8E4D5; }
+details.answer .answer-body { padding: 4px 22px 18px 22px; }
+
+/* Code */
+pre, code { font-family: 'JetBrains Mono', 'Source Code Pro', Menlo, Consolas, monospace; }
+code { background: #EFEBE0; padding: 1px 5px; border-radius: 3px; font-size: 0.93em; }
+pre {
+  background: var(--code-bg);
+  color: var(--code-fg);
+  padding: 18px 20px;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-size: 14px;
+  line-height: 1.55;
+  box-shadow: inset 0 0 0 1px #2A2A2A;
+}
+pre code { background: transparent; color: inherit; padding: 0; }
+pre .cm { color: var(--code-comment); font-style: italic; }   /* comment */
+pre .kw { color: var(--code-keyword); }                          /* keyword */
+pre .st { color: var(--code-string); }                           /* string */
+pre .nu { color: var(--code-number); }                           /* number */
+pre .fn { color: var(--code-fn); }                               /* function */
+pre .op { color: #CFCFCF; }                                       /* operator */
+
+.code-label {
+  display: inline-block;
+  background: #2D2D2D;
+  color: #E0E0E0;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 4px 4px 0 0;
+  margin-bottom: 0;
+}
+.code-label + pre { border-radius: 0 8px 8px 8px; margin-top: 0; }
+
+/* Tables */
+table {
+  border-collapse: collapse;
+  margin: 18px 0;
+  width: 100%;
+  background: var(--panel);
+  border-radius: 6px;
+  overflow: hidden;
+}
+th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); }
+th { background: var(--panel-alt); font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--osu-stone); }
+tr:last-child td { border-bottom: none; }
+
+/* Math */
+.math { font-style: italic; font-family: 'Latin Modern Math', 'Cambria Math', Georgia, serif; }
+.eq { text-align: center; margin: 18px 0; font-size: 18px; }
+.eq-block {
+  background: var(--panel-alt);
+  border-left: 4px solid var(--osu-orange);
+  padding: 12px 18px;
+  margin: 18px 0;
+  border-radius: 0 6px 6px 0;
+  font-size: 18px;
+  text-align: center;
+  overflow-x: auto;
+}
+
+/* Quiz */
+.quiz {
+  background: var(--panel);
+  border: 2px solid var(--accent);
+  border-radius: 10px;
+  padding: 22px 26px;
+  margin: 28px 0;
+}
+.quiz h4 {
+  margin-top: 0;
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.quiz h4::before { content: "?"; background: var(--accent); color: white; border-radius: 50%; width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; font-weight: bold; }
+.quiz .choices { list-style: none; padding: 0; margin: 14px 0; }
+.quiz .choices li { padding: 8px 0; }
+.quiz .choices label { cursor: pointer; display: flex; align-items: flex-start; gap: 10px; }
+.quiz .choices input { margin-top: 4px; }
+.quiz .feedback { margin-top: 14px; padding: 12px 16px; border-radius: 6px; display: none; font-size: 14px; }
+.quiz .feedback.show { display: block; }
+.quiz .feedback.correct { background: #E0F2D9; color: var(--good); }
+.quiz .feedback.wrong { background: #FBE3DD; color: var(--bad); }
+.quiz button {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+}
+.quiz button:hover { background: #224F46; }
+
+/* Tabs */
+.tabs { margin: 24px 0; }
+.tab-buttons {
+  display: flex;
+  gap: 4px;
+  border-bottom: 2px solid var(--border);
+}
+.tab-buttons button {
+  background: transparent;
+  border: none;
+  padding: 10px 18px;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+}
+.tab-buttons button.active { color: var(--osu-orange); border-bottom-color: var(--osu-orange); }
+.tab-buttons button:hover { color: var(--osu-orange-dark); }
+.tab-panel { display: none; padding: 18px 0; }
+.tab-panel.active { display: block; }
+
+/* Difficulty pills */
+.pill {
+  display: inline-block;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  text-transform: uppercase;
+}
+.pill.easy { background: #E0F2D9; color: var(--good); }
+.pill.medium { background: #FFF1D6; color: var(--warn); }
+.pill.hard { background: #FBE3DD; color: var(--bad); }
+.pill.r { background: #E1ECF7; color: #1C638A; }
+.pill.nimble { background: #F0E4F5; color: #6C2C8A; }
+.pill.jags { background: #E8DACE; color: #6A3F22; }
+
+/* Figure */
+figure { margin: 22px 0; }
+figure svg { max-width: 100%; height: auto; display: block; margin: 0 auto; background: white; border: 1px solid var(--border); border-radius: 6px; }
+figcaption { font-size: 13px; color: var(--muted); text-align: center; margin-top: 8px; font-style: italic; }
+
+/* Footer */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 30px 60px;
+  font-size: 13px;
+  color: var(--muted);
+  background: var(--panel-alt);
+  margin-top: 60px;
+}
+
+/* Print */
+@media print {
+  .sidebar { display: none; }
+  .shell { grid-template-columns: 1fr; }
+  details.answer { border: 1px solid #888; }
+  details.answer .answer-body { display: block !important; }
+  details.answer summary::before { content: ""; }
+  pre { background: #f4f4f4 !important; color: #111 !important; box-shadow: none; border: 1px solid #ddd; }
+}
+
+/* Mobile */
+@media (max-width: 900px) {
+  .shell { grid-template-columns: 1fr; }
+  .sidebar { position: relative; height: auto; border-right: none; border-bottom: 6px solid var(--osu-orange); }
+  .content { padding: 24px; }
+}
+
+
+/* Data files & R scripts card on lab pages */
+.data-card {
+  background: white;
+  border-left: 5px solid var(--accent);
+  border-radius: 8px;
+  padding: 22px 28px;
+  margin: 30px 0;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+}
+.data-card h2 {
+  border: none;
+  font-size: 22px;
+  margin: 0 0 6px 0;
+  padding: 0;
+  color: var(--osu-black);
+}
+.data-card > p { color: var(--osu-stone); font-size: 14px; margin: 0 0 16px 0; }
+.data-card .data-h {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-size: 12px;
+  color: var(--accent);
+  margin: 14px 0 6px 0;
+  border: none;
+}
+.data-card .data-row {
+  padding: 6px 0;
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 16px;
+  align-items: baseline;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+}
+.data-card .data-row:last-child { border-bottom: none; }
+.data-card .data-row a {
+  color: var(--osu-orange-dark);
+  text-decoration: none;
+  font-weight: 600;
+}
+.data-card .data-row a:hover { color: var(--osu-orange); text-decoration: underline; }
+.data-card .data-row a code { background: #F0EAD2; padding: 2px 6px; border-radius: 3px; font-size: 13px; }
+.data-card .data-row .data-desc { color: var(--osu-stone); font-size: 13px; }

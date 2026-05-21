@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>FW 536 · Pre-course exam · ANSWER KEY (instructor only)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="_Shared/css/lab.css" />
+<script defer src="_Shared/js/lab.js"></script>
+<script>MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] } };</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+</head>
+<body>
+<div class="shell">
+
+<aside class="sidebar">
+ <h1><a href="index.html" title="Back to course home">FW 536</a></h1>
+ <div class="subtitle">Pre-course exam · KEY</div>
+ <nav>
+ <ul>
+ <li><a href="#scoring">Scoring guidance</a></li>
+ <li><a href="#part-a">Part A · Probability</a></li>
+ <li><a href="#part-b">Part B · Distributions</a></li>
+ <li><a href="#part-c">Part C · Regression</a></li>
+ <li><a href="#part-d">Part D · Mixed models</a></li>
+ <li><a href="#part-e">Part E · Likelihood</a></li>
+ <li><a href="#part-f">Part F · Bayes</a></li>
+ <li><a href="#part-g">Part G · Free response</a></li>
+ </ul>
+ <div class="section">Course</div>
+ <ul>
+ <li><a href="index.html">All materials</a></li>
+ <li><a href="pre_course_exam.html">Pre-course exam (student copy)</a></li>
+ <li><a href="post_course_exam_KEY.html">Post-course exam KEY</a></li>
+ </ul>
+ </nav>
+</aside>
+
+<main class="content">
+<header class="lab-header">
+ <div class="eyebrow">FW 536 · Instructor copy · NOT for student distribution</div>
+ <h1>Pre-course exam — answer key</h1>
+ <p class="lede">Worked solutions, point values, scoring rubrics, and instructor notes for the FW 536 Day-1-morning pre-course exam. Pair this with <a href="post_course_exam_KEY.html">post_course_exam_KEY.html</a> when computing pre/post gain.</p>
+</header>
+
+<section id="scoring">
+<h2>Scoring guidance</h2>
+<div class="callout key">
+<p>The pre-course exam is intentionally scored generously. Use the following heuristic:</p>
+<ul>
+<li>Full credit (= listed pts): correct answer, plausible reasoning.</li>
+<li>Partial credit (≈ half pts): correct setup but arithmetic / interpretation error; or close-but-wrong intuition that shows the student grasped the question.</li>
+<li>Zero credit: blank, or "I don't know" with no further attempt. Note: <em>do not penalize</em> students for "I don't know" — record it (for the diagnostic) but give them the same zero-cost-to-the-final-grade effect.</li>
+</ul>
+<p>Total: 50 points. Pre-course exam is included in the grade, but the cut-points are calibrated so a student who took zero stats can earn ~25/50 with sensible guessing and partial English-prose answers.</p>
+</div>
+
+<p>Compute each student's <strong>pre/post gain</strong> as <code>post_pct − pre_pct</code> (in percentage points). The aggregate gain is the primary measure of course effectiveness; expect class median of +30 to +50 points.</p>
+</section>
+
+<section id="part-a">
+<h2>Part A — Probability fundamentals (8 points)</h2>
+
+<h3>A1. Conditional probability (2 pts)</h3>
+<p>Bayes: P(infected | +) = (0.92 × 0.05) / (0.92 × 0.05 + 0.05 × 0.95) = 0.046 / (0.046 + 0.0475) = <strong>0.492 ≈ 0.49</strong>.</p>
+<pre><code>(0.92 * 0.05) / (0.92 * 0.05 + 0.05 * 0.95) # 0.4919</code></pre>
+<p><em>Scoring:</em> 2 pts for correct ~0.49. 1 pt if they set up the Bayes formula but compute wrong. 0 if they answer "0.92" (interpret sensitivity as posterior).</p>
+
+<h3>A2. Independence vs mutually exclusive (2 pts)</h3>
+<p>Independent: knowing one tells you nothing about the other (P(A|B) = P(A)). Mutually exclusive: cannot both occur (P(A∩B) = 0). Example pairs vary.</p>
+<p><em>Scoring:</em> 1 pt for correct distinction; 1 pt for a sensible ecological example pair.</p>
+
+<h3>A3. Joint probability (2 pts)</h3>
+<p>P(≥1 detection) = 1 − (0.7)² = <strong>0.51</strong>.</p>
+<p><em>Scoring:</em> 2 pts for 0.51. 1 pt if they answered 0.6 (added probabilities, ignoring intersection) or 0.09 (multiplied detections).</p>
+
+<h3>A4. Expected value (2 pts)</h3>
+<p>E[payoff] = 0.7 × \$10,000 + 0.3 × (−\$2,000) = \$7,000 − \$600 = <strong>\$6,400</strong>.</p>
+<p><em>Scoring:</em> 2 pts for \$6,400. 1 pt for correct formulation but arithmetic error.</p>
+</section>
+
+<section id="part-b">
+<h2>Part B — Distributions (8 points)</h2>
+
+<h3>B1. Pick the distribution (2 pts; ~0.67 pt each)</h3>
+<p>a. <strong>Binomial</strong> (n=12, p). b. <strong>Poisson</strong>. c. <strong>Multinomial</strong>.</p>
+
+<h3>B2. Mean and variance of Poisson(4) (2 pts)</h3>
+<p>Mean = 4, Variance = 4. They are equal — that is a defining feature of the Poisson and tends to fail in real ecological data (which are usually over-dispersed).</p>
+<p><em>Scoring:</em> 1 pt for mean = var = 4; 1 pt for noting equality as a feature (and/or its failure mode in real data).</p>
+
+<h3>B3. Continuous distribution choice (2 pts)</h3>
+<p>Acceptable: Lognormal (log scale is Normal), Gamma (variance scales with mean), or even Weibull. The "why" should mention positive support and right-skew accommodation.</p>
+
+<h3>B4. Normal probability (2 pts)</h3>
+<p>z = (160 − 152) / 8 = 1. P(Z &gt; 1) ≈ <strong>0.159 ≈ 16%</strong>.</p>
+<p>Acceptable answers: "about 16%" or "approximately 15–18%". Full credit either way.</p>
+</section>
+
+<section id="part-c">
+<h2>Part C — Regression (10 points)</h2>
+
+<h3>C1. Reading a coefficient (2 pts)</h3>
+<p>"For each additional mm of length, average weight increases by 0.8 g." (Or equivalent.) Full credit for any version that correctly identifies "per unit predictor" and the direction.</p>
+
+<h3>C2. Choosing a GLM (3 pts)</h3>
+<p>a. <strong>Binomial(logit)</strong>. b. <strong>Poisson(log)</strong> (or NB for overdispersion). c. <strong>Gamma(log)</strong> or Lognormal regression (or Normal on log y).</p>
+
+<h3>C3. Log-link interpretation (3 pts)</h3>
+<p>Multiplicative effect on expected response = exp(0.30) = <strong>1.35</strong> per unit increase in x. Equivalently, a ~35% increase per unit.</p>
+<p><em>Scoring:</em> 3 pts for the multiplicative reading. 1 pt for "the response goes up" with no quantification. 0 for "the response increases by 0.3."</p>
+
+<h3>C4. Logit-link interpretation (2 pts)</h3>
+<p>exp(−0.5) = 0.61. Each additional year of age <em>multiplies the odds of survival by 0.61</em> (a 39% reduction in odds). Full credit for noting the multiplicative effect on odds (not probability).</p>
+<p>Common partial-credit answer: "the probability decreases" — give 1 pt; this is correct in direction but misses the odds-ratio interpretation.</p>
+</section>
+
+<section id="part-d">
+<h2>Part D — Mixed models / hierarchy (8 points)</h2>
+
+<h3>D1. When to use a random effect (2 pts)</h3>
+<p>Plots within a site are not independent (share unmeasured site-level drivers — soil, microclimate, observer). Ignoring this leads to standard errors that are too narrow and inflated false-positive rates.</p>
+
+<h3>D2. Random vs fixed (3 pts)</h3>
+<p>a. <strong>Fixed</strong> (you care about males vs females specifically).</p>
+<p>b. <strong>Random</strong> if you want to generalize across years; can also be modeled as fixed if you care about specific years.</p>
+<p>c. <strong>Fixed</strong> (the experimental design specifies the levels).</p>
+
+<h3>D3. Shrinkage intuition (3 pts)</h3>
+<p>Group-level estimates are pulled toward the overall mean, with the pull being stronger for groups with fewer observations. This is desirable because small groups have noisy estimates; shrinkage trades a little bias for substantially reduced variance, producing better out-of-sample predictions.</p>
+<p><em>Scoring:</em> 3 pts for a description mentioning small-sample pull and predictive accuracy. 1–2 pts for partial intuition. 0 for "I don't know" — but record for the diagnostic.</p>
+</section>
+
+<section id="part-e">
+<h2>Part E — Likelihood (5 points)</h2>
+
+<h3>E1. What is a likelihood? (2 pts)</h3>
+<p>The probability of the observed data given a set of parameter values, viewed as a function of those parameters (with data fixed). A probability is the converse: a function of outcomes given parameters.</p>
+
+<h3>E2. MLE for a proportion (3 pts)</h3>
+<p>MLE = 30/50 = <strong>0.60</strong>.</p>
+<p>Acceptable derivations: (a) intuitive ("the sample proportion is the best estimator"), (b) algebraic from the Binomial likelihood (set derivative of log L = 0 and solve for p).</p>
+<p><em>Scoring:</em> 3 pts for 0.6 with any justification. 2 pts for 0.6 with no reasoning. 0 for incorrect.</p>
+</section>
+
+<section id="part-f">
+<h2>Part F — Bayes (8 points)</h2>
+
+<h3>F1. Prior, likelihood, posterior (2 pts)</h3>
+<p><strong>Prior:</strong> belief about parameters before seeing the data. <strong>Likelihood:</strong> probability of the data given parameter values. <strong>Posterior:</strong> belief about parameters after seeing the data, obtained by combining prior and likelihood via Bayes' rule.</p>
+
+<h3>F2. Posterior interpretation (3 pts)</h3>
+<p>Bayesian: "Given the data and model, there is a 95% probability that the parameter lies in (0.2, 0.8)." Frequentist 95% CI: "If we repeated this experiment many times and computed CIs the same way each time, 95% of those intervals would contain the true parameter." The Bayesian statement is the more direct probability statement people usually want.</p>
+
+<h3>F3. Why MCMC (3 pts)</h3>
+<p>The posterior involves an integral in the denominator (marginal likelihood) that is intractable for most realistic models — no closed form exists. MCMC samples from the posterior without computing that integral, by constructing a Markov chain whose stationary distribution is the posterior. The samples can then be summarized like draws from any distribution.</p>
+<p><em>Scoring:</em> 3 pts for mentioning the intractable normalizing integral and that MCMC samples rather than computes. 1–2 pts for "MCMC samples from the posterior" without the why. 0 for "I don't know" — record for the diagnostic.</p>
+</section>
+
+<section id="part-g">
+<h2>Part G — Free response (3 points)</h2>
+
+<h3>G1. Tell me about your data</h3>
+<p>Full credit (3 pts) for any reasonable description and question, even if statistically naive. This is a diagnostic for tuning workshop examples — record the dominant taxa, response variables, and aspirations for use in the early afternoon Day 1 discussion.</p>
+</section>
+
+<div class="callout warn" style="margin-top:60px;">
+<strong>Aggregate analysis to do after grading.</strong>
+<ol>
+<li>Compute per-student pre-course percent.</li>
+<li>After Day 5, compute per-student post-course percent (using the parallel post-course key).</li>
+<li>Compute gain = post − pre. Report mean, SD, and a paired-difference plot.</li>
+<li>Identify topics where the class collectively did worst on the pre-course exam — these guide where to put extra emphasis on subsequent runs of the workshop.</li>
+</ol>
+</div>
+
+</main>
+</div>
+
+<footer>FW 536 · Statistical Modeling for Ecology and Conservation · Oregon State University · Instructor materials</footer>
+</body>
+</html>

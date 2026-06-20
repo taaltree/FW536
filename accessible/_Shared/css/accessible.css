@@ -1,0 +1,311 @@
+/* ============================================================
+   FW 536 — ACCESSIBLE stylesheet (screen-reader-first)
+   Goals:
+   - DOM reading order = visual order (single column)
+   - High contrast, large, user-scalable text (rem units)
+   - Strong, always-visible keyboard focus indicators
+   - Nothing conveyed by color alone (type labels are real text)
+   - Respects prefers-reduced-motion, prefers-contrast, forced-colors
+   ============================================================ */
+
+:root {
+  --orange: #B33107;        /* darkened OSU orange for AA contrast on white */
+  --orange-strong: #8F2705;
+  --ink: #161616;           /* near-black body text on white = ~16:1 */
+  --ink-soft: #2E2E2E;
+  --bg: #FFFFFF;
+  --panel: #FFFFFF;
+  --panel-alt: #F4F2EC;
+  --border: #6B6B6B;        /* high-contrast borders */
+  --border-soft: #BDBDBD;
+  --link: #0A4DA6;          /* AA-passing blue */
+  --link-visited: #6B3FA0;
+  --accent: #1F5B50;        /* dark teal, AA on white */
+  --good: #1E5D1A;
+  --warn: #7A4E00;
+  --bad: #8E1B1B;
+  --code-bg: #F3F1EA;
+  --code-ink: #1A1A1A;
+}
+
+* { box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  /* allow the OS / browser font-size preference to scale everything */
+  font-size: 100%;
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { transition: none !important; animation: none !important; }
+}
+
+body {
+  font-family: Georgia, 'Times New Roman', 'Charter', serif;
+  font-size: 1.125rem;       /* 18px default, scales with user setting */
+  line-height: 1.7;
+  color: var(--ink);
+  background: var(--bg);
+  margin: 0;
+  padding: 0;
+}
+
+/* ---- Skip link: visible when focused ---- */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: var(--orange);
+  color: #fff;
+  padding: 12px 18px;
+  z-index: 1000;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: 700;
+  border-radius: 0 0 6px 0;
+  text-decoration: underline;
+}
+.skip-link:focus {
+  left: 0;
+}
+
+/* ---- Single-column layout (no sticky sidebar) ---- */
+.shell { display: block; }
+.content, main {
+  max-width: 75ch;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 5rem 1.25rem;
+}
+
+/* ---- In-page navigation rendered as a clear, bordered region ---- */
+.sidebar {
+  background: var(--panel-alt);
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  max-width: 75ch;
+  margin: 1.25rem auto 0 auto;
+  padding: 1rem 1.25rem;
+}
+.sidebar .brand {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0 0 0.25rem 0;
+}
+.sidebar .brand a { color: var(--orange-strong); }
+.sidebar .subtitle {
+  font-size: 0.95rem;
+  color: var(--ink-soft);
+  margin: 0 0 0.75rem 0;
+}
+.sidebar nav { margin-top: 0.5rem; }
+.sidebar nav .section {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin: 0.75rem 0 0.25rem 0;
+}
+.sidebar nav ul {
+  list-style: disc;
+  margin: 0.25rem 0 0.5rem 1.25rem;
+  padding: 0;
+}
+.sidebar nav li { margin: 0.2rem 0; }
+.sidebar nav a { font-size: 1rem; }
+.sidebar nav a.featured { font-weight: 700; }
+
+/* ---- Links: always underlined, high contrast ---- */
+a { color: var(--link); text-decoration: underline; text-underline-offset: 2px; }
+a:visited { color: var(--link-visited); }
+a:hover { color: var(--orange-strong); }
+
+/* ---- Focus: strong, never removed ---- */
+:focus { outline: 3px solid #0A4DA6; outline-offset: 2px; }
+:focus:not(:focus-visible) { outline: 3px solid #0A4DA6; } /* keep for older browsers */
+a:focus, button:focus, summary:focus, input:focus, [tabindex]:focus {
+  outline: 3px solid #0A4DA6;
+  outline-offset: 2px;
+  background: #FFF6CC;
+}
+main:focus { outline: none; }   /* focus target for skip link, no visible box */
+
+/* ---- Headings ---- */
+h1, h2, h3, h4 { font-family: Arial, Helvetica, sans-serif; line-height: 1.25; color: var(--ink); }
+h1 { font-size: 1.9rem; margin: 0.4rem 0 0.6rem; }
+h2 { font-size: 1.5rem; margin: 2rem 0 0.5rem; border-bottom: 2px solid var(--border-soft); padding-bottom: 0.25rem; }
+h3 { font-size: 1.25rem; margin: 1.5rem 0 0.4rem; color: var(--orange-strong); }
+h4 { font-size: 1.05rem; margin: 1.2rem 0 0.3rem; text-transform: uppercase; letter-spacing: 0.03em; color: var(--ink-soft); }
+
+.lab-header { border-bottom: 3px solid var(--orange); padding-bottom: 0.75rem; margin-bottom: 1.5rem; }
+.lab-header .eyebrow {
+  font-family: Arial, Helvetica, sans-serif; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.08em; font-size: 0.85rem; color: var(--orange-strong);
+}
+.lab-header h1 { font-size: 2rem; }
+.lab-header .lede { font-size: 1.15rem; color: var(--ink-soft); font-style: italic; }
+
+p, li { max-width: 75ch; }
+
+/* ---- Accessibility info bar at the very top of body content ---- */
+.a11y-bar {
+  background: #11304A;
+  color: #fff;
+  padding: 0.6rem 1rem;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.95rem;
+  text-align: center;
+}
+.a11y-bar a { color: #FFE08A; }
+.a11y-bar a:hover { color: #fff; }
+
+/* ---- Callouts: real text label injected by transform; hide ::before ---- */
+.callout { border-left: 6px solid var(--accent); background: var(--panel-alt); padding: 0.8rem 1.1rem; margin: 1.25rem 0; border-radius: 0 6px 6px 0; }
+.callout::before { content: none !important; }     /* we use real <p class="callout-label"> instead */
+.callout-label {
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+  font-size: 0.8rem; margin: 0 0 0.35rem 0;
+}
+.callout.plain { border-left-color: var(--orange); } .callout.plain .callout-label { color: var(--orange-strong); }
+.callout.bio   { border-left-color: var(--good); }   .callout.bio .callout-label   { color: var(--good); }
+.callout.warn  { border-left-color: var(--warn); background: #FCF4E0; } .callout.warn .callout-label { color: var(--warn); }
+.callout.key   { border-left-color: var(--orange); background: #F7F1E2; } .callout.key .callout-label { color: var(--orange-strong); }
+.callout.try   { border-left-color: var(--accent); } .callout.try .callout-label { color: var(--accent); }
+
+/* ---- Exercises ---- */
+.exercise { border: 2px solid var(--border); border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; background: var(--panel); }
+.exercise .ex-tag {
+  display: inline-block; background: var(--orange-strong); color: #fff;
+  font-family: Arial, Helvetica, sans-serif; font-weight: 700; font-size: 0.8rem;
+  padding: 0.2rem 0.5rem; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.04em;
+}
+.exercise .difficulty { font-family: Arial, Helvetica, sans-serif; font-size: 0.85rem; color: var(--ink-soft); }
+.exercise h3 { margin-top: 0.5rem; color: var(--ink); }
+
+/* ---- Reveal-able answers ---- */
+details.answer { border: 2px dashed var(--border); border-radius: 6px; margin: 1rem 0 0; background: var(--panel-alt); }
+details.answer > summary {
+  cursor: pointer; font-family: Arial, Helvetica, sans-serif; font-weight: 700;
+  color: var(--orange-strong); padding: 0.7rem 1rem; font-size: 1rem;
+}
+details.answer > summary:hover { background: #ECE7D8; }
+details.answer .answer-body { padding: 0.25rem 1.1rem 1rem; }
+details.answer[open] > summary { border-bottom: 1px solid var(--border-soft); }
+
+/* ---- Code ---- */
+pre, code { font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace; }
+code { background: var(--code-bg); color: var(--code-ink); padding: 0.05rem 0.3rem; border-radius: 3px; font-size: 0.95em; }
+pre {
+  background: var(--code-bg); color: var(--code-ink);
+  padding: 1rem 1.1rem; border: 1px solid var(--border-soft); border-left: 4px solid var(--accent);
+  border-radius: 6px; overflow-x: auto; font-size: 1rem; line-height: 1.55;
+}
+pre code { background: transparent; padding: 0; }
+/* In the accessible build, syntax-color spans are flattened to one ink color
+   so screen readers and low-contrast detection stay simple. */
+pre .cm, pre .kw, pre .st, pre .nu, pre .fn, pre .op { color: var(--code-ink); }
+pre .cm { font-style: italic; }
+.code-label {
+  display: inline-block; background: #2c2c2c; color: #fff;
+  font-family: Arial, Helvetica, sans-serif; font-size: 0.8rem; text-transform: uppercase;
+  letter-spacing: 0.04em; padding: 0.25rem 0.6rem; border-radius: 4px 4px 0 0;
+}
+.code-label + pre { border-top-left-radius: 0; margin-top: 0; }
+
+/* ---- Tables ---- */
+table { border-collapse: collapse; width: 100%; margin: 1.25rem 0; }
+caption { text-align: left; font-weight: 700; font-family: Arial, Helvetica, sans-serif; padding: 0.3rem 0; color: var(--ink); }
+th, td { border: 1px solid var(--border); padding: 0.5rem 0.7rem; text-align: left; vertical-align: top; }
+th { background: #E9E5DA; font-family: Arial, Helvetica, sans-serif; }
+thead th { border-bottom: 2px solid var(--ink); }
+
+/* ---- Math: keep MathJax output legible; assistive MathML is visually hidden ---- */
+.eq, .eq-block { margin: 1rem 0; font-size: 1.05rem; }
+.eq-block { background: var(--panel-alt); border-left: 4px solid var(--orange); padding: 0.6rem 1rem; border-radius: 0 6px 6px 0; overflow-x: auto; }
+mjx-container { outline: none; }
+mjx-container:focus { outline: 3px solid #0A4DA6; }
+
+/* ---- Pills / tags (already real text) ---- */
+.pill, .tag {
+  display: inline-block; font-family: Arial, Helvetica, sans-serif; font-weight: 700;
+  font-size: 0.78rem; padding: 0.15rem 0.5rem; border-radius: 4px; border: 1px solid var(--border);
+  text-transform: uppercase; letter-spacing: 0.03em; background: #ECE9DF; color: var(--ink);
+}
+
+/* ---- Lab table-of-contents card ---- */
+.lab-toc { border: 2px solid var(--orange); border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; background: var(--panel); }
+.lab-toc h2 { border: none; margin-top: 0; }
+.lab-toc .session { border-top: 1px solid var(--border-soft); padding: 0.75rem 0; }
+.lab-toc .session:first-of-type { border-top: none; }
+.lab-toc .session-label { font-family: Arial, Helvetica, sans-serif; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; font-size: 0.85rem; color: var(--orange-strong); }
+.lab-toc .session-title { font-family: Arial, Helvetica, sans-serif; font-weight: 700; font-size: 1.05rem; margin: 0.2rem 0 0.4rem; }
+.lab-toc .row { padding: 0.3rem 0; }
+.lab-toc .row .tag { margin-right: 0.4rem; }
+.lab-toc .note { color: var(--ink-soft); font-size: 0.92rem; }
+
+/* ---- Practice banner ---- */
+.practice-banner { border: 2px solid var(--good); border-left-width: 6px; background: #F1F8EC; padding: 0.9rem 1.1rem; border-radius: 0 6px 6px 0; margin: 1.5rem 0; }
+.practice-banner .label { font-family: Arial, Helvetica, sans-serif; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; font-size: 0.8rem; color: var(--good); }
+.practice-banner h3 { margin: 0.2rem 0 0.4rem; }
+.practice-banner .hand-in { display: inline-block; margin-top: 0.4rem; padding: 0.35rem 0.7rem; border: 2px solid var(--orange-strong); border-radius: 4px; color: var(--orange-strong); font-family: Arial, Helvetica, sans-serif; font-weight: 700; text-decoration: underline; }
+.practice-banner .hand-in:hover { background: var(--orange-strong); color: #fff; }
+
+/* ---- Data files card ---- */
+.data-card { border: 2px solid var(--accent); border-left-width: 6px; border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; background: var(--panel); }
+.data-card h2 { border: none; margin-top: 0; }
+.data-card .data-h { font-family: Arial, Helvetica, sans-serif; text-transform: uppercase; letter-spacing: 0.04em; font-size: 0.85rem; color: var(--accent); margin: 0.75rem 0 0.25rem; }
+.data-card .data-row { padding: 0.35rem 0; border-bottom: 1px solid var(--border-soft); }
+.data-card .data-row:last-child { border-bottom: none; }
+.data-card .data-desc { display: block; color: var(--ink-soft); font-size: 0.95rem; }
+
+/* ---- Tabs (ARIA wired in JS) ---- */
+.tab-buttons { display: flex; flex-wrap: wrap; gap: 0.25rem; border-bottom: 2px solid var(--border); margin: 1rem 0 0; padding: 0; }
+.tab-buttons button {
+  font-family: Arial, Helvetica, sans-serif; font-size: 1rem; font-weight: 700;
+  background: var(--panel-alt); color: var(--ink); border: 2px solid var(--border);
+  border-bottom: none; padding: 0.5rem 1rem; cursor: pointer; border-radius: 6px 6px 0 0;
+}
+.tab-buttons button[aria-selected="true"] { background: var(--orange-strong); color: #fff; }
+.tab-panel { border: 2px solid var(--border); border-top: none; padding: 1rem; }
+.tab-panel[hidden] { display: none; }
+
+/* ---- Quiz ---- */
+.quiz { border: 2px solid var(--accent); border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; }
+.quiz h4 { margin-top: 0; color: var(--accent); }
+.quiz .choices { list-style: none; padding: 0; }
+.quiz .choices li { padding: 0.3rem 0; }
+.quiz .choices label { display: flex; gap: 0.6rem; align-items: flex-start; cursor: pointer; }
+.quiz button { font-family: Arial, Helvetica, sans-serif; font-weight: 700; background: var(--accent); color: #fff; border: none; padding: 0.5rem 1.1rem; border-radius: 4px; cursor: pointer; font-size: 1rem; }
+.quiz .feedback { margin-top: 0.8rem; padding: 0.7rem 0.9rem; border-radius: 6px; border: 2px solid var(--border); }
+.quiz .feedback.correct { background: #E7F4E0; border-color: var(--good); color: var(--good); }
+.quiz .feedback.wrong { background: #FBE9E6; border-color: var(--bad); color: var(--bad); }
+
+/* ---- Footer ---- */
+footer { border-top: 2px solid var(--border-soft); padding: 1.5rem 1.25rem; color: var(--ink-soft); font-size: 0.95rem; max-width: 75ch; margin: 2rem auto 0; }
+
+/* ---- Visually-hidden helper for SR-only text ---- */
+.sr-only {
+  position: absolute !important; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+/* ---- High-contrast / forced-colors mode ---- */
+@media (prefers-contrast: more) {
+  :root { --ink: #000; --border: #000; --border-soft: #000; }
+  a { text-decoration-thickness: 2px; }
+}
+@media (forced-colors: active) {
+  .callout, .exercise, .lab-toc, .data-card, .practice-banner, .quiz, details.answer, pre, th, td {
+    border: 1px solid CanvasText;
+  }
+  .exercise .ex-tag, .practice-banner .hand-in, .tab-buttons button[aria-selected="true"] {
+    forced-color-adjust: none;
+  }
+}
+
+/* ---- Landing page (index) helpers ---- */
+.day-list { list-style: none; padding: 0; max-width: 75ch; margin: 0 auto; }
+.day-list > li { border: 2px solid var(--border); border-radius: 8px; padding: 1rem 1.25rem; margin: 1rem 0; }
+.day-list h2 { margin-top: 0; }

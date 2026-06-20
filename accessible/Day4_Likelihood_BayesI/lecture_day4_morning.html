@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en" data-a11y="done">
+<head>
+<meta charset="UTF-8" />
+<title>Day 4 Morning — Maximum likelihood lecture notes | FW 536</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../_Shared/css/accessible.css" />
+<script>
+MathJax = {
+  tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
+  options: { menuOptions: { settings: { assistiveMml: true, explorer: true } } },
+  loader: { load: ['a11y/assistive-mml', 'a11y/explorer'] }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script"></script>
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<div class="a11y-bar" role="region" aria-label="Accessibility">Accessible version &middot; <a href="../accessibility.html">How to use this site with a screen reader</a> &middot; <a href="../index.html">Course home</a></div>
+
+<aside class="sidebar">
+<p class="brand"><a href="../index.html">FW 536 · Day 4 Morning</a></p>
+<div class="subtitle">Lecture notes: Maximum likelihood</div>
+<nav aria-label="Slides in this lecture">
+<div class="section">Slides</div><ul>
+<li><a href="#slide-1">1. Slide 1</a></li>
+<li><a href="#slide-2">2. Slide 2</a></li>
+<li><a href="#slide-3">3. What is Maximum Likelihood-II?</a></li>
+<li><a href="#slide-4">4. What is Maximum Likelihood-II?</a></li>
+<li><a href="#slide-5">5. What is Maximum Likelihood-III?</a></li>
+<li><a href="#slide-6">6. Basics of Likelihood</a></li>
+<li><a href="#slide-7">7. Further Likelihood Considerations-I</a></li>
+<li><a href="#slide-8">8. Further Likelihood Considerations-II</a></li>
+<li><a href="#slide-9">9. Back to our original problem</a></li>
+<li><a href="#slide-10">10. Overview</a></li>
+<li><a href="#slide-11">11. Slide 11</a></li>
+<li><a href="#slide-12">12. Slide 12</a></li>
+<li><a href="#slide-13">13. Slide 13</a></li>
+<li><a href="#slide-14">14. Negative log-likelihoods</a></li>
+<li><a href="#slide-15">15. A Poisson mixture problem</a></li>
+<li><a href="#slide-16">16. Slide 16</a></li>
+<li><a href="#slide-17">17. Slide 17</a></li>
+<li><a href="#slide-18">18. Slide 18</a></li>
+<li><a href="#slide-19">19. Start by assuming we know Propn We now have a three dimensional likelihood surface</a></li>
+<li><a href="#slide-20">20. Slide 20</a></li>
+<li><a href="#slide-21">21. Slide 21</a></li>
+<li><a href="#slide-22">22. Slide 22</a></li>
+<li><a href="#slide-23">23. The Optim/MLE routines</a></li>
+<li><a href="#slide-24">24. Some options for MLE-I</a></li>
+<li><a href="#slide-25">25. Question-1</a></li>
+<li><a href="#slide-26">26. Example 1 - revisited</a></li>
+<li><a href="#slide-27">27. Example 2 - revisited</a></li>
+<li><a href="#slide-28">28. Slide 28</a></li>
+<li><a href="#slide-29">29. Slide 29</a></li>
+<li><a href="#slide-30">30. Example 2 - revisited</a></li>
+<li><a href="#slide-31">31. Dissecting Example 2-I</a></li>
+<li><a href="#slide-32">32. Dissecting Example 2-II</a></li>
+<li><a href="#slide-33">33. Hints for optimization</a></li>
+<li><a href="#slide-34">34. Question 3</a></li>
+<li><a href="#slide-35">35. Question 3</a></li>
+<li><a href="#slide-36">36. Example 3-I</a></li>
+<li><a href="#slide-37">37. Likelihood Profile</a></li>
+<li><a href="#slide-38">38. Confidence Interval</a></li>
+</ul></nav></aside>
+<main class="content" id="main-content" tabindex="-1">
+<header class="lab-header">
+<div class="eyebrow">Day 4 Morning · Accessible lecture notes</div>
+<h1>Maximum likelihood</h1>
+<p class="lede">A screen-reader-friendly transcript of the lecture slides: all slide text and speaker notes are included. Figures are flagged where a text description still needs to be added.</p>
+</header>
+<div class="callout key"><p class="callout-label">About these notes</p>These notes are generated from the lecture slides. Each section below is one slide. Where a slide contained a picture, plot, or equation image, you will see a "Figure needs description" note &mdash; ask your instructor for the description of that figure. For the underlying concepts with worked examples, also read the <a href="plain_language_summary.html">plain-language summary</a> and <a href="lab.html">lab</a> for this session.</p></div>
+<section aria-labelledby="slide-1-h">
+<h2 id="slide-1-h"><span id="slide-1"></span>Slide 1</h2>
+<ul>
+<li>Nonlinear Models</li>
+<li>Maximum Likelihood Primer</li>
+</ul>
+<details class="answer"><summary>Speaker notes for this slide</summary><div class="answer-body"><p>a</p></div></details>
+</section>
+<section aria-labelledby="slide-2-h">
+<h2 id="slide-2-h"><span id="slide-2"></span>Slide 2</h2>
+<p>What is Maximum Likelihood-I?</p>
+<ul>
+<li>Maximum likelihood is a method for fitting a mathematical model to some data. “Fitting” involves estimating the values for the parameters of the model. This is what is happening under the hood when you fit a glm, lmer, glmer, etc.</li>
+<li>For some problems, you may not have canned functions, but this has become increasingly uncommon.</li>
+</ul>
+</section>
+<section aria-labelledby="slide-3-h">
+<h2 id="slide-3-h"><span id="slide-3"></span>Slide 3: What is Maximum Likelihood-II?</h2>
+<ul>
+<li>- Given a set of data, and a probability model, maximum</li>
+<li>likelihood chooses the values for the parameters that were most likely to have produced the data</li>
+</ul>
+<ul>
+<li>Probability: knowing parameters -&gt; predicting data.</li>
+<li>Likelihood: knowing data -&gt; parameter estimation.</li>
+</ul>
+<p>L(p|x) = Prob(x|p)</p>
+</section>
+<section aria-labelledby="slide-4-h">
+<h2 id="slide-4-h"><span id="slide-4"></span>Slide 4: What is Maximum Likelihood-II?</h2>
+<p>Parameters, data and error distributions:</p>
+<p>Data</p>
+<p>Parameter</p>
+<p>Error</p>
+<p>What are the data, parameters, and incorporation of error?</p>
+</section>
+<section aria-labelledby="slide-5-h">
+<h2 id="slide-5-h"><span id="slide-5"></span>Slide 5: What is Maximum Likelihood-III?</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 5.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<ul>
+<li>Which of these curves</li>
+<li>are ”most likely” to have</li>
+<li>generated the data?</li>
+</ul>
+<ul>
+<li>These two seem pretty</li>
+<li>similar – is one better?</li>
+</ul>
+<p>5</p>
+</section>
+<section aria-labelledby="slide-6-h">
+<h2 id="slide-6-h"><span id="slide-6"></span>Slide 6: Basics of Likelihood</h2>
+<p>The likelihood of the data is the product of the likelihoods of each data point</p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 6.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>Notation often inconsistent, but IMO better  to put parameters conditional on data</p>
+<p>The set of data Xi</p>
+<p>Product of the PDF/Likelihood across all data points</p>
+</section>
+<section aria-labelledby="slide-7-h">
+<h2 id="slide-7-h"><span id="slide-7"></span>Slide 7: Further Likelihood Considerations-I</h2>
+<ul>
+<li>The deterministic (model) relationship between the input</li>
+<li>variables (covariates) and the (expected) data:</li>
+<li>The probability model  for how the data pertain to the model prediction – in this case normal</li>
+</ul>
+<p>To compute the likelihood for a given set of parameters we need:</p>
+<ul>
+<li>Model prediction</li>
+<li>(Q: why here?)</li>
+</ul>
+<p>Data</p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 7.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-8-h">
+<h2 id="slide-8-h"><span id="slide-8"></span>Slide 8: Further Likelihood Considerations-II</h2>
+<p>dnorm(observed, expected, sigma)</p>
+<p>In R, the term:</p>
+<p>is evaluated using the expression</p>
+<p>or in R:</p>
+<p>The full likelihood is the product over all the data points:</p>
+<p>prod(dnorm(observed_vector, expected_vector, sigma))</p>
+<p>Note: The function dnorm returns the value of the normal distribution PDF given x, μ, and σ.</p>
+</section>
+<section aria-labelledby="slide-9-h">
+<h2 id="slide-9-h"><span id="slide-9"></span>Slide 9: Back to our original problem</h2>
+<ul>
+<li>pred_vec &lt;- Linfs[II]*(1-exp(-Kappa[II]*age_vec))</li>
+<li>likelihood &lt;- prod(dnorm(len_vec, pred_vec, sigma))</li>
+<li>print(likelihood)</li>
+</ul>
+<p>We can compare the four parameters choices using the following code (open R code):</p>
+<ul>
+<li>Results:</li>
+<li>4.82e-149</li>
+<li>2.74e-87</li>
+<li>2.744-80</li>
+<li>3.64e-82</li>
+</ul>
+<ul>
+<li>Best (so far)</li>
+<li>How do we know?</li>
+</ul>
+<p class="callout warn" role="note"><span class="callout-label">Figure 9.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-10-h">
+<h2 id="slide-10-h"><span id="slide-10"></span>Slide 10: Overview</h2>
+<ul>
+<li>Given a data set:</li>
+<li>Select a model for the underlying process.</li>
+<li>Select a model for the uncertainty of the data.</li>
+<li>Write the likelihood for one data point.</li>
+<li>Multiply the likelihoods across all data points.</li>
+<li>Find the values for the parameters that maximize the likelihood.</li>
+<li style="margin-left:1em">Do this by minimizing negative log likelihood</li>
+</ul>
+</section>
+<section aria-labelledby="slide-11-h">
+<h2 id="slide-11-h"><span id="slide-11"></span>Slide 11</h2>
+<ul>
+<li>You monitor an intersection for cars that run the</li>
+<li>red light. Based on 50 days of observation, you detect</li>
+<li>30 days on which “light running” took place. You repeat the “experiment” after a red light camera is installed and now observe 10 days on which “running” occurred.</li>
+</ul>
+<ul>
+<li>Questions</li>
+<li>What is the probability of “light running” before the camera was installed?</li>
+<li>2.	Has the probability of “light running” changed significantly?</li>
+</ul>
+<ul>
+<li>We’ll explore numerical methods later</li>
+<li>For now, let’s apply this to a simpler problem</li>
+</ul>
+</section>
+<section aria-labelledby="slide-12-h">
+<h2 id="slide-12-h"><span id="slide-12"></span>Slide 12</h2>
+<ul>
+<li>Let the probability of “running” be p (and hence the</li>
+<li>probability of not “running” be (1-p)). The probability of</li>
+<li>30 “runs” and 20 “non-runs” is then p30(1-p)20</li>
+<li>(assuming “runs” and “non-runs” are independent).</li>
+<li>This leads to the following likelihood function from the Binomial:</li>
+</ul>
+<p>We refer to the value for p that maximizes the likelihood function as the maximum likelihood estimate and denote it as     .</p>
+<p>Is something missing? Why is this ok?</p>
+</section>
+<section aria-labelledby="slide-13-h">
+<h2 id="slide-13-h"><span id="slide-13"></span>Slide 13</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 13.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<ul>
+<li>In R:</li>
+<li>Prob &lt;- seq(from=0.01,to=0.99,by=0.01)</li>
+<li>Like &lt;- Probs^30*(1-Probs)^20</li>
+<li>plot(Prob,Like)</li>
+</ul>
+<ul>
+<li>We can find the MLE in R:</li>
+<li>Ibest &lt;- which(Like==max(Like),arr.ind=T)</li>
+<li>print(Probs[Ibest])</li>
+</ul>
+<p>See why normalizing constant doesn’t matter here?</p>
+</section>
+<section aria-labelledby="slide-14-h">
+<h2 id="slide-14-h"><span id="slide-14"></span>Slide 14: Negative log-likelihoods</h2>
+<p>Rather than working with likelihoods we often work with negative log-likelihoods. Therefore, rather than maximizing the likelihood, we minimize the negative log-likelihood – this leads to same point estimates.</p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 14.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>The estimate of p,    , is again 0.6.</p>
+<p>Logs help with the tiny number problem, and negative works for numerical optimizers</p>
+</section>
+<section aria-labelledby="slide-15-h">
+<h2 id="slide-15-h"><span id="slide-15"></span>Slide 15: A Poisson mixture problem</h2>
+<p>The blow rate for a given whale species is Poisson-distributed and it is “known” that the average number of blows in an interval for males and females is different. We monitor a population and find the following distribution of blow times.</p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 15.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>15</p>
+<ul>
+<li>Questions</li>
+<li>What is the fraction of females in the population (females have</li>
+<li>higher blow rate)?</li>
+<li>Can we conclude that females and males really do differ in mean blow rate?</li>
+</ul>
+</section>
+<section aria-labelledby="slide-16-h">
+<h2 id="slide-16-h"><span id="slide-16"></span>Slide 16</h2>
+<ul>
+<li>Now, an animal is either male or female and letting the</li>
+<li>mean blow rate for males be 1 and that for females be 2,</li>
+<li>and assuming that the proportion of males is p:</li>
+</ul>
+<p>The Poisson distribution is:</p>
+<p>16</p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 16.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>How would you do this with linear models?</p>
+</section>
+<section aria-labelledby="slide-17-h">
+<h2 id="slide-17-h"><span id="slide-17"></span>Slide 17</h2>
+<ul>
+<li>In English:</li>
+<li>An animal is selected at random; the probability it is male isp.</li>
+<li>A blow rate is generated given the appropriate Poisson distribution.</li>
+<li>This type of model is called a mixture model. In this case there are two mixture components.</li>
+</ul>
+<p>17</p>
+</section>
+<section aria-labelledby="slide-18-h">
+<h2 id="slide-18-h"><span id="slide-18"></span>Slide 18</h2>
+<p>The likelihood function is then:</p>
+<ul>
+<li>This looks pretty complicated but R is there to help us:</li>
+<li>dpois(x,lambda)  =</li>
+</ul>
+<p>18</p>
+</section>
+<section aria-labelledby="slide-19-h">
+<h2 id="slide-19-h"><span id="slide-19"></span>Slide 19: Start by assuming we know Propn We now have a three dimensional likelihood surface</h2>
+<ul>
+<li>TheData &lt;- matrix(scan(”Whale.dat&quot;,skip=1),byrow=T,ncol=2)</li>
+<li>TheData &lt;- TheData[,2]</li>
+<li>Blow1 &lt;- seq(from=1,to=40,by=1)</li>
+<li>Blow2 &lt;- seq(from=1,to=60,by=1)</li>
+<li>Likes &lt;- matrix(0,nrow=length(Blow1),ncol=length(Blow2))</li>
+<li>for (ii in 1:length(Blow1))</li>
+<li>for (jj in 1:length(Blow2))</li>
+<li>{</li>
+<li>LikeOut &lt;- Propn*dpois(TheData,Blow1[ii])+(1-Propn)*dpois(TheData,Blow2[jj])</li>
+<li>Likes[ii,jj] &lt;- -1*sum(log(LikeOut))</li>
+<li>}</li>
+<li>par(mfrow=c(1,2));  persp(x=Blow1,y=Blow2,z=Likes);contour(x=Blow1,y=Blow2,z=Likes,120)</li>
+<li>Ibest &lt;- which(Likes==min(Likes),arr.ind=T)</li>
+<li>cat(Propn,Blow1[Ibest[1]],Blow2[Ibest[2]],min(Likes),&quot;\n&quot;)</li>
+</ul>
+<ul>
+<li>GIVEN</li>
+<li>a value for Propn</li>
+</ul>
+<p>19</p>
+</section>
+<section aria-labelledby="slide-20-h">
+<h2 id="slide-20-h"><span id="slide-20"></span>Slide 20</h2>
+<ul>
+<li>Notes on the code:</li>
+<li>dpois is taking a vector and returning a vector.</li>
+<li>persp is producing a 3d plot, contour is similar.</li>
+<li>Ibest is now a vector and not a scalar.</li>
+<li>We are computing the negative log-likelihood.</li>
+<li>Function in grid search lab takes “propn” and returns the lowest value of the negative log-likelihood.</li>
+</ul>
+<p>20</p>
+</section>
+<section aria-labelledby="slide-21-h">
+<h2 id="slide-21-h"><span id="slide-21"></span>Slide 21</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 21.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>This is a plot of the negative log-likelihood surface</p>
+<ul>
+<li>The minimum negative</li>
+<li>log-likelihood</li>
+</ul>
+<p>21</p>
+</section>
+<section aria-labelledby="slide-22-h">
+<h2 id="slide-22-h"><span id="slide-22"></span>Slide 22</h2>
+<p>22</p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 22.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>Notice anything interesting about this likelihood surface?</p>
+</section>
+<section aria-labelledby="slide-23-h">
+<h2 id="slide-23-h"><span id="slide-23"></span>Slide 23: The Optim/MLE routines</h2>
+<ul>
+<li>The optim function is in the base package and the mle</li>
+<li>function is in the stats4 package – We will focus on mle</li>
+</ul>
+<ul>
+<li>ll1 &lt;- function(x) {</li>
+<li>obj &lt;- (x-0.3)^2</li>
+<li>return(obj)</li>
+<li>}</li>
+<li>ret1 &lt;- mle(ll1,start=list(x=1))</li>
+<li>print(summary(ret1))</li>
+</ul>
+<p>Function to be minimized</p>
+<ul>
+<li>Initial values for the</li>
+<li>parameters</li>
+</ul>
+<p>23</p>
+</section>
+<section aria-labelledby="slide-24-h">
+<h2 id="slide-24-h"><span id="slide-24"></span>Slide 24: Some options for MLE-I</h2>
+<ul>
+<li>mle(Func, start=list(), method, lower, upper)</li>
+<li>Func – function to be minimized</li>
+<li>start – initial values for the parameters</li>
+<li>method – method for minimization (e.g. “L-BFGS-B”,</li>
+<li>“Nelder-Mead”, “BFGS”).</li>
+<li>lower – lower bounds for the variables (including –Inf)</li>
+<li>upper - upper bounds for the variables (including Inf)</li>
+</ul>
+<p>24</p>
+<p>Note, “L-BFGS-B” allows you to bound the parameters</p>
+</section>
+<section aria-labelledby="slide-25-h">
+<h2 id="slide-25-h"><span id="slide-25"></span>Slide 25: Question-1</h2>
+<ul>
+<li>You monitor an intersection for cars that run the</li>
+<li>red light. Based on 50 days of observation, you detect</li>
+<li>30 days on which “light running” took place. You repeat the “experiment” after a red light camera is installed and now observe 10 days on which “running” occurred.</li>
+</ul>
+<ul>
+<li>Questions</li>
+<li>What is the probability of “light running” before the camera</li>
+<li>was installed?</li>
+<li>Has the probability of “light running” changed significantly?</li>
+<li style="margin-left:2em">We’ll get to this question later</li>
+</ul>
+</section>
+<section aria-labelledby="slide-26-h">
+<h2 id="slide-26-h"><span id="slide-26"></span>Slide 26: Example 1 - revisited</h2>
+<ul>
+<li>LL2 &lt;- function(p) {</li>
+<li>obj &lt;- -1*30*log(p)-20*log(1-p)</li>
+<li>return(obj)</li>
+<li>}</li>
+<li>ret2 &lt;- mle(LL2,start=list(p=0.1),</li>
+<li>lower=c(0.00001),upper=c(0.999999),</li>
+<li>method=&quot;L-BFGS-B&quot;)</li>
+<li>print(summary(ret2))</li>
+</ul>
+<p>Negative log-likelihood</p>
+<ul>
+<li>“Method” must be L-BFGS-B if you</li>
+<li>want to bound the parameters</li>
+</ul>
+<p>26</p>
+</section>
+<section aria-labelledby="slide-27-h">
+<h2 id="slide-27-h"><span id="slide-27"></span>Slide 27: Example 2 - revisited</h2>
+<p>The blow rate for a given whale species is Poisson-distributed and it is “known” that the average number of blows in an interval for males and females is different. We monitor a population and find the following distribution of blow times.</p>
+<ul>
+<li>Questions</li>
+<li>What is the fraction of females in the population (females have</li>
+<li>longer blow times)?</li>
+<li>Can we conclude that females and males really do differ in mean</li>
+<li>length of blow?</li>
+</ul>
+<p>27</p>
+</section>
+<section aria-labelledby="slide-28-h">
+<h2 id="slide-28-h"><span id="slide-28"></span>Slide 28</h2>
+<ul>
+<li>Now, an animal is either male or female and letting the</li>
+<li>mean blow rate for males be 1 and that for females be 2,</li>
+<li>and assuming that the proportion of males is p:</li>
+</ul>
+<p>The Poisson distribution is:</p>
+<p>28</p>
+<p>Example 2 - revisited</p>
+<p>The likelihood function is then:</p>
+</section>
+<section aria-labelledby="slide-29-h">
+<h2 id="slide-29-h"><span id="slide-29"></span>Slide 29</h2>
+<p>29</p>
+<p>Example 2 - revisited</p>
+<p>The likelihood function is then:</p>
+<p>Question: What are we solving for here with optimization?</p>
+</section>
+<section aria-labelledby="slide-30-h">
+<h2 id="slide-30-h"><span id="slide-30"></span>Slide 30: Example 2 - revisited</h2>
+<ul>
+<li>LL3 &lt;- function(lam1,lam2,p,Blows)</li>
+<li>{</li>
+<li>LikeOut &lt;- p*dpois(Blows,lam1)+(1-p)*dpois(Blows,lam2)</li>
+<li>NegLogLike &lt;- -1*sum(log(LikeOut))</li>
+<li>return(NegLogLike)</li>
+<li>}</li>
+<li>TheData &lt;- matrix(scan(”Whale.dat&quot;,skip=1),byrow=T,ncol=2)</li>
+<li>Blows &lt;- TheData[,2]</li>
+<li>ret3 &lt;- mle(LL3,start=list(lam1=10,lam2=10,p=0.4),fixed=list(Blows=Blows),lower=c(0.01,0.01,0.00001),upper=c(Inf,Inf,0.99999),method=&quot;L-BFGS-B&quot;)</li>
+<li>print(summary(ret3))</li>
+</ul>
+<p>30</p>
+</section>
+<section aria-labelledby="slide-31-h">
+<h2 id="slide-31-h"><span id="slide-31"></span>Slide 31: Dissecting Example 2-I</h2>
+<ul>
+<li>LL3 &lt;- function(lam1,lam2,p,Blows)</li>
+<li>{</li>
+<li>LikeOut &lt;- p*dpois(Blows,lam1)+(1-p)*dpois(Blows,lam2)</li>
+<li>NegLogLike &lt;- -1*sum(log(LikeOut))</li>
+<li>return(NegLogLike)</li>
+<li>}</li>
+</ul>
+<p>Parameters</p>
+<p>The data</p>
+<ul>
+<li>This is a vector of</li>
+<li>likelihoods for each</li>
+<li>data point</li>
+</ul>
+<ul>
+<li>This is the negative</li>
+<li>log-likelihood (sum over negative</li>
+<li>log-likelihoods for each datum)</li>
+</ul>
+<p>31</p>
+</section>
+<section aria-labelledby="slide-32-h">
+<h2 id="slide-32-h"><span id="slide-32"></span>Slide 32: Dissecting Example 2-II</h2>
+<ul>
+<li>ret3 &lt;- mle(LL3,</li>
+<li>start=list(lam1=10,lam2=10,p=0.4),</li>
+<li>fixed=list(Blows=Blows),</li>
+<li>lower=c(0.01,0.01,0.00001),</li>
+<li>upper=c(Inf,Inf,0.99999),</li>
+<li>method=&quot;L-BFGS-B&quot;)</li>
+</ul>
+<ul>
+<li>Starting values</li>
+<li>(must be a list)</li>
+</ul>
+<ul>
+<li>Data</li>
+<li>(must be a list)</li>
+</ul>
+<ul>
+<li>Upper and</li>
+<li>lower bounds for</li>
+<li>each parameter</li>
+</ul>
+<p>32</p>
+</section>
+<section aria-labelledby="slide-33-h">
+<h2 id="slide-33-h"><span id="slide-33"></span>Slide 33: Hints for optimization</h2>
+<ul>
+<li>Consider different parameterizations (e.g. log(x) rather than x).</li>
+<li>Methods may work better if the variables are all scaled to approximately 1.</li>
+<li>Never trust a non-linear minimizer!</li>
+<li style="margin-left:1em">Try different starting values.</li>
+<li style="margin-left:1em">Combine different methods</li>
+<li style="margin-left:1em">Test your code with data for which you know the correct answer (simulate!).</li>
+</ul>
+<p>33</p>
+</section>
+<section aria-labelledby="slide-34-h">
+<h2 id="slide-34-h"><span id="slide-34"></span>Slide 34: Question 3</h2>
+<p>The length of a fish is related to its age according to the von Bertalanffy growth curve:</p>
+<ul>
+<li>Questions</li>
+<li>Estimate the parameters of this equation (what are they?) for</li>
+<li>males and females, 	and compute 95% confidence intervals for</li>
+<li>asymptotic length.</li>
+<li>Can we conclude that the asymptotic sizes for females and males</li>
+<li>are the same?</li>
+</ul>
+</section>
+<section aria-labelledby="slide-35-h">
+<h2 id="slide-35-h"><span id="slide-35"></span>Slide 35: Question 3</h2>
+<ul>
+<li>The length of a fish is related to its age according to the von Bertalanffy growth curve:</li>
+<li>Below find some data for random fish</li>
+</ul>
+<p class="callout warn" role="note"><span class="callout-label">Figure 35.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>35</p>
+</section>
+<section aria-labelledby="slide-36-h">
+<h2 id="slide-36-h"><span id="slide-36"></span>Slide 36: Example 3-I</h2>
+<ul>
+<li>Estimate the values for    , , and  from the age and</li>
+<li>growth data.</li>
+<li>Create vectors with the age, sex, and length data.</li>
+<li style="margin-left:1em">Create a function that takes values for the</li>
+<li style="margin-left:1em">parameters as well as the data, and computes the</li>
+<li style="margin-left:1em">negative log-likelihood.</li>
+<li style="margin-left:1em">LL4 &lt;- function(Linf1,Kappa1,Linf2,Kappa2,Sigma,Age,Length,Sex)</li>
+<li style="margin-left:1em">use mle to find the maximum likelihood estimates</li>
+<li style="margin-left:1em">Bound the region of parameter space to reasonable values</li>
+<li style="margin-left:2em">E.g. Can the parameters be negative?</li>
+</ul>
+<p>36</p>
+</section>
+<section aria-labelledby="slide-37-h">
+<h2 id="slide-37-h"><span id="slide-37"></span>Slide 37: Likelihood Profile</h2>
+<p>Parameter of Interest</p>
+<ul>
+<li>-log</li>
+<li>likelihood</li>
+</ul>
+<p>MLE</p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<ul>
+<li>Alternative</li>
+<li>values for the</li>
+<li>parameter</li>
+</ul>
+<ul>
+<li>Negative log-likelihood, fixing the</li>
+<li>parameter to each value in turn</li>
+<li>(minimize on the rest of the parameters)</li>
+</ul>
+<p>37</p>
+</section>
+<section aria-labelledby="slide-38-h">
+<h2 id="slide-38-h"><span id="slide-38"></span>Slide 38: Confidence Interval</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 38.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<ul>
+<li>95% confidence</li>
+<li>interval</li>
+</ul>
+<p>1.92</p>
+<p>38</p>
+<p>The mle() function in R does this for you, but you can pretty easily do it by hand.</p>
+</section>
+</main>
+
+<footer>FW 536 &middot; Statistical Modeling for Ecology and Conservation &middot; Oregon State University &middot; Accessible lecture notes</footer>
+</body>
+</html>

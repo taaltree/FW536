@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en" data-a11y="done">
+<head>
+<meta charset="UTF-8" />
+<title>Day 5 · Plain-language summary | FW 536</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../_Shared/css/accessible.css" />
+<script defer src="../_Shared/js/accessible.js"></script>
+<script>
+MathJax = {
+  tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
+  options: {
+    menuOptions: { settings: { assistiveMml: true, explorer: true } }
+  },
+  loader: { load: ['a11y/assistive-mml', 'a11y/explorer'] }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script"></script>
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<div class="a11y-bar" role="region" aria-label="Accessibility">Accessible version &middot; <a href="../accessibility.html">How to use this site with a screen reader</a> &middot; <a href="../index.html">Course home</a></div>
+
+<div class="shell">
+
+<aside class="sidebar">
+ <p class="brand"><a href="../index.html" title="Back to course home">FW 536 · Day 5</a></p>
+ <div class="subtitle">Plain-language summary</div>
+ <nav aria-label="On this page and related documents">
+ <ul>
+ <li><a href="#what">What we did today</a></li>
+ <li><a href="#hier">Hierarchical models in plain English</a></li>
+ <li><a href="#shrink">What shrinkage really means</a></li>
+ <li><a href="#latent">Latent state models &mdash; process vs. observation</a></li>
+ <li><a href="#derived">Derived quantities</a></li>
+ <li><a href="#mcmc">Why MCMC works</a></li>
+ <li><a href="#nimble">Why we switched JAGS → NIMBLE</a></li>
+ <li><a href="#mistakes">Common pitfalls</a></li>
+ </ul>
+ <div class="section">Day 5 docs</div>
+ <ul>
+ <li><a href="lab.html">Main lab</a></li>
+ <li><a href="answer_key.html">Answer key</a></li>
+ <li><a href="problem_set_v2.html">Problem set v2</a></li>
+ <li><a href="problem_set_v3.html">Problem set v3</a></li>
+ </ul>
+ </nav>
+</aside>
+
+<main class="content" id="main-content" tabindex="-1">
+<header class="lab-header">
+ <div class="eyebrow">Day 5 · Plain-language summary</div>
+ <h1>Hierarchical Bayes, latent states, and management quantities &mdash; in normal English</h1>
+ <p class="lede">Read this <em>before</em> the lab. It explains every Day 5 idea with as little math as possible, and tells you what to focus on while reading the code.</p>
+</header>
+
+<section id="what">
+<h2>What we did today, in one paragraph</h2>
+<div class="callout plain"><p class="callout-label">Plain-language summary</p>
+We took the Bayesian models from Day 4 (one likelihood, a small handful of parameters, vague priors) and added the three things that show up in almost every real ecological dataset: <strong>multiple levels of grouping</strong> (sites within regions, fish within streams), <strong>latent biological states</strong> that we never directly observe (true occupancy, true abundance, true survival), and <strong>derived quantities</strong> that managers actually care about (equilibrium population size, harvest at maximum sustainable yield, year-to-year occupancy). The whole day was about <em>fitting these models in <span class="pill nimble">NIMBLE</span></em>, getting them to converge, and reading the posteriors back as biology.
+</div>
+</section>
+
+<section id="hier">
+<h2>Hierarchical models in plain English</h2>
+
+<p>A <strong>hierarchical model</strong> is a model in which some of the parameters themselves have parameters. The textbook example: you measured something at 30 sites, and you want a separate intercept $\alpha_j$ for each site, but you also think the sites are not totally unrelated &mdash; they all come from the same regional population. You write:</p>
+<div class="eq-block">$\alpha_j \sim \mathcal{N}(\mu_\alpha, \sigma_\alpha^2)$</div>
+<p>and then you estimate both the individual $\alpha_j$'s <em>and</em> the higher-level $\mu_\alpha$ and $\sigma_\alpha$ from the data. That's it. You have just acknowledged that sites are different but related, and the model will use that fact wisely.</p>
+
+<div class="callout key"><p class="callout-label">Key idea</p>
+<p>Three things to remember about hierarchical models:</p>
+<ol>
+ <li>They are the principled middle ground between <strong>complete pooling</strong> (everyone is the same) and <strong>no pooling</strong> (everyone is independent).</li>
+ <li>They <strong>share information</strong> across groups, which means small or noisy groups borrow strength from larger or cleaner groups.</li>
+ <li>They produce <strong>shrinkage</strong> &mdash; extreme group estimates get pulled toward the overall mean, especially for groups with little data.</li>
+</ol>
+</div>
+
+<p>The same logic applies to slopes, variances, intercepts on log scales, intercepts on logit scales, dispersion parameters &mdash; anything that varies across some grouping. The hierarchical machinery is reusable.</p>
+</section>
+
+<section id="shrink">
+<h2>What "shrinkage" really means</h2>
+<p>Imagine you sampled 50 streams for steelhead presence. In 49 streams you have 30 observations each. In one stream you have a single observation, which happened to be a detection. If you treat that one stream as its own universe (no pooling), your estimated probability of presence in stream 50 is $1/1 = 1.0$.</p>
+
+<p>If you pool partially, the model says: "Across all the streams I've seen, presence rates are roughly $\mu = 0.4$ with SD $\sigma = 0.2$. Stream 50 has one observation that says 'present.' Both pieces of information are valid. Let me weight them by their precision."</p>
+
+<p>The result: stream 50's estimated occupancy gets pulled from 1.0 toward 0.4, ending up somewhere around 0.5 or 0.6. <strong>That is shrinkage.</strong> It is the same logic a human expert would apply: don't take one observation at face value when you have a population of similar streams to compare against.</p>
+
+<div class="callout bio"><p class="callout-label">Biological intuition</p>
+<p>Shrinkage is not a flaw in hierarchical models; it is their main feature. It corrects the over-confidence of extreme single-group estimates by recognising that those groups are part of a population of similar groups. In small-sample work it is often the difference between making good decisions and getting fooled by noise.</p>
+</div>
+</section>
+
+<section id="latent">
+<h2>Latent state models: separating what's happening from what you saw</h2>
+
+<p>In ecology, we almost never measure the quantity we care about. We don't see "true occupancy" &mdash; we see whether a camera or eDNA sample flagged a species during one visit. We don't see "true abundance" &mdash; we see a count that is a noisy fraction of the truth. The actual biological state is <strong>latent</strong> (hidden).</p>
+
+<p>A latent-state model has two layers:</p>
+
+<div class="callout key"><p class="callout-label">Key idea</p>
+<p><strong>Process layer:</strong> What the biology is doing. Sites are occupied or not ($z[i, t]$). Patches have some true abundance ($N_i$). Tagged animals are alive or dead ($z_i$).</p>
+<p><strong>Observation layer:</strong> What your survey records. You might detect the species with probability $p$ given it's actually there. You might count $y[i, j]$ animals, drawn binomially from the true $N_i$ with detection $p$.</p>
+</div>
+
+<p>Estimating both layers at once is the whole point. If you ignored the observation layer and treated raw counts as truth, you would underestimate abundance, overestimate trend rates, and miss extinctions that are really just non-detections. The Bayesian latent-state framework gives you a clean place to write down both layers.</p>
+
+<h3>The two canonical examples</h3>
+<ul>
+ <li><strong>Dynamic occupancy:</strong> $z[i, t]$ is the true occupancy of site $i$ in year $t$, evolving with persistence $\phi$ and colonization $\gamma$. The data are repeated detections $y[i, j, t]$ given $z$ and detection $p$. We met this in section E of the lab.</li>
+ <li><strong>N-mixture:</strong> $N_i$ is the true abundance at site $i$, drawn from Poisson($\lambda$). The data are repeated counts $y[i, j]$ drawn from Binomial($N_i, p$). We met this in section F.</li>
+</ul>
+
+<p>Both models look complicated when you first see them, but each is just a process layer (one line) plus an observation layer (one line) plus priors. Once you internalise that split, dozens of other models in the literature suddenly become recognisable as variations on the same theme: capture-recapture, hidden Markov, dynamic N-mixture, false-positive occupancy, multistate models, etc.</p>
+</section>
+
+<section id="derived">
+<h2>Derived quantities &mdash; the Bayesian superpower for managers</h2>
+
+<p>A <strong>derived quantity</strong> is anything you compute from your model's parameters that you care about. Examples:</p>
+<ul>
+ <li>$S_\text{msy} = b\sqrt{1/a} - b/a$ in a Beverton-Holt fit &mdash; spawners at maximum sustainable yield.</li>
+ <li>The equilibrium occupancy $\gamma / (\gamma + (1 - \phi))$ in a dynamic occupancy model.</li>
+ <li>The total population $\sum_i N_i$ across all sites in an N-mixture model.</li>
+ <li>The probability that population $A$ has higher abundance than population $B$.</li>
+</ul>
+
+<p>In maximum-likelihood land, you fit $(a, b)$, get point estimates and standard errors, and use the delta method or bootstrap to put a CI on $S_\text{msy}$. It works, but it's an approximation.</p>
+
+<p>In Bayes, you compute $S_\text{msy}$ at <em>every MCMC iteration</em>, using that iteration's draw of $(a, b)$. The resulting set of values is the posterior distribution of $S_\text{msy}$ &mdash; with all the correlation between $a$ and $b$ correctly accounted for, no delta method, no bootstrap. You just write the derived-quantity line inside your <code>nimbleCode</code> block and ask <code>MCMCsummary</code> for it.</p>
+
+<div class="callout bio"><p class="callout-label">Biological intuition</p>
+<p>This is the answer to "why bother with Bayes" for many applied scientists. You get fully propagated uncertainty in any quantity you can compute from parameters &mdash; for the same effort as defining the parameter.</p>
+</div>
+</section>
+
+<section id="mcmc">
+<h2>Why MCMC works (intuitively)</h2>
+<p>Bayes' rule tells you what the posterior <em>is</em>:</p>
+<div class="eq-block">$p(\theta \mid y) \propto p(y \mid \theta) \cdot p(\theta)$</div>
+<p>It does not tell you what shape the posterior has, or how to compute its mean, or how to sample from it. For all but a few toy problems, the right-hand side is so messy that no formula will hand you the answer.</p>
+
+<p><strong>Markov Chain Monte Carlo</strong> (MCMC) is a clever way to sidestep the messy denominator. The idea: build a random walk through parameter space that, in the long run, visits each region with probability proportional to the posterior. Tally up where the walk spent its time, and you have an approximation of the posterior.</p>
+
+<p>The two most common engines are:</p>
+<ul>
+ <li><strong>Gibbs sampling:</strong> update each parameter from its full conditional distribution. Works great when those conditionals have known forms. JAGS and BUGS built their reputations on Gibbs.</li>
+ <li><strong>Metropolis-Hastings:</strong> propose a small random step, accept or reject based on the ratio of posterior densities. Works on essentially any model.</li>
+</ul>
+
+<p><span class="pill nimble">NIMBLE</span> uses a mix of both (and more &mdash; slice samplers, block samplers, Hamiltonian Monte Carlo via add-ons) and lets you customise.</p>
+
+<div class="callout warn"><p class="callout-label">Watch out</p>
+<p><strong>Two things to always check after running MCMC.</strong></p>
+<ol>
+ <li><strong>Convergence.</strong> Did all chains end up in the same place? Use R-hat (<code>gelman.diag</code>), and look at the traceplots (<code>MCMCtrace</code>) &mdash; they should look like horizontal fuzzy caterpillars.</li>
+ <li><strong>Effective sample size.</strong> A correlated sample of 10,000 might only be worth 200 independent samples. Use <code>effectiveSize()</code>. Aim for at least a few hundred per parameter for any parameter you care about.</li>
+</ol>
+</div>
+</section>
+
+<section id="nimble">
+<h2>Why we switched JAGS → NIMBLE for the course</h2>
+<p>The model code is nearly identical &mdash; same distributions, same precision parameterisation, same <code>logit/ilogit</code> idiom. The reasons to switch are practical:</p>
+<ul>
+ <li><span class="pill nimble">NIMBLE</span> is actively developed in R, with the maintainers responsive to bugs and feature requests.</li>
+ <li>It compiles models to C++ for speed, then runs them as MCMC by default. You can also write your own samplers in R.</li>
+ <li>It generalises: you can run MCMC, but also Sequential Monte Carlo, MCEM, Laplace approximation, or your own custom algorithms, on the same model object.</li>
+ <li>The split between <code>constants</code> (sizes, indices, fixed covariates) and <code>data</code> (observed random variables) forces a clarity that JAGS' single-list approach often obscures.</li>
+</ul>
+<p>The cheat sheet you need:</p>
+<table>
+<tr><th scope="col">JAGS</th><th scope="col"><span class="pill nimble">NIMBLE</span></th></tr>
+<tr><td><code>cat("model{...}", file="x.txt")</code></td><td><code>myCode &lt;- nimbleCode({ ... })</code></td></tr>
+<tr><td><code>jags.model() / update() / coda.samples()</code></td><td><code>nimbleMCMC()</code></td></tr>
+<tr><td>single <code>data=</code> list</td><td>split into <code>constants=</code> + <code>data=</code></td></tr>
+<tr><td>argument order <code>dbinom(p, n)</code></td><td>same: <code>dbinom(prob, size)</code></td></tr>
+<tr><td>precision: <code>dnorm(mu, tau)</code></td><td>same: <code>dnorm(mu, tau)</code></td></tr>
+</table>
+</section>
+
+<section id="mistakes">
+<h2>Common pitfalls (and how to avoid them)</h2>
+
+<div class="callout warn"><p class="callout-label">Watch out</p>
+<p><strong>Vague priors on link scales.</strong> A $\mathcal{N}(0, 100)$ prior on a log-link slope is not noninformative; it puts most weight on impossible parameter values. <em>Fix:</em> standardise predictors and use $\mathcal{N}(0, \sigma \approx 2)$ priors.</p>
+</div>
+
+<div class="callout warn"><p class="callout-label">Watch out</p>
+<p><strong>Bad starting values in latent-state models.</strong> If your initial latent state implies a $y$ that contradicts the data, the log-density is $-\infty$ and the chain won't start. <em>Fix:</em> in dynamic occupancy, initialise all $z = 1$; in N-mixture, initialise $N_i = \max_j y_{i,j}$.</p>
+</div>
+
+<div class="callout warn"><p class="callout-label">Watch out</p>
+<p><strong>Wrong binomial argument order.</strong> R: <code>rbinom(n, size, prob)</code>. <span class="pill nimble">NIMBLE</span>/<span class="pill jags">JAGS</span>: <code>dbinom(prob, size)</code>. Silent bug if you copy-paste from one to the other. <em>Fix:</em> always use named arguments.</p>
+</div>
+
+<div class="callout warn"><p class="callout-label">Watch out</p>
+<p><strong>Wrong split between constants and data.</strong> If you put a covariate vector in <code>data=</code> but never assign it with <code>~</code>, NIMBLE will treat it as missing (NA) and try to estimate it. <em>Fix:</em> covariates and indices go in <code>constants=</code>. Only random variables observed with <code>~</code> go in <code>data=</code>.</p>
+</div>
+
+<div class="callout warn"><p class="callout-label">Watch out</p>
+<p><strong>Not checking convergence.</strong> A bad posterior summary will happily print to your screen even if R-hat is 1.5 and the chains never mixed. <em>Fix:</em> always run <code>gelman.diag()</code> and <code>MCMCtrace()</code> before believing any output.</p>
+</div>
+
+</section>
+
+</main>
+</div>
+<footer>FW 536 · Statistical Modeling for Ecology and Conservation · Oregon State University</footer>
+</body>
+</html>

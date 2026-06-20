@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en" data-a11y="done">
+<head>
+<meta charset="UTF-8" />
+<title>Day 1 Morning — Introduction to probability lecture notes | FW 536</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../_Shared/css/accessible.css" />
+<script>
+MathJax = {
+  tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
+  options: { menuOptions: { settings: { assistiveMml: true, explorer: true } } },
+  loader: { load: ['a11y/assistive-mml', 'a11y/explorer'] }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script"></script>
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<div class="a11y-bar" role="region" aria-label="Accessibility">Accessible version &middot; <a href="../accessibility.html">How to use this site with a screen reader</a> &middot; <a href="../index.html">Course home</a></div>
+
+<aside class="sidebar">
+<p class="brand"><a href="../index.html">FW 536 · Day 1 Morning</a></p>
+<div class="subtitle">Lecture notes: Introduction to probability</div>
+<nav aria-label="Slides in this lecture">
+<div class="section">Slides</div><ul>
+<li><a href="#slide-1">1. FW599 - Fall 2025Get your data on!</a></li>
+<li><a href="#slide-2">2. What is this course?</a></li>
+<li><a href="#slide-3">3. Course oath</a></li>
+<li><a href="#slide-4">4. Grading</a></li>
+<li><a href="#slide-5">5. This course is just a jumping off point</a></li>
+<li><a href="#slide-6">6. Slide 6</a></li>
+<li><a href="#slide-7">7. Slide 7</a></li>
+<li><a href="#slide-8">8. Slide 8</a></li>
+<li><a href="#slide-9">9. Slide 9</a></li>
+<li><a href="#slide-10">10. Slide 10</a></li>
+<li><a href="#slide-11">11. Probability Experiments</a></li>
+<li><a href="#slide-12">12. Probability Experiments</a></li>
+<li><a href="#slide-13">13. Probability Experiments</a></li>
+<li><a href="#slide-14">14. Classical Probability</a></li>
+<li><a href="#slide-15">15. Classical Probability-II(Example)</a></li>
+<li><a href="#slide-16">16. DNA Example</a></li>
+<li><a href="#slide-17">17. DNA Example</a></li>
+<li><a href="#slide-18">18. DNA Example</a></li>
+<li><a href="#slide-19">19. Probabilities Formalized</a></li>
+<li><a href="#slide-20">20. Example</a></li>
+<li><a href="#slide-21">21. Conditional Probability-I</a></li>
+<li><a href="#slide-22">22. Conditional Probability-II</a></li>
+<li><a href="#slide-23">23. Conditional Probability-III</a></li>
+<li><a href="#slide-24">24. Conditional Probability-IV</a></li>
+<li><a href="#slide-25">25. Conditional Probability-V</a></li>
+<li><a href="#slide-26">26. Independent Events-I</a></li>
+<li><a href="#slide-27">27. “AND” - The Multiplication RuleThe “joint distribution” of A and B</a></li>
+<li><a href="#slide-28">28. “AND” - The Multiplication RuleThe “joint distribution” of A and B</a></li>
+<li><a href="#slide-29">29. Slide 29</a></li>
+<li><a href="#slide-30">30. Slide 30</a></li>
+<li><a href="#slide-31">31. Slide 31</a></li>
+<li><a href="#slide-32">32. “OR” - The Additive Rule</a></li>
+<li><a href="#slide-33">33. “OR” - The Additive Rule</a></li>
+<li><a href="#slide-34">34. Using the Rules of Probability(Example)</a></li>
+<li><a href="#slide-35">35. Review of Concepts and Formulae</a></li>
+<li><a href="#slide-36">36. QUESTION: Prove the equality in Bayes rule using simple probability rules</a></li>
+<li><a href="#slide-37">37. BREAK: Up Next - Operationalizing Probability</a></li>
+<li><a href="#slide-38">38. Random Variables-I</a></li>
+<li><a href="#slide-39">39. Random Variables - II</a></li>
+<li><a href="#slide-40">40. Random Variables - III</a></li>
+<li><a href="#slide-41">41. Slide 41</a></li>
+<li><a href="#slide-42">42. Probability Distributions (Discrete-I)</a></li>
+<li><a href="#slide-43">43. Probability Distributions (Discrete-II)</a></li>
+<li><a href="#slide-44">44. Discrete Cumulative Distribution Function</a></li>
+<li><a href="#slide-45">45. Discrete Cumulative Distribution Function</a></li>
+<li><a href="#slide-46">46. Means, Variances and Standard Deviations-I</a></li>
+<li><a href="#slide-47">47. Expected Value</a></li>
+<li><a href="#slide-48">48. Means, Variances and Standard Deviations-II</a></li>
+<li><a href="#slide-49">49. Slide 49</a></li>
+<li><a href="#slide-50">50. Slide 50</a></li>
+<li><a href="#slide-51">51. Slide 51</a></li>
+<li><a href="#slide-52">52. Algebra with Expectation and Variance</a></li>
+<li><a href="#slide-53">53. Answer: Algebra with Expectation and Variance</a></li>
+<li><a href="#slide-54">54. Algebra with Expectation and Variance</a></li>
+<li><a href="#slide-55">55. Answer: Algebra with Expectation and Variance</a></li>
+<li><a href="#slide-56">56. Key terms moving forward</a></li>
+</ul></nav></aside>
+<main class="content" id="main-content" tabindex="-1">
+<header class="lab-header">
+<div class="eyebrow">Day 1 Morning · Accessible lecture notes</div>
+<h1>Introduction to probability</h1>
+<p class="lede">A screen-reader-friendly transcript of the lecture slides: all slide text and speaker notes are included. Figures are flagged where a text description still needs to be added.</p>
+</header>
+<div class="callout key"><p class="callout-label">About these notes</p>These notes are generated from the lecture slides. Each section below is one slide. Where a slide contained a picture, plot, or equation image, you will see a "Figure needs description" note &mdash; ask your instructor for the description of that figure. For the underlying concepts with worked examples, also read the <a href="plain_language_summary.html">plain-language summary</a> and <a href="lab.html">lab</a> for this session.</p></div>
+<section aria-labelledby="slide-1-h">
+<h2 id="slide-1-h"><span id="slide-1"></span>Slide 1: FW599 - Fall 2025Get your data on!</h2>
+<p><em>(No text on this slide.)</em></p>
+</section>
+<section aria-labelledby="slide-2-h">
+<h2 id="slide-2-h"><span id="slide-2"></span>Slide 2: What is this course?</h2>
+<p>Goal: Provide a strong statistical foundation and transferable skills to help you (1) understand and analyze data, and (2) conduct more complex statistical modeling</p>
+<p>We are going for deep understanding not just implementing R code.</p>
+</section>
+<section aria-labelledby="slide-3-h">
+<h2 id="slide-3-h"><span id="slide-3"></span>Slide 3: Course oath</h2>
+<ul>
+<li>“I agree to ask questions when something is not clear or I am confused.</li>
+<li>I will strive to work together to help one another.</li>
+<li>I will not be afraid to look stupid because we’re all just apes in a room”</li>
+</ul>
+</section>
+<section aria-labelledby="slide-4-h">
+<h2 id="slide-4-h"><span id="slide-4"></span>Slide 4: Grading</h2>
+<ul>
+<li>Participation and group work (100 points)</li>
+<li>Labs (200 points)</li>
+</ul>
+</section>
+<section aria-labelledby="slide-5-h">
+<h2 id="slide-5-h"><span id="slide-5"></span>Slide 5: This course is just a jumping off point</h2>
+<ul>
+<li>Train yourself by reading books.</li>
+<li>Consider pursuing side project using methods you want to learn</li>
+<li>Consider attending weekly math/stats seminars</li>
+</ul>
+<p class="callout warn" role="note"><span class="callout-label">Figure 5.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 5.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 5.3 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 5.4 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 5.5 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 5.6 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-6-h">
+<h2 id="slide-6-h"><span id="slide-6"></span>Slide 6</h2>
+<ul>
+<li style="margin-left:2em">one sample  t-test</li>
+<li style="margin-left:2em">two sample t-test</li>
+<li style="margin-left:2em">paired t-test</li>
+<li style="margin-left:2em">Analysis of Variance (ANOVA)</li>
+<li style="margin-left:2em">Analysis of Covariance (ANCOVA)</li>
+<li style="margin-left:2em">Chi.sq test</li>
+<li style="margin-left:2em">linear regression</li>
+<li style="margin-left:2em">multiple regression</li>
+<li style="margin-left:2em">logistic regression</li>
+</ul>
+<p>GLM: the superset of all stuff you learned</p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 6.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<ul>
+<li>Useful to get started.</li>
+<li>But a really stupid way to learn.</li>
+</ul>
+<ul>
+<li>General linear model vs.</li>
+<li>Generalized linear model?</li>
+</ul>
+</section>
+<section aria-labelledby="slide-7-h">
+<h2 id="slide-7-h"><span id="slide-7"></span>Slide 7</h2>
+<ul>
+<li style="margin-left:2em">one sample t-test</li>
+<li style="margin-left:2em">two sample t-test</li>
+<li style="margin-left:2em">paired t-test</li>
+<li style="margin-left:2em">Analysis of Variance (ANOVA)</li>
+<li style="margin-left:2em">Analysis of Covariance (ANCOVA)</li>
+<li style="margin-left:2em">linear regression</li>
+<li style="margin-left:2em">multiple regression</li>
+<li style="margin-left:2em">logistic regression</li>
+</ul>
+<p>GLM: the superset of almost all stuff you learned</p>
+<ul>
+<li style="margin-left:2em">Is mean of one measured continuous thing different from what you expect?</li>
+<li style="margin-left:2em">Are means of two measured continuous things different from each other?</li>
+<li style="margin-left:2em">Are means of two measured continuous things collected in a paired treatment (e.g. same subject at two times) different?</li>
+<li style="margin-left:2em">X=factor, Y=continuous</li>
+<li style="margin-left:2em">X=both factor and continuous, Y=continuous</li>
+<li style="margin-left:2em">X=continuous, Y=continuous</li>
+<li style="margin-left:2em">X1, X2…=continuous, Y=continuous</li>
+<li style="margin-left:2em">X=continuous, Y=binary  (mostly taught this way) – Note that is a “generalized” linear model because the errors are not Normal</li>
+</ul>
+<details class="answer"><summary>Speaker notes for this slide</summary><div class="answer-body"><p>Paired - Count macroinvertebrates in a stream before and after a restoration intervention.</p></div></details>
+</section>
+<section aria-labelledby="slide-8-h">
+<h2 id="slide-8-h"><span id="slide-8"></span>Slide 8</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 8.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-9-h">
+<h2 id="slide-9-h"><span id="slide-9"></span>Slide 9</h2>
+<p>This can be generalized further</p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 9.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-10-h">
+<h2 id="slide-10-h"><span id="slide-10"></span>Slide 10</h2>
+<ul>
+<li>Probability vs. Statistics</li>
+<li>Different subjects: both about random processes</li>
+<li>Probability</li>
+<li>Logically self-contained</li>
+<li>A few rules for computing probabilities</li>
+<li>One correct answer</li>
+<li>Statistics</li>
+<li>Messier and more of an art</li>
+<li>Get experimental data and try to draw probabilistic conclusions</li>
+<li>No single correct answer</li>
+<li>But built on probability</li>
+</ul>
+</section>
+<section aria-labelledby="slide-11-h">
+<h2 id="slide-11-h"><span id="slide-11"></span>Slide 11: Probability Experiments</h2>
+<p>A probability experiment is a process or action that can be repeated under the same conditions and results in well-defined outcomes, but the outcome is uncertain or random. Each possible outcome of the experiment has an associated probability, which is a measure of how likely that outcome is to occur.</p>
+</section>
+<section aria-labelledby="slide-12-h">
+<h2 id="slide-12-h"><span id="slide-12"></span>Slide 12: Probability Experiments</h2>
+<table>
+<thead><tr><th scope="col">Probability Experiment</th><th scope="col">Count of the number of trees in a stand</th></tr></thead>
+<tbody>
+<tr><td>Sample Space (all possible outcomes)</td><td>{0, 1, 2, ….}</td></tr>
+<tr><td>Event (subset of interest from sample space)</td><td>&gt;10</td></tr>
+<tr><td>Outcome (the actual result in the probability experiment)</td><td>5</td></tr>
+</tbody>
+</table>
+</section>
+<section aria-labelledby="slide-13-h">
+<h2 id="slide-13-h"><span id="slide-13"></span>Slide 13: Probability Experiments</h2>
+<table>
+<thead><tr><th scope="col">Probability Experiment</th><th scope="col">Determine the maturity state of a baleen whale</th></tr></thead>
+<tbody>
+<tr><td>Sample Space</td><td>Mature, Calf, Juvenile</td></tr>
+<tr><td>Event</td><td>Immature = {Juvenile OR Calf}</td></tr>
+<tr><td>Outcome</td><td>Calf</td></tr>
+</tbody>
+</table>
+</section>
+<section aria-labelledby="slide-14-h">
+<h2 id="slide-14-h"><span id="slide-14"></span>Slide 14: Classical Probability</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 14.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 14.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 14.3 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-15-h">
+<h2 id="slide-15-h"><span id="slide-15"></span>Slide 15: Classical Probability-II(Example)</h2>
+<ul>
+<li>What is the (classical) probability of selecting the King of Clubs from a pack of 52 cards?</li>
+<li style="margin-left:1em">What are the sample space and event?</li>
+<li>If you drew a card from a pack and it was the King of Clubs, what is the probability of then randomly drawing another club?</li>
+<li style="margin-left:1em">What are the sample space and event?</li>
+</ul>
+</section>
+<section aria-labelledby="slide-16-h">
+<h2 id="slide-16-h"><span id="slide-16"></span>Slide 16: DNA Example</h2>
+<ul>
+<li>DNA is made of sequences of nucleotides: A, C, G, T.</li>
+<li>How many DNA sequences of length 3 are there? (This is a sample space of all possible outcome)</li>
+<li>(i) 12  (ii) 24  (iii) 64  (iv) 81</li>
+<li>How many DNA sequences of length 3 are there with no repeats? (This could be an event)</li>
+<li>(i) 12  (ii) 24  (iii) 64  (iv) 81</li>
+<li>What is the probability that a DNA sequence of length 3 has no repeat nucleotides?</li>
+</ul>
+</section>
+<section aria-labelledby="slide-17-h">
+<h2 id="slide-17-h"><span id="slide-17"></span>Slide 17: DNA Example</h2>
+<ul>
+<li>DNA is made of sequences of nucleotides: A, C, G, T.</li>
+<li>How many DNA sequences of length 3 are there? (This is a sample space of all possible outcome)</li>
+<li>(i) 12  (ii) 24  (iii) 64  (iv) 81</li>
+<li>How many DNA sequences of length 3 are there with no repeats? (This could be an event)</li>
+<li>(i) 12  (ii) 24  (iii) 64  (iv) 81</li>
+<li>What is the probability that a DNA sequence of length 3 has no repeat nucleotides?</li>
+</ul>
+</section>
+<section aria-labelledby="slide-18-h">
+<h2 id="slide-18-h"><span id="slide-18"></span>Slide 18: DNA Example</h2>
+<ul>
+<li>DNA is made of sequences of nucleotides: A, C, G, T.</li>
+<li>How many DNA sequences of length 3 are there? (This is a sample space of all possible outcome)</li>
+<li>(i) 12  (ii) 24  (iii) 64  (iv) 81</li>
+<li>How many DNA sequences of length 3 are there with no repeats? (This could be an event)</li>
+<li>(i) 12  (ii) 24  (iii) 64  (iv) 81</li>
+<li>What is the probability that a DNA sequence of length 3 has no repeat nucleotides?</li>
+</ul>
+</section>
+<section aria-labelledby="slide-19-h">
+<h2 id="slide-19-h"><span id="slide-19"></span>Slide 19: Probabilities Formalized</h2>
+<ul>
+<li>A probability cannot be negative and cannot exceed 1, i.e.:</li>
+<li>The complement of the event E is the set of outcomes not part of E. The probability of the complement of E (denoted E ’) is:</li>
+</ul>
+<p>Why “1” here?</p>
+</section>
+<section aria-labelledby="slide-20-h">
+<h2 id="slide-20-h"><span id="slide-20"></span>Slide 20: Example</h2>
+<ul>
+<li>The sex ratio at birth for a particular pinniped is 55:45 male:female. You select two pups at random from the (large) population. What is the probability that:</li>
+<li style="margin-left:1em">a. they are both male?</li>
+<li style="margin-left:1em">b. at least one of them is male?</li>
+<li>Solution:</li>
+<li style="margin-left:1em">We can assume that the population is “large” (not 100!)</li>
+<li style="margin-left:1em">P(male) * P(male) = 0.55*0.55</li>
+<li style="margin-left:1em">P(at least one male) = 1-P(both female) = 1 - 0.45*0.45</li>
+</ul>
+<p>How would this be different if the population wasn’t large?</p>
+</section>
+<section aria-labelledby="slide-21-h">
+<h2 id="slide-21-h"><span id="slide-21"></span>Slide 21: Conditional Probability-I</h2>
+<ul>
+<li>A conditional probability is the probability of an event occurring given that another event has already occurred.</li>
+<li>The conditional probability of event B occurring given that event A has already occurred is denoted P(B|A) and is read as “probability of B given A”</li>
+</ul>
+</section>
+<section aria-labelledby="slide-22-h">
+<h2 id="slide-22-h"><span id="slide-22"></span>Slide 22: Conditional Probability-II</h2>
+<table>
+<thead><tr><th scope="col"></th><th scope="col">Gene Present</th><th scope="col">Gene Not Present</th><th scope="col">Total</th></tr></thead>
+<tbody>
+<tr><td>Spring Run</td><td>33</td><td>19</td><td>52</td></tr>
+<tr><td>Fall Run</td><td>39</td><td>11</td><td>50</td></tr>
+<tr><td>Total</td><td>72</td><td>30</td><td>102</td></tr>
+</tbody>
+</table>
+<ul>
+<li>What is the probability of being a spring run fish?</li>
+<li>What is the probability of being a spring run fish if you have the gene?</li>
+</ul>
+<p class="callout warn" role="note"><span class="callout-label">Figure 22.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-23-h">
+<h2 id="slide-23-h"><span id="slide-23"></span>Slide 23: Conditional Probability-III</h2>
+<table>
+<thead><tr><th scope="col"></th><th scope="col">Gene Present</th><th scope="col">Gene Not Present</th><th scope="col">Total</th></tr></thead>
+<tbody>
+<tr><td>Spring Run</td><td>33</td><td>19</td><td>52</td></tr>
+<tr><td>Fall Run</td><td>39</td><td>11</td><td>50</td></tr>
+<tr><td>Total</td><td>72</td><td>30</td><td>102</td></tr>
+</tbody>
+</table>
+<ul>
+<li>What is the probability of being a spring run fish?</li>
+<li style="margin-left:1em">Solution: This question says nothing about the other factor (gene)</li>
+<li style="margin-left:1em">so we look at the last column (total); =52/102</li>
+</ul>
+<p class="callout warn" role="note"><span class="callout-label">Figure 23.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-24-h">
+<h2 id="slide-24-h"><span id="slide-24"></span>Slide 24: Conditional Probability-IV</h2>
+<table>
+<thead><tr><th scope="col"></th><th scope="col">Gene Present</th><th scope="col">Gene Not Present</th><th scope="col">Total</th></tr></thead>
+<tbody>
+<tr><td>Spring Run</td><td>33</td><td>19</td><td>52</td></tr>
+<tr><td>Fall Run</td><td>39</td><td>11</td><td>50</td></tr>
+<tr><td>Total</td><td>72</td><td>30</td><td>102</td></tr>
+</tbody>
+</table>
+<ul>
+<li>What is the probability of being a spring run fish if you have the gene?</li>
+<li style="margin-left:1em">Solution: The question relates only to having the gene so we are dealing with a conditional probability. We focus on the “Gene present” column and find the probability of being a spring run fish GIVEN having the gene = 33/72.</li>
+</ul>
+<p class="callout warn" role="note"><span class="callout-label">Figure 24.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-25-h">
+<h2 id="slide-25-h"><span id="slide-25"></span>Slide 25: Conditional Probability-V</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 25.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 25.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>Mangel’s Toolbox</p>
+</section>
+<section aria-labelledby="slide-26-h">
+<h2 id="slide-26-h"><span id="slide-26"></span>Slide 26: Independent Events-I</h2>
+<ul>
+<li>Two events are said to be independent if the occurrence of one does not affect the probability of the other</li>
+<li>Two events are independent therefore if:</li>
+</ul>
+</section>
+<section aria-labelledby="slide-27-h">
+<h2 id="slide-27-h"><span id="slide-27"></span>Slide 27: “AND” - The Multiplication RuleThe “joint distribution” of A and B</h2>
+<ul>
+<li>The probability that two events A and B will occur in sequence is:</li>
+<li>If A and B are independent, then the multiplication rule becomes:</li>
+</ul>
+</section>
+<section aria-labelledby="slide-28-h">
+<h2 id="slide-28-h"><span id="slide-28"></span>Slide 28: “AND” - The Multiplication RuleThe “joint distribution” of A and B</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 28.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 28.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>Note the multiplication. What’s another way to write this?</p>
+</section>
+<section aria-labelledby="slide-29-h">
+<h2 id="slide-29-h"><span id="slide-29"></span>Slide 29</h2>
+<p>Factoring joint distributions into conditionals “the chain rule”</p>
+<p>P(A, B, C, D) = P(A|B,C,D)P(B|C,D)P(C|D)P(D)</p>
+<ul>
+<li>The probability of multiple events (or random variables) is called the joint distribution of A and B.</li>
+<li>The joint distribution can be factored into conditional distributions</li>
+</ul>
+<p>The conditional distributions can further be simplified if variables are independent</p>
+</section>
+<section aria-labelledby="slide-30-h">
+<h2 id="slide-30-h"><span id="slide-30"></span>Slide 30</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 30.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>The conditional distributions can be represented by a Directed Acyclic Graph (DAG) based on the dependencies of the process</p>
+<ul>
+<li>Variables with arrowheads: LHS of conditionality</li>
+<li>They depend on tails of arrows, which go on RHS</li>
+<li>Variables without arrow pointing to them are independent</li>
+</ul>
+</section>
+<section aria-labelledby="slide-31-h">
+<h2 id="slide-31-h"><span id="slide-31"></span>Slide 31</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 31.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>Bayesian models are often represented by DAGs</p>
+</section>
+<section aria-labelledby="slide-32-h">
+<h2 id="slide-32-h"><span id="slide-32"></span>Slide 32: “OR” - The Additive Rule</h2>
+<ul>
+<li>The probability that events A or B will occur is:</li>
+<li>If events A and B are mutually exclusive, then:</li>
+</ul>
+<p>Note the addition</p>
+<p>Why?</p>
+</section>
+<section aria-labelledby="slide-33-h">
+<h2 id="slide-33-h"><span id="slide-33"></span>Slide 33: “OR” - The Additive Rule</h2>
+<p>The probability that events A or B will occur</p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 33.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>To avoid double count</p>
+</section>
+<section aria-labelledby="slide-34-h">
+<h2 id="slide-34-h"><span id="slide-34"></span>Slide 34: Using the Rules of Probability(Example)</h2>
+<table>
+<thead><tr><th scope="col"></th><th scope="col"></th><th scope="col">Blood Type</th><th scope="col"></th><th scope="col"></th><th scope="col"></th><th scope="col"></th></tr></thead>
+<tbody>
+<tr><td></td><td></td><td>O</td><td>A</td><td>B</td><td>AB</td><td>Total</td></tr>
+<tr><td>Rh factor</td><td>Positive</td><td>156</td><td>139</td><td>37</td><td>12</td><td>344</td></tr>
+<tr><td></td><td>Negative</td><td>28</td><td>25</td><td>8</td><td>4</td><td>65</td></tr>
+<tr><td></td><td>Total</td><td>184</td><td>164</td><td>45</td><td>16</td><td>409</td></tr>
+</tbody>
+</table>
+<ul>
+<li>The above table is based on data for 409 randomly selected blood donors</li>
+<li>What is the probability that a donor has type O or type A blood?</li>
+<li>What is the probability that a donor has type B blood and is Rh-negative?</li>
+<li>What is the probability that a donor has type A blood and is Rh-negative?</li>
+<li>What is the probability that a donor is Rh-positive given he / she has</li>
+<li>blood type O?</li>
+</ul>
+</section>
+<section aria-labelledby="slide-35-h">
+<h2 id="slide-35-h"><span id="slide-35"></span>Slide 35: Review of Concepts and Formulae</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 35.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-36-h">
+<h2 id="slide-36-h"><span id="slide-36"></span>Slide 36: QUESTION: Prove the equality in Bayes rule using simple probability rules</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 36.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-37-h">
+<h2 id="slide-37-h"><span id="slide-37"></span>Slide 37: BREAK: Up Next - Operationalizing Probability</h2>
+<p><em>(No text on this slide.)</em></p>
+</section>
+<section aria-labelledby="slide-38-h">
+<h2 id="slide-38-h"><span id="slide-38"></span>Slide 38: Random Variables-I</h2>
+<ul>
+<li>A random variable X  represents a numerical value associated with each outcome of a probability experiment.</li>
+<li>“Random” implies that there is an element of chance involved. Typical random variables:</li>
+<li style="margin-left:1em">Time that a tagged animal is at large.</li>
+<li style="margin-left:1em">Number of offspring produced by a female Panda bear in one year / over her lifespan.</li>
+<li style="margin-left:1em">Length / weight of a sampled fish</li>
+</ul>
+</section>
+<section aria-labelledby="slide-39-h">
+<h2 id="slide-39-h"><span id="slide-39"></span>Slide 39: Random Variables - II</h2>
+<ul>
+<li>Notation:</li>
+<li style="margin-left:1em">Convention is to use upper case letters to denote random variables and lower case letters to denote particular values of random variables.</li>
+<li style="margin-left:1em">The probability that the random variable X has value x is written as P (X=x).</li>
+</ul>
+</section>
+<section aria-labelledby="slide-40-h">
+<h2 id="slide-40-h"><span id="slide-40"></span>Slide 40: Random Variables - III</h2>
+<ul>
+<li>A random variable is:</li>
+<li style="margin-left:1em">Discrete if it has a countable number of possible outcomes that can be listed.</li>
+<li style="margin-left:1em">Continuous if it has an uncountable number of possible outcomes  (or the number of outcomes cannot be listed). Continuous random variables can (at least conceptually) be measured to any degree of accuracy.</li>
+</ul>
+</section>
+<section aria-labelledby="slide-41-h">
+<h2 id="slide-41-h"><span id="slide-41"></span>Slide 41</h2>
+<ul>
+<li>The number of scales forming the lateral line of a fish?</li>
+<li style="margin-left:1em">Discrete random variable</li>
+<li>Max swimming speed of a blue whale?</li>
+<li style="margin-left:1em">Continuous random variable</li>
+<li>Number of reproductive events of a Fathead minnow each year?</li>
+<li style="margin-left:1em">Discrete random variable</li>
+</ul>
+<p class="callout warn" role="note"><span class="callout-label">Figure 41.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 41.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 41.3 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>Random Variables - III</p>
+</section>
+<section aria-labelledby="slide-42-h">
+<h2 id="slide-42-h"><span id="slide-42"></span>Slide 42: Probability Distributions (Discrete-I)</h2>
+<ul>
+<li>A discrete probability distribution lists each possible value the random variable can take, together with its probability.</li>
+<li style="margin-left:1em">typically called a probability mass function (PMF)</li>
+<li>From our earlier discussion of probability, it must be true that:</li>
+<li style="margin-left:1em">The probability of each value of the discrete random variable must lie between 0 and 1.</li>
+<li style="margin-left:1em">The sum of all the probabilities must equal 1.</li>
+</ul>
+</section>
+<section aria-labelledby="slide-43-h">
+<h2 id="slide-43-h"><span id="slide-43"></span>Slide 43: Probability Distributions (Discrete-II)</h2>
+<ul>
+<li>Mathematically:</li>
+<li style="margin-left:1em">Let the possible values for the random variable be:</li>
+<li style="margin-left:1em">By the first condition:</li>
+<li style="margin-left:1em">By the second condition:</li>
+</ul>
+<p>The probability of each value of the discrete random variable is between 0 and 1, inclusive.</p>
+<p>The sum of all the probabilities is 1.</p>
+<p>Upper summation limit</p>
+<p>Lower summation limit</p>
+</section>
+<section aria-labelledby="slide-44-h">
+<h2 id="slide-44-h"><span id="slide-44"></span>Slide 44: Discrete Cumulative Distribution Function</h2>
+<ul>
+<li>The probability that random variable X takes values less than or equal to a specific value x</li>
+<li>It is common for f(x), or here p(x), to refer to the probability mass function (what people usually mean when they say “distribution”) and F(x) to refer to the cumulative distribution function</li>
+</ul>
+<p class="callout warn" role="note"><span class="callout-label">Figure 44.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-45-h">
+<h2 id="slide-45-h"><span id="slide-45"></span>Slide 45: Discrete Cumulative Distribution Function</h2>
+<ul>
+<li>The probability that random variable X takes values less than or equal to a specific value x</li>
+<li>The probability that X is between a and b is</li>
+<li style="margin-left:1em">Notice the inequalities are not the same. Why?</li>
+</ul>
+<p class="callout warn" role="note"><span class="callout-label">Figure 45.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 45.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-46-h">
+<h2 id="slide-46-h"><span id="slide-46"></span>Slide 46: Means, Variances and Standard Deviations-I</h2>
+<p>The mean of a discrete random variable is given by:</p>
+<p>Each value of x is multiplied by its corresponding probability and the products are added.</p>
+<p>This is just a weighted average!</p>
+</section>
+<section aria-labelledby="slide-47-h">
+<h2 id="slide-47-h"><span id="slide-47"></span>Slide 47: Expected Value</h2>
+<p>The expected value of a discrete random variable (jargon for the mean) is:</p>
+<p>This is just a weighted average!</p>
+</section>
+<section aria-labelledby="slide-48-h">
+<h2 id="slide-48-h"><span id="slide-48"></span>Slide 48: Means, Variances and Standard Deviations-II</h2>
+<ul>
+<li>The variance of a discrete random variable is given by:</li>
+<li>Which is the same as E{(X - µ )2}</li>
+<li>Question: show that  an equivalent definition is</li>
+</ul>
+<p>Var{X} =</p>
+<p>Recall that</p>
+<p>Var{X} = E{X2} - (E{X})2</p>
+</section>
+<section aria-labelledby="slide-49-h">
+<h2 id="slide-49-h"><span id="slide-49"></span>Slide 49</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 49.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-50-h">
+<h2 id="slide-50-h"><span id="slide-50"></span>Slide 50</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 50.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-51-h">
+<h2 id="slide-51-h"><span id="slide-51"></span>Slide 51</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 51.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-52-h">
+<h2 id="slide-52-h"><span id="slide-52"></span>Slide 52: Algebra with Expectation and Variance</h2>
+<ul>
+<li>Expectation is a linear operator that can be distributed across a function of a random variable, X, but variance is not</li>
+<li>What is E{a + bX}</li>
+<li>What is Var{a + bX}</li>
+</ul>
+<p>Recall: Var{X} = E{X2} - (E{X})2</p>
+</section>
+<section aria-labelledby="slide-53-h">
+<h2 id="slide-53-h"><span id="slide-53"></span>Slide 53: Answer: Algebra with Expectation and Variance</h2>
+<ul>
+<li>E{a + bX} = E{a} +b*E{X} = a + b*E{X}</li>
+<li>Var{a + bX} = E{(a + bX)2} - (E{a + bX})2 = E{a2 + 2abX + b2X2} – (a + b*E{X})2</li>
+<li>a2+2abE{X}+b2 E{X2} – (a2+2abE{X}+b2 E{X}2)</li>
+<li>b2(E{X2} - E{X}2)</li>
+<li>b2Var{X}</li>
+</ul>
+</section>
+<section aria-labelledby="slide-54-h">
+<h2 id="slide-54-h"><span id="slide-54"></span>Slide 54: Algebra with Expectation and Variance</h2>
+<p>If X and Y are independent, what is Var{X + Y}?</p>
+<p>Recall: Var{X} = E{X2} - (E{X})2</p>
+</section>
+<section aria-labelledby="slide-55-h">
+<h2 id="slide-55-h"><span id="slide-55"></span>Slide 55: Answer: Algebra with Expectation and Variance</h2>
+<ul>
+<li>If X and Y are independent, what is Var{X + Y}?</li>
+<li>Var{X +Y} = E{X2 + 2XY + Y2} – (E{X} + E{Y})2</li>
+<li>= E{X2} + 2E{XY} + E{Y2} – (E{X}2 + 2E{X}E{Y} + E{Y} 2)</li>
+<li>= E{X2} – E{X}2 + E{Y2} – E{Y}2</li>
+<li>Var{X +Y} = Var{X} + Var{Y}</li>
+</ul>
+<p>Recall: Var{X} = E{X2} - (E{X})2</p>
+<p>So, variances of independent random variables add!</p>
+</section>
+<section aria-labelledby="slide-56-h">
+<h2 id="slide-56-h"><span id="slide-56"></span>Slide 56: Key terms moving forward</h2>
+<ul>
+<li>Probability mass function, PMF</li>
+<li>Cumulative distribution function, CDF</li>
+<li>Expectation/Expected value</li>
+<li>Variance</li>
+<li>Random variable</li>
+</ul>
+</section>
+</main>
+
+<footer>FW 536 &middot; Statistical Modeling for Ecology and Conservation &middot; Oregon State University &middot; Accessible lecture notes</footer>
+</body>
+</html>

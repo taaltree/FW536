@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en" data-a11y="done">
+<head>
+<meta charset="UTF-8" />
+<title>Day 4 Afternoon — Bayesian statistics I lecture notes | FW 536</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../_Shared/css/accessible.css" />
+<script>
+MathJax = {
+  tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
+  options: { menuOptions: { settings: { assistiveMml: true, explorer: true } } },
+  loader: { load: ['a11y/assistive-mml', 'a11y/explorer'] }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script"></script>
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<div class="a11y-bar" role="region" aria-label="Accessibility">Accessible version &middot; <a href="../accessibility.html">How to use this site with a screen reader</a> &middot; <a href="../index.html">Course home</a></div>
+
+<aside class="sidebar">
+<p class="brand"><a href="../index.html">FW 536 · Day 4 Afternoon</a></p>
+<div class="subtitle">Lecture notes: Bayesian statistics I</div>
+<nav aria-label="Slides in this lecture">
+<div class="section">Slides</div><ul>
+<li><a href="#slide-1">1. Slide 1</a></li>
+<li><a href="#slide-2">2. Slide 2</a></li>
+<li><a href="#slide-3">3. Slide 3</a></li>
+<li><a href="#slide-4">4. Slide 4</a></li>
+<li><a href="#slide-5">5. Slide 5</a></li>
+<li><a href="#slide-6">6. Slide 6</a></li>
+<li><a href="#slide-7">7. Slide 7</a></li>
+<li><a href="#slide-8">8. Slide 8</a></li>
+<li><a href="#slide-9">9. Slide 9</a></li>
+<li><a href="#slide-10">10. Slide 10</a></li>
+<li><a href="#slide-11">11. Slide 11</a></li>
+<li><a href="#slide-12">12. Slide 12</a></li>
+<li><a href="#slide-13">13. Slide 13</a></li>
+<li><a href="#slide-14">14. Slide 14</a></li>
+<li><a href="#slide-15">15. Slide 15</a></li>
+<li><a href="#slide-16">16. Slide 16</a></li>
+<li><a href="#slide-17">17. Slide 17</a></li>
+<li><a href="#slide-18">18. Slide 18</a></li>
+<li><a href="#slide-19">19. Slide 19</a></li>
+<li><a href="#slide-20">20. Slide 20</a></li>
+<li><a href="#slide-21">21. Slide 21</a></li>
+<li><a href="#slide-22">22. Slide 22</a></li>
+<li><a href="#slide-23">23. Slide 23</a></li>
+<li><a href="#slide-24">24. Slide 24</a></li>
+<li><a href="#slide-25">25. Slide 25</a></li>
+<li><a href="#slide-26">26. Slide 26</a></li>
+<li><a href="#slide-27">27. Slide 27</a></li>
+<li><a href="#slide-28">28. Slide 28</a></li>
+<li><a href="#slide-29">29. Slide 29</a></li>
+<li><a href="#slide-30">30. Slide 30</a></li>
+<li><a href="#slide-31">31. Slide 31</a></li>
+<li><a href="#slide-32">32. Slide 32</a></li>
+<li><a href="#slide-33">33. Slide 33</a></li>
+<li><a href="#slide-34">34. Slide 34</a></li>
+<li><a href="#slide-35">35. Slide 35</a></li>
+<li><a href="#slide-36">36. Slide 36</a></li>
+<li><a href="#slide-37">37. Slide 37</a></li>
+<li><a href="#slide-38">38. Slide 38</a></li>
+<li><a href="#slide-39">39. Slide 39</a></li>
+<li><a href="#slide-40">40. Slide 40</a></li>
+<li><a href="#slide-41">41. Slide 41</a></li>
+<li><a href="#slide-42">42. Slide 42</a></li>
+<li><a href="#slide-43">43. Slide 43</a></li>
+<li><a href="#slide-44">44. Slide 44</a></li>
+<li><a href="#slide-45">45. Slide 45</a></li>
+<li><a href="#slide-46">46. Slide 46</a></li>
+<li><a href="#slide-47">47. Slide 47</a></li>
+<li><a href="#slide-48">48. Slide 48</a></li>
+<li><a href="#slide-49">49. Slide 49</a></li>
+<li><a href="#slide-50">50. Slide 50</a></li>
+<li><a href="#slide-51">51. Slide 51</a></li>
+<li><a href="#slide-52">52. Slide 52</a></li>
+<li><a href="#slide-53">53. Slide 53</a></li>
+<li><a href="#slide-54">54. Slide 54</a></li>
+<li><a href="#slide-55">55. Slide 55</a></li>
+<li><a href="#slide-56">56. Slide 56</a></li>
+<li><a href="#slide-57">57. Slide 57</a></li>
+<li><a href="#slide-58">58. Slide 58</a></li>
+<li><a href="#slide-59">59. Slide 59</a></li>
+<li><a href="#slide-60">60. Slide 60</a></li>
+<li><a href="#slide-61">61. Slide 61</a></li>
+</ul></nav></aside>
+<main class="content" id="main-content" tabindex="-1">
+<header class="lab-header">
+<div class="eyebrow">Day 4 Afternoon · Accessible lecture notes</div>
+<h1>Bayesian statistics I</h1>
+<p class="lede">A screen-reader-friendly transcript of the lecture slides: all slide text and speaker notes are included. Figures are flagged where a text description still needs to be added.</p>
+</header>
+<div class="callout key"><p class="callout-label">About these notes</p>These notes are generated from the lecture slides. Each section below is one slide. Where a slide contained a picture, plot, or equation image, you will see a "Figure needs description" note &mdash; ask your instructor for the description of that figure. For the underlying concepts with worked examples, also read the <a href="plain_language_summary.html">plain-language summary</a> and <a href="lab.html">lab</a> for this session.</p></div>
+<section aria-labelledby="slide-1-h">
+<h2 id="slide-1-h"><span id="slide-1"></span>Slide 1</h2>
+<p>Introduction to Bayesian Analysis</p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 1.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>Many slides adapted from Matt Falcy ODFW, and SESYNC course by Chris Che-Castaldo, Mary B. Collins, N. Thompson Hobbs (with permission)</p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 1.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-2-h">
+<h2 id="slide-2-h"><span id="slide-2"></span>Slide 2</h2>
+<ul>
+<li>“Frequentist” or classical inference</li>
+<li>Probability is a long-run relative frequency.</li>
+<li>Parameters are fixed and unknown constants.</li>
+<li>Statistical procedures are judged by how they perform over hypothetical replications of data that are never actually observed.</li>
+</ul>
+<ul>
+<li>Bayesian inference</li>
+<li>Probability is a degree of belief.</li>
+<li>Once data are observed, they are treated as fixed (not random) values.</li>
+<li>Parameters are unknown, therefore treated as random variables</li>
+<li>Rules of probability used to revise “prior” beliefs in light of data.</li>
+</ul>
+<p>Frequentist and Bayesian inference</p>
+</section>
+<section aria-labelledby="slide-3-h">
+<h2 id="slide-3-h"><span id="slide-3"></span>Slide 3</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 3.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>Remember Bayes Rule?</p>
+<p>We derived this from simple rules of conditional probability</p>
+<p>P(A,B) = P(A|B)P(B)</p>
+</section>
+<section aria-labelledby="slide-4-h">
+<h2 id="slide-4-h"><span id="slide-4"></span>Slide 4</h2>
+<p>1% of women at age forty who participate in routine screening have breast cancer.  80% of women with breast cancer will get positive mammographies.  9.6% of women without breast cancer will also get positive mammographies.  A woman in this age group had a positive mammography in a routine screening.  What is the probability that she actually has breast cancer?</p>
+<p>[c | + ] =</p>
+<p>[ +|c ] * [c]</p>
+<p>[ + ]</p>
+<p>[+ |c ] * [c]</p>
+<p>[ +| c]*[c] + [+ | not c]*[not c]</p>
+<p>=</p>
+<p>0.8 * 0.01</p>
+<p>0.8*0.01 + 0.096*0.99</p>
+<p>= 0.0776</p>
+<p>95 out of 100 doctors put it at 0.70 to 0.80 (Eddy 1982, with replicated results)!!</p>
+</section>
+<section aria-labelledby="slide-5-h">
+<h2 id="slide-5-h"><span id="slide-5"></span>Slide 5</h2>
+<p>We had complete information about medical testing probabilities</p>
+<p>In almost all practical scenarios, we will just have data, y, and then want to make inference about parameters, θ.</p>
+</section>
+<section aria-labelledby="slide-6-h">
+<h2 id="slide-6-h"><span id="slide-6"></span>Slide 6</h2>
+<p>[θ | y] =</p>
+<p>[y | θ] [θ]</p>
+<p>[y]</p>
+<p>What is the marginal probability of the data?</p>
+<p>L(θ|y) = [y| θ] ≠ [θ | y]</p>
+<p>Bayes Rule</p>
+<p>Prior</p>
+<p>Posterior</p>
+</section>
+<section aria-labelledby="slide-7-h">
+<h2 id="slide-7-h"><span id="slide-7"></span>Slide 7</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 7.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>Integrating B out of the joint distribution</p>
+</section>
+<section aria-labelledby="slide-8-h">
+<h2 id="slide-8-h"><span id="slide-8"></span>Slide 8</h2>
+<p>[θ | y] =</p>
+<p>[y | θ] [θ]</p>
+<p>[y]</p>
+<p>What is the marginal probability of the data?</p>
+<p>[y] =    [y| θ] [θ] dθ</p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 8.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<ul>
+<li>It’s the integral (or sum) of the numerator!</li>
+<li>This “scales” the numerator so that it integrates to 1.</li>
+</ul>
+<p class="callout warn" role="note"><span class="callout-label">Figure 8.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>L(θ|y) = [y| θ] ≠ [θ | y]</p>
+<p>We call this a normalizing constant</p>
+</section>
+<section aria-labelledby="slide-9-h">
+<h2 id="slide-9-h"><span id="slide-9"></span>Slide 9</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 9.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 9.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>P(X, Y) or [X,Y]</p>
+<p>P(X) or [X], and P(Y) or [Y]</p>
+<ul>
+<li>Sum or integrate over all values of the random variable you DON’T care about</li>
+<li>Or if you’ve sampled from the joint distribution, just take the values of the variable of interest</li>
+</ul>
+</section>
+<section aria-labelledby="slide-10-h">
+<h2 id="slide-10-h"><span id="slide-10"></span>Slide 10</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 10.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>E.g. Number of chocolate chips observed in cookies</p>
+<p>For simple problem, can use numerical integration (what would we integrate)</p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 10.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-11-h">
+<h2 id="slide-11-h"><span id="slide-11"></span>Slide 11</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 11.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>E.g. Number of chocolate chips observed in cookies</p>
+<p>For simple problem, can use numerical integration (what would we integrate)</p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 11.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<ul>
+<li>fun = function(x){</li>
+<li>dpois(5,x)*dpois(10,x)*dpois(11,x)*dpois(12,x)*dpois(14,x)*dpois(9,x)*dpois(8,x)*dpois(6,x)  	#The likelihood</li>
+<li>*dgamma(x,0.0001,0.0001)}							       	#The prior</li>
+<li>integrate(fun,0,20)  						#[y]; Integral of the numerator = 8.010413e-14</li>
+<li>integrate(fun,0,20)$value/8.010413e-14</li>
+<li>x=seq(0,20,0.1)</li>
+<li>plot(x,fun(x),type=&quot;l&quot;)</li>
+<li>plot(x,fun(x)/8.010413e-14,type=&quot;l&quot;)</li>
+</ul>
+</section>
+<section aria-labelledby="slide-12-h">
+<h2 id="slide-12-h"><span id="slide-12"></span>Slide 12</h2>
+<p>[y| θ] “likelihood”</p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 12.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<ul>
+<li>Data: We get 5 heads out of 12 flips. Binomial process. Make inference on p.</li>
+<li>How would we have done this with maximum likelihood?</li>
+</ul>
+<p class="callout warn" role="note"><span class="callout-label">Figure 12.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<ul>
+<li>[θ]</li>
+<li>“vague prior”</li>
+</ul>
+<p>Beta_pdf(1,1)</p>
+<p>Binomial Example</p>
+</section>
+<section aria-labelledby="slide-13-h">
+<h2 id="slide-13-h"><span id="slide-13"></span>Slide 13</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 13.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>How would we scale this so that it integrates to 1 and becomes a “real distribution”?</p>
+<p>[y|θ][θ] Still doesn’t integrate to 1</p>
+</section>
+<section aria-labelledby="slide-14-h">
+<h2 id="slide-14-h"><span id="slide-14"></span>Slide 14</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 14.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<ul>
+<li>The integral is 0.077.</li>
+<li>So lets divide every number on the y-axis by 0.077</li>
+</ul>
+<ul>
+<li>Divide [y|θ][θ] by the are under it’s curve ([y])</li>
+<li>AKA “integral”</li>
+</ul>
+</section>
+<section aria-labelledby="slide-15-h">
+<h2 id="slide-15-h"><span id="slide-15"></span>Slide 15</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 15.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<ul>
+<li>&gt; fun1&lt;-function(x){dbinom(5,12,x)}</li>
+<li>&gt; integrate(fun1,0,1)</li>
+<li>0.07692308 with absolute error &lt; 8.5e-16</li>
+</ul>
+<ul>
+<li>&gt; fun2&lt;-function(x){dbinom(5,12,x)*dbeta(x,1,1)/0.07692308}</li>
+<li>&gt; integrate(fun2,0,1)</li>
+<li>1 with absolute error &lt; 1.1e-14</li>
+</ul>
+<p>Notice new scale on y-axis. NOW this integrates to 1 and is a proper distribution</p>
+<ul>
+<li>Divide by marginal distribution of the data,</li>
+<li>Which is just a “normalizing constant”</li>
+</ul>
+</section>
+<section aria-labelledby="slide-16-h">
+<h2 id="slide-16-h"><span id="slide-16"></span>Slide 16</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 16.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>The Bayesian inferential paradigm requires subjective prior beliefs!</p>
+</section>
+<section aria-labelledby="slide-17-h">
+<h2 id="slide-17-h"><span id="slide-17"></span>Slide 17</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 17.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 17.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 17.3 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>The integral of this thing is 0.092308</p>
+<p>The integral of this thing is 1</p>
+<p>We have 5 heads out of 12 flips – 5/12 = 0.417.  Now let’s use an informative prior, Beta(3,2).</p>
+<p>Why is posterior mean larger than 0.417?</p>
+<p>Question: What is the mean of a Beta(3,2)? What are we saying with this?</p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 17.4 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 17.5 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-18-h">
+<h2 id="slide-18-h"><span id="slide-18"></span>Slide 18</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 18.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 18.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>Instead of 5 heads out of 12 flips, lets see what happens with 50 heads out of 120 flips (50/120 = 0.417)</p>
+<p>The integral of this thing is 0.010036</p>
+<p>The integral of this thing is 1</p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 18.3 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<ul>
+<li>The more data you have, the lower the likelihood.</li>
+<li>(Think here. Why?  Likelihood of datum vs. data)</li>
+</ul>
+<p>50/120=0.41667</p>
+<p>Look at uncertainty</p>
+<p>Much closer to data mean than posterior mean now</p>
+</section>
+<section aria-labelledby="slide-19-h">
+<h2 id="slide-19-h"><span id="slide-19"></span>Slide 19</h2>
+<p>Think about what we just did</p>
+<ul>
+<li>We multiplied the prior and likelihood</li>
+<li>Each value was divided by the integral of the prior*likelihood, to “normalize” or scale so that it integrates to 1 (thereby satisfying a definition of probability).</li>
+<li>This gave us a posterior for p to make probabilistic inference</li>
+</ul>
+<p class="callout warn" role="note"><span class="callout-label">Figure 19.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-20-h">
+<h2 id="slide-20-h"><span id="slide-20"></span>Slide 20</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 20.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-21-h">
+<h2 id="slide-21-h"><span id="slide-21"></span>Slide 21</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 21.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-22-h">
+<h2 id="slide-22-h"><span id="slide-22"></span>Slide 22</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 22.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-23-h">
+<h2 id="slide-23-h"><span id="slide-23"></span>Slide 23</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 23.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>If we transform this into many conditional distributions, then we can sample from it</p>
+</section>
+<section aria-labelledby="slide-24-h">
+<h2 id="slide-24-h"><span id="slide-24"></span>Slide 24</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 24.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>The conditional distributions can be represented by a Directed Acyclic Graph (DAG) based on the dependencies of the process</p>
+<p>Variables with arrow heads should be on LHS of conditionality. They depend on tails of arrows, which go on RHS of conditionality. Variables without arrow pointing to them need a prior.</p>
+</section>
+<section aria-labelledby="slide-25-h">
+<h2 id="slide-25-h"><span id="slide-25"></span>Slide 25</h2>
+<ul>
+<li>Complex models are now in widespread use in fisheries and wildlife</li>
+<li>E.g. Joel Ruprecht’s 2021 density estimation paper using spatial capture recapture and spatial mark resight. Can incorporate GPS data, marking process, integrate multiple datasets, etc.</li>
+</ul>
+<p class="callout warn" role="note"><span class="callout-label">Figure 25.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-26-h">
+<h2 id="slide-26-h"><span id="slide-26"></span>Slide 26</h2>
+<ul>
+<li>But let’s start simpler!</li>
+<li>Back to coin flip problem</li>
+</ul>
+</section>
+<section aria-labelledby="slide-27-h">
+<h2 id="slide-27-h"><span id="slide-27"></span>Slide 27</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 27.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 27.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>Instead of 5 heads out of 12 flips, lets see what happens with 50 heads out of 120 flips.</p>
+<p>The integral of this thing is 0.010036</p>
+<p>The integral of this thing is 1</p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 27.3 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<ul>
+<li>The more data you have, the lower the likelihood.</li>
+<li>(Think here. Why?  Likelihood of datum vs. data)</li>
+</ul>
+<p>50/120=0.41667</p>
+<p>Look at uncertainty</p>
+<p>Much closer to data mean than posterior mean now</p>
+</section>
+<section aria-labelledby="slide-28-h">
+<h2 id="slide-28-h"><span id="slide-28"></span>Slide 28</h2>
+<p>Funny thing is that the beta distribution is the “conjugate prior” to the binomial distribution.</p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 28.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>Note: 3 and 2 come from the beta prior</p>
+<p>“conjugate priors” have the special property that the posterior follows the same distribution as the prior. This gives us a ‘closed-form’ solution for the posterior</p>
+</section>
+<section aria-labelledby="slide-29-h">
+<h2 id="slide-29-h"><span id="slide-29"></span>Slide 29</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 29.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>Mean of the NEW Beta distribution is</p>
+<p>The new Beta distribution for the posterior of p</p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 29.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 29.3 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 29.4 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 29.5 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 29.6 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>+</p>
+<p>=</p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 29.7 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>+</p>
+<ul>
+<li>Now we can see precisely how much information the prior adds!</li>
+<li>A Beta(1,1) prior is like observing 1 more success and 1 more failure because y increases by 1 and n increases by 2</li>
+<li>A Beta(3,2) prior is like observing 3 more success and 2 more failures because y increases by 3 and n increases by 5</li>
+<li>Large datasets typically swamp priors, but how would you minimize information in this prior?</li>
+<li>That is called the Haldane prior – an “improper prior”.  What is its functional form here?</li>
+</ul>
+<p>Sampling from a known posterior is called “Gibbs sampling”</p>
+</section>
+<section aria-labelledby="slide-30-h">
+<h2 id="slide-30-h"><span id="slide-30"></span>Slide 30</h2>
+<ul>
+<li>Taal, work through</li>
+<li>Beta-Binomial Lab</li>
+</ul>
+</section>
+<section aria-labelledby="slide-31-h">
+<h2 id="slide-31-h"><span id="slide-31"></span>Slide 31</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 31.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>To reiterate: Conjugacy</p>
+<ul>
+<li>“The beta is the conjugate prior for the binomial distribution”</li>
+<li>“The gamma is the conjugate prior for the Poisson distribution”</li>
+<li style="margin-left:1em">So what does that mean about our Poisson problem from earlier?</li>
+<li style="margin-left:1em">Let’s derive this together</li>
+</ul>
+</section>
+<section aria-labelledby="slide-32-h">
+<h2 id="slide-32-h"><span id="slide-32"></span>Slide 32</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 32.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-33-h">
+<h2 id="slide-33-h"><span id="slide-33"></span>Slide 33</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 33.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-34-h">
+<h2 id="slide-34-h"><span id="slide-34"></span>Slide 34</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 34.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-35-h">
+<h2 id="slide-35-h"><span id="slide-35"></span>Slide 35</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 35.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>Conjugacy relationships</p>
+<p>Note this is the “precision” or inverse of the variance</p>
+</section>
+<section aria-labelledby="slide-36-h">
+<h2 id="slide-36-h"><span id="slide-36"></span>Slide 36</h2>
+<ul>
+<li>The elegance of conjugate priors is not available except for simple models.</li>
+<li>Symbolic calculus usually not possible when extended into multiple dimensions (models with many parameters) and more complex probability distributions.</li>
+<li>The numerical integrations we did earlier…</li>
+<li>can’t be done for high-dimensional (many parameters) problems</li>
+<li style="margin-left:1em">http://math.stackexchange.com/questions/425782/why-does-monte-carlo-integration-work-better-than-naive-numerical-integration-in</li>
+<li style="margin-left:1em">https://en.wikipedia.org/wiki/Numerical_integration</li>
+</ul>
+<p class="callout warn" role="note"><span class="callout-label">Figure 36.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>Unfortunately…</p>
+<ul>
+<li>&gt; fun1&lt;-function(x){dbinom(5,12,x)}</li>
+<li>&gt; integrate(fun1,0,1)</li>
+<li>0.07692308 with absolute error &lt; 8.5e-16</li>
+</ul>
+<p>(We did them to illustrate concepts.  Not advice on solving real Bayesian problems)</p>
+</section>
+<section aria-labelledby="slide-37-h">
+<h2 id="slide-37-h"><span id="slide-37"></span>Slide 37</h2>
+<ul>
+<li>Because we couldn’t solve high-dimensional integrals, Thomas Bayes’ (1702-1761) approach to inferential logic languished for two centuries!</li>
+<li>In the mean time, Ronald Fisher and others developed an alternative approach that did not use priors and did not attempt to characterize parameters probabilistically.</li>
+</ul>
+</section>
+<section aria-labelledby="slide-38-h">
+<h2 id="slide-38-h"><span id="slide-38"></span>Slide 38</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 38.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 38.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 38.3 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>Markov chain Monte Carlo (MCMC)</p>
+<p>Then comes WWII and some mathematical physicists at Los Alamos needed to evaluate high dimensional integrals.</p>
+<p>Note:  like Newton’s invention of calculus to study gravity/orbits</p>
+<p>“Markov” means dependence only on the previous sample</p>
+<p>“Monte Carlo” means estimation of properties of a distribution by random sampling from the distribution. Apparently named for the Grand Casino in Monte Carlo</p>
+</section>
+<section aria-labelledby="slide-39-h">
+<h2 id="slide-39-h"><span id="slide-39"></span>Slide 39</h2>
+<p>We’re going to sample from the numerator</p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 39.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>Pick values of p. Keep them in the chain at a rate proportional to the relative value on the y-axis.</p>
+<p>The Metropolis Algorithm</p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 39.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<ul>
+<li>Nicholas Metropolis</li>
+<li>(1915-1999)</li>
+</ul>
+<p>We say: ”The posterior is proportional to the likelihood times the prior”</p>
+</section>
+<section aria-labelledby="slide-40-h">
+<h2 id="slide-40-h"><span id="slide-40"></span>Slide 40</h2>
+<p>For example</p>
+<p>The symmetry requirement can be problematic if θ is constrained (e.g. standard deviations and proportions must be positive).</p>
+<p>If this is too big, then you propose lots of values that don’t get accepted, which is inefficient. If too small there is too much autocorrelation and it takes forever to sample the full posterior</p>
+<p>The Metropolis Algorithm</p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 40.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<ul>
+<li>Nicholas Metropolis</li>
+<li>(1915-1999)</li>
+</ul>
+<ul>
+<li>A small modification:</li>
+<li>The “Metropolis-Hastings” algorithm allows for asymmetric proposals</li>
+</ul>
+</section>
+<section aria-labelledby="slide-41-h">
+<h2 id="slide-41-h"><span id="slide-41"></span>Slide 41</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 41.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>Time series of an MCMC</p>
+</section>
+<section aria-labelledby="slide-42-h">
+<h2 id="slide-42-h"><span id="slide-42"></span>Slide 42</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 42.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>Time series of an MCMC</p>
+</section>
+<section aria-labelledby="slide-43-h">
+<h2 id="slide-43-h"><span id="slide-43"></span>Slide 43</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 43.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>Time series of 3 MCMCs</p>
+</section>
+<section aria-labelledby="slide-44-h">
+<h2 id="slide-44-h"><span id="slide-44"></span>Slide 44</h2>
+<p>count</p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 44.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>count</p>
+<p>Here is the posterior of the joint distribution (both parameters) from which we also have the marginal distribution for each</p>
+</section>
+<section aria-labelledby="slide-45-h">
+<h2 id="slide-45-h"><span id="slide-45"></span>Slide 45</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 45.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>https://mbjoseph.github.io/posts/2018-12-25-animating-the-metropolis-algorithm/</p>
+</section>
+<section aria-labelledby="slide-46-h">
+<h2 id="slide-46-h"><span id="slide-46"></span>Slide 46</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 46.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-47-h">
+<h2 id="slide-47-h"><span id="slide-47"></span>Slide 47</h2>
+<ul>
+<li style="margin-left:1em">https://chi-feng.github.io/mcmc-demo/</li>
+</ul>
+<p>There are now many algorithms to solve this problem</p>
+<ul>
+<li>Click on an algorithm below to view interactive demo:</li>
+<li>Random Walk Metropolis Hastings</li>
+<li>Adaptive Metropolis Hastings [1]</li>
+<li>Hamiltonian Monte Carlo [2]</li>
+<li>No-U-Turn Sampler [2]</li>
+<li>Metropolis-adjusted Langevin Algorithm (MALA) [3]</li>
+<li>Hessian-Hamiltonian Monte Carlo (H2MC) [4]</li>
+<li>Gibbs Sampling</li>
+<li>Stein Variational Gradient Descent (SVGD) [5]</li>
+<li>Nested Sampling with RadFriends (RadFriends-NS) [6]</li>
+</ul>
+</section>
+<section aria-labelledby="slide-48-h">
+<h2 id="slide-48-h"><span id="slide-48"></span>Slide 48</h2>
+<p>BUGS, JAGS, Nimble, STAN, and INLA oh my!</p>
+<ul>
+<li>In 2008, my first Bayesian professor, Herbie Lee, thought WinBUGS shouldn’t be taught because it would make it too easy so that incompetent people would implement poorly specified models</li>
+<li>Now BUGS (Bayesian Analysis Using Gibbs Sampling) is very common</li>
+<li>OpenBUGS and WinBUGS needs Windows. JAGS was designed to work on multiple platforms.</li>
+<li>Unlike OpenBUGS and WinBUGS, which have a graphical user interface, JAGS works on the command line and interfaces nicely with R. It can be run on UNIX clusters like OSU’s CQLS.</li>
+<li>Nimble is similar to JAGS, but is more flexible and faster for many problems in Ecology!</li>
+<li>STAN uses the very fast Hamiltonian MCMC algorithm, but doesn’t use BUGS language</li>
+<li>INLA is extremely fast because it approximates the posterior instead of sampling. Used for a restricted subset of problems.</li>
+</ul>
+</section>
+<section aria-labelledby="slide-49-h">
+<h2 id="slide-49-h"><span id="slide-49"></span>Slide 49</h2>
+<p>MSY = rK/4</p>
+<p>Greatest population growth rate</p>
+<p>r</p>
+<p>K</p>
+<p>Greatest per-capita growth rate</p>
+<p>“Negative density dependence”</p>
+<p>Estimating parameters in logistic population growth</p>
+</section>
+<section aria-labelledby="slide-50-h">
+<h2 id="slide-50-h"><span id="slide-50"></span>Slide 50</h2>
+<ul>
+<li>JAGS PRIMER</li>
+<li>estimating parameters in logistic population growth</li>
+<li>From Hobbs and Che-Castaldo’s SESYNC course</li>
+</ul>
+<p class="callout warn" role="note"><span class="callout-label">Figure 50.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 50.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<ul>
+<li>Observations of per-capita growth rate paired with population size</li>
+<li>Ah ha, our scientific model is a line! We know what to do with lines!</li>
+<li style="margin-left:1em">Let’s try it with our standard tools.</li>
+</ul>
+</section>
+<section aria-labelledby="slide-51-h">
+<h2 id="slide-51-h"><span id="slide-51"></span>Slide 51</h2>
+<p>reg=lm(GrowthRate~PopulationSize,data=Logistic)</p>
+<p>Good Ole Regression Approach</p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 51.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 51.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 51.3 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>But what can we say about K, K/2 or MSY?</p>
+</section>
+<section aria-labelledby="slide-52-h">
+<h2 id="slide-52-h"><span id="slide-52"></span>Slide 52</h2>
+<ul>
+<li>JAGS PRIMER</li>
+<li>estimating parameters in logistic population growth</li>
+</ul>
+<ul>
+<li>Joint posterior distribution of parameters is proportional to likelihood*prior</li>
+<li>We want positive continuous values for r and K. Bring on the gamma!</li>
+<li>The gamma is the conjugate prior for the precision term in Normal distribution</li>
+<li>But why gamma(0.001, 0.001)</li>
+</ul>
+<p class="callout warn" role="note"><span class="callout-label">Figure 52.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-53-h">
+<h2 id="slide-53-h"><span id="slide-53"></span>Slide 53</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 53.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<ul>
+<li>“Bayesian Network” or</li>
+<li>”Directed Acyclic Graph”</li>
+</ul>
+</section>
+<section aria-labelledby="slide-54-h">
+<h2 id="slide-54-h"><span id="slide-54"></span>Slide 54</h2>
+<ul>
+<li>JAGS PRIMER</li>
+<li>estimating parameters in logistic population growth</li>
+</ul>
+<p class="callout warn" role="note"><span class="callout-label">Figure 54.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>JAGS parses this code to set up MCMC sampling, including proposal distribution, tuning parameters, and returns MCMC chain for each parameter so we can approximate posterior distributions and find associated statistics (e.g., means, medians, standard deviations, quantiles).</p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 54.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>In general, we always need</p>
+<p>#Use “for loop” to loop over all the data</p>
+<p>Normal distribution in JAGS is parameterized with precision, not variance or standard deviation</p>
+</section>
+<section aria-labelledby="slide-55-h">
+<h2 id="slide-55-h"><span id="slide-55"></span>Slide 55</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 55.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>Some other priors</p>
+<ul>
+<li>sink(&quot;LogisticJAGS.R&quot;)</li>
+<li>cat(&quot;</li>
+<li>model {</li>
+<li># priors</li>
+<li style="margin-left:1em">K ~ dunif(0, 4000)</li>
+<li style="margin-left:1em">r ~ dunif (0, 2)</li>
+<li style="margin-left:1em">sigma ~ dunif(0, 50)</li>
+<li style="margin-left:1em">tau &lt;- 1/sigma^2</li>
+<li># likelihood</li>
+<li>for(i in 1:n) {</li>
+<li>mu[i] &lt;- r - r/K * x[i]</li>
+<li>y[i] ~ dnorm(mu[i], tau)</li>
+<li>}</li>
+<li>} &quot;,fill = TRUE)</li>
+<li>sink()</li>
+</ul>
+<p>Use “sink” to keep all your code in one R script, but can also make JAGS code separately</p>
+<p>Normal distribution in JAGS is parameterized with precision, not variance or standard deviation</p>
+</section>
+<section aria-labelledby="slide-56-h">
+<h2 id="slide-56-h"><span id="slide-56"></span>Slide 56</h2>
+<ul>
+<li>JAGS PRIMER</li>
+<li>estimating parameters in logistic population growth</li>
+</ul>
+<ul>
+<li>Unlike with least squares or maximum likelihood, with Bayesian statistics it is easy to derive chains for other quantities of interest and their posterior distributions.</li>
+<li>These are called “derived quantities”</li>
+<li>For example, K/2, rK/4, N as a function of time, dN/dt as a function of N with uncertainty, or incorporate errors in the observations of population growth rate or population size.</li>
+</ul>
+<p>This is a BFD!</p>
+</section>
+<section aria-labelledby="slide-57-h">
+<h2 id="slide-57-h"><span id="slide-57"></span>Slide 57</h2>
+<p>JAGS PRIMER</p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 57.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>For small models, use the sink() function to write your JAGS model to file for input</p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 57.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>JAGS is not a procedural language like R. It is not a set of instructions to be executed sequentially. It is a way to translate a mathematical statement into syntax that determine the MCMC sampler that JAGS uses behind the scenes</p>
+<p>Remember another sink() to write the file</p>
+<p>fill = TRUE to print on separate lines</p>
+</section>
+<section aria-labelledby="slide-58-h">
+<h2 id="slide-58-h"><span id="slide-58"></span>Slide 58</h2>
+<p>JAGS PRIMER – slightly different approaches for rjags, jagsUI, and R2jags packages</p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 58.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 58.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>Use jags.model() to run JAGS. Specify the data, initial values, and MCMC parameters</p>
+<p>Use update() to add iterations to an existing model. Use coda.samples() to access the MCMC chains</p>
+<p>JAGS uses this to optimize the MCMC parameters</p>
+<p>The burn in</p>
+<p>Posterior draws we keep</p>
+<p>The burn in</p>
+<p>The samples</p>
+</section>
+<section aria-labelledby="slide-59-h">
+<h2 id="slide-59-h"><span id="slide-59"></span>Slide 59</h2>
+<p>JAGS PRIMER</p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 59.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<ul>
+<li>Use update() to add iterations to an existing model. Use coda.samples() to access the MCMC chains.</li>
+<li>Use MCMCsummary() to summarize the parameters and derived quantities (if they exist)</li>
+</ul>
+<p class="callout warn" role="note"><span class="callout-label">Figure 59.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>Note that Rhat near 1 means that there is good convergence. This is for model diagnostics.</p>
+</section>
+<section aria-labelledby="slide-60-h">
+<h2 id="slide-60-h"><span id="slide-60"></span>Slide 60</h2>
+<p>Nimble PRIMER</p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 60.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<ul>
+<li>BUGS Code is written in a nimbleCode() function.</li>
+<li>Models compiled into C++ and are more customizeable</li>
+<li>Can be much faster than JAGS</li>
+<li>Can produce MCMC output in one line with nimbleMCMC()</li>
+<li style="margin-left:1em">No separate adaption phase to tune MCMC</li>
+<li style="margin-left:1em">Can also compile model first and then run nimbleMCMC</li>
+</ul>
+<p class="callout warn" role="note"><span class="callout-label">Figure 60.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-61-h">
+<h2 id="slide-61-h"><span id="slide-61"></span>Slide 61</h2>
+<p>Logistic Growth Lab. Use the html file and code to guide you. Fit the model in both JAGS and Nimble. Visualize and interpret the output</p>
+</section>
+</main>
+
+<footer>FW 536 &middot; Statistical Modeling for Ecology and Conservation &middot; Oregon State University &middot; Accessible lecture notes</footer>
+</body>
+</html>

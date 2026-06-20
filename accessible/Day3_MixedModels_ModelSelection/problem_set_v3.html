@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en" data-a11y="done">
+<head>
+<meta charset="UTF-8" />
+<title>Day 3 · Problem Set v3 (Aquatic / Fisheries) | FW 536 · Student copy (no answers)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../_Shared/css/accessible.css" />
+<script defer src="../_Shared/js/accessible.js"></script>
+<script>
+MathJax = {
+  tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
+  options: {
+    menuOptions: { settings: { assistiveMml: true, explorer: true } }
+  },
+  loader: { load: ['a11y/assistive-mml', 'a11y/explorer'] }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script"></script>
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<div class="a11y-bar" role="region" aria-label="Accessibility">Accessible version &middot; <a href="../accessibility.html">How to use this site with a screen reader</a> &middot; <a href="../index.html">Course home</a></div>
+
+<div class="shell">
+
+<aside class="sidebar">
+ <p class="brand"><a href="../index.html" title="Back to course home">FW 536 · Day 3</a></p>
+ <div class="subtitle">Problem Set v3 — Aquatic / Fisheries</div>
+ <nav aria-label="On this page and related documents">
+ <ul>
+ <li><a href="#p1">1. Salmon redds in streams</a></li>
+ <li><a href="#p2">2. Temperature loggers</a></li>
+ <li><a href="#p3">3. Steelhead growth</a></li>
+ <li><a href="#p4">4. Sockeye PIT detections</a></li>
+ <li><a href="#p5">5. Lamprey occupancy slopes</a></li>
+ <li><a href="#p6">6. Bull trout LRT</a></li>
+ <li><a href="#p7">7. Crab pot dredge</a></li>
+ <li><a href="#p8">8. Cutthroat BIC trap</a></li>
+ <li><a href="#p9">9. Smelt LOOCV</a></li>
+ <li><a href="#p10">10. Halibut multimodel</a></li>
+ </ul>
+ <div class="section">Day 3 docs</div>
+ <ul>
+ <li><a href="lab.html">Main lab</a></li>
+ <li><a class="featured" href="plain_language_summary.html">Plain-language summary</a></li>
+ <li><a href="answer_key.html">Lab answer key</a></li>
+ <li><a href="problem_set_v2.html">Problem set v2 (terrestrial)</a></li>
+ </ul>
+ </nav>
+</aside>
+
+<main class="content" id="main-content" tabindex="-1">
+<header class="lab-header">
+ <div class="eyebrow">Day 3 · Alternate Problem Set v3</div>
+ <h1>Aquatic and fisheries scenarios — mixed models and model selection</h1>
+ <p class="lede">Ten novel problems (five mixed models, five model selection) using salmon, steelhead, sockeye, lamprey, bull trout, crab, cutthroat, smelt, and halibut. Write your answers in the matching R Markdown template and submit on Canvas.</p>
+</header>
+
+<section class="callout warn" style="margin-top:24px;"><p class="callout-label">Watch out</p><p><strong>Assessed problem set (v3) &middot; aquatic &amp; fisheries theme.</strong> Answers are <em>not</em> shown here. Write your work in the template tailored to this version: <a href="morning_lab_template_v3.Rmd"><code>morning_lab_template_v3.Rmd</code></a> for morning problems, <a href="afternoon_lab_template_v3.Rmd"><code>afternoon_lab_template_v3.Rmd</code></a> for afternoon problems. Knit to HTML, then upload to the matching Canvas assignment.</p><p><strong>Pick whichever theme fits your interests.</strong> The companion version is <a href="problem_set_v2.html">v2 &middot; terrestrial wildlife</a> &mdash; they cover the same statistical concepts with different ecological scenarios.</p><p>For worked-example study with visible answers, see <a href="lab.html">the practice problem set</a>.</p></section>
+
+
+<section><p>Each problem covers the same concept families as the main lab and v2 problem set, but in fishery/aquatic systems. Work each problem in the matching R Markdown template and submit on Canvas. Where simulations are requested, exact numbers depend on the seed.</p></section>
+
+<!-- ========================= MIXED MODELS ========================= -->
+<h2 style="margin-top:36px;">Part 1 · Mixed models</h2>
+
+<a id="morning"></a>
+<div class="exercise" id="p1">
+<span class="ex-tag">Problem 1</span><span class="difficulty easy"> · pooling decision</span>
+<h3>Chinook salmon redds nested in streams</h3>
+<p>A redd survey covers 15 streams in the Willamette basin; each stream is walked once and the number of Chinook redds per 100 m of stream is recorded for 4 segments per stream. The science question: are mean redd densities meaningfully different among streams, and can we use the random structure to predict for new streams in the basin?</p>
+
+<ol type="a">
+<li>Write the complete pooling, no pooling, and partial pooling models in math.</li>
+<li>The lead biologist proposes treating "stream" as fixed effects so each stream's mean is explicitly estimated. What is gained and what is lost relative to a random-effect treatment?</li>
+<li>If $\sigma_\text{stream} \approx 4$ redds/100m and $\sigma_\text{residual} \approx 1.5$ redds/100m, what is the ICC? What does the ICC say about how much partial pooling will shrink any one stream's estimate?</li>
+</ol>
+
+<div class="callout try" style="margin-top: 12px;"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
+</div>
+
+<div class="exercise" id="p2">
+<span class="ex-tag">Problem 2</span><span class="difficulty medium"> · two crossed random effects</span>
+<h3>Stream temperature loggers across watersheds and years</h3>
+<p>You deploy temperature loggers in 6 watersheds, 5 sites per watershed, sampled in 3 years. The response is summer mean temperature. You want to test whether shading (canopy cover %) predicts temperature, after accounting for watershed and year.</p>
+<pre><code>m &lt;- lmer(SummerTemp ~ scale(Canopy) + (1 | Watershed) + (1 | Year), data=d)
+summary(m)
+# Random effects:
+# Groups Name Variance Std.Dev.
+# Year (Intercept) 0.71 0.84
+# Watershed (Intercept) 1.94 1.39
+# Residual 0.46 0.68
+# Fixed effects:
+# Estimate Std.Error t
+# (Intercept) 14.20 0.66 21.5
+# scale(Canopy) -1.30 0.18 -7.2</code></pre>
+
+<ol type="a">
+<li>Why are Watershed and Year specified as crossed (with <code>+</code>) rather than nested (with <code>/</code>)?</li>
+<li>What fraction of variation is between watersheds, between years, and within (residual)?</li>
+<li>Interpret the canopy slope in real units. Hint: a 1-SD change in canopy on the original scale produces a 1.3°C change in expected summer temperature.</li>
+<li>If the same site IDs (1, 2, 3, 4, 5) are reused across watersheds, what happens if you write <code>(1 | Site)</code> instead of <code>(1 | Watershed:Site)</code>?</li>
+</ol>
+
+<div class="callout try" style="margin-top: 12px;"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
+</div>
+
+<div class="exercise" id="p3">
+<span class="ex-tag">Problem 3</span><span class="difficulty hard"> · nonlinear mixed (vonB)</span>
+<h3>Steelhead growth: individual-level $L_\infty$</h3>
+<p>You have repeated length-at-age data for 25 PIT-tagged steelhead, each measured 4–10 times over 5 years. Fit a fixed-effect von Bertalanffy via <code>nls</code> and a mixed-effect version via <code>nlme</code> with a random $L_\infty$ per fish.</p>
+<pre><code>library(nlme)
+m_nls &lt;- nls(Length ~ Linf*(1 - exp(-K*(Age - t0))),
+ data=steel, start=c(Linf=80, K=0.25, t0=-0.5))
+m_nlme &lt;- nlme(Length ~ Linf*(1 - exp(-K*(Age - t0))),
+ fixed = Linf + K + t0 ~ 1,
+ random = Linf ~ 1 | FishID,
+ data = steel, start = c(Linf=80, K=0.25, t0=-0.5))
+summary(m_nls)$sigma # e.g., 6.2
+summary(m_nlme)$sigma # e.g., 2.5
+VarCorr(m_nlme) # SD(Linf | FishID) ≈ 5.8</code></pre>
+
+<ol type="a">
+<li>How much variation in growth is among individuals (between-fish) vs within an individual (measurement / time)?</li>
+<li>What does the BLUP for one fish's $L_\infty$ look like, and how would you compute it from <code>m_nlme$coefficients</code>?</li>
+<li>Why is the within-fish residual SE from <code>nlme</code> systematically smaller than the residual SE from the fixed-effects <code>nls</code>?</li>
+</ol>
+
+<div class="callout try" style="margin-top: 12px;"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
+</div>
+
+<div class="exercise" id="p4">
+<span class="ex-tag">Problem 4</span><span class="difficulty medium"> · binomial GLMM</span>
+<h3>Sockeye smolt detection at PIT arrays</h3>
+<p>20,000 PIT-tagged sockeye smolts pass through 8 mainstem detection arrays. Each tag is observed at each array (1) or not (0). You fit:</p>
+<pre><code>library(lme4)
+m &lt;- glmer(Detect ~ scale(Flow) + scale(Turbidity) + (1 | TagID) + (1 | Array),
+ data=d, family=binomial)
+VarCorr(m)
+# Groups Name Variance Std.Dev.
+# TagID (Intercept) 0.62 0.79
+# Array (Intercept) 2.10 1.45
+# Fixed effects:
+# Estimate Std.Error z
+# (Intercept) -0.85 0.55 -1.5
+# scale(Flow) -0.22 0.04 -5.5
+# scale(Turbidity) -0.41 0.04 -10.3</code></pre>
+
+<ol type="a">
+<li>Why include TagID as a random intercept here?</li>
+<li>Translate the array-level SD into a "typical odds-ratio range" across arrays (how much do detection odds vary between a strong array and a weak array, ± 2 SD apart)?</li>
+<li>Interpret the Turbidity slope as an odds ratio with 95% CI.</li>
+<li>For a typical array and typical tag, what is the detection probability at average flow and turbidity?</li>
+</ol>
+
+<div class="callout try" style="margin-top: 12px;"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
+</div>
+
+<div class="exercise" id="p5">
+<span class="ex-tag">Problem 5</span><span class="difficulty medium"> · random slopes vs random intercepts</span>
+<h3>Pacific lamprey emergence × temperature, across rivers</h3>
+<p>You have 8 rivers and 5 years of lamprey emergence counts vs spring water temperature. You fit:</p>
+<pre><code>m_int &lt;- lmer(log_emerg ~ scale(Temp) + (1 | River), REML=TRUE, data=d)
+m_slope &lt;- lmer(log_emerg ~ scale(Temp) + (1 + scale(Temp) | River), REML=TRUE, data=d)
+anova(m_int, m_slope, refit=FALSE)
+# Df AIC logLik Chisq Chi Df Pr(&gt;Chisq)
+# m_int 4
+# m_slope 6 9.4 2 0.009</code></pre>
+
+<ol type="a">
+<li>Does the LRT support the random slope?</li>
+<li>The boundary-test caveat applies — adjust the p-value accordingly.</li>
+<li>If <code>VarCorr(m_slope)</code> shows the slope-intercept correlation = +0.99, what is happening, and what is one fix?</li>
+<li>Compare the population-average slope (fixed effect) between <code>m_int</code> and <code>m_slope</code>. If they differ noticeably, which would you report?</li>
+</ol>
+
+<div class="callout try" style="margin-top: 12px;"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
+</div>
+
+<!-- ========================= MODEL SELECTION ========================= -->
+<h2 style="margin-top:60px;">Part 2 · Model selection</h2>
+
+<a id="afternoon"></a>
+<div class="exercise" id="p6">
+<span class="ex-tag">Problem 6</span><span class="difficulty medium"> · LRT and the boundary issue</span>
+<h3>Bull trout occupancy: testing a random effect with LRT</h3>
+<p>You fit two GLMMs of bull trout occupancy in 120 streams:</p>
+<pre><code>m_no &lt;- glm (Occ ~ scale(Elev) + scale(Width), family=binomial, data=d)
+m_with &lt;- glmer(Occ ~ scale(Elev) + scale(Width) + (1 | Basin), family=binomial, data=d)
+anova(m_no, m_with, test="LRT")
+# Df Deviance Chisq Chi Df Pr(&gt;Chisq)
+# 2.2 1 0.138</code></pre>
+
+<ol type="a">
+<li>The LRT compares "no random effect" to "with random effect." What is the boundary issue and how should we correct the p-value?</li>
+<li>After correction, would you retain the basin random effect?</li>
+<li>What is the practical risk of <em>dropping</em> a random effect that the LRT calls "non-significant"?</li>
+<li>What would you do if you only had 4 basins instead of 30?</li>
+</ol>
+
+<div class="callout try" style="margin-top: 12px;"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
+</div>
+
+<div class="exercise" id="p7">
+<span class="ex-tag">Problem 7</span><span class="difficulty medium"> · dredge danger</span>
+<h3>Dungeness crab pot CPUE — full-subsets selection on 10 predictors</h3>
+<p>You have 240 pot soaks with CPUE (count per pot per soak) and 10 candidate predictors: depth, substrate, distance-to-shore, kelp density, soak duration, bait type (5-level factor), and a few interactions. A colleague proposes running <code>dredge()</code> on a Poisson GLM and reporting the "best" model.</p>
+<ol type="a">
+<li>How many candidate models does <code>dredge()</code> consider?</li>
+<li>What is the family-wise Type I error rate of "at least one noise variable in the top model" likely to be?</li>
+<li>Outline a defensible alternative workflow.</li>
+<li>If the colleague insists, what one diagnostic should they at least include?</li>
+</ol>
+
+<div class="callout try" style="margin-top: 12px;"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
+</div>
+
+<div class="exercise" id="p8">
+<span class="ex-tag">Problem 8</span><span class="difficulty medium"> · BIC vs AIC trade-off</span>
+<h3>Coastal cutthroat smolt-to-adult return rate</h3>
+<p>You want to test 3 predictors of SAR: <code>ocean_temp_anomaly</code> (strong known driver), <code>juvenile_size</code> (modest), <code>parr_density</code> (weak). $n = 35$ year-stream combinations.</p>
+<pre><code>set.seed(11); n &lt;- 35
+ot &lt;- rnorm(n); js &lt;- rnorm(n); pd &lt;- rnorm(n)
+sar &lt;- 0.6*ot + 0.25*js + 0.06*pd + rnorm(n, 0, 0.4)
+d &lt;- data.frame(sar, ot, js, pd)
+m &lt;- lm(sar ~ ot + js + pd, data=d)
+library(MuMIn); options(na.action="na.fail")
+dredge(m, rank="AICc"); dredge(m, rank="BIC")</code></pre>
+
+<ol type="a">
+<li>Run the simulation 500 times. Report the proportion of replicates in which each criterion retains <code>pd</code> (the weak predictor).</li>
+<li>Same for <code>js</code> (modest) and <code>ot</code> (strong).</li>
+<li>If the science question is "what governs cutthroat SAR?", which criterion would you choose and why?</li>
+</ol>
+
+<div class="callout try" style="margin-top: 12px;"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
+</div>
+
+<div class="exercise" id="p9">
+<span class="ex-tag">Problem 9</span><span class="difficulty hard"> · LOOCV for prediction</span>
+<h3>Eulachon (smelt) abundance forecasting</h3>
+<p>You have 18 years of eulachon escapement counts in the Columbia, with annual covariates: <code>spring_outflow</code>, <code>SST</code>, <code>NPGO</code>, <code>predator_index</code>. The agency wants a model to predict next year's run.</p>
+
+<pre><code>library(boot)
+forms &lt;- list(
+ null = log_run ~ 1,
+ flow = log_run ~ spring_outflow,
+ fs = log_run ~ spring_outflow + SST,
+ fsn = log_run ~ spring_outflow + SST + NPGO,
+ fsnp = log_run ~ spring_outflow + SST + NPGO + predator_index)
+cv &lt;- sapply(forms, function(f) cv.glm(d, glm(f, data=d))$delta[1])
+aic &lt;- sapply(forms, function(f) AICc::AICc(glm(f, data=d)))
+data.frame(cv, aic)</code></pre>
+
+<ol type="a">
+<li>With $n = 18$ years and up to 5 parameters, why is AICc essential rather than AIC?</li>
+<li>Suppose the smallest LOOCV MSE belongs to <code>fs</code> but the smallest AICc belongs to <code>fsn</code>. How do you resolve the disagreement for the forecasting task?</li>
+<li>For a forecasting application, what is one extra validation step beyond LOOCV you should consider?</li>
+<li>What is the danger of using ICs of any kind on a tiny dataset like this?</li>
+</ol>
+
+<div class="callout try" style="margin-top: 12px;"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
+</div>
+
+<div class="exercise" id="p10">
+<span class="ex-tag">Problem 10</span><span class="difficulty hard"> · multimodel inference + the "right question" trap</span>
+<h3>Pacific halibut size-at-age and the inference question</h3>
+<p>A halibut age/length dataset is fit with three competing candidate models: M1 has a fixed temperature effect, M2 has a fixed regional effect, M3 has both. AICc table:</p>
+<pre><code>Model K AICc deltaAICc weight
+M3 5 1240.0 0.0 0.45
+M1 4 1240.6 0.6 0.33
+M2 4 1241.9 1.9 0.18
+M0 3 1244.7 4.7 0.04</code></pre>
+
+<ol type="a">
+<li>By the "$\Delta\text{AIC} &lt; 2$" rule, which models are competitive?</li>
+<li>What is the Akaike-weighted prediction at a specific (age, region, temp) using M1, M2, M3 with weights from the table?</li>
+<li>The biologist's <em>actual</em> question is "does temperature affect halibut size-at-age?" Re-frame the model-selection results to answer that question directly (hint: think about evidence ratios, not "the best model").</li>
+<li>If the temperature coefficient in M3 is $\hat\beta_T = 0.03$ with SE 0.02, what does that say about the practical importance of temperature, irrespective of which model "wins"?</li>
+</ol>
+
+<div class="callout try" style="margin-top: 12px;"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
+</div>
+
+<div style="margin-top:60px;">
+<a href="lab.html" style="background:var(--osu-orange); color:white; padding:10px 20px; border-radius:4px; text-decoration:none;">← Back to lab</a>
+<a href="problem_set_v2.html" style="background:var(--accent); color:white; padding:10px 20px; border-radius:4px; text-decoration:none; margin-left:8px;">← Problem set v2 (terrestrial)</a>
+</div>
+
+</main>
+</div>
+
+<footer>FW 536 · Statistical Modeling for Ecology and Conservation · Oregon State University</footer>
+</body>
+</html>

@@ -1,0 +1,100 @@
+---
+title: "FW 536 — Day 4 morning lab (v2 · avian / songbird) — Your Name"
+author: "Your Name Here"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    self_contained: true
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    code_folding: show
+    theme: cosmo
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+# Day 4 morning lab — Maximum likelihood problem set
+
+**Problem set version:** **v2 — avian / songbird theme**.
+(The companion version is [v3 — marine & stock assessment](problem_set_v3.html); you choose whichever theme fits your interests.)
+
+> **Note on topic scope.** The morning lecture covers **maximum likelihood**. The Bayesian content comes in the afternoon. The problems below use only what was taught this morning (likelihood ideas, MLE by hand, numerical optimization, mixture models). The remaining problems in `problem_set_v2.html` are reserved for the **afternoon Bayesian lab**.
+
+This template matches [`problem_set_v2.html`](problem_set_v2.html). Write your work below, **Knit** to HTML, and upload the `.html` to the matching Canvas assignment.
+
+For setup help see the [R Markdown tutorial](../rmarkdown_tutorial.html).
+
+---
+
+# Setup
+
+```{r}
+# Load packages you'll need. Add or remove as appropriate.
+library(ggplot2)
+library(dplyr)
+```
+
+---
+
+# Problem 1 — Yellow Warbler nest survival
+
+> You monitored 24 Yellow Warbler nests through the egg-laying and incubation periods. Each nest either successfully hatched at least one chick ($y_i = 1$) or failed ($y_i = 0$). Out of 24 nests, 17 succeeded; the remaining 7 failed (depredation or abandonment).
+
+**My work:**
+
+```{r}
+# Your R code here
+```
+
+**Answer / biological interpretation:**
+
+
+---
+
+# Problem 2 — Black-capped Chickadee count MLE
+
+> During point-count surveys at $n = 30$ stations you observed counts $y_i$ of Black-capped Chickadees, totaling $\sum y_i = 84$ birds. Treat counts as iid Poisson($\lambda$).
+
+**My work:**
+
+```{r}
+# Your R code here
+```
+
+**Answer / biological interpretation:**
+
+
+---
+
+# Problem 3 — Hummingbird arrival times — two-component Normal mixture
+
+> You record the arrival time of $n=200$ Rufous Hummingbirds at a feeder over a single morning, measured in minutes after sunrise. Field intuition suggests two cohorts — early risers and a later wave — modeled as a 2-component Normal mixture:
+
+**My work:**
+
+```{r}
+# Your R code here
+```
+
+**Answer / biological interpretation:**
+
+
+---
+
+# (Optional) Embed a photo of hand-written work
+
+```{r, echo=FALSE, eval=FALSE, out.width="60%", fig.cap="Hand-derivation for Problem N"}
+knitr::include_graphics("images/problemN_derivation.jpg")
+```
+
+---
+
+# Submission checklist
+
+- [ ] Answered every morning problem from `problem_set_v2.html`.
+- [ ] Knitted to HTML without errors.
+- [ ] Photos (if any) embedded with `self_contained: true` in the YAML.
+- [ ] Uploaded the `.html` to the matching Canvas assignment.

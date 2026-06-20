@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en" data-a11y="done">
+<head>
+<meta charset="UTF-8" />
+<title>Day 1 · Plain-language summary | FW 536</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../_Shared/css/accessible.css" />
+<script defer src="../_Shared/js/accessible.js"></script>
+<script>
+MathJax = {
+  tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
+  options: {
+    menuOptions: { settings: { assistiveMml: true, explorer: true } }
+  },
+  loader: { load: ['a11y/assistive-mml', 'a11y/explorer'] }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script"></script>
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<div class="a11y-bar" role="region" aria-label="Accessibility">Accessible version &middot; <a href="../accessibility.html">How to use this site with a screen reader</a> &middot; <a href="../index.html">Course home</a></div>
+
+<div class="shell">
+
+<aside class="sidebar">
+ <p class="brand"><a href="../index.html" title="Back to course home">FW 536 · Day 1</a></p>
+ <div class="subtitle">Plain-language summary</div>
+ <nav aria-label="On this page and related documents">
+ <ul>
+ <li><a href="#what">What we did today</a></li>
+ <li><a href="#story">The big-picture story</a></li>
+ <li><a href="#prob">What is a probability?</a></li>
+ <li><a href="#rv">Random variables in plain English</a></li>
+ <li><a href="#dist">The cast of characters (distributions)</a></li>
+ <li><a href="#mistakes">Common pitfalls</a></li>
+ <li><a href="#tomorrow">Looking ahead</a></li>
+ </ul>
+ <div class="section">Day 1 docs</div>
+ <ul>
+ <li><a href="lab.html">Main lab</a></li>
+ <li><a href="answer_key.html">Answer key</a></li>
+ <li><a href="problem_set_v2.html">Problem set v2</a></li>
+ <li><a href="problem_set_v3.html">Problem set v3</a></li>
+ </ul>
+ </nav>
+</aside>
+
+<main class="content" id="main-content" tabindex="-1">
+<header class="lab-header">
+ <div class="eyebrow">Day 1 · Plain-language summary</div>
+ <h1>Probability, distributions, and the stories your data tell</h1>
+ <p class="lede">Read this <em>before</em> tackling the lab. It explains every Day 1 idea in normal English, with as little math as possible.</p>
+</header>
+
+<section id="what">
+<h2>What we did today, in one paragraph</h2>
+<div class="callout plain"><p class="callout-label">Plain-language summary</p>
+We started with the question: <em>"What does it mean to give a number to how likely something is?"</em> We built up the rules for how those numbers behave (probability axioms), how to combine them when one thing depends on another (conditional probability), and how to flip them around (Bayes' rule). Then we introduced <em>random variables</em> — numerical summaries of random outcomes — and met five workhorse "named" distributions you'll see all week: <strong>Bernoulli, Binomial, Poisson, Negative Binomial, and Multinomial</strong>. The lab problems ground each of these in real wildlife and ecology examples.
+</div>
+</section>
+
+<section id="story">
+<h2>The big-picture story of the whole course</h2>
+<p>By the end of the week, you'll be fitting models like <code>glm(y ~ x, family=binomial)</code> or writing Bayesian models in Nimble. Underneath every such command is the same idea:</p>
+
+<div class="callout key"><p class="callout-label">Key idea</p>
+<p><strong>Every statistical model is a probability story about how your data were made.</strong> You picked it. The computer's job is to find parameter values that make that story most plausible given what you saw. Your job — the part that doesn't go away no matter how fancy the tools get — is to pick a story that resembles how the data really were generated.</p>
+</div>
+
+<p>That's why we spend Day 1 on probability and distributions, not on R syntax. If you know the right story, the R will follow.</p>
+</section>
+
+<section id="prob">
+<h2>What <em>is</em> a probability?</h2>
+<p>A probability is a number between 0 and 1 that summarizes how often something would happen if we could replay reality many times. There are two ways people interpret it:</p>
+<ul>
+<li><strong>Frequentist:</strong> "If I drew this sample 10,000 times, the proportion of times I'd see X is the probability of X."</li>
+<li><strong>Bayesian:</strong> "Given everything I currently know, my degree of belief that X is true is..."</li>
+</ul>
+<p>Both interpretations follow the same algebra. We'll use frequentist language all week until Day 4, when we'll switch to Bayesian and you'll see why the second interpretation buys you something extra.</p>
+
+<h3>Three rules you must internalize</h3>
+
+<div class="callout plain"><p class="callout-label">Plain-language summary</p>
+<p><strong>Multiplication rule (AND).</strong> If two events are independent, the probability they both happen is the product of their individual probabilities.</p>
+<p><em>Ecology example:</em> A camera has 0.03 chance of detecting a marten on any night. Two consecutive nights: $0.03 \times 0.03 = 0.0009$ chance of detection on both, <em>if</em> the nights are independent. They probably aren't.</p>
+</div>
+
+<div class="callout plain"><p class="callout-label">Plain-language summary</p>
+<p><strong>Addition rule (OR, for mutually exclusive events).</strong> If two events can't both happen, the probability that one or the other does is the sum.</p>
+<p><em>Ecology example:</em> A camera classifies a photo as bobcat, lynx, or cougar with probabilities 0.6, 0.1, 0.3. The chance it says "wild cat" (any of the three) is $0.6 + 0.1 + 0.3 = 1.0$.</p>
+</div>
+
+<div class="callout plain"><p class="callout-label">Plain-language summary</p>
+<p><strong>Bayes' rule (turning conditionals around).</strong> If you know P(positive test | disease) and the base rate of disease, you can compute P(disease | positive test).</p>
+<p><em>Why this matters:</em> for rare events, even a very accurate detector mostly produces false alarms. This is the math behind why "the eDNA was positive" doesn't necessarily mean "the fish is there."</p>
+</div>
+</section>
+
+<section id="rv">
+<h2>Random variables in plain English</h2>
+<p>A <strong>random variable</strong> is a number that pops out of a random process. Examples:</p>
+<ul>
+<li>The count of fawns observed in a 1-km transect (an integer).</li>
+<li>Whether a tagged steelhead returns to spawn (1 or 0).</li>
+<li>The temperature of a stream measured next Tuesday (a positive real number).</li>
+</ul>
+
+<p>For each random variable, two questions matter:</p>
+<ol>
+<li><strong>What values can it take?</strong> Discrete (integers, categories) or continuous (real numbers)?</li>
+<li><strong>How is its probability spread across those values?</strong> Concentrated near a mean? Heavy on zero? Skewed?</li>
+</ol>
+
+<p>The answer to question 2 is the <strong>distribution</strong>. Different stories pick different distributions.</p>
+
+<div class="callout bio"><p class="callout-label">Biological intuition</p>
+<strong>Mental exercise.</strong> Before fitting any model, write the sentence "the random variable I'm modeling is..." and "the values it can take are..." and "the natural distribution given how the data were collected is...". If you can write all three confidently, you understand your model. If not, the modeling will go wrong somewhere.
+</div>
+</section>
+
+<section id="dist">
+<h2>The cast of characters (discrete distributions)</h2>
+
+<h3>Bernoulli — one coin flip</h3>
+<p><strong>Story:</strong> a single yes/no outcome. The only parameter is $p$, the probability of "yes."</p>
+<p><strong>Where you'll see it:</strong> Did the animal survive? Was the species present? Was the egg fertile?</p>
+
+<h3>Binomial — count of yeses in $n$ independent coin flips</h3>
+<p><strong>Story:</strong> $n$ fixed-size Bernoulli trials with the same success probability $p$, all independent. You report only the total count.</p>
+<p><strong>Where you'll see it:</strong> Number of marten cameras that detected the species; number of nests that hatched out of $n$ monitored; number of deer testing positive for CWD out of a sample of 24.</p>
+
+<h3>Poisson — count of rare independent events in a window</h3>
+<p><strong>Story:</strong> events happen "rarely" and "independently" at some average rate $\lambda$ per unit. The count in one unit is Poisson.</p>
+<p><strong>Where you'll see it:</strong> Whales per transect, calls per hour at an acoustic detector, mortalities per year, anything with an obvious "rate."</p>
+<p><strong>Key feature:</strong> mean equals variance. This will almost never match real data. Which leads us to...</p>
+
+<h3>Negative Binomial — counts that clump</h3>
+<p><strong>Story:</strong> a Poisson, but the rate itself varies from unit to unit (heterogeneity). The marginal counts are over-dispersed.</p>
+<p><strong>Where you'll see it:</strong> Basically every count dataset in ecology. Use it as your default.</p>
+
+<h3>Multinomial — Binomial with more than two categories</h3>
+<p><strong>Story:</strong> a fixed sample of size $n$ is sorted into $k$ mutually exclusive categories with probabilities $p_1, \dots, p_k$ that sum to 1.</p>
+<p><strong>Where you'll see it:</strong> Survey results (oppose/neutral/support); age-sex classifications; habitat-use proportions.</p>
+
+<div class="callout key"><p class="callout-label">Key idea</p>
+<p><strong>Pattern to memorize:</strong> Each named distribution is identified by (a) its sample space — what values it can take — and (b) its parameters. Memorizing the <em>story</em> is far more useful than memorizing the PMF formula.</p>
+</div>
+</section>
+
+<section id="mistakes">
+<h2>Common pitfalls (and how to avoid them)</h2>
+
+<div class="callout warn"><p class="callout-label">Watch out</p>
+<strong>"My count data are Poisson because they're counts."</strong> Counts can be Poisson, but they very often aren't. Always check whether the variance is bigger than the mean. If it is, you need a Negative Binomial or a mixed model.
+</div>
+
+<div class="callout warn"><p class="callout-label">Watch out</p>
+<strong>Confusing P(A|B) with P(B|A).</strong> The probability of "positive test given disease" is not the same as "disease given positive test." Bayes' rule converts between them, and the answer depends on the base rate. (See the taxi puzzle.)
+</div>
+
+<div class="callout warn"><p class="callout-label">Watch out</p>
+<strong>Adding probabilities when they aren't mutually exclusive.</strong> $P(\text{rain Mon}) + P(\text{rain Tue})$ is <em>not</em> $P(\text{rain Mon or Tue})$ unless one rules out the other. Use the inclusion-exclusion correction: $P(A \cup B) = P(A) + P(B) - P(A \cap B)$.
+</div>
+
+<div class="callout warn"><p class="callout-label">Watch out</p>
+<strong>Forgetting that independence is rare in ecology.</strong> Detections on the same transect, animals in the same herd, plots in the same site — all tend to be positively correlated. Treating them as independent inflates your effective sample size and gives you confidence intervals that are too narrow. This is the seed of the entire <em>mixed models</em> conversation we'll have on Day 3.
+</div>
+</section>
+
+<section id="tomorrow">
+<h2>Looking ahead</h2>
+<p>Tomorrow morning (Day 2) we shift from discrete to <strong>continuous distributions</strong> — Normal, Lognormal, Gamma, Beta, Exponential — and start to use them inside linear models. The day after, we'll combine the linear model framework with the various distributions to get <strong>Generalized Linear Models</strong>, which are the bread and butter of modern ecological statistics.</p>
+<p>Everything else this week — model selection, mixed models, MLE, Bayes — is built directly on the foundation we put down today. If something here didn't click yet, work through the alternate problem sets (<a href="problem_set_v2.html">v2</a>, <a href="problem_set_v3.html">v3</a>) before tomorrow morning.</p>
+</section>
+
+</main>
+</div>
+
+<footer>
+ FW 536 · Statistical Modeling for Ecology and Conservation · Oregon State University
+</footer>
+</body>
+</html>

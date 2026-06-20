@@ -1,0 +1,210 @@
+---
+title: "FW 536 — Day 5 morning lab (v2 · forest carnivore) — Your Name"
+author: "Your Name Here"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    self_contained: true
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    code_folding: show
+    theme: cosmo
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+# Day 5 morning lab — Bayesian modeling problem set 2
+
+**Problem set version:** **v2 — forest carnivore theme**.
+(The companion version is [v3 — anadromous fish & freshwater](problem_set_v3.html); you choose whichever theme fits your interests.)
+
+This template matches [`problem_set_v2.html`](problem_set_v2.html). Read each problem statement there, write your work below, **Knit** to HTML, and upload the `.html` to the matching Canvas assignment.
+
+For setup help see the [R Markdown tutorial](../rmarkdown_tutorial.html).
+
+---
+
+# Setup
+
+```{r}
+# Load packages you'll need. Add or remove as appropriate.
+library(ggplot2)
+library(dplyr)
+library(nimble)
+library(MCMCvis)
+library(coda)
+```
+
+---
+
+# Problem 1 — Marten detection counts on baited camera arrays
+
+> Twelve camera arrays across the Oregon coast range each ran for 30 nights. Total marten detections at array $j$ are modelled as:
+
+**My work:**
+
+```{r}
+# Your R code here
+```
+
+**Answer / biological interpretation:**
+
+
+---
+
+# Problem 2 — Fisher occupancy on the Olympic peninsula
+
+> 200 stations, grouped in 25 watersheds. Detection of fisher at each station ($y_i \in \{0,1\}$) depends on canopy cover ($x_i$, scaled), with a watershed-level random intercept.
+
+**My work:**
+
+```{r}
+# Your R code here
+```
+
+**Answer / biological interpretation:**
+
+
+---
+
+# Problem 3 — Wolverine repeat-count abundance at 40 plots
+
+> 40 winter trail-camera plots in the North Cascades, each visited 4 times. Snow-track count $y[i,j]$ at plot $i$ visit $j$. True wolverine "use intensity" $N_i \sim \text{Poisson}(\lambda)$, with a per-visit detection $p$.
+
+**My work:**
+
+```{r}
+# Your R code here
+```
+
+**Answer / biological interpretation:**
+
+
+---
+
+# Problem 4 — Canada lynx recolonization in Maine
+
+> 50 grid cells surveyed annually for 6 years (3 replicate visits per cell-year). After a state-line predator-control change in year 2, you expect colonization to rise. Fit a dynamic occupancy model with year-specific $\phi_t$ and $\gamma_t$.
+
+**My work:**
+
+```{r}
+# Your R code here
+```
+
+**Answer / biological interpretation:**
+
+
+---
+
+# Problem 5 — Black bear hair-snare counts across elevation
+
+> 60 hair snare stations, 5 visits each. Abundance varies with elevation (a U-shape: peak at middle elevations); detection varies with visit weather.
+
+**My work:**
+
+```{r}
+# Your R code here
+```
+
+**Answer / biological interpretation:**
+
+
+---
+
+# Problem 6 — Total bear density across the survey region
+
+> Building on Problem 5, you want the posterior of total abundance $N_\text{tot} = \sum_i N_i$, and density $D = N_\text{tot} / A$ where $A = 600$ km².
+
+**My work:**
+
+```{r}
+# Your R code here
+```
+
+**Answer / biological interpretation:**
+
+
+---
+
+# Problem 7 — Marten detection: does the prior matter?
+
+> Re-fit Problem 1 with three priors on $\mu$:
+
+**My work:**
+
+```{r}
+# Your R code here
+```
+
+**Answer / biological interpretation:**
+
+
+---
+
+# Problem 8 — Five carnivores, shared detection structure
+
+> You ran 80 cameras for 30 nights and recorded presence/absence of each of 5 species (marten, fisher, bobcat, coyote, black bear). Fit a multi-species occupancy model with species-specific occupancy $\psi_s$ and detection $p_s$, both modeled hierarchically across species.
+
+**My work:**
+
+```{r}
+# Your R code here
+```
+
+**Answer / biological interpretation:**
+
+
+---
+
+# Problem 9 — Fisher recolonization: time to 80% occupancy
+
+> Given posterior draws of $\phi, \gamma$ from a dynamic occupancy fit (use the values from Problem 4 for lynx as a proxy), derive the posterior distribution of the equilibrium occupancy $\psi_\infty = \gamma / (\gamma + 1 - \phi)$ and the years to reach 80% of equilibrium start...
+
+**My work:**
+
+```{r}
+# Your R code here
+```
+
+**Answer / biological interpretation:**
+
+
+---
+
+# Problem 10 — Are habitat-specialist carnivores faring worse than generalists?
+
+> Using the multi-species occupancy fit from Problem 8, compute the posterior probability that the average occupancy of habitat specialists (species 1 = marten, species 2 = fisher) is less than the average occupancy of generalists (species 3 = bobcat, 4 = coyote, 5 = bear).
+
+**My work:**
+
+```{r}
+# Your R code here
+```
+
+**Answer / biological interpretation:**
+
+
+---
+
+# (Optional) Embed a photo of hand-written work
+
+For problems easier to do on paper, photograph and embed:
+
+```{r, echo=FALSE, eval=FALSE, out.width="60%", fig.cap="Hand-derivation for Problem N"}
+knitr::include_graphics("images/problemN_derivation.jpg")
+```
+
+(Change `eval=FALSE` to `eval=TRUE` after saving an image. See the [R Markdown tutorial](../rmarkdown_tutorial.html) for details.)
+
+---
+
+# Submission checklist
+
+- [ ] Answered every morning problem from `problem_set_v2.html`.
+- [ ] Knitted to HTML without errors.
+- [ ] Photos (if any) embedded with `self_contained: true` in the YAML.
+- [ ] Uploaded the `.html` to the matching Canvas assignment.

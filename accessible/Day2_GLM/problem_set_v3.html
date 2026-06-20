@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en" data-a11y="done">
+<head>
+<meta charset="UTF-8" />
+<title>Day 2 · Problem Set v3 (Aquatic & Fisheries) | FW 536 · Student copy (no answers)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../_Shared/css/accessible.css" />
+<script defer src="../_Shared/js/accessible.js"></script>
+<script>
+MathJax = {
+  tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
+  options: {
+    menuOptions: { settings: { assistiveMml: true, explorer: true } }
+  },
+  loader: { load: ['a11y/assistive-mml', 'a11y/explorer'] }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script"></script>
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<div class="a11y-bar" role="region" aria-label="Accessibility">Accessible version &middot; <a href="../accessibility.html">How to use this site with a screen reader</a> &middot; <a href="../index.html">Course home</a></div>
+
+<div class="shell">
+
+<aside class="sidebar">
+ <p class="brand"><a href="../index.html" title="Back to course home">FW 536 · Day 2</a></p>
+ <div class="subtitle">Problem Set v3 — Aquatic & Fisheries</div>
+ <nav aria-label="On this page and related documents">
+ <ul>
+ <li><a href="#p1">1. Fish weight distribution</a></li>
+ <li><a href="#p2">2. Length-weight allometry</a></li>
+ <li><a href="#p3">3. Trawl CPUE (Poisson)</a></li>
+ <li><a href="#p4">4. Smolt survival (logit)</a></li>
+ <li><a href="#p5">5. Shrimp catch: NB vs Poisson</a></li>
+ <li><a href="#p6">6. Stream flow × season interaction</a></li>
+ <li><a href="#p7">7. CPUE offset for tow duration</a></li>
+ <li><a href="#p8">8. Salmon spawning success (probability scale)</a></li>
+ <li><a href="#p9">9. Eelgrass cover back-transform</a></li>
+ <li><a href="#p10">10. Estuarine occupancy threshold</a></li>
+ </ul>
+ <div class="section">Day 2 docs</div>
+ <ul>
+ <li><a href="lab.html">Main lab</a></li>
+ <li><a class="featured" href="plain_language_summary.html">Plain-language summary</a></li>
+ <li><a href="log_logit_intuition.html">Log/logit intuition guide</a></li>
+ <li><a href="answer_key.html">Lab answer key</a></li>
+ <li><a href="problem_set_v2.html">Problem set v2 (forest)</a></li>
+ </ul>
+ </nav>
+</aside>
+
+<main class="content" id="main-content" tabindex="-1">
+<header class="lab-header">
+ <div class="eyebrow">Day 2 · Alternate Problem Set v3</div>
+ <h1>Aquatic and fisheries themed problems</h1>
+ <p class="lede">Ten novel problems covering continuous distribution choice, Normal vs lognormal regression, Poisson with log-link interpretation, logistic regression with odds-ratio interpretation, NB vs Poisson, interaction terms, and offsets — all set in freshwater, estuarine, and marine fisheries contexts. The pedagogical goal: leave with the ability to read a log-link or logit-link coefficient as biology.</p>
+</header>
+
+<section class="callout warn" style="margin-top:24px;"><p class="callout-label">Watch out</p><p><strong>Assessed problem set (v3) &middot; aquatic &amp; fisheries theme.</strong> Answers are <em>not</em> shown here. Write your work in the template tailored to this version: <a href="morning_lab_template_v3.Rmd"><code>morning_lab_template_v3.Rmd</code></a> for morning problems, <a href="afternoon_lab_template_v3.Rmd"><code>afternoon_lab_template_v3.Rmd</code></a> for afternoon problems. Knit to HTML, then upload to the matching Canvas assignment.</p><p><strong>Pick whichever theme fits your interests.</strong> The companion version is <a href="problem_set_v2.html">v2 &middot; forest &amp; songbird</a> &mdash; they cover the same statistical concepts with different ecological scenarios.</p><p>For worked-example study with visible answers, see <a href="lab.html">the practice problem set</a>.</p></section>
+
+
+<section><p>Try every problem before checking the answer. The numeric output is necessary but not sufficient: each answer ends with a "say it as biology" line — practice writing those before you peek.</p></section>
+
+<!-- =========================== PROBLEM 1 =========================== -->
+<a id="morning"></a>
+<div class="exercise" id="p1">
+<span class="ex-tag">Problem 1</span><span class="difficulty easy"> · continuous distribution choice</span>
+<h3>Distribution of fish weights in a creel survey</h3>
+<p>You record body weight (g) for every fish kept in a 30-day creel survey on a coastal river. Most fish are sub-legal-size cutthroat (small), with a long right tail of large hatchery steelhead retained in the same fishery. The distribution is strongly right-skewed.</p>
+<ol type="a">
+<li>Which of {Normal, Lognormal, Gamma, Exponential, Beta} would you choose? Justify in one sentence.</li>
+<li>If $\log(\text{weight}) \sim \mathcal{N}(5.0, 0.8^2)$, what is the expected weight on the raw scale?</li>
+<li>What is the median weight?</li>
+<li>If you mistakenly fit a Normal to these weights and computed a 95% prediction interval centered at the mean, why would the lower end be biologically nonsense?</li>
+</ol>
+</div>
+
+<!-- =========================== PROBLEM 2 =========================== -->
+<div class="exercise" id="p2">
+<span class="ex-tag">Problem 2</span><span class="difficulty medium"> · Normal vs lognormal regression</span>
+<h3>Length-weight allometry of Chinook salmon</h3>
+<p>For 200 Chinook salmon you have fork length (cm) and weight (g). Lengths range 30–110 cm; weights range 250 g to 18 kg.</p>
+<ul>
+<li>Analyst A: <code>lm(weight ~ length)</code></li>
+<li>Analyst B: <code>lm(log(weight) ~ log(length))</code></li>
+</ul>
+<ol type="a">
+<li>Sketch what Analyst A's residuals-vs-fitted plot would look like.</li>
+<li>Analyst B finds $\hat\beta_1 = 3.05$. Connect this to the standard $W = a L^b$ allometric equation and interpret $b$.</li>
+<li>What multiplicative effect on weight corresponds to a 25% increase in length?</li>
+<li>Why is the "cube law" (b = 3) a useful null and what does a fitted value of 3.05 say biologically?</li>
+</ol>
+</div>
+
+<!-- =========================== PROBLEM 3 =========================== -->
+<div class="exercise" id="p3">
+<span class="ex-tag">Problem 3</span><span class="difficulty medium"> · Poisson regression, log-link interpretation</span>
+<h3>Juvenile coho counts in snorkel surveys</h3>
+<p>From 80 pool surveys, juvenile coho counts are modeled as</p>
+<pre><code>glm(coho ~ pool_depth + cover_lwd, family = poisson, data = pools)</code></pre>
+<p>Estimates: intercept $\hat\beta_0 = 0.20$; pool depth (m) $\hat\beta_1 = +0.65$; large woody debris cover (% scaled 0–10) $\hat\beta_2 = +0.10$.</p>
+<ol type="a">
+<li>Expected count in a 0-depth, 0-cover pool? (This is the intercept back-transform.)</li>
+<li>What is the multiplicative effect of an extra meter of pool depth?</li>
+<li>A pool that goes from 1 m to 2 m depth, holding LWD cover constant — what is the percent change in expected count?</li>
+<li>What multiplicative effect does a 1-SD change in each predictor produce, given pool depth has SD 0.4 m and cover has SD 2 units?</li>
+</ol>
+</div>
+
+<!-- =========================== PROBLEM 4 =========================== -->
+<div class="exercise" id="p4">
+<span class="ex-tag">Problem 4</span><span class="difficulty medium"> · binomial logistic, logit interpretation</span>
+<h3>Smolt survival through a hydro reach vs. temperature</h3>
+<p>Acoustic-tagged Chinook smolts tracked through an 80-km reach: outcome is survived (1) or not (0). Predictor is river temperature (°C) at release. Logistic regression returns intercept $+2.20$ and slope $-0.18$ per °C.</p>
+<ol type="a">
+<li>Predicted survival probability at 12 °C? At 18 °C?</li>
+<li>What temperature corresponds to 50% predicted survival?</li>
+<li>What is the odds ratio for a 5 °C increase?</li>
+<li>Translate the slope to a marginal probability change at the inflection.</li>
+</ol>
+</div>
+
+<!-- =========================== PROBLEM 5 =========================== -->
+<div class="exercise" id="p5">
+<span class="ex-tag">Problem 5</span><span class="difficulty medium"> · NB vs Poisson</span>
+<h3>Pink shrimp catch per tow</h3>
+<p>For 120 standard 30-minute trawl tows, shrimp catch has mean 80 individuals and variance 1200.</p>
+<ol type="a">
+<li>What is the dispersion ratio?</li>
+<li>Find the NB <code>size</code> parameter $k$ that matches the empirical variance.</li>
+<li>Simulate 1000 tows under both Poisson(80) and NB($\mu = 80, k$). Compare P(catch = 0) and P(catch &gt; 200).</li>
+<li>If you reported Poisson-based 95% CIs for the mean tow catch, by roughly what factor would your CIs be too narrow?</li>
+</ol>
+</div>
+
+<!-- =========================== PROBLEM 6 =========================== -->
+<a id="afternoon"></a>
+<div class="exercise" id="p6">
+<span class="ex-tag">Problem 6</span><span class="difficulty hard"> · interaction</span>
+<h3>Stream discharge × season interaction on macroinvertebrate counts</h3>
+<p>Macroinvertebrate counts per Surber sample from 90 collections; predictors are discharge (m³/s, continuous) and season (factor: <em>spring</em> reference, <em>fall</em>). Poisson fit:</p>
+<pre><code>glm(macros ~ discharge * season, family = poisson, data = samps)</code></pre>
+<p>Coefficients: intercept = 3.50, discharge = $-0.30$, seasonFall = $+0.40$, discharge:seasonFall = $+0.50$.</p>
+<ol type="a">
+<li>What is the discharge slope in spring?</li>
+<li>What is the discharge slope in fall?</li>
+<li>What is the expected count at discharge = 0, fall season?</li>
+<li>At what discharge do spring and fall predicted counts cross? Interpret biologically.</li>
+</ol>
+</div>
+
+<!-- =========================== PROBLEM 7 =========================== -->
+<div class="exercise" id="p7">
+<span class="ex-tag">Problem 7</span><span class="difficulty hard"> · offsets</span>
+<h3>CPUE for a longline fishery — variable hook numbers</h3>
+<p>Across 200 longline sets, the number of hooks varies from 500 to 5000. You record bycatch counts of yelloweye rockfish per set. Two analyses:</p>
+<ul>
+<li>Analyst A: <code>glm(bycatch ~ depth_m, family = poisson)</code></li>
+<li>Analyst B: <code>glm(bycatch ~ depth_m + offset(log(hooks)), family = poisson)</code></li>
+</ul>
+<ol type="a">
+<li>What does Analyst B's intercept now represent?</li>
+<li>Why does the offset go on the log scale (not, say, dividing by hooks)?</li>
+<li>If Analyst B's depth slope is $+0.012$ per m, write a one-sentence biological summary.</li>
+<li>How would Analyst A's depth slope be biased if shallow sets tended to use fewer hooks?</li>
+</ol>
+</div>
+
+<!-- =========================== PROBLEM 8 =========================== -->
+<div class="exercise" id="p8">
+<span class="ex-tag">Problem 8</span><span class="difficulty medium"> · probability ↔ odds ↔ log-odds</span>
+<h3>Sockeye redd success vs. substrate gravel size</h3>
+<p>Logistic regression of redd-survival to emergence on median gravel diameter (mm). Intercept $-1.5$, slope $+0.06$ per mm.</p>
+<ol type="a">
+<li>Fitted $p$ at 10, 25, 40, and 60 mm gravel.</li>
+<li>Express the slope as an odds ratio per 1 mm and per 10 mm.</li>
+<li>What is the difference in predicted survival between a 25 mm gravel and a 40 mm gravel?</li>
+<li>Why is the marginal effect of gravel size on probability not constant across the curve?</li>
+</ol>
+</div>
+
+<!-- =========================== PROBLEM 9 =========================== -->
+<div class="exercise" id="p9">
+<span class="ex-tag">Problem 9</span><span class="difficulty hard"> · back-transform with CI</span>
+<h3>Eelgrass biomass vs sediment grain size</h3>
+<p>A Gamma GLM with log link returns, for the contrast "fine sediment vs medium sediment", $\hat\beta = -0.65$ with 95% CI $(-0.95, -0.35)$ on the log scale.</p>
+<ol type="a">
+<li>Back-transform the point estimate. What multiplicative effect does it represent?</li>
+<li>Back-transform the CI.</li>
+<li>Translate to a "percent decrease" statement.</li>
+<li>Write one sentence appropriate for a journal results section.</li>
+</ol>
+</div>
+
+<!-- =========================== PROBLEM 10 =========================== -->
+<div class="exercise" id="p10">
+<span class="ex-tag">Problem 10</span><span class="difficulty hard"> · logistic threshold + marginal effects</span>
+<h3>Estuarine green sturgeon occupancy</h3>
+<p>Occupancy (1/0) at 250 estuarine sites modeled as <code>glm(present ~ salinity + depth, family = binomial)</code>. Intercept $-2.5$; salinity slope $+0.10$ per ppt; depth slope $+0.20$ per m.</p>
+<ol type="a">
+<li>For a 5-m-deep site, at what salinity does $p = 0.5$?</li>
+<li>For a 2-m-deep site, at what salinity does $p = 0.5$?</li>
+<li>Marginal effect of salinity at the inflection.</li>
+<li>If a restoration project can raise salinity by 5 ppt (by managing an upstream tidal gate) <em>or</em> deepen channels by 1 m, which produces a larger predicted occupancy gain at a typical site with $p = 0.2$?</li>
+</ol>
+</div>
+</main>
+</div>
+<footer>FW 536 · Statistical Modeling for Ecology and Conservation · Oregon State University</footer>
+</body>
+</html>

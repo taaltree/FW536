@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en" data-a11y="done">
+<head>
+<meta charset="UTF-8" />
+<title>Day 1 · Answer key | FW 536</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../_Shared/css/accessible.css" />
+<script defer src="../_Shared/js/accessible.js"></script>
+<script>
+MathJax = {
+  tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
+  options: {
+    menuOptions: { settings: { assistiveMml: true, explorer: true } }
+  },
+  loader: { load: ['a11y/assistive-mml', 'a11y/explorer'] }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script"></script>
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<div class="a11y-bar" role="region" aria-label="Accessibility">Accessible version &middot; <a href="../accessibility.html">How to use this site with a screen reader</a> &middot; <a href="../index.html">Course home</a></div>
+
+<div class="shell">
+
+<aside class="sidebar">
+ <p class="brand"><a href="../index.html" title="Back to course home">FW 536 · Day 1</a></p>
+ <div class="subtitle">Answer key</div>
+ <nav aria-label="On this page and related documents">
+ <ul>
+ <li><a href="#a1">Exercise 1 — boy-or-girl</a></li>
+ <li><a href="#a2">Exercise 2 — Bayes/taxi</a></li>
+ <li><a href="#a3">Exercise 3 — round table</a></li>
+ <li><a href="#a4">Exercise 4 — CF basic</a></li>
+ <li><a href="#a5">Exercise 5 — Poisson vs NB</a></li>
+ <li><a href="#a6">Exercise 6 — marten</a></li>
+ <li><a href="#a7">Exercise 7 — CWD</a></li>
+ <li><a href="#a8">Exercise 8 — elk multinomial</a></li>
+ <li><a href="#a9">Exercise 9 — Likert</a></li>
+ <li><a href="#a10">Exercise 10 — CF generalized</a></li>
+ <li><a href="#a11">Stretch 11 — Bernoulli sums</a></li>
+ <li><a href="#a12">Stretch 12 — Poisson limit</a></li>
+ <li><a href="#a13">Stretch 13 — Monty Hall</a></li>
+ </ul>
+ <div class="section">Day 1 docs</div>
+ <ul>
+ <li><a href="lab.html">Main lab</a></li>
+ <li><a class="featured" href="plain_language_summary.html">Plain-language summary</a></li>
+ <li><a href="problem_set_v2.html">Problem set v2</a></li>
+ <li><a href="problem_set_v3.html">Problem set v3</a></li>
+ </ul>
+ </nav>
+</aside>
+
+<main class="content" id="main-content" tabindex="-1">
+<header class="lab-header">
+ <div class="eyebrow">Day 1 · Answer Key (instructor)</div>
+ <h1>Worked solutions — Probability & Discrete Distributions</h1>
+ <p class="lede">Full numeric and conceptual answers to every Day 1 exercise. Each answer includes the underlying logic, the R verification, and a short "what to look for in a student response" note for instructors.</p>
+</header>
+
+<section id="a1">
+<h2>Exercise 1 — Boy-or-girl paradox</h2>
+<p><strong>Sample space:</strong> {BB, BG, GB, GG}, each with probability 1/4.</p>
+<p><strong>(a)</strong> Condition on "at least one girl": 3 of 4 outcomes survive. Only GG = both girls. So $P = 1/3$.</p>
+<p><strong>(b)</strong> Condition on "older is a girl": 2 of 4 outcomes survive ({GB, GG}). Only GG. So $P = 1/2$.</p>
+<p><strong>(c)</strong> The two conditioning events are different. The second is strictly stronger (more specific), shrinking the sample space more.</p>
+<pre><code>set.seed(1)
+fams &lt;- matrix(sample(c("B","G"), 2*1e6, replace=TRUE), ncol=2)
+mean(rowSums(fams=="G")==2) / mean(rowSums(fams=="G")&gt;=1) # ~ 0.333
+mean(fams[,1]=="G" &amp; fams[,2]=="G") / mean(fams[,1]=="G") # ~ 0.500</code></pre>
+
+<div class="callout key"><p class="callout-label">Key idea</p><strong>What to look for:</strong> students should explicitly state the sample space and which subset survives each conditioning. The "1/2 vs 1/3" confusion is normal — the instructor's job is to make sure they can write out the sample-space restriction.</div>
+</section>
+
+<section id="a2">
+<h2>Exercise 2 — Taxi / Bayes</h2>
+<p>Let $B$ = blue taxi (prior 0.01), $W_B$ = witness says blue.</p>
+<div class="eq-block">
+$P(B \mid W_B) = \dfrac{P(W_B \mid B)P(B)}{P(W_B \mid B)P(B) + P(W_B \mid \bar B)P(\bar B)} = \dfrac{0.99 \cdot 0.01}{0.99 \cdot 0.01 + 0.05 \cdot 0.99} = \dfrac{0.0099}{0.0594} \approx 0.1667$
+</div>
+<pre><code>(0.99*0.01) / (0.99*0.01 + 0.05*0.99) # 0.1667</code></pre>
+<p><strong>Interpretation:</strong> only ~17% chance the taxi really was blue — base-rate dominance.</p>
+<div class="callout key"><p class="callout-label">Key idea</p><strong>What to look for:</strong> correctly identifying the false-positive rate as P(W_B | not B) = 0.05, not 1 − 0.99. Students often plug in the wrong "reliability" number.</div>
+</section>
+
+<section id="a3">
+<h2>Exercise 3 — Tallest among neighbors</h2>
+<p>Define $X_i = 1$ if person $i$ is shorter than both neighbors. The indicator approach:</p>
+<div class="eq">$E[\sum X_i] = \sum E[X_i] = n \cdot P(\text{shorter than both})$</div>
+<p>For any three distinct people, the smallest is in the "middle" with probability 1/3 — by symmetry of orderings, the middle is equally likely to be smallest, middle, or largest among the three. So $E[X] = n/3$.</p>
+<pre><code>n &lt;- 50; reps &lt;- 1e5
+samples &lt;- replicate(reps, {
+ h &lt;- sample(n)
+ sum(h &lt; c(h[n], h[-n]) &amp; h &lt; c(h[-1], h[1]))
+})
+mean(samples) # ~ 16.67</code></pre>
+<div class="callout key"><p class="callout-label">Key idea</p><strong>What to look for:</strong> the indicator-variable trick. Many students try to compute the joint distribution and get stuck.</div>
+</section>
+
+<section id="a4">
+<h2>Exercise 4 — Cystic fibrosis (basic)</h2>
+<p>(a) $P(\text{unaffected child}) = 1 - 1/4 = 3/4$.</p>
+<p>(b) $P(\text{four unaffected}) = (3/4)^4 = 81/256 \approx 0.3164$.</p>
+<pre><code>(3/4)^4 # 0.3164
+dbinom(0, 4, 0.25) # P(0 affected) = same number</code></pre>
+</section>
+
+<section id="a5">
+<h2>Exercise 5 — Poisson vs Negative Binomial</h2>
+<p>Set λ = 10, simulate 1000 draws per distribution:</p>
+<pre><code>library(dplyr); library(tidyr); library(ggplot2)
+set.seed(2025); n &lt;- 1000; lambda &lt;- 10
+sims &lt;- tibble(
+ pois = rpois(n, lambda),
+ nb_k5 = rnbinom(n, mu=lambda, size=5),
+ nb_k1 = rnbinom(n, mu=lambda, size=1),
+ nb_kp5= rnbinom(n, mu=lambda, size=0.5))
+sims %&gt;% summarise(across(everything(),
+ list(mean=mean, var=var, p0=~mean(.==0), pgt20=~mean(.&gt;20))))</code></pre>
+<table>
+<tr><th scope="col">Distribution</th><th scope="col">Mean (≈)</th><th scope="col">Variance (≈)</th><th scope="col">P(0)</th><th scope="col">P(&gt;20)</th></tr>
+<tr><td>Pois(10)</td><td>10.0</td><td>10.0</td><td>0.000</td><td>0.003</td></tr>
+<tr><td>NB(10, k=5)</td><td>10.0</td><td>30</td><td>0.020</td><td>0.06</td></tr>
+<tr><td>NB(10, k=1)</td><td>10.0</td><td>110</td><td>0.09</td><td>0.16</td></tr>
+<tr><td>NB(10, k=0.5)</td><td>10.0</td><td>210</td><td>0.18</td><td>0.21</td></tr>
+</table>
+<p>(d) Many-zero, occasional-large data is the NB k=0.5 pattern.</p>
+
+<div class="callout key"><p class="callout-label">Key idea</p><strong>What to look for:</strong> students saying "Poisson <em>has to</em> have variance = mean" and connecting that to the failure mode in real data.</div>
+</section>
+
+<section id="a6">
+<h2>Exercise 6 — Marten survival</h2>
+<pre><code>dbinom(0:5, 5, 0.7)
+# 0.00243 0.02835 0.13230 0.30870 0.36015 0.16807</code></pre>
+<p>This is Bin(5, 0.7). Mode at $k=4$ (rounding $(n+1)p = 4.2$ down). Mean = 3.5, variance = $5 \cdot 0.7 \cdot 0.3 = 1.05$.</p>
+</section>
+
+<section id="a7">
+<h2>Exercise 7 — CWD surveillance</h2>
+<p>(a) $Y \sim \text{Bin}(24, 0.12)$.</p>
+<pre><code>dbinom(3, 24, 0.12) # 0.2429
+pbinom(4, 24, 0.12) # 0.8722
+dbinom(0, 24, 0.12) # 0.0479</code></pre>
+<p>(d) The 4.8% chance of zero detections despite 12% prevalence is the critical surveillance message: sampling too few animals fails to certify "free of disease" even when present. Real-world surveillance programs use this exact calculation to set minimum sample sizes for declarations of freedom from disease.</p>
+</section>
+
+<section id="a8">
+<h2>Exercise 8 — Elk multinomial</h2>
+<pre><code>p &lt;- c(0.20, 0.45, 0.25, 0.10)
+dmultinom(c(18, 38, 18, 6), prob=p) # 0.00115
+set.seed(1)
+flights &lt;- rmultinom(5000, size=80, prob=p)
+hist(flights[3,], main="Calves observed", xlab="count")
+mean(flights[3,]) # ~ 20 (= 80 * 0.25)
+var(flights[3,]) # ~ 15 (= 80*0.25*0.75)</code></pre>
+<p>(c) Each marginal of a multinomial is binomial: calves ~ Bin(80, 0.25).</p>
+</section>
+
+<section id="a9">
+<h2>Exercise 9 — Likert simulation</h2>
+<pre><code>p &lt;- c(.30, .20, .15, .20, .15)
+rmultinom(1, 80, p)
+sims &lt;- rmultinom(500, 80, p)
+mean(sims[5,]); sd(sims[5,]) # ~ 12 and ~ 3.2</code></pre>
+<p>The standard deviation across replicate surveys (~3) is large relative to the point estimate (~12), illustrating the noise in a single n=80 survey.</p>
+</section>
+
+<section id="a10">
+<h2>Exercise 10 — Cystic fibrosis generalized</h2>
+<p>$K \sim \text{Bin}(n, 0.25)$.</p>
+<p>(b) $P(K \ge 1) = 1 - (0.75)^5 = 1 - 0.2373 = 0.7627$.</p>
+<p>(c) Smallest $n$ with $P(\ge 1) \ge 0.5$ is $n = 3$ (since $0.75^3 = 0.4219 &lt; 0.5$ — meaning $P(\ge 1) = 1 - 0.4219 = 0.578$).</p>
+<pre><code>1 - dbinom(0, 5, 0.25) # 0.7627
+which(1 - dbinom(0, 1:10, 0.25) &gt;= 0.5)[1] # 3</code></pre>
+</section>
+
+<section id="a11">
+<h2>Stretch 11 — Sum of Bernoullis = Binomial</h2>
+<p>(a) Linearity of expectation: $E[\sum Y_i] = \sum p = np$.</p>
+<p>(b) Under independence, $\mathrm{Var}(\sum Y_i) = \sum \mathrm{Var}(Y_i) = np(1-p)$.</p>
+<p>(c) Linearity of expectation does NOT require independence. Variance addition does. The covariance terms $2\sum_{i&lt;j} \mathrm{Cov}(Y_i, Y_j)$ vanish only under independence. Positive correlation inflates variance — overdispersion.</p>
+</section>
+
+<section id="a12">
+<h2>Stretch 12 — Binomial → Poisson limit</h2>
+<p>Set $p = \lambda/n$. Then</p>
+<div class="eq-block">$P(X=k) = \binom{n}{k}\left(\frac{\lambda}{n}\right)^k\left(1-\frac{\lambda}{n}\right)^{n-k}$</div>
+<p>The three pieces:</p>
+<ol>
+<li>$\binom{n}{k}\left(\frac{\lambda}{n}\right)^k = \frac{n(n-1)\dots(n-k+1)}{k!\, n^k} \lambda^k \to \frac{\lambda^k}{k!}$ as $n \to \infty$.</li>
+<li>$(1-\lambda/n)^n \to e^{-\lambda}$.</li>
+<li>$(1-\lambda/n)^{-k} \to 1$.</li>
+</ol>
+<p>Product: $\frac{\lambda^k e^{-\lambda}}{k!}$, the Poisson PMF.</p>
+<pre><code>for(pp in list(c(20,0.2), c(100,0.04), c(1000,0.004))) {
+ x &lt;- rbinom(1e4, pp[1], pp[2])
+ cat("n=", pp[1], " mean=", mean(x), " var=", var(x), "\n")
+}
+y &lt;- rpois(1e4, 4); cat("Pois mean=", mean(y), " var=", var(y), "\n")</code></pre>
+<p>All four distributions look essentially identical, with mean ≈ variance ≈ 4.</p>
+</section>
+
+<section id="a13">
+<h2>Stretch 13 — Monty Hall (camera trap)</h2>
+<p>P(initial guess right) = 1/3 regardless of what is revealed. The technician's reveal of an empty camera moves the remaining 2/3 onto the unopened alternative. So <strong>switch</strong>.</p>
+<pre><code>set.seed(1)
+trials &lt;- 1e5
+truth &lt;- sample(1:3, trials, replace=TRUE)
+guess &lt;- 1
+# Without switching:
+mean(truth == guess) # 1/3
+# With switching, we always end up on the unchosen alternative
+mean(truth != guess) # 2/3</code></pre>
+</section>
+
+<div style="margin-top:60px;">
+<button id="reveal-all" style="background:var(--accent); color:white; border:none; padding:10px 20px; border-radius:4px; cursor:pointer;">Expand all</button>
+<a href="lab.html" style="background:var(--osu-orange); color:white; padding:10px 20px; border-radius:4px; text-decoration:none; margin-left:8px;">← Back to lab</a>
+</div>
+
+</main>
+</div>
+
+<footer>FW 536 · Statistical Modeling for Ecology and Conservation · Oregon State University</footer>
+</body>
+</html>

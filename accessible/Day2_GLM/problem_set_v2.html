@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en" data-a11y="done">
+<head>
+<meta charset="UTF-8" />
+<title>Day 2 · Problem Set v2 (Forest & Songbird) | FW 536 · Student copy (no answers)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../_Shared/css/accessible.css" />
+<script defer src="../_Shared/js/accessible.js"></script>
+<script>
+MathJax = {
+  tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
+  options: {
+    menuOptions: { settings: { assistiveMml: true, explorer: true } }
+  },
+  loader: { load: ['a11y/assistive-mml', 'a11y/explorer'] }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script"></script>
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<div class="a11y-bar" role="region" aria-label="Accessibility">Accessible version &middot; <a href="../accessibility.html">How to use this site with a screen reader</a> &middot; <a href="../index.html">Course home</a></div>
+
+<div class="shell">
+
+<aside class="sidebar">
+ <p class="brand"><a href="../index.html" title="Back to course home">FW 536 · Day 2</a></p>
+ <div class="subtitle">Problem Set v2 — Forest & Songbird</div>
+ <nav aria-label="On this page and related documents">
+ <ul>
+ <li><a href="#p1">1. Tree DBH distribution</a></li>
+ <li><a href="#p2">2. Lognormal vs Normal biomass</a></li>
+ <li><a href="#p3">3. Warbler counts (Poisson)</a></li>
+ <li><a href="#p4">4. Nest success (logit)</a></li>
+ <li><a href="#p5">5. Acorn masts: NB vs Poisson</a></li>
+ <li><a href="#p6">6. Stand age × management</a></li>
+ <li><a href="#p7">7. Point-count offsets</a></li>
+ <li><a href="#p8">8. Owl occupancy (probability scale)</a></li>
+ <li><a href="#p9">9. Cone production back-transform</a></li>
+ <li><a href="#p10">10. Logistic threshold for thrush</a></li>
+ </ul>
+ <div class="section">Day 2 docs</div>
+ <ul>
+ <li><a href="lab.html">Main lab</a></li>
+ <li><a class="featured" href="plain_language_summary.html">Plain-language summary</a></li>
+ <li><a href="log_logit_intuition.html">Log/logit intuition guide</a></li>
+ <li><a href="answer_key.html">Lab answer key</a></li>
+ <li><a href="problem_set_v3.html">Problem set v3 (aquatic)</a></li>
+ </ul>
+ </nav>
+</aside>
+
+<main class="content" id="main-content" tabindex="-1">
+<header class="lab-header">
+ <div class="eyebrow">Day 2 · Alternate Problem Set v2</div>
+ <h1>Forest and songbird themed problems</h1>
+ <p class="lede">Ten novel problems covering continuous distribution choice, Normal vs lognormal regression, Poisson with log-link interpretation, logistic regression with odds-ratio interpretation, NB vs Poisson, interaction terms, and offsets — all set in temperate-forest and songbird-ecology systems. Heavy emphasis on translating coefficients into biology you would put in a manuscript.</p>
+</header>
+
+<section class="callout warn" style="margin-top:24px;"><p class="callout-label">Watch out</p><p><strong>Assessed problem set (v2) &middot; forest &amp; songbird theme.</strong> Answers are <em>not</em> shown here. Write your work in the template tailored to this version: <a href="morning_lab_template_v2.Rmd"><code>morning_lab_template_v2.Rmd</code></a> for morning problems, <a href="afternoon_lab_template_v2.Rmd"><code>afternoon_lab_template_v2.Rmd</code></a> for afternoon problems. Knit to HTML, then upload to the matching Canvas assignment.</p><p><strong>Pick whichever theme fits your interests.</strong> The companion version is <a href="problem_set_v3.html">v3 &middot; aquatic &amp; fisheries</a> &mdash; they cover the same statistical concepts with different ecological scenarios.</p><p>For worked-example study with visible answers, see <a href="lab.html">the practice problem set</a>.</p></section>
+
+
+<section><p>Work each problem before opening the answer. The biological-interpretation sentence is the assessment, not the numeric output. Every answer below ends with a "say it as biology" line — use those as a checklist of how to communicate.</p></section>
+
+<!-- =========================== PROBLEM 1 =========================== -->
+<a id="morning"></a>
+<div class="exercise" id="p1">
+<span class="ex-tag">Problem 1</span><span class="difficulty easy"> · continuous distribution choice</span>
+<h3>Tree DBH on a 1-hectare plot</h3>
+<p>You map every stem &gt; 5 cm DBH on a hectare of mixed Douglas-fir / western hemlock forest. The empirical DBH distribution is strongly right-skewed: many small understory stems, a few enormous overstory trees, with a long right tail.</p>
+<ol type="a">
+<li>Which of {Normal, Lognormal, Gamma, Exponential, Beta} would you choose for DBH? Why?</li>
+<li>If $\log(\text{DBH}) \sim \mathcal{N}(3.0, 0.6^2)$, what is the expected DBH on the raw scale? (Hint: lognormal mean is $e^{\mu + \sigma^2/2}$.)</li>
+<li>What is the median DBH? Why does it differ from the mean?</li>
+</ol>
+</div>
+
+<!-- =========================== PROBLEM 2 =========================== -->
+<div class="exercise" id="p2">
+<span class="ex-tag">Problem 2</span><span class="difficulty medium"> · Normal vs lognormal regression</span>
+<h3>Aboveground biomass vs basal area</h3>
+<p>For 60 forested plots you have aboveground biomass (Mg/ha) and basal area (m²/ha). Biomass spans 5 to 800 Mg/ha. Two analysts fit:</p>
+<ul>
+<li>Analyst A: <code>lm(biomass ~ basal_area)</code></li>
+<li>Analyst B: <code>lm(log(biomass) ~ log(basal_area))</code></li>
+</ul>
+<ol type="a">
+<li>Why is Analyst A likely to get heteroskedastic residuals?</li>
+<li>If Analyst B's slope is $\hat\beta_1 = 1.10$, what does this mean ecologically? (Power law.)</li>
+<li>What multiplicative effect on biomass corresponds to a doubling of basal area, under Analyst B's model?</li>
+<li>If you wanted Analyst A's identity-link <em>mean</em> of biomass at a basal area of 40 m²/ha, what is wrong with simply exponentiating $\hat\beta_0 + \hat\beta_1 \log(40)$?</li>
+</ol>
+</div>
+
+<!-- =========================== PROBLEM 3 =========================== -->
+<div class="exercise" id="p3">
+<span class="ex-tag">Problem 3</span><span class="difficulty medium"> · Poisson regression, log-link interpretation</span>
+<h3>Black-throated gray warbler counts on point counts</h3>
+<p>From 120 ten-minute point counts in oak woodland, you fit</p>
+<pre><code>glm(warblers ~ canopy_oak + elev_km, family = poisson, data = pc)</code></pre>
+<p>and get $\hat\beta_{\text{oak}} = +0.020$ per percent canopy oak, $\hat\beta_{\text{elev}} = -0.55$ per km elevation. Intercept $\hat\beta_0 = +0.10$.</p>
+<ol type="a">
+<li>What is the predicted mean count at oak = 0% canopy, elev = 0 km?</li>
+<li>What is the multiplicative effect of going from 10% to 60% oak canopy?</li>
+<li>What is the elevation half-decay (elevation at which expected count is half the sea-level expectation)?</li>
+<li>Write the one-sentence biology summary you would put in a manuscript.</li>
+</ol>
+</div>
+
+<!-- =========================== PROBLEM 4 =========================== -->
+<div class="exercise" id="p4">
+<span class="ex-tag">Problem 4</span><span class="difficulty medium"> · binomial logistic, logit interpretation</span>
+<h3>Nest success of song sparrow vs nest height</h3>
+<p>250 monitored song-sparrow nests; outcome is fledged (1) or failed (0). Predictor: nest height in cm. Logistic regression returns intercept $-0.50$ and slope $+0.025$ per cm.</p>
+<ol type="a">
+<li>What is the predicted probability of success at the ground (height = 0)?</li>
+<li>At what height does predicted probability equal 0.5?</li>
+<li>What is the odds ratio for a 100 cm increase in nest height? Translate to plain English.</li>
+<li>Use the divide-by-4 rule to estimate the per-cm probability change at the inflection point. Compare to the formal marginal effect $\beta p (1-p)$.</li>
+</ol>
+</div>
+
+<!-- =========================== PROBLEM 5 =========================== -->
+<div class="exercise" id="p5">
+<span class="ex-tag">Problem 5</span><span class="difficulty medium"> · NB vs Poisson</span>
+<h3>Acorn mast counts from individual oaks</h3>
+<p>You collect acorn counts from 80 individual white oaks over one fall. Mean = 350, variance = 18,000. Both fits use a single intercept (no predictors).</p>
+<ol type="a">
+<li>What is the dispersion ratio? Does the Poisson assumption hold?</li>
+<li>Find the NB <code>size</code> parameter $k$ such that variance = $\mu + \mu^2/k$ matches the data.</li>
+<li>Simulate 1000 oaks under both Poisson(350) and NB($\mu = 350, k$). Compare P(count = 0) and P(count &gt; 1500).</li>
+<li>What is the biological mechanism producing this overdispersion in mast counts?</li>
+</ol>
+</div>
+
+<!-- =========================== PROBLEM 6 =========================== -->
+<a id="afternoon"></a>
+<div class="exercise" id="p6">
+<span class="ex-tag">Problem 6</span><span class="difficulty hard"> · interaction</span>
+<h3>Stand age × management interaction on bird species richness</h3>
+<p>Forty-eight stands; species richness (a count) modeled as Poisson with predictors stand age (years, continuous) and management (factor: <em>unmanaged</em>, <em>thinned</em>). Fit</p>
+<pre><code>glm(richness ~ age * management, family = poisson, data = stands)</code></pre>
+<p>Coefficients: intercept = 1.50, age = +0.005, managementThinned = +0.30, age:managementThinned = $-0.010$.</p>
+<ol type="a">
+<li>What is the age slope on unmanaged stands? Translate to a per-decade percent change.</li>
+<li>What is the age slope on thinned stands?</li>
+<li>At age 0, what is the multiplicative effect of thinning?</li>
+<li>At what stand age do thinned and unmanaged stands have equal expected richness? Interpret this crossover biologically.</li>
+</ol>
+</div>
+
+<!-- =========================== PROBLEM 7 =========================== -->
+<div class="exercise" id="p7">
+<span class="ex-tag">Problem 7</span><span class="difficulty hard"> · offsets</span>
+<h3>Detection rate of pileated woodpeckers — variable point-count duration</h3>
+<p>Across 90 stations, point counts ranged from 5 to 25 minutes (not all the same). You record total detections per station. Two analysts:</p>
+<ul>
+<li>Analyst A: <code>glm(detections ~ forest_age, family = poisson)</code></li>
+<li>Analyst B: <code>glm(detections ~ forest_age + offset(log(minutes)), family = poisson)</code></li>
+</ul>
+<ol type="a">
+<li>What is Analyst B's intercept reporting that Analyst A's intercept is <em>not</em>?</li>
+<li>Why is the offset on the log scale, not the raw scale?</li>
+<li>If Analyst B's forest_age coefficient is $+0.04$ per decade, write the one-sentence biology statement.</li>
+<li>What kind of bias would Analyst A introduce if longer counts happened to be conducted preferentially in old-growth stands?</li>
+</ol>
+</div>
+
+<!-- =========================== PROBLEM 8 =========================== -->
+<div class="exercise" id="p8">
+<span class="ex-tag">Problem 8</span><span class="difficulty medium"> · probability ↔ odds ↔ log-odds</span>
+<h3>Northern spotted owl occupancy from canopy cover</h3>
+<p>Logistic regression of site-occupancy on percent canopy cover. Intercept = $-2.0$, slope = $+0.05$ per percent canopy.</p>
+<ol type="a">
+<li>Compute fitted $p$ at canopy = 0, 40, 70, and 100%.</li>
+<li>Express the slope as an odds ratio per 1% canopy and per 20% canopy.</li>
+<li>For a manager comparing a 40% canopy stand to a 70% canopy stand, what is the difference in occupancy probability?</li>
+<li>Why is the same 30-point canopy change worth more "probability" near 40% than near 90%?</li>
+</ol>
+</div>
+
+<!-- =========================== PROBLEM 9 =========================== -->
+<div class="exercise" id="p9">
+<span class="ex-tag">Problem 9</span><span class="difficulty hard"> · back-transform with CI</span>
+<h3>Cone production vs crown class</h3>
+<p>A Gamma GLM with log link gives, for the contrast "dominant vs codominant trees", a coefficient $\hat\beta = +0.55$ with 95% CI $(0.32, 0.78)$ on the log scale.</p>
+<ol type="a">
+<li>Back-transform the point estimate. What multiplicative effect does that represent?</li>
+<li>Back-transform the CI. Is it symmetric?</li>
+<li>Why is exponentiating each endpoint correct, and exponentiating the midpoint wrong?</li>
+<li>One-sentence biology, suitable for a results section.</li>
+</ol>
+</div>
+
+<!-- =========================== PROBLEM 10 =========================== -->
+<div class="exercise" id="p10">
+<span class="ex-tag">Problem 10</span><span class="difficulty hard"> · logistic threshold + marginal effects</span>
+<h3>Hermit thrush habitat threshold</h3>
+<p>Presence/absence of hermit thrush at 300 sites. Model: <code>glm(present ~ basal_area + shrub_cover, family = binomial)</code>. Intercept $-3.0$; basal-area slope $+0.08$ per m²/ha; shrub slope $+0.04$ per percent shrub.</p>
+<ol type="a">
+<li>For a site with shrub cover = 25%, at what basal area does predicted occupancy probability equal 0.5?</li>
+<li>For a site with shrub cover = 50%, what is the new "threshold" basal area?</li>
+<li>Compute the marginal effect of basal area on probability at the 0.5 inflection.</li>
+<li>If a manager can either raise basal area by 5 m²/ha or shrub cover by 10 percentage points, which intervention has the larger predicted effect at a site currently at $p = 0.3$?</li>
+</ol>
+</div>
+</main>
+</div>
+<footer>FW 536 · Statistical Modeling for Ecology and Conservation · Oregon State University</footer>
+</body>
+</html>

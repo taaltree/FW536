@@ -1,0 +1,136 @@
+---
+title: "FW 536 — Day 3 morning lab (v3 · aquatic & fisheries) — Your Name"
+author: "Your Name Here"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    self_contained: true
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    code_folding: show
+    theme: cosmo
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+# Day 3 morning lab — Hierarchical modeling problem set
+
+**Problem set version:** **v3 — aquatic & fisheries theme**.
+(The companion version is [v2 — terrestrial wildlife](problem_set_v2.html); you choose whichever theme fits your interests.)
+
+This template matches [`problem_set_v3.html`](problem_set_v3.html). Read each problem statement there, write your work below, **Knit** to HTML, and upload the `.html` to the matching Canvas assignment.
+
+For setup help see the [R Markdown tutorial](../rmarkdown_tutorial.html).
+
+---
+
+# Setup
+
+```{r}
+# Load packages you'll need. Add or remove as appropriate.
+library(ggplot2)
+library(dplyr)
+library(lme4)
+library(nlme)
+library(AICcmodavg)
+library(MuMIn)
+```
+
+---
+
+# Problem 1 — Chinook salmon redds nested in streams
+
+> A redd survey covers 15 streams in the Willamette basin; each stream is walked once and the number of Chinook redds per 100 m of stream is recorded for 4 segments per stream. The science question: are mean redd densities meaningfully different among streams, and can we use the...
+
+**My work:**
+
+```{r}
+# Your R code here
+```
+
+**Answer / biological interpretation:**
+
+
+---
+
+# Problem 2 — Stream temperature loggers across watersheds and years
+
+> You deploy temperature loggers in 6 watersheds, 5 sites per watershed, sampled in 3 years. The response is summer mean temperature. You want to test whether shading (canopy cover %) predicts temperature, after accounting for watershed and year.
+
+**My work:**
+
+```{r}
+# Your R code here
+```
+
+**Answer / biological interpretation:**
+
+
+---
+
+# Problem 3 — Steelhead growth: individual-level $L_\infty$
+
+> You have repeated length-at-age data for 25 PIT-tagged steelhead, each measured 4–10 times over 5 years. Fit a fixed-effect von Bertalanffy via nls and a mixed-effect version via nlme with a random $L_\infty$ per fish.
+
+**My work:**
+
+```{r}
+# Your R code here
+```
+
+**Answer / biological interpretation:**
+
+
+---
+
+# Problem 4 — Sockeye smolt detection at PIT arrays
+
+> 20,000 PIT-tagged sockeye smolts pass through 8 mainstem detection arrays. Each tag is observed at each array (1) or not (0). You fit:
+
+**My work:**
+
+```{r}
+# Your R code here
+```
+
+**Answer / biological interpretation:**
+
+
+---
+
+# Problem 5 — Pacific lamprey emergence × temperature, across rivers
+
+> You have 8 rivers and 5 years of lamprey emergence counts vs spring water temperature. You fit:
+
+**My work:**
+
+```{r}
+# Your R code here
+```
+
+**Answer / biological interpretation:**
+
+
+---
+
+# (Optional) Embed a photo of hand-written work
+
+For problems easier to do on paper, photograph and embed:
+
+```{r, echo=FALSE, eval=FALSE, out.width="60%", fig.cap="Hand-derivation for Problem N"}
+knitr::include_graphics("images/problemN_derivation.jpg")
+```
+
+(Change `eval=FALSE` to `eval=TRUE` after saving an image. See the [R Markdown tutorial](../rmarkdown_tutorial.html) for details.)
+
+---
+
+# Submission checklist
+
+- [ ] Answered every morning problem from `problem_set_v3.html`.
+- [ ] Knitted to HTML without errors.
+- [ ] Photos (if any) embedded with `self_contained: true` in the YAML.
+- [ ] Uploaded the `.html` to the matching Canvas assignment.

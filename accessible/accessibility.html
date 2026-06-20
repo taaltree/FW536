@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en" data-a11y="done">
+<head>
+<meta charset="UTF-8" />
+<title>Accessibility guide | FW 536</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="_Shared/css/accessible.css" />
+<script>
+MathJax = {
+  tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
+  options: { menuOptions: { settings: { assistiveMml: true, explorer: true } } },
+  loader: { load: ['a11y/assistive-mml', 'a11y/explorer'] }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script"></script>
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<div class="a11y-bar" role="region" aria-label="Accessibility">Accessible version &middot; <a href="index.html">Course home</a></div>
+
+<aside class="sidebar">
+<p class="brand"><a href="index.html">FW 536 · Accessibility</a></p>
+<div class="subtitle">How to use this site with a screen reader</div>
+<nav aria-label="On this page">
+<div class="section">Contents</div>
+<ul>
+  <li><a href="#what">What this accessible version is</a></li>
+  <li><a href="#structure">How every page is laid out</a></li>
+  <li><a href="#screenreader">Screen-reader tips</a></li>
+  <li><a href="#math">Reading the math</a></li>
+  <li><a href="#widgets">Answers, tabs, and tables</a></li>
+  <li><a href="#lectures">Lecture notes</a></li>
+  <li><a href="#work">Doing and submitting the work</a></li>
+  <li><a href="#accommodations">Accommodations summary</a></li>
+  <li><a href="#help">Getting help</a></li>
+</ul>
+</nav>
+</aside>
+
+<main class="content" id="main-content" tabindex="-1">
+<header class="lab-header">
+  <div class="eyebrow">FW 536 · Accessible edition</div>
+  <h1>Using this course with a screen reader</h1>
+  <p class="lede">This page explains how the accessible version of the FW 536 site is built and how to navigate it efficiently with VoiceOver, NVDA, or JAWS.</p>
+</header>
+
+<section id="what" aria-labelledby="what-h">
+<h2 id="what-h">What this accessible version is</h2>
+<p>This is a parallel copy of the full FW 536 course site, rebuilt for screen-reader use. Compared with the standard site it has:</p>
+<ul>
+  <li>A single-column reading order, so what you hear matches the page order.</li>
+  <li>A "Skip to main content" link as the first item on every page.</li>
+  <li>Proper headings, landmarks, and lists for fast navigation.</li>
+  <li>Math exposed as MathML, so your screen reader can speak and explore every equation.</li>
+  <li>Lecture slides converted to text (the original PowerPoint files are hard to navigate by ear).</li>
+  <li>High-contrast styling and text that scales with your browser font setting, for anyone using magnification as well.</li>
+</ul>
+<p>All content &mdash; labs, problem sets, answer keys, plain-language summaries, R Markdown templates, datasets, and exams &mdash; is the same as the standard site.</p>
+</section>
+
+<section id="structure" aria-labelledby="structure-h">
+<h2 id="structure-h">How every page is laid out</h2>
+<p>Every page follows the same order, so you can build a habit:</p>
+<ol>
+  <li><strong>Skip link</strong> &mdash; press Enter on "Skip to main content" to jump past navigation.</li>
+  <li><strong>Accessibility bar</strong> &mdash; a link back to this guide and to the course home page.</li>
+  <li><strong>Navigation region</strong> labeled "On this page and related documents" &mdash; a list of the sections on the current page plus links to the other documents for that day.</li>
+  <li><strong>Main content</strong> &mdash; one top-level heading (Heading level 1) naming the page, then Heading level 2 for each major section.</li>
+  <li><strong>Footer</strong> &mdash; course identification.</li>
+</ol>
+<p>There is exactly one Heading level 1 per page (the page title), so jumping to "first heading" always lands you on the page topic.</p>
+</section>
+
+<section id="screenreader" aria-labelledby="sr-h">
+<h2 id="sr-h">Screen-reader tips</h2>
+
+<h3>VoiceOver (macOS / iOS)</h3>
+<ul>
+  <li>Open the rotor with <strong>VO + U</strong>, then arrow to "Landmarks" to jump between the navigation region, main content, and footer.</li>
+  <li>Use the rotor "Headings" list to jump between sections.</li>
+  <li>Navigate by heading with <strong>VO + Command + H</strong>.</li>
+  <li>Math is read automatically; see "Reading the math" below for exploring an equation piece by piece.</li>
+</ul>
+
+<h3>NVDA (Windows)</h3>
+<ul>
+  <li>Press <strong>H</strong> to move to the next heading, <strong>1</strong>&ndash;<strong>6</strong> for a specific heading level.</li>
+  <li>Press <strong>D</strong> to move between landmarks (navigation, main, footer).</li>
+  <li>Press <strong>K</strong> to move between links, <strong>L</strong> for lists, <strong>T</strong> for tables.</li>
+  <li>NVDA reads MathML directly; with the MathCAT or MathPlayer add-on you can also explore subexpressions.</li>
+</ul>
+
+<h3>JAWS (Windows)</h3>
+<ul>
+  <li><strong>H</strong> for next heading, <strong>R</strong> for next region/landmark, <strong>T</strong> for next table.</li>
+  <li>JAWS reads MathML and supports equation exploration.</li>
+</ul>
+</section>
+
+<section id="math" aria-labelledby="math-h">
+<h2 id="math-h">Reading the math</h2>
+<p>Every equation is rendered by MathJax with <strong>assistive MathML</strong> turned on. That means a hidden, screen-reader-native MathML version of each equation sits alongside the visual one, so your screen reader speaks the math correctly rather than reading raw symbols.</p>
+<p>Here is a sample equation so you can test your setup &mdash; it is Bayes' rule:</p>
+<div class="eq-block">$P(\theta \mid y) = \dfrac{P(y \mid \theta)\,P(\theta)}{P(y)}$</div>
+<p>To explore an equation piece by piece:</p>
+<ul>
+  <li>Move focus onto the equation (it is focusable). Your screen reader will announce the whole expression.</li>
+  <li>The MathJax <strong>Explorer</strong> is enabled: with the equation focused, use the arrow keys to walk into and out of subexpressions (for example, into just the numerator or just the denominator). Press <strong>Down</strong> to go deeper, <strong>Up</strong> to come back out, <strong>Left/Right</strong> to move between sibling parts.</li>
+  <li>Right-click (or use the application/menu key) on an equation to open the MathJax menu, where you can change speech verbosity or copy the equation as LaTeX or MathML.</li>
+</ul>
+<p>If math is read as a string of disconnected symbols, make sure JavaScript is enabled and the page has finished loading; the MathML is added after MathJax runs.</p>
+</section>
+
+<section id="widgets" aria-labelledby="widgets-h">
+<h2 id="widgets-h">Answers, tabs, and tables</h2>
+<h3>Reveal-able answers</h3>
+<p>Worked answers in the practice labs are inside expand/collapse controls. Your screen reader announces them as "collapsed" buttons or a disclosure triangle; press <strong>Enter</strong> or <strong>Space</strong> to expand and read the answer. Each lab also has "Expand all" / "Hide all" buttons near the bottom.</p>
+<h3>Tabbed content</h3>
+<p>A few pages group related material in tabs (for example, the five continuous distributions on Day 2). Tabs are a standard ARIA tablist: <strong>Tab</strong> to reach the tab strip, then use <strong>Left/Right arrows</strong> to move between tabs; the matching panel updates automatically.</p>
+<h3>Tables</h3>
+<p>All tables have proper column headers, announced as you move across each row. Use your screen reader's table navigation (for example, NVDA: <strong>Ctrl + Alt + arrows</strong>) to move cell by cell and hear the column heading for each value.</p>
+</section>
+
+<section id="lectures" aria-labelledby="lectures-h">
+<h2 id="lectures-h">Lecture notes</h2>
+<p>The lecture PowerPoint files are difficult to navigate by ear, so each lecture has an <strong>accessible lecture-notes page</strong> instead: one Heading level 2 per slide, with the slide's text as paragraphs, lists, and tables, plus any speaker notes inside an expandable "Speaker notes" control.</p>
+<p>Many slides contain figures &mdash; plots, diagrams, R output, or equations shown as images. Those cannot be read automatically, so each is marked with a "Figure needs description" note. If you reach one and need to know what the figure shows, ask the instructor; descriptions are being added over time (the instructor has a checklist of every one).</p>
+<p>For the concepts behind each lecture, the <strong>plain-language summary</strong> and the <strong>lab</strong> for that session are fully text-based and are often the best place to start.</p>
+</section>
+
+<section id="work" aria-labelledby="work-h">
+<h2 id="work-h">Doing and submitting the work</h2>
+<p>Assignments are submitted as R Markdown knitted to HTML, uploaded to Canvas. R Markdown is plain text and works well with a screen reader. Each session has a hand-in template tailored to the problem set you choose.</p>
+<ul>
+  <li>Write answers as text and code in the template, then knit to HTML.</li>
+  <li>The R Markdown tutorial (linked from the course home page) walks through install, knit, and adding images.</li>
+  <li>Where a problem says to "plot and inspect," you may instead report and interpret the <strong>numeric summaries</strong> (estimates, standard errors, intervals, fitted values at chosen points). A described numeric result is accepted in place of reading a plot.</li>
+  <li>If a problem expects a photo of hand-written derivation, you may type the derivation instead (for example, using LaTeX math inside the R Markdown), which also makes your own submission accessible.</li>
+</ul>
+</section>
+
+<section id="accommodations" aria-labelledby="acc-h">
+<h2 id="acc-h">Accommodations summary</h2>
+<div class="callout key">
+<p class="callout-label">Key points</p>
+<ul>
+  <li>Lecture slides are available as accessible text notes, not only as PowerPoint.</li>
+  <li>Math is screen-reader navigable everywhere via MathML.</li>
+  <li>Numeric/textual answers are accepted in place of reading or producing plots.</li>
+  <li>Figure descriptions for lecture images are available from the instructor on request.</li>
+  <li>You choose the same theme options (version 2 or version 3) as everyone else for each problem set.</li>
+</ul>
+</div>
+</section>
+
+<section id="help" aria-labelledby="help-h">
+<h2 id="help-h">Getting help</h2>
+<p>If any page, equation, table, or lecture figure is not usable with your screen reader, tell the instructor so it can be fixed promptly. Please report the page name and the section heading so it can be found quickly.</p>
+<p><a href="index.html">Return to the course home page</a>.</p>
+</section>
+
+</main>
+
+<footer>FW 536 &middot; Statistical Modeling for Ecology and Conservation &middot; Oregon State University &middot; Accessible edition</footer>
+</body>
+</html>

@@ -1,0 +1,135 @@
+---
+title: "FW 536 — Day 2 afternoon lab (v2 · forest & songbird) — Your Name"
+author: "Your Name Here"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    self_contained: true
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    code_folding: show
+    theme: cosmo
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+# Day 2 afternoon lab — Linear models problem set
+
+**Problem set version:** **v2 — forest & songbird theme**.
+(The companion version is [v3 — aquatic & fisheries](problem_set_v3.html); you choose whichever theme fits your interests.)
+
+This template matches [`problem_set_v2.html`](problem_set_v2.html). Read each problem statement there, write your work below, **Knit** to HTML, and upload the `.html` to the matching Canvas assignment.
+
+For setup help see the [R Markdown tutorial](../rmarkdown_tutorial.html).
+
+---
+
+# Setup
+
+```{r}
+# Load packages you'll need. Add or remove as appropriate.
+library(ggplot2)
+library(dplyr)
+library(MASS)        # for glm.nb
+library(effects)
+library(emmeans)
+```
+
+---
+
+# Problem 6 — Stand age × management interaction on bird species richness
+
+> Forty-eight stands; species richness (a count) modeled as Poisson with predictors stand age (years, continuous) and management (factor: unmanaged, thinned). Fit
+
+**My work:**
+
+```{r}
+# Your R code here
+```
+
+**Answer / biological interpretation:**
+
+
+---
+
+# Problem 7 — Detection rate of pileated woodpeckers — variable point-count duration
+
+> Across 90 stations, point counts ranged from 5 to 25 minutes (not all the same). You record total detections per station. Two analysts:
+
+**My work:**
+
+```{r}
+# Your R code here
+```
+
+**Answer / biological interpretation:**
+
+
+---
+
+# Problem 8 — Northern spotted owl occupancy from canopy cover
+
+> Logistic regression of site-occupancy on percent canopy cover. Intercept = $-2.0$, slope = $+0.05$ per percent canopy.
+
+**My work:**
+
+```{r}
+# Your R code here
+```
+
+**Answer / biological interpretation:**
+
+
+---
+
+# Problem 9 — Cone production vs crown class
+
+> A Gamma GLM with log link gives, for the contrast "dominant vs codominant trees", a coefficient $\hat\beta = +0.55$ with 95% CI $(0.32, 0.78)$ on the log scale.
+
+**My work:**
+
+```{r}
+# Your R code here
+```
+
+**Answer / biological interpretation:**
+
+
+---
+
+# Problem 10 — Hermit thrush habitat threshold
+
+> Presence/absence of hermit thrush at 300 sites. Model: glm(present ~ basal_area + shrub_cover, family = binomial). Intercept $-3.0$; basal-area slope $+0.08$ per m²/ha; shrub slope $+0.04$ per percent shrub.
+
+**My work:**
+
+```{r}
+# Your R code here
+```
+
+**Answer / biological interpretation:**
+
+
+---
+
+# (Optional) Embed a photo of hand-written work
+
+For problems easier to do on paper, photograph and embed:
+
+```{r, echo=FALSE, eval=FALSE, out.width="60%", fig.cap="Hand-derivation for Problem N"}
+knitr::include_graphics("images/problemN_derivation.jpg")
+```
+
+(Change `eval=FALSE` to `eval=TRUE` after saving an image. See the [R Markdown tutorial](../rmarkdown_tutorial.html) for details.)
+
+---
+
+# Submission checklist
+
+- [ ] Answered every afternoon problem from `problem_set_v2.html`.
+- [ ] Knitted to HTML without errors.
+- [ ] Photos (if any) embedded with `self_contained: true` in the YAML.
+- [ ] Uploaded the `.html` to the matching Canvas assignment.

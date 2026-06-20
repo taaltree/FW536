@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en" data-a11y="done">
+<head>
+<meta charset="UTF-8" />
+<title>Day 5 Lab — Hierarchical & Latent-State Bayesian Models | FW 536</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../_Shared/css/accessible.css" />
+<script defer src="../_Shared/js/accessible.js"></script>
+<script>
+MathJax = {
+  tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
+  options: {
+    menuOptions: { settings: { assistiveMml: true, explorer: true } }
+  },
+  loader: { load: ['a11y/assistive-mml', 'a11y/explorer'] }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script"></script>
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<div class="a11y-bar" role="region" aria-label="Accessibility">Accessible version &middot; <a href="../accessibility.html">How to use this site with a screen reader</a> &middot; <a href="../index.html">Course home</a></div>
+
+<div class="shell">
+
+<aside class="sidebar">
+ <p class="brand"><a href="../index.html" title="Back to course home">FW 536 · Day 5</a></p>
+ <div class="subtitle">Bayes II — Hierarchical &amp; Latent-State Models</div>
+ <nav aria-label="On this page and related documents">
+ <div class="section">Lab</div>
+ <ul>
+ <li><a href="#orient">Where we are</a></li>
+ <li><a href="#big-picture">Plain-language overview</a></li>
+ <li><a href="#priors">A. Priors on the link scale</a></li>
+ <li><a href="#logistic">B. Bayesian logistic regression</a></li>
+ <li><a href="#hier">C. Hierarchical / multilevel models</a></li>
+ <li><a href="#sr">D. Spawner-recruit &amp; derived management quantities</a></li>
+ <li><a href="#dynocc">E. Latent states: dynamic occupancy</a></li>
+ <li><a href="#nmix">F. Latent states: N-mixture</a></li>
+ <li><a href="#wrap">Wrap up &amp; reading</a></li>
+ </ul>
+ <div class="section">Other docs</div>
+ <ul>
+ <li><a class="featured" href="plain_language_summary.html">Plain-language summary</a></li>
+ <li><a href="answer_key.html">Answer key</a></li>
+ <li><a href="problem_set_v2.html">Problem set · v2 (carnivores)</a></li>
+ <li><a href="problem_set_v3.html">Problem set · v3 (fish)</a></li>
+ </ul>
+ <div class="section">R / Nimble scripts</div>
+ <ul>
+ <li><a href="Lizards_Nimble.R">Lizards_Nimble.R</a></li>
+ <li><a href="SpawnerRecruit_Nimble.R">SpawnerRecruit_Nimble.R</a></li>
+ <li><a href="DynamicOccupancy_Nimble.R">DynamicOccupancy_Nimble.R</a></li>
+ <li><a href="NMixture_Nimble.R">NMixture_Nimble.R</a></li>
+ <li><a href="Multilevel_Nimble.R">Multilevel_Nimble.R</a></li>
+ </ul>
+ <div class="section">Course</div>
+ <ul><li><a href="../index.html">All days</a></li></ul>
+ </nav>
+</aside>
+
+<main class="content" id="main-content" tabindex="-1">
+
+<header class="lab-header">
+ <div class="eyebrow">Day 5 · Lab</div>
+ <h1>From "I fit one Bayesian model" to hierarchical, latent-state, management-relevant inference</h1>
+ <p class="lede">Today we plug everything together: priors on link scales, multilevel structure, latent states, derived management quantities, and proper convergence checks &mdash; all in <span class="pill nimble">NIMBLE</span>.</p>
+</header>
+
+<div class="lab-toc" id="lab-toc">
+  <h2>What's in this lab and what to hand in</h2>
+  <p class="toc-intro">This page is your <strong>in-class practice</strong> problem set — worked examples with visible answers. Your <strong>graded 20-point assignment</strong> is a separate problem set (v2 or v3); write up your answers in the matching R Markdown template and submit on Canvas.</p>
+  
+<div class="session">
+  <div class="session-label">Morning · 20 pts</div>
+  
+<section class="data-card" id="data-files">
+<h2>Data files &amp; R scripts</h2>
+<p>Everything referenced in this lab's exercises and problem sets lives in this folder. Click any link below to download.</p>
+<div class="data-section">
+  <h3 class="data-h">Datasets</h3>
+  <div class="data-row"><a href="data/ants.csv"><code>ants.csv</code></a><span class="data-desc">Ant species richness in 44 New England bogs (Gotelli & Ellison); covariates: forest, latitude, elevation.</span></div>
+  <div class="data-row"><a href="data/N2OEmission.csv"><code>N2OEmission.csv</code></a><span class="data-desc">N2O emissions from agricultural plots, multiple fertilizers across sites.</span></div>
+  <div class="data-row"><a href="data/IslandsLizards.csv"><code>IslandsLizards.csv</code></a><span class="data-desc">Lizard occupancy (0/1) vs perimeter:area ratio for island habitat patches.</span></div>
+</div>
+<div class="data-section">
+  <h3 class="data-h">R scripts</h3>
+  <div class="data-row"><a href="ant.priors.R"><code>ant.priors.R</code></a><span class="data-desc">ant.priors.R · original Nimble script for the priors sensitivity walkthrough</span></div>
+  <div class="data-row"><a href="lizzard.R"><code>lizzard.R</code></a><span class="data-desc">lizzard.R · original JAGS model for the island lizards example (for comparison)</span></div>
+  <div class="data-row"><a href="Lizards_Nimble.R"><code>Lizards_Nimble.R</code></a><span class="data-desc">Lizards_Nimble.R · Nimble re-implementation</span></div>
+  <div class="data-row"><a href="SpawnerRecruit_Nimble.R"><code>SpawnerRecruit_Nimble.R</code></a><span class="data-desc">SpawnerRecruit_Nimble.R · Beverton-Holt + derived management quantities</span></div>
+  <div class="data-row"><a href="Multilevel_Nimble.R"><code>Multilevel_Nimble.R</code></a><span class="data-desc">Multilevel_Nimble.R · 5-model pooling spectrum on the N2O emission data</span></div>
+  <div class="data-row"><a href="DynamicOccupancy_Nimble.R"><code>DynamicOccupancy_Nimble.R</code></a><span class="data-desc">DynamicOccupancy_Nimble.R · multi-year occupancy with latent z</span></div>
+  <div class="data-row"><a href="NMixture_Nimble.R"><code>NMixture_Nimble.R</code></a><span class="data-desc">NMixture_Nimble.R · four nested N-mixture models + Bayesian p-value</span></div>
+</div>
+</section>
+<div>
+    <div class="session-title">Bayesian modeling problem set 2</div>
+    <div class="row"><span class="tag practice">Practice</span>
+      <span><a href="#morning">Walk through the morning problems on this page</a> <span class="note">— answers visible, in-class</span></span></div>
+    <div class="row"><span class="tag assessed">Assessed</span>
+      <span><a href="problem_set_v2.html#morning">Assessed v2 &middot; forest carnivore</a> &nbsp;or&nbsp; <a href="problem_set_v3.html#morning">Assessed v3 &middot; anadromous fish &amp; freshwater</a>
+            <span class="note">— answers NOT shown; choose whichever theme fits your interests</span></span></div>
+    <div class="row"><span class="tag template">Hand-in</span><span>Choose template matching your theme: <a href="morning_lab_template_v2.Rmd">morning v2 (forest carnivore).Rmd</a> <span class="note">or</span> <a href="morning_lab_template_v3.Rmd">morning v3 (anadromous fish &amp; freshwater).Rmd</a> <span class="note">— knit to HTML and upload to Canvas</span></span></div>
+    <div class="row"><span class="tag lecture">Lecture</span>
+      <span><a href="lecture_day5.html">Day 5 lecture · Bayes II</a></span></div>
+  </div>
+</div>
+
+  <p style="font-size:13px; color:var(--muted); margin: 18px 0 0 0;">
+    Need help with R Markdown? See the <a href="../rmarkdown_tutorial.html">R Markdown tutorial</a>.
+    Other docs for this day: <a href="plain_language_summary.html">plain-language summary</a> &middot;
+    <a href="answer_key.html">practice answer key</a>.
+  </p>
+</div>
+
+
+
+
+
+<section id="orient">
+<h2>Where Day 4 left us, and where Day 5 takes us</h2>
+<p>Yesterday (Day 4) you wrote your first Bayesian models. Each was a single-level model with a likelihood, priors, and a small handful of parameters &mdash; the Bayesian analog of the GLMs from Day 2. You learned how MCMC explores a posterior and how to read <code>MCMCsummary</code> output.</p>
+
+<p>Today is where Bayes earns its keep. The real-world ecological problems that motivated us to learn this machinery rarely have just one level of variation, and they rarely have clean, fully-observed data. They have:</p>
+<ul>
+ <li><strong>Multiple levels of grouping</strong> &mdash; sites within regions within years, fish within streams within basins. Multilevel models share information across groups in a principled way.</li>
+ <li><strong>Latent states</strong> &mdash; the quantity you actually care about (true presence, true abundance, true survival) is never directly observed; what you have is a noisy observation of it.</li>
+ <li><strong>Derived management quantities</strong> &mdash; nobody manages a fishery by Beverton-Holt's $a$ and $b$. They manage by $S_\text{msy}$ and $H_\text{msy}$, which are nonlinear functions of $a$ and $b$. Bayes gives you their full posterior for free.</li>
+</ul>
+
+<div class="callout key"><p class="callout-label">Key idea</p>
+<p>Today's curriculum is six tightly connected sections. Each follows the same structure: <em>biological motivation &rarr; the math &rarr; the <span class="pill nimble">NIMBLE</span> code &rarr; one or two exercises to make it stick.</em></p>
+</div>
+
+<div class="callout warn"><p class="callout-label">Watch out</p>
+<p>Throughout the day we will use <span class="pill nimble">NIMBLE</span>, not JAGS. The body of the model code is essentially identical (same <code>dnorm</code> precision parameterisation, same <code>dbern</code>, <code>dpois</code>, <code>logit()/ilogit()</code> assignments). The wrapper changes:</p>
+<ul>
+ <li>JAGS' <code>cat("model{...}", file="x.txt")</code> becomes <code>myCode &lt;- nimbleCode({ ... })</code>.</li>
+ <li>JAGS' single <code>data=</code> list splits into <strong>two</strong>: <code>constants=</code> (sizes, indices, fixed covariate vectors &mdash; anything that never appears on the LHS of <code>~</code>) and <code>data=</code> (the observed random variables).</li>
+ <li>JAGS' three-line <code>jags.model() / update() / coda.samples()</code> becomes a single <code>nimbleMCMC()</code> call.</li>
+</ul>
+<p>Set <code>samplesAsCodaMCMC = TRUE</code> so <code>coda</code> functions like <code>gelman.diag()</code> and <code>effectiveSize()</code> work directly.</p>
+</div>
+</section>
+
+<section id="big-picture">
+<h2>Plain-language overview</h2>
+<div class="callout plain"><p class="callout-label">Plain-language summary</p>
+<p>A <strong>hierarchical model</strong> is a model where parameters themselves come from a prior distribution governed by other parameters that you also estimate. The classic case is: each site has its own intercept $\alpha_j$, and all the $\alpha_j$ come from a Normal distribution with mean $\mu_\alpha$ and SD $\sigma_\alpha$. The result &mdash; called <em>shrinkage</em> &mdash; is that sites with very few data points get pulled toward the overall mean, while sites with lots of data are barely budged. That's exactly what a good ecologist would do by hand, and the math does it automatically.</p>
+<p>A <strong>latent-state model</strong> separates two layers: the <em>process</em> (the true biological state of the system, which we never directly see) and the <em>observation</em> (what our imperfect survey actually records). Dynamic-occupancy and N-mixture models are the two canonical examples: both estimate true occupancy/abundance while explicitly modeling that we don't always detect what's there.</p>
+<p>A <strong>derived quantity</strong> is any function of the model's parameters that you want a posterior for. $S_\text{msy}$ in fisheries, equilibrium occupancy in metapopulation work, marginal effects in any GLM &mdash; all are derived quantities. Bayes gives you their full posterior just by computing them inside the model.</p>
+</div>
+</section>
+
+<!-- ================================================================== -->
+<a id="morning"></a>
+<div class="practice-banner"><div class="label">Practice — answers visible</div><h3>Morning practice problems</h3><p>The exercises below are walk-through practice. Your graded morning assignment uses a separate, novel problem set &mdash; <strong>choose either theme below</strong> and write your answers in the matching theme template (<code>morning_lab_template_v2.Rmd</code> or <code>morning_lab_template_v3.Rmd</code>).</p><p style="margin: 8px 0 0 0;"><a class="hand-in" href="problem_set_v2.html#morning">v2 &middot; forest carnivore &rarr;</a> &nbsp;or&nbsp; <a class="hand-in" href="problem_set_v3.html#morning">v3 &middot; anadromous fish &amp; freshwater &rarr;</a> &nbsp;&nbsp; <a class="hand-in" href="morning_lab_template_v2.Rmd" style="background:#1C638A; color:white; border-color:#1C638A;">v2 template &darr;</a> <a class="hand-in" href="morning_lab_template_v3.Rmd" style="background:#1C638A; color:white; border-color:#1C638A;">v3 template &darr;</a></p></div>
+<section id="priors">
+<h2>A. Priors on the link scale &mdash; the ant richness example</h2>
+
+<h3>Biological setup</h3>
+<p>The <code>ants.csv</code> data from Gotelli &amp; Ellison contains ant species richness measured in 44 New England bogs, with three covariates: <em>forest</em> (bog vs. forest habitat), <em>latitude</em>, and <em>elevation</em>. The natural model is Poisson regression with a log link:</p>
+<div class="eq-block">$y_i \sim \text{Poisson}(\lambda_i), \quad \log \lambda_i = \beta_0 + \beta_1 \cdot \text{forest}_i + \beta_2 \cdot \text{latitude}_i + \beta_3 \cdot \text{elevation}_i$</div>
+
+<div class="callout bio"><p class="callout-label">Biological intuition</p>
+<p>If you fit this in <code>glm()</code> with a vague prior, you get the maximum likelihood estimates we covered on Day 2. Bayesian fitting should reproduce them &mdash; <em>unless</em> the priors accidentally encode strong information you didn't intend.</p>
+</div>
+
+<h3>The trap: vague priors on a link scale</h3>
+<p>A common rookie move is to put a "vague" prior $\beta \sim \mathcal{N}(0, 10000)$ on every coefficient. On the log link, a coefficient $\beta_j = 7$ corresponds to a $e^7 \approx 1096$-fold multiplicative effect on $\lambda$ &mdash; a 1000x change in richness from a one-unit change in latitude. The prior says that's plausible. It is not.</p>
+
+<p>Worse, when one of the predictors (here <em>latitude</em>, on raw scale ~41&deg;-45&deg;) has a large mean, $\beta_j \cdot x_{ij}$ multiplies and shifts so wildly during MCMC that $\lambda_i$ overflows the floating-point range. The sampler stalls or wanders into nonsense.</p>
+
+<h3>The fix: scale your predictors</h3>
+<p>Standardising each predictor (subtract mean, divide by SD) puts every $x_{ij}$ in roughly $[-3, 3]$, so a vague $\beta$ prior no longer implies astronomical multiplicative effects. The frequentist and Bayesian fits then agree closely, and chains converge fast.</p>
+
+<div class="code-label">R · Poisson regression in NIMBLE (template ant.priors.R)</div>
+<pre><code><span class="kw">library</span>(nimble); <span class="kw">library</span>(MCMCvis)
+
+ants &lt;- <span class="fn">read.csv</span>(<span class="st">"data/ants.csv"</span>)
+<span class="cm"># Scale predictors -- THIS IS WHAT FIXES THINGS</span>
+ants$forest &lt;- <span class="fn">as.numeric</span>(<span class="fn">scale</span>(ants$forest))
+ants$latitude &lt;- <span class="fn">as.numeric</span>(<span class="fn">scale</span>(ants$latitude))
+ants$elevation &lt;- <span class="fn">as.numeric</span>(<span class="fn">scale</span>(ants$elevation))
+
+antCode &lt;- <span class="fn">nimbleCode</span>({
+ <span class="kw">for</span> (i <span class="kw">in</span> <span class="nu">1</span>:n) {
+ ants[i, <span class="nu">1</span>] ~ <span class="fn">dpois</span>(lam[i])
+ <span class="fn">log</span>(lam[i]) &lt;- b0 + b1 * ants[i,<span class="nu">2</span>] + b2 * ants[i,<span class="nu">3</span>] + b3 * ants[i,<span class="nu">4</span>]
+ }
+ b0 ~ <span class="fn">dnorm</span>(<span class="nu">0</span>, tau) <span class="cm"># tau = 1/sigma^2 (NIMBLE = JAGS parameterisation)</span>
+ b1 ~ <span class="fn">dnorm</span>(<span class="nu">0</span>, tau)
+ b2 ~ <span class="fn">dnorm</span>(<span class="nu">0</span>, tau)
+ b3 ~ <span class="fn">dnorm</span>(<span class="nu">0</span>, tau)
+})
+
+constants &lt;- <span class="kw">list</span>(ants = <span class="fn">as.matrix</span>(ants), n = <span class="fn">nrow</span>(ants), tau = <span class="nu">1</span>/<span class="nu">10</span>)
+samples &lt;- <span class="fn">nimbleMCMC</span>(antCode, constants = constants,
+ monitors = <span class="fn">c</span>(<span class="st">"b0"</span>,<span class="st">"b1"</span>,<span class="st">"b2"</span>,<span class="st">"b3"</span>),
+ nchains = <span class="nu">3</span>, niter = <span class="nu">10000</span>, nburnin = <span class="nu">500</span>,
+ samplesAsCodaMCMC = <span class="kw">TRUE</span>)
+<span class="fn">MCMCsummary</span>(samples)</code></pre>
+
+<div class="callout warn"><p class="callout-label">Watch out</p>
+<p>Why <code>tau = 1/10</code> and not <code>tau = 1/10000</code>? On the log link, a $\mathcal{N}(0, \sigma=\sqrt{10})$ prior on each $\beta$ corresponds to roughly a $e^{\pm 6}$ range of multiplicative effects &mdash; still very wide, but not crazy. The truly "vague" $\mathcal{N}(0, 100)$ is informative in the wrong direction: it puts huge prior weight on impossible parameter values.</p>
+</div>
+
+<div class="exercise" id="ex-1">
+<span class="ex-tag">Exercise 1</span><span class="difficulty easy"> · 10 min · prior intuition</span>
+<h3>What does a "vague" log-scale prior actually look like?</h3>
+<p>You're putting a $\mathcal{N}(0, 100)$ prior on the slope of a log-link Poisson regression. Latitude in the ants data ranges from 41.97&deg; to 45.00&deg; <em>on the raw scale</em>.</p>
+<ol type="a">
+ <li>Draw $10^5$ values of $\beta_2$ from $\mathcal{N}(0, 100)$. For each draw, compute the implied multiplicative effect $e^{\beta_2 \cdot 3}$ over the latitudinal range (3 degrees). Plot the distribution of $\log_{10}$ of that effect.</li>
+ <li>What fraction of the prior puts $|\log_{10}(\text{effect})| &gt; 6$ (a million-fold change)?</li>
+ <li>Now standardise latitude. Repeat (a) using $\beta_2 \cdot 1$ (a one-SD change in scaled latitude). Compare.</li>
+</ol>
+<details class="answer"><summary>Reveal worked solution</summary><div class="answer-body">
+<pre><code>set.seed(<span class="nu">1</span>)
+beta &lt;- <span class="fn">rnorm</span>(<span class="nu">1e5</span>, <span class="nu">0</span>, <span class="nu">100</span>)
+eff &lt;- <span class="fn">exp</span>(beta * <span class="nu">3</span>) <span class="cm"># raw scale: 3 deg latitude</span>
+<span class="fn">hist</span>(<span class="fn">log10</span>(eff), breaks=<span class="nu">200</span>, xlab=<span class="st">"log10(effect)"</span>)
+<span class="fn">mean</span>(<span class="fn">abs</span>(<span class="fn">log10</span>(eff)) &gt; <span class="nu">6</span>) <span class="cm"># ~ 0.98</span>
+
+eff2 &lt;- <span class="fn">exp</span>(beta * <span class="nu">1</span>) <span class="cm"># scaled scale: 1 SD</span>
+<span class="fn">mean</span>(<span class="fn">abs</span>(<span class="fn">log10</span>(eff2)) &gt; <span class="nu">6</span>) <span class="cm"># still ~ 0.94 (!) -- prior is too wide</span></code></pre>
+<p>The takeaway: a $\mathcal{N}(0, 100)$ prior on a log-scale coefficient is almost always far too wide. Use $\mathcal{N}(0, \approx 2)$ or $\mathcal{N}(0, \approx 3)$ for standardised predictors. Tight, weakly informative priors are what most of the modern Bayesian regression literature now recommends.</p>
+</div></details>
+</div>
+
+<div class="exercise" id="ex-2">
+<span class="ex-tag">Exercise 2</span><span class="difficulty medium"> · 25 min · R</span>
+<h3>Fit the ant richness model twice</h3>
+<p>Using <code>ants.csv</code> and <code>ant.priors.R</code> as a starting point, fit the model:</p>
+<ol type="a">
+ <li>With RAW predictors and $\mathcal{N}(0, 100)$ prior on each $\beta$. How long do the chains take to mix? What does <code>MCMCtrace</code> show? What does <code>gelman.diag</code> give for R-hat?</li>
+ <li>With SCALED predictors and the same prior. Compare R-hat, effective sample size, and the posterior medians of (b1, b2, b3) to the frequentist <code>glm()</code> output.</li>
+ <li>Now keep the scaled predictors but tighten the prior to $\mathcal{N}(0, \sigma=2)$ (i.e. <code>dnorm(0, 1/4)</code>). Does the posterior change meaningfully? Why or why not?</li>
+</ol>
+<details class="answer"><summary>Reveal expected output</summary><div class="answer-body">
+<p>(a) Often you'll see <code>Inf</code> log densities and a stuck chain, or chains that drift slowly with R-hat &gt; 1.5. (b) Posterior medians match <code>glm()</code> to 2 decimals; R-hat &asymp; 1.00. (c) Posterior is essentially unchanged because the data are very informative for these coefficients. Tight priors only matter when data are weak.</p>
+</div></details>
+</div>
+
+</section>
+
+<!-- ================================================================== -->
+<section id="logistic">
+<h2>B. Bayesian logistic regression &mdash; the island lizard example</h2>
+
+<h3>Biological setup</h3>
+<p>You have presence/absence of a lizard species on $n$ islands, plus each island's perimeter:area ratio (a proxy for habitat edge per unit interior). Logistic regression on the logit scale:</p>
+<div class="eq-block">$y_i \sim \text{Bernoulli}(p_i), \quad \text{logit}\,p_i = a + b \cdot x_i$</div>
+
+<h3>The full NIMBLE template</h3>
+<div class="code-label">R · Lizards_Nimble.R (excerpt)</div>
+<pre><code><span class="kw">library</span>(nimble); <span class="kw">library</span>(MCMCvis); <span class="kw">library</span>(coda)
+
+liz &lt;- <span class="fn">read.csv</span>(<span class="st">"data/IslandsLizards.csv"</span>)
+x.scaled &lt;- <span class="fn">as.numeric</span>(<span class="fn">scale</span>(liz$perimeterAreaRatio))
+x.grid &lt;- <span class="fn">seq</span>(-<span class="nu">2</span>, <span class="nu">2</span>, by = <span class="nu">0.01</span>)
+
+lizardCode &lt;- <span class="fn">nimbleCode</span>({
+ a ~ <span class="fn">dnorm</span>(<span class="nu">0</span>, <span class="nu">1e-6</span>) <span class="cm"># vague (intentionally bad)</span>
+ b ~ <span class="fn">dnorm</span>(<span class="nu">0</span>, <span class="nu">1e-6</span>)
+ <span class="kw">for</span> (i <span class="kw">in</span> <span class="nu">1</span>:n) {
+ <span class="fn">logit</span>(p[i]) &lt;- a + b * x[i]
+ y[i] ~ <span class="fn">dbern</span>(p[i])
+ }
+ <span class="kw">for</span> (j <span class="kw">in</span> <span class="nu">1</span>:ngrid) {
+ p.out[j] &lt;- <span class="fn">ilogit</span>(a + b * x.grid[j]) <span class="cm"># prediction</span>
+ }
+})
+
+constants &lt;- <span class="kw">list</span>(n=<span class="fn">nrow</span>(liz), ngrid=<span class="fn">length</span>(x.grid),
+ x=x.scaled, x.grid=x.grid)
+data &lt;- <span class="kw">list</span>(y = <span class="fn">as.integer</span>(liz$presence))
+inits &lt;- <span class="kw">list</span>(<span class="kw">list</span>(a=<span class="nu">0</span>,b=<span class="nu">0</span>), <span class="kw">list</span>(a=<span class="nu">1</span>,b=-<span class="nu">1</span>), <span class="kw">list</span>(a=-<span class="nu">1</span>,b=<span class="nu">0.5</span>))
+
+samples &lt;- <span class="fn">nimbleMCMC</span>(lizardCode, constants=constants, data=data,
+ inits=inits, monitors=<span class="fn">c</span>(<span class="st">"a"</span>,<span class="st">"b"</span>,<span class="st">"p.out"</span>),
+ nchains=<span class="nu">3</span>, nburnin=<span class="nu">1000</span>, niter=<span class="nu">6000</span>,
+ samplesAsCodaMCMC=<span class="kw">TRUE</span>)
+<span class="fn">MCMCsummary</span>(samples, params=<span class="fn">c</span>(<span class="st">"a"</span>,<span class="st">"b"</span>))
+<span class="fn">gelman.diag</span>(samples[, <span class="fn">c</span>(<span class="st">"a"</span>,<span class="st">"b"</span>)])
+<span class="fn">heidel.diag</span>(samples[, <span class="fn">c</span>(<span class="st">"a"</span>,<span class="st">"b"</span>)])</code></pre>
+
+<h3>Init gotchas</h3>
+<div class="callout warn"><p class="callout-label">Watch out</p>
+<p>If you initialise <code>a = 10, b = -10</code>, then for some islands $\text{logit}^{-1}(a + bx) \approx 0$. If $y_i = 1$ at that island, the Bernoulli likelihood at start is $\log(0) = -\infty$ and the sampler refuses to start. The safe pattern is initial values close to 0. The lab script uses $\{0, 1, -1\}$ for both $a$ and $b$.</p>
+</div>
+
+<h3>The tighter-prior fix</h3>
+<p>Recall the link-scale problem from section A. The same issue appears in logistic regression: vague <code>dnorm(0, 1e-6)</code> on $a$ and $b$ means the prior on $p_i$ is bimodal at 0 and 1, not flat. The fix is a moderate prior:</p>
+<div class="eq-block">$a, b \sim \mathcal{N}(0, \sigma^2 = 2.71) \quad\Leftrightarrow\quad \texttt{dnorm(0, 1/2.71)}$</div>
+<p>This is the "Gelman default" weakly-informative prior for logistic regression with standardised predictors. The implied marginal prior on $p_i$ is almost uniform on $[0, 1]$.</p>
+
+<div class="exercise" id="ex-3">
+<span class="ex-tag">Exercise 3</span><span class="difficulty medium"> · 20 min · R · convergence</span>
+<h3>Lizards: run the model, diagnose, predict</h3>
+<p>Run the script <code>Lizards_Nimble.R</code> end to end. Then:</p>
+<ol type="a">
+ <li>Report <code>gelman.diag</code> and <code>heidel.diag</code> for $a$ and $b$. Do all three chains agree?</li>
+ <li>What is the posterior probability that the slope $b$ is negative? (i.e., higher perimeter:area &rArr; lower occupancy)</li>
+ <li>Compute and report the posterior median and 95% CI for $\text{diff} = P(\text{presence} \mid \text{PA}=20) - P(\text{presence} \mid \text{PA}=10)$.</li>
+ <li>Compare the marginal posterior of $b$ under <code>dnorm(0, 1e-6)</code> versus <code>dnorm(0, 1/2.71)</code>. With this sample size, does the prior matter much?</li>
+</ol>
+<details class="answer"><summary>Reveal expected output</summary><div class="answer-body">
+<p>(a) R-hat &asymp; 1.00, Heidelberger stationarity passes. (b) $P(b &lt; 0) &gt; 0.99$. (c) <code>diff</code> is negative with 95% CI not crossing 0 &mdash; islands with more perimeter per unit area are less likely to host the lizard. (d) The two priors give nearly identical posteriors here because the data are informative; the practical difference matters most when sample size is small.</p>
+</div></details>
+</div>
+
+</section>
+
+<!-- ================================================================== -->
+<section id="hier">
+<h2>C. Hierarchical / multilevel models &mdash; the N2O example</h2>
+
+<h3>Biological setup</h3>
+<p>Soil nitrous-oxide ($\text{N}_2\text{O}$) emissions are measured at multiple sites across the world. Each site has multiple measurements of (nitrogen input, emission). Different sites have wildly different soil organic carbon, climate, and microbial communities &mdash; so we expect <em>site-level</em> structure.</p>
+
+<h3>The pooling spectrum</h3>
+<p>You face a fundamental choice on how to handle the site grouping:</p>
+<table>
+<tr><th scope="col">Approach</th><th scope="col">Math</th><th scope="col">What it assumes</th><th scope="col">When to use</th></tr>
+<tr><td>Complete pooling</td><td>$\mu_i = \alpha + \beta x_i$</td><td>All sites identical</td><td>Almost never &mdash; ignores grouping</td></tr>
+<tr><td>No pooling</td><td>$\mu_i = \alpha_{j[i]} + \beta x_i$, each $\alpha_j$ independent</td><td>Sites totally unrelated</td><td>When you have abundant data per site</td></tr>
+<tr><td>Partial pooling</td><td>$\alpha_j \sim \mathcal{N}(\mu_\alpha, \sigma_\alpha^2)$</td><td>Sites are exchangeable draws from a population</td><td>Default choice for grouped data</td></tr>
+</table>
+
+<div class="callout key"><p class="callout-label">Key idea</p>
+<p>Partial pooling produces <strong>shrinkage</strong>: each site's estimated $\alpha_j$ is pulled toward the global $\mu_\alpha$ by an amount inversely proportional to that site's data quantity and quality. Sites with one noisy observation get shrunk a lot; sites with 50 clean observations barely move. This is exactly the inference an expert ecologist would do by hand.</p>
+</div>
+
+<h3>NIMBLE template: partial-pooling random intercept</h3>
+<div class="code-label">R · partial pooling on alpha</div>
+<pre><code>mod3 &lt;- <span class="fn">nimbleCode</span>({
+ <span class="kw">for</span> (j <span class="kw">in</span> <span class="nu">1</span>:n.sites) {
+ alpha[j] ~ <span class="fn">dnorm</span>(mu_alpha, tau_alpha)
+ }
+ mu_alpha ~ <span class="fn">dnorm</span>(<span class="nu">0</span>, <span class="nu">1</span>/<span class="nu">10000</span>)
+ sigma_alpha ~ <span class="fn">dunif</span>(<span class="nu">0</span>, <span class="nu">100</span>)
+ tau_alpha &lt;- <span class="nu">1</span> / sigma_alpha^<span class="nu">2</span>
+
+ beta ~ <span class="fn">dnorm</span>(<span class="nu">0</span>, <span class="nu">1</span>/<span class="nu">10000</span>)
+ sigma ~ <span class="fn">dunif</span>(<span class="nu">0</span>, <span class="nu">100</span>)
+ tau &lt;- <span class="nu">1</span> / sigma^<span class="nu">2</span>
+
+ <span class="kw">for</span> (i <span class="kw">in</span> <span class="nu">1</span>:n) {
+ mu[i] &lt;- alpha[group[i]] + beta * x[i]
+ y[i] ~ <span class="fn">dnorm</span>(mu[i], tau)
+ }
+})</code></pre>
+
+<h3>Modeling the random intercept itself</h3>
+<p>The next layer: rather than letting $\mu_\alpha$ be a single number, regress the per-site mean on a <strong>site-level covariate</strong> $w_j$ (e.g. log-soil-carbon at site $j$):</p>
+<div class="eq-block">$\alpha_j \sim \mathcal{N}\left(\kappa + \eta \cdot w_j,\ \sigma_\alpha^2\right)$</div>
+<p>This is "group-level regression" and is what lets you say things like "after accounting for differences in N input, sites with higher SOC tend to emit more N2O on average."</p>
+
+<div class="exercise" id="ex-4">
+<span class="ex-tag">Exercise 4</span><span class="difficulty medium"> · 30 min · R · core lab</span>
+<h3>Build and compare all five N2O models</h3>
+<p>Open <code>Multilevel_Nimble.R</code> and walk through all five models in order. For each:</p>
+<ol type="a">
+ <li>Report posterior median + 95% CI for $\beta$ (the N-input slope on log scale).</li>
+ <li>For models 2 and 3, plot the per-site $\alpha_j$ estimates from no-pooling vs. partial-pooling on the same axes. Where are the largest shrinkages?</li>
+ <li>For model 4 (covariate on random intercept), is the posterior of $\eta$ (the effect of SOC on baseline emissions) credibly different from 0?</li>
+ <li>For model 5 (random slope by fertilizer), which fertilizer has the largest absolute effect of N input on emissions?</li>
+</ol>
+<details class="answer"><summary>Reveal expected discussion</summary><div class="answer-body">
+<p>(a) $\beta$ remains positive and tight across all five models. (b) The smallest-N sites move most under partial pooling. (c) $\eta &gt; 0$ with most of the posterior away from zero. (d) Among the fertilizer types, urea-based fertilizers tend to show the steepest emission response &mdash; consistent with the agronomic literature. Exact numerics depend on your data version; the qualitative answer is what matters here.</p>
+</div></details>
+</div>
+
+<div class="exercise" id="ex-5">
+<span class="ex-tag">Exercise 5</span><span class="difficulty easy"> · 15 min · pencil/paper</span>
+<h3>Shrinkage by hand</h3>
+<p>Two sites: site A has 100 measurements with sample mean $\bar y_A = 5$ and within-site SD $\sigma = 2$. Site B has 4 measurements with sample mean $\bar y_B = 5$ and the same within-site SD. The hierarchical prior on $\alpha_j$ is $\mathcal{N}(\mu_\alpha = 0, \sigma_\alpha = 3)$. Using the closed-form shrinkage formula</p>
+<div class="eq-block">$\hat\alpha_j = \dfrac{n_j / \sigma^2 \cdot \bar y_j + 1/\sigma_\alpha^2 \cdot \mu_\alpha}{n_j/\sigma^2 + 1/\sigma_\alpha^2}$</div>
+<p>compute $\hat\alpha_A$ and $\hat\alpha_B$. Which is pulled further toward $\mu_\alpha = 0$?</p>
+<details class="answer"><summary>Reveal worked solution</summary><div class="answer-body">
+<p>Site A: precision from data = $100/4 = 25$; from prior = $1/9 \approx 0.11$. Posterior mean = $(25 \cdot 5 + 0.11 \cdot 0) / (25 + 0.11) = 125 / 25.11 \approx 4.98$. Almost no shrinkage.</p>
+<p>Site B: precision from data = $4/4 = 1$; posterior mean = $(1 \cdot 5 + 0.11 \cdot 0)/1.11 \approx 4.50$. Substantial pull toward 0.</p>
+<p>Sites with less data are pulled more strongly. This is the entire point of hierarchical models.</p>
+</div></details>
+</div>
+
+</section>
+
+<!-- ================================================================== -->
+<section id="sr">
+<h2>D. Spawner-recruit &amp; derived management quantities</h2>
+
+<h3>Biological setup</h3>
+<p>For a salmon population, you have time series of spawners $S_t$ and recruits $R_t$ for $t = 1, \dots, T$ years. The Beverton-Holt model:</p>
+<div class="eq-block">$R_t = \dfrac{a \cdot S_t}{1 + (a/b) \cdot S_t} \cdot e^{\varepsilon_t}, \quad \varepsilon_t \sim \mathcal{N}(0, \sigma^2)$</div>
+<p>where $a$ = productivity at low spawners, $b$ = asymptotic recruitment. Equivalently on the log scale:</p>
+<div class="eq-block">$\log R_t \sim \mathcal{N}\left(\log a + \log S_t - \log\!\left(1 + \tfrac{a}{b} S_t\right),\ \sigma^2\right)$</div>
+
+<h3>Why fisheries managers love Bayes</h3>
+<p>The quantities that drive policy are <em>derived</em> from $(a, b)$:</p>
+<ul>
+ <li>Equilibrium population size: $N_\text{eq} = b(a-1)/a$</li>
+ <li>Spawners for max sustained yield: $S_\text{msy} = b\sqrt{1/a} - b/a$</li>
+ <li>Harvest rate at MSY: $H_\text{msy} = 1 - \sqrt{1/a}$</li>
+</ul>
+<p>In a maximum likelihood fit you'd plug in point estimates and either accept zero uncertainty in the management quantities or bootstrap them. In Bayes, you compute them <em>inside the model</em> and the MCMC delivers their full joint posterior &mdash; correctly propagating the correlated uncertainty in $a$ and $b$.</p>
+
+<div class="code-label">R · Beverton-Holt model body (NIMBLE)</div>
+<pre><code>BHcode &lt;- <span class="fn">nimbleCode</span>({
+ <span class="cm"># Likelihood</span>
+ <span class="kw">for</span> (t <span class="kw">in</span> <span class="nu">1</span>:Nyears) {
+ log.mu[t] &lt;- <span class="fn">log</span>(a) + <span class="fn">log</span>(S[t]) - <span class="fn">log</span>(<span class="nu">1</span> + (a / b) * S[t])
+ log.R[t] ~ <span class="fn">dnorm</span>(log.mu[t], tau)
+ }
+ <span class="cm"># Priors</span>
+ a ~ <span class="fn">dunif</span>(<span class="nu">1</span>, <span class="nu">10</span>)
+ b ~ <span class="fn">dunif</span>(<span class="nu">1000</span>, <span class="nu">10000</span>)
+ sigma ~ <span class="fn">dunif</span>(<span class="nu">0</span>, <span class="nu">1</span>)
+ tau &lt;- <span class="nu">1</span> / (sigma * sigma)
+
+ <span class="cm"># Derived management quantities -- automatic posterior!</span>
+ Neq &lt;- b * (a - <span class="nu">1</span>) / a
+ Smsy &lt;- b * <span class="fn">sqrt</span>(<span class="nu">1</span> / a) - b / a
+ Hmsy &lt;- <span class="nu">1</span> - <span class="fn">sqrt</span>(<span class="nu">1</span> / a)
+})</code></pre>
+
+<div class="callout bio"><p class="callout-label">Biological intuition</p>
+<p>Notice that we put the derived-quantity lines <em>inside</em> the model block. NIMBLE tracks them as deterministic nodes; at every MCMC iteration their values are computed from the current $(a, b)$ and stored. Posterior summaries of $S_\text{msy}$ and $H_\text{msy}$ come from <code>MCMCsummary</code> with no extra work and with all the parameter correlations properly accounted for.</p>
+</div>
+
+<div class="exercise" id="ex-6">
+<span class="ex-tag">Exercise 6</span><span class="difficulty medium"> · 25 min · R</span>
+<h3>Spawner-recruit: fit, predict, derive</h3>
+<p>Open <code>SpawnerRecruit_Nimble.R</code>. The script simulates 20 years of data from a known truth ($a=5, b=5000, \sigma=0.2$), then fits the model.</p>
+<ol type="a">
+ <li>Run the script. Report posterior median + 95% CI for $a, b, \sigma, N_\text{eq}, S_\text{msy}, H_\text{msy}$.</li>
+ <li>Plot the posterior of $H_\text{msy}$ as a histogram. What is the 5th percentile? In management language, the harvest rate you'd allow if you wanted to be 95% confident you weren't overfishing.</li>
+ <li>Increase <code>Nyears</code> from 20 to 100, regenerate data, refit. How much does the posterior of $H_\text{msy}$ tighten? Is the gain linear in $N$?</li>
+</ol>
+<details class="answer"><summary>Reveal expected output</summary><div class="answer-body">
+<p>(a) Posterior medians close to truth; 95% CIs include truth. (b) 5th percentile of $H_\text{msy}$ is the conservative estimate; this is exactly the kind of risk-based number Bayes lets you write down. (c) Doubling $N$ shrinks CI by roughly $\sqrt{2}$ &mdash; the standard $\sqrt{N}$ rule.</p>
+</div></details>
+</div>
+
+</section>
+
+<!-- ================================================================== -->
+<section id="dynocc">
+<h2>E. Latent state models &mdash; dynamic occupancy</h2>
+
+<h3>Biological setup</h3>
+<p>You survey $N_\text{sites}$ sites in $N_\text{years}$ years with $N_\text{reps}$ replicate visits per site-year. You want to estimate the <em>true</em> occupancy of each site each year ($z[i,t] \in \{0, 1\}$), allowing for imperfect detection ($p &lt; 1$).</p>
+
+<div class="callout key"><p class="callout-label">Key idea</p>
+<p>The model has two layers:</p>
+<div class="eq-block">$z[i, t] \sim \text{Bernoulli}(z[i, t-1] \phi_{t-1} + (1 - z[i, t-1]) \gamma_{t-1})$ &nbsp; (process)</div>
+<div class="eq-block">$y[i, j, t] \sim \text{Bernoulli}(z[i, t] \cdot p)$ &nbsp; (observation)</div>
+<p>$\phi$ = site persistence (probability an occupied site stays occupied), $\gamma$ = site colonization (probability an empty site becomes occupied). Both are estimated <em>per year transition</em>.</p>
+</div>
+
+<h3>The z-init trick (read carefully)</h3>
+<div class="callout warn"><p class="callout-label">Watch out</p>
+<p>If you ever observed $y[i, j, t] = 1$, then $z[i, t]$ <em>must</em> equal 1, because $P(y=1 \mid z=0) = 0$. Random initial values for $z$ will sometimes put $z = 0$ where a $y = 1$ was observed &mdash; this gives a log-density of $-\infty$ and the MCMC won't start. The fix: <strong>initialise the entire <code>z</code> matrix at 1</strong>. The sampler will quickly learn from the data where the actual 0s belong.</p>
+</div>
+
+<div class="code-label">R · dynamic occupancy in NIMBLE (excerpt)</div>
+<pre><code>DynOccCode &lt;- <span class="fn">nimbleCode</span>({
+ <span class="cm"># Process</span>
+ <span class="kw">for</span> (i <span class="kw">in</span> <span class="nu">1</span>:Nsites) {
+ z[i, <span class="nu">1</span>] ~ <span class="fn">dbern</span>(psi)
+ <span class="kw">for</span> (t <span class="kw">in</span> <span class="nu">2</span>:Nyears) {
+ muZ[i,t] &lt;- z[i,t-<span class="nu">1</span>]*phi[t-<span class="nu">1</span>] + (<span class="nu">1</span>-z[i,t-<span class="nu">1</span>])*gamma[t-<span class="nu">1</span>]
+ z[i,t] ~ <span class="fn">dbern</span>(muZ[i,t])
+ }
+ }
+ <span class="cm"># Observation</span>
+ <span class="kw">for</span> (t <span class="kw">in</span> <span class="nu">1</span>:Nyears) <span class="kw">for</span> (i <span class="kw">in</span> <span class="nu">1</span>:Nsites) <span class="kw">for</span> (j <span class="kw">in</span> <span class="nu">1</span>:Nreps) {
+ Py[i,j,t] &lt;- z[i,t] * p
+ y[i,j,t] ~ <span class="fn">dbern</span>(Py[i,j,t])
+ }
+ <span class="cm"># Priors</span>
+ psi ~ <span class="fn">dunif</span>(<span class="nu">0</span>,<span class="nu">1</span>); p ~ <span class="fn">dunif</span>(<span class="nu">0</span>,<span class="nu">1</span>)
+ <span class="kw">for</span> (t <span class="kw">in</span> <span class="nu">1</span>:(Nyears-<span class="nu">1</span>)) {
+ phi[t] ~ <span class="fn">dunif</span>(<span class="nu">0</span>,<span class="nu">1</span>)
+ gamma[t] ~ <span class="fn">dunif</span>(<span class="nu">0</span>,<span class="nu">1</span>)
+ }
+})
+
+zst &lt;- <span class="fn">matrix</span>(<span class="nu">1L</span>, Nsites, Nyears) <span class="cm"># THE init trick</span></code></pre>
+
+<div class="exercise" id="ex-7">
+<span class="ex-tag">Exercise 7</span><span class="difficulty hard"> · 35 min · R · latent states</span>
+<h3>Dynamic occupancy: simulate and recover</h3>
+<p>Open <code>DynamicOccupancy_Nimble.R</code> and run end-to-end.</p>
+<ol type="a">
+ <li>Plot posterior medians of $\phi_t$ vs. their simulated truth values. How close are they?</li>
+ <li>Repeat for $\gamma_t$.</li>
+ <li>Repeat for the year-specific expected occupancy $\psi_t$.</li>
+ <li>What happens if you (mistakenly) omit the z-init trick &mdash; replace <code>zst</code> with <code>matrix(rbinom(Nsites*Nyears, 1, 0.3), Nsites, Nyears)</code>?</li>
+ <li>Posterior intervals on individual $\phi_t$ are wide. Why? What would you do in a real analysis to tighten them?</li>
+</ol>
+<details class="answer"><summary>Reveal expected discussion</summary><div class="answer-body">
+<p>(a-c) Estimates near the 1:1 line but with substantial scatter. (d) You will often get "initial values produce a likelihood of 0" errors. (e) Each individual year-transition $\phi_t$ is estimated from only ~30 site-by-2-year combos. The standard fix is to assume $\phi_t \sim \mathcal{N}(\mu_\phi, \sigma_\phi^2)$ on the logit scale (hierarchical prior on the transitions) and/or to add a covariate model for $\phi$.</p>
+</div></details>
+</div>
+
+</section>
+
+<!-- ================================================================== -->
+<section id="nmix">
+<h2>F. Latent state models &mdash; N-mixture</h2>
+
+<h3>Biological setup</h3>
+<p>You visit $N_\text{sites}$ sites $N_\text{reps}$ times each and record a count $y[i, j]$. The classic Royle (2004) N-mixture model treats the true abundance $N_i$ at each site as a latent integer that is sampled with detection probability $p$:</p>
+<div class="eq-block">$N_i \sim \text{Poisson}(\lambda), \quad y[i, j] \sim \text{Binomial}(N_i, p)$</div>
+
+<h3>Four nested models</h3>
+<ol>
+ <li><strong>Basic:</strong> constant $\lambda$, constant $p$.</li>
+ <li><strong>Covariate on abundance:</strong> $\log \lambda_i = \beta_0 + \beta_1 \cdot \text{env}_i$.</li>
+ <li><strong>Covariate on both:</strong> abundance and detection get their own linear predictors.</li>
+ <li><strong>Overdispersion + Bayesian p-value:</strong> generate data with $N \sim \text{NB}$ but fit with the wrong Poisson model. Use posterior predictive simulation to detect the misspecification.</li>
+</ol>
+
+<div class="callout warn"><p class="callout-label">Watch out</p>
+<p>In <span class="pill nimble">NIMBLE</span> (and JAGS) the binomial is <code>dbinom(prob, size)</code> &mdash; the argument order is the opposite of R's <code>rbinom(n, size, prob)</code>. A frequent silent bug. Also, initialise the latent abundance vector with <code>N = apply(y, 1, max)</code> so the binomial constraint $N_i \ge \max_j y_{i,j}$ is satisfied at the start.</p>
+</div>
+
+<h3>Bayesian p-value as a goodness-of-fit check</h3>
+<p>For each MCMC draw of parameters, simulate a replicate dataset $y^\text{rep}$ from the model, compute a discrepancy statistic $T$ on both real and replicate data, and report:</p>
+<div class="eq-block">$p_B = \dfrac{1}{M}\sum_{m=1}^M \mathbb{1}\!\left[ T(y^\text{rep}_m) &gt; T(y_m) \right]$</div>
+<p>If $p_B$ is far from 0.5, the data are "weirder" (or more boring) than the model expects &mdash; evidence of misfit. Values near 0.5 mean the model captures the chosen discrepancy.</p>
+
+<div class="exercise" id="ex-8">
+<span class="ex-tag">Exercise 8</span><span class="difficulty medium"> · 25 min · R</span>
+<h3>N-mixture: build up from basic to overdispersed</h3>
+<p>Open <code>NMixture_Nimble.R</code> and run all four models.</p>
+<ol type="a">
+ <li>Model 1 (basic): recover $\lambda$ and $p$ from 20-site / 3-rep simulated data. How close are the posteriors to truth?</li>
+ <li>Model 2 (covariate on abundance): is the posterior of $\beta_1$ credibly different from 0?</li>
+ <li>Model 3 (covariate on both): does adding the detection covariate change inference on the abundance covariate?</li>
+ <li>Model 4 (overdispersion): what is the Bayesian p-value? What does it say about the Poisson assumption?</li>
+</ol>
+<details class="answer"><summary>Reveal expected output</summary><div class="answer-body">
+<p>(a) Both close to truth. (b) Yes, well-separated from 0. (c) Modest change; properly modeling detection variation usually tightens posteriors on abundance covariates. (d) Bayesian p-value far from 0.5 (often near 0 or 1) &mdash; the data have more variance than Poisson allows. The fix is a Poisson-lognormal or NB N-mixture.</p>
+</div></details>
+</div>
+
+<div class="exercise" id="ex-9">
+<span class="ex-tag">Exercise 9</span><span class="difficulty hard"> · 35 min · R · synthesis</span>
+<h3>Add a site-level random effect to the N-mixture model</h3>
+<p>Modify <code>Nmix4Code</code> to add a Poisson-lognormal structure:</p>
+<div class="eq-block">$\log \lambda_i = \beta_0 + \epsilon_i, \quad \epsilon_i \sim \mathcal{N}(0, \sigma_\epsilon^2)$</div>
+<ol type="a">
+ <li>Write the modified <code>nimbleCode</code> block. Remember to add a prior on $\sigma_\epsilon$ (e.g. <code>dunif(0, 5)</code>).</li>
+ <li>Re-fit using the overdispersed simulated data from Model 4.</li>
+ <li>Compute the Bayesian p-value again. Is it closer to 0.5 now?</li>
+ <li>What is the posterior of $\sigma_\epsilon$? Does it capture the overdispersion that the basic Poisson missed?</li>
+</ol>
+<details class="answer"><summary>Reveal sketch</summary><div class="answer-body">
+<pre><code>Nmix5Code &lt;- <span class="fn">nimbleCode</span>({
+ <span class="kw">for</span> (i <span class="kw">in</span> <span class="nu">1</span>:Nsites) {
+ eps[i] ~ <span class="fn">dnorm</span>(<span class="nu">0</span>, <span class="nu">1</span>/sig.eps^<span class="nu">2</span>)
+ <span class="fn">log</span>(lambda[i]) &lt;- b0 + eps[i]
+ N[i] ~ <span class="fn">dpois</span>(lambda[i])
+ <span class="kw">for</span> (j <span class="kw">in</span> <span class="nu">1</span>:Nreps) {
+ y[i,j] ~ <span class="fn">dbinom</span>(prob = p, size = N[i])
+ }
+ }
+ b0 ~ <span class="fn">dunif</span>(-<span class="nu">5</span>, <span class="nu">5</span>)
+ p ~ <span class="fn">dbeta</span>(<span class="nu">1</span>, <span class="nu">1</span>)
+ sig.eps ~ <span class="fn">dunif</span>(<span class="nu">0</span>, <span class="nu">5</span>)
+})</code></pre>
+<p>After fitting, the Bayesian p-value moves much closer to 0.5 and the posterior of $\sigma_\epsilon$ is bounded away from 0.</p>
+</div></details>
+</div>
+
+<div class="exercise" id="ex-10">
+<span class="ex-tag">Exercise 10</span><span class="difficulty medium"> · 20 min · synthesis</span>
+<h3>Pick the right tool</h3>
+<p>For each scenario, name the model family from today (priors / logistic / multilevel / spawner-recruit / dynamic occupancy / N-mixture / multilevel + N-mixture) and explain the latent vs. observed split.</p>
+<ol type="a">
+ <li>30 forest plots, each surveyed once per year for 10 years for marten presence; you want trends.</li>
+ <li>Pellet count quadrats with repeat visits, expected to be overdispersed because deer cluster.</li>
+ <li>Mark-recapture data with annual survival probabilities that vary by site.</li>
+ <li>Salmon escapement and recruitment for one stock; manager wants conservative harvest rate.</li>
+ <li>200 streams with replicate eDNA samples; you want occupancy by basin and by year, and you have a basin-level covariate (mean discharge).</li>
+</ol>
+<details class="answer"><summary>Reveal sketches</summary><div class="answer-body">
+<p>(a) Dynamic occupancy with random year effects on $\phi, \gamma$. (b) N-mixture with overdispersion (Poisson-lognormal). (c) Multilevel survival (Cormack-Jolly-Seber with random effects on $\phi$). (d) Beverton-Holt, report posterior 5th percentile of $H_\text{msy}$. (e) Multilevel dynamic occupancy with basin-level random intercept and discharge covariate.</p>
+</div></details>
+</div>
+
+</section>
+
+<!-- ================================================================== -->
+<section id="wrap">
+<h2>Wrap up &amp; reading</h2>
+
+<div class="callout key"><p class="callout-label">Key idea</p>
+<p><strong>What you can now do.</strong></p>
+<ol>
+ <li>Translate any JAGS model into <span class="pill nimble">NIMBLE</span>, splitting <code>data=</code> into <code>constants=</code> and <code>data=</code>.</li>
+ <li>Diagnose link-scale prior problems and fix them with predictor scaling and weakly informative priors.</li>
+ <li>Build multilevel models that share information across groups, with optional group-level covariates.</li>
+ <li>Define derived quantities inside the model and let MCMC propagate uncertainty into them.</li>
+ <li>Write latent-state models (dynamic occupancy and N-mixture) and apply the init tricks that make them actually run.</li>
+ <li>Check goodness of fit with Bayesian p-values.</li>
+</ol>
+</div>
+
+<h3>Suggested reading</h3>
+<ul>
+ <li>Hobbs &amp; Hooten (2015), <em>Bayesian Models: A Statistical Primer for Ecologists</em>, Princeton.</li>
+ <li>Kéry &amp; Schaub (2012), <em>Bayesian Population Analysis using WinBUGS</em>, Academic Press.</li>
+ <li>Gelman, Hill &amp; Vehtari (2020), <em>Regression and Other Stories</em>, Cambridge &mdash; chapters 22-23 on hierarchical models.</li>
+ <li>de Valpine et al. (2017), "Programming with models: writing statistical algorithms for general model structures with NIMBLE," <em>JCGS</em>.</li>
+ <li>Royle &amp; Dorazio (2008), <em>Hierarchical Modeling and Inference in Ecology</em>, Academic Press.</li>
+</ul>
+
+<h3>If you want to keep going</h3>
+<p>The two problem sets (<a href="problem_set_v2.html">v2 carnivores</a>, <a href="problem_set_v3.html">v3 fish</a>) give you 20 more hierarchical, latent-state, and derived-quantity problems with reveal-able solutions in <span class="pill nimble">NIMBLE</span>. Pick the one that matches your study system and work through it on your own data afterward.</p>
+</section>
+
+</main>
+</div>
+<footer>FW 536 · Statistical Modeling for Ecology and Conservation · Oregon State University</footer>
+</body>
+</html>

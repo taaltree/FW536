@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en" data-a11y="done">
+<head>
+<meta charset="UTF-8" />
+<title>Day 2 · Problem Set v3 (Aquatic & Fisheries) | FW 536 · INSTRUCTOR ANSWER KEY</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../_Shared/css/accessible.css" />
+<script defer src="../_Shared/js/accessible.js"></script>
+<script>
+MathJax = {
+  tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
+  options: {
+    menuOptions: { settings: { assistiveMml: true, explorer: true } }
+  },
+  loader: { load: ['a11y/assistive-mml', 'a11y/explorer'] }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script"></script>
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<div class="a11y-bar" role="region" aria-label="Accessibility">Accessible version &middot; <a href="../accessibility.html">How to use this site with a screen reader</a> &middot; <a href="../index.html">Course home</a></div>
+
+<div class="shell">
+
+<aside class="sidebar">
+ <p class="brand"><a href="../index.html" title="Back to course home">FW 536 · Day 2</a></p>
+ <div class="subtitle">Problem Set v3 — Aquatic & Fisheries</div>
+ <nav aria-label="On this page and related documents">
+ <ul>
+ <li><a href="#p1">1. Fish weight distribution</a></li>
+ <li><a href="#p2">2. Length-weight allometry</a></li>
+ <li><a href="#p3">3. Trawl CPUE (Poisson)</a></li>
+ <li><a href="#p4">4. Smolt survival (logit)</a></li>
+ <li><a href="#p5">5. Shrimp catch: NB vs Poisson</a></li>
+ <li><a href="#p6">6. Stream flow × season interaction</a></li>
+ <li><a href="#p7">7. CPUE offset for tow duration</a></li>
+ <li><a href="#p8">8. Salmon spawning success (probability scale)</a></li>
+ <li><a href="#p9">9. Eelgrass cover back-transform</a></li>
+ <li><a href="#p10">10. Estuarine occupancy threshold</a></li>
+ </ul>
+ <div class="section">Day 2 docs</div>
+ <ul>
+ <li><a href="lab.html">Main lab</a></li>
+ <li><a class="featured" href="plain_language_summary.html">Plain-language summary</a></li>
+ <li><a href="log_logit_intuition.html">Log/logit intuition guide</a></li>
+ <li><a href="answer_key.html">Lab answer key</a></li>
+ <li><a href="problem_set_v2.html">Problem set v2 (forest)</a></li>
+ </ul>
+ </nav>
+</aside>
+
+<main class="content" id="main-content" tabindex="-1">
+<header class="lab-header">
+ <div class="eyebrow">Day 2 · Alternate Problem Set v3</div>
+ <h1>Aquatic and fisheries themed problems</h1>
+ <p class="lede">Ten novel problems covering continuous distribution choice, Normal vs lognormal regression, Poisson with log-link interpretation, logistic regression with odds-ratio interpretation, NB vs Poisson, interaction terms, and offsets — all set in freshwater, estuarine, and marine fisheries contexts. The pedagogical goal: leave with the ability to read a log-link or logit-link coefficient as biology.</p>
+</header>
+
+<section><p>Try every problem before checking the answer. The numeric output is necessary but not sufficient: each answer ends with a "say it as biology" line — practice writing those before you peek.</p></section>
+
+<!-- =========================== PROBLEM 1 =========================== -->
+<div class="exercise" id="p1">
+<span class="ex-tag">Problem 1</span><span class="difficulty easy"> · continuous distribution choice</span>
+<h3>Distribution of fish weights in a creel survey</h3>
+<p>You record body weight (g) for every fish kept in a 30-day creel survey on a coastal river. Most fish are sub-legal-size cutthroat (small), with a long right tail of large hatchery steelhead retained in the same fishery. The distribution is strongly right-skewed.</p>
+<ol type="a">
+<li>Which of {Normal, Lognormal, Gamma, Exponential, Beta} would you choose? Justify in one sentence.</li>
+<li>If $\log(\text{weight}) \sim \mathcal{N}(5.0, 0.8^2)$, what is the expected weight on the raw scale?</li>
+<li>What is the median weight?</li>
+<li>If you mistakenly fit a Normal to these weights and computed a 95% prediction interval centered at the mean, why would the lower end be biologically nonsense?</li>
+</ol>
+</div>
+
+<!-- =========================== PROBLEM 2 =========================== -->
+<div class="exercise" id="p2">
+<span class="ex-tag">Problem 2</span><span class="difficulty medium"> · Normal vs lognormal regression</span>
+<h3>Length-weight allometry of Chinook salmon</h3>
+<p>For 200 Chinook salmon you have fork length (cm) and weight (g). Lengths range 30–110 cm; weights range 250 g to 18 kg.</p>
+<ul>
+<li>Analyst A: <code>lm(weight ~ length)</code></li>
+<li>Analyst B: <code>lm(log(weight) ~ log(length))</code></li>
+</ul>
+<ol type="a">
+<li>Sketch what Analyst A's residuals-vs-fitted plot would look like.</li>
+<li>Analyst B finds $\hat\beta_1 = 3.05$. Connect this to the standard $W = a L^b$ allometric equation and interpret $b$.</li>
+<li>What multiplicative effect on weight corresponds to a 25% increase in length?</li>
+<li>Why is the "cube law" (b = 3) a useful null and what does a fitted value of 3.05 say biologically?</li>
+</ol>
+</div>
+
+<!-- =========================== PROBLEM 3 =========================== -->
+<div class="exercise" id="p3">
+<span class="ex-tag">Problem 3</span><span class="difficulty medium"> · Poisson regression, log-link interpretation</span>
+<h3>Juvenile coho counts in snorkel surveys</h3>
+<p>From 80 pool surveys, juvenile coho counts are modeled as</p>
+<pre><code>glm(coho ~ pool_depth + cover_lwd, family = poisson, data = pools)</code></pre>
+<p>Estimates: intercept $\hat\beta_0 = 0.20$; pool depth (m) $\hat\beta_1 = +0.65$; large woody debris cover (% scaled 0–10) $\hat\beta_2 = +0.10$.</p>
+<ol type="a">
+<li>Expected count in a 0-depth, 0-cover pool? (This is the intercept back-transform.)</li>
+<li>What is the multiplicative effect of an extra meter of pool depth?</li>
+<li>A pool that goes from 1 m to 2 m depth, holding LWD cover constant — what is the percent change in expected count?</li>
+<li>What multiplicative effect does a 1-SD change in each predictor produce, given pool depth has SD 0.4 m and cover has SD 2 units?</li>
+</ol>
+</div>
+
+<!-- =========================== PROBLEM 4 =========================== -->
+<div class="exercise" id="p4">
+<span class="ex-tag">Problem 4</span><span class="difficulty medium"> · binomial logistic, logit interpretation</span>
+<h3>Smolt survival through a hydro reach vs. temperature</h3>
+<p>Acoustic-tagged Chinook smolts tracked through an 80-km reach: outcome is survived (1) or not (0). Predictor is river temperature (°C) at release. Logistic regression returns intercept $+2.20$ and slope $-0.18$ per °C.</p>
+<ol type="a">
+<li>Predicted survival probability at 12 °C? At 18 °C?</li>
+<li>What temperature corresponds to 50% predicted survival?</li>
+<li>What is the odds ratio for a 5 °C increase?</li>
+<li>Translate the slope to a marginal probability change at the inflection.</li>
+</ol>
+</div>
+
+<!-- =========================== PROBLEM 5 =========================== -->
+<div class="exercise" id="p5">
+<span class="ex-tag">Problem 5</span><span class="difficulty medium"> · NB vs Poisson</span>
+<h3>Pink shrimp catch per tow</h3>
+<p>For 120 standard 30-minute trawl tows, shrimp catch has mean 80 individuals and variance 1200.</p>
+<ol type="a">
+<li>What is the dispersion ratio?</li>
+<li>Find the NB <code>size</code> parameter $k$ that matches the empirical variance.</li>
+<li>Simulate 1000 tows under both Poisson(80) and NB($\mu = 80, k$). Compare P(catch = 0) and P(catch &gt; 200).</li>
+<li>If you reported Poisson-based 95% CIs for the mean tow catch, by roughly what factor would your CIs be too narrow?</li>
+</ol>
+</div>
+
+<!-- =========================== PROBLEM 6 =========================== -->
+<div class="exercise" id="p6">
+<span class="ex-tag">Problem 6</span><span class="difficulty hard"> · interaction</span>
+<h3>Stream discharge × season interaction on macroinvertebrate counts</h3>
+<p>Macroinvertebrate counts per Surber sample from 90 collections; predictors are discharge (m³/s, continuous) and season (factor: <em>spring</em> reference, <em>fall</em>). Poisson fit:</p>
+<pre><code>glm(macros ~ discharge * season, family = poisson, data = samps)</code></pre>
+<p>Coefficients: intercept = 3.50, discharge = $-0.30$, seasonFall = $+0.40$, discharge:seasonFall = $+0.50$.</p>
+<ol type="a">
+<li>What is the discharge slope in spring?</li>
+<li>What is the discharge slope in fall?</li>
+<li>What is the expected count at discharge = 0, fall season?</li>
+<li>At what discharge do spring and fall predicted counts cross? Interpret biologically.</li>
+</ol>
+</div>
+
+<!-- =========================== PROBLEM 7 =========================== -->
+<div class="exercise" id="p7">
+<span class="ex-tag">Problem 7</span><span class="difficulty hard"> · offsets</span>
+<h3>CPUE for a longline fishery — variable hook numbers</h3>
+<p>Across 200 longline sets, the number of hooks varies from 500 to 5000. You record bycatch counts of yelloweye rockfish per set. Two analyses:</p>
+<ul>
+<li>Analyst A: <code>glm(bycatch ~ depth_m, family = poisson)</code></li>
+<li>Analyst B: <code>glm(bycatch ~ depth_m + offset(log(hooks)), family = poisson)</code></li>
+</ul>
+<ol type="a">
+<li>What does Analyst B's intercept now represent?</li>
+<li>Why does the offset go on the log scale (not, say, dividing by hooks)?</li>
+<li>If Analyst B's depth slope is $+0.012$ per m, write a one-sentence biological summary.</li>
+<li>How would Analyst A's depth slope be biased if shallow sets tended to use fewer hooks?</li>
+</ol>
+</div>
+
+<!-- =========================== PROBLEM 8 =========================== -->
+<div class="exercise" id="p8">
+<span class="ex-tag">Problem 8</span><span class="difficulty medium"> · probability ↔ odds ↔ log-odds</span>
+<h3>Sockeye redd success vs. substrate gravel size</h3>
+<p>Logistic regression of redd-survival to emergence on median gravel diameter (mm). Intercept $-1.5$, slope $+0.06$ per mm.</p>
+<ol type="a">
+<li>Fitted $p$ at 10, 25, 40, and 60 mm gravel.</li>
+<li>Express the slope as an odds ratio per 1 mm and per 10 mm.</li>
+<li>What is the difference in predicted survival between a 25 mm gravel and a 40 mm gravel?</li>
+<li>Why is the marginal effect of gravel size on probability not constant across the curve?</li>
+</ol>
+</div>
+
+<!-- =========================== PROBLEM 9 =========================== -->
+<div class="exercise" id="p9">
+<span class="ex-tag">Problem 9</span><span class="difficulty hard"> · back-transform with CI</span>
+<h3>Eelgrass biomass vs sediment grain size</h3>
+<p>A Gamma GLM with log link returns, for the contrast "fine sediment vs medium sediment", $\hat\beta = -0.65$ with 95% CI $(-0.95, -0.35)$ on the log scale.</p>
+<ol type="a">
+<li>Back-transform the point estimate. What multiplicative effect does it represent?</li>
+<li>Back-transform the CI.</li>
+<li>Translate to a "percent decrease" statement.</li>
+<li>Write one sentence appropriate for a journal results section.</li>
+</ol>
+</div>
+
+<!-- =========================== PROBLEM 10 =========================== -->
+<div class="exercise" id="p10">
+<span class="ex-tag">Problem 10</span><span class="difficulty hard"> · logistic threshold + marginal effects</span>
+<h3>Estuarine green sturgeon occupancy</h3>
+<p>Occupancy (1/0) at 250 estuarine sites modeled as <code>glm(present ~ salinity + depth, family = binomial)</code>. Intercept $-2.5$; salinity slope $+0.10$ per ppt; depth slope $+0.20$ per m.</p>
+<ol type="a">
+<li>For a 5-m-deep site, at what salinity does $p = 0.5$?</li>
+<li>For a 2-m-deep site, at what salinity does $p = 0.5$?</li>
+<li>Marginal effect of salinity at the inflection.</li>
+<li>If a restoration project can raise salinity by 5 ppt (by managing an upstream tidal gate) <em>or</em> deepen channels by 1 m, which produces a larger predicted occupancy gain at a typical site with $p = 0.2$?</li>
+</ol>
+</div>
+
+<!-- =================== ANSWERS =================== -->
+<section>
+<h2 style="margin-top:80px;">Answers (with R)</h2>
+
+<details class="answer" open><summary>Problem 1 — Fish weight distribution</summary><div class="answer-body">
+<p>(a) <strong>Lognormal</strong> is the natural choice: weights are strictly positive, strongly right-skewed, and the biology (growth as a multiplicative process across many small annual increments) matches the lognormal data-generating story. Gamma is an acceptable backup.</p>
+<p>(b) Mean = $e^{5.0 + 0.32} = e^{5.32} = 204$ g.</p>
+<p>(c) Median = $e^{5.0} = 148$ g.</p>
+<p>(d) A Normal centered at 204 g with realistic SD (say 250 g) would put substantial probability below zero — biologically nonsensical for weight. The Normal also has too thin a right tail to admit the occasional 10 kg steelhead that the dataset contains.</p>
+<pre><code>mu &lt;- 5.0; sig &lt;- 0.8
+exp(mu + sig^2/2) # 204.4
+exp(mu) # 148.4
+set.seed(1)
+hist(rlnorm(1e4, mu, sig), breaks = 100, xlab = "weight (g)")</code></pre>
+<p><strong>Say it as biology:</strong> "Creel weights are lognormal because somatic growth is a multiplicative process. The mean (204 g) is 38% larger than the median (148 g), so reporting only an average misrepresents the typical fish kept in the fishery — a common pitfall in catch-statistic summaries."</p>
+</div></details>
+
+<details class="answer" open><summary>Problem 2 — Length-weight allometry</summary><div class="answer-body">
+<p>(a) Analyst A's residuals would form the classic megaphone: tiny absolute residuals near small fish, huge absolute residuals near large fish. The Normal model forces constant SD when biology demands proportional SD.</p>
+<p>(b) Power law: $W = a L^b$ implies $\log W = \log a + b \log L$. So Analyst B's slope <em>is</em> the allometric exponent: $b = 3.05$.</p>
+<p>(c) Multiplicative effect of 25% length increase: $(1.25)^{3.05} = 1.99$. A 25% longer fish weighs about twice as much.</p>
+<p>(d) Cube law ($b=3$) is the geometric-similitude null: if fish grew isometrically (no change in shape), weight scales with the cube of length. Real fish often have $b$ slightly above 3 because larger fish are proportionally deeper-bodied or fatter (positive allometry). A fitted 3.05 is essentially indistinguishable from the cube law — these Chinook follow near-isometric growth.</p>
+<pre><code># power law verification
+(1.25)^3.05 # 1.991
+# Compare a 50 vs 100 cm Chinook
+2^3.05 # 8.28: doubling length increases weight ~8.3x</code></pre>
+<p><strong>Say it as biology:</strong> "Chinook length-weight scaling follows a near-isometric power law with exponent 3.05: a 25% longer fish weighs about twice as much, and a doubling of length increases weight 8.3-fold. Deviations of $b$ from 3 are small enough to be biologically negligible in this population."</p>
+</div></details>
+
+<details class="answer" open><summary>Problem 3 — Juvenile coho snorkel counts</summary><div class="answer-body">
+<p>(a) $\exp(0.20) = 1.22$ coho expected in a 0-depth, 0-cover pool.</p>
+<p>(b) Multiplicative effect per meter depth: $\exp(0.65) = 1.92$ — almost a doubling.</p>
+<p>(c) 1 m to 2 m depth = a 1-m increase → $\exp(0.65) = 1.92$ → 92% increase in expected count.</p>
+<p>(d) 1-SD effects:
+<ul>
+<li>Pool depth (SD 0.4 m): $\exp(0.65 \cdot 0.4) = \exp(0.26) = 1.30$ → 30% increase per SD.</li>
+<li>LWD cover (SD 2 units): $\exp(0.10 \cdot 2) = \exp(0.20) = 1.22$ → 22% increase per SD.</li>
+</ul>
+Depth has a slightly larger standardized effect than cover.</p>
+<pre><code>exp(0.20) # 1.221
+exp(0.65) # 1.916
+exp(0.65 * 0.4); exp(0.10 * 2) # 1.297 1.221</code></pre>
+<p><strong>Say it as biology:</strong> "Pool depth roughly doubles expected juvenile coho counts per meter — consistent with deep-pool dependence in over-summering parr — while large woody debris contributes an additional ~22% per SD of cover. After standardization, depth is the stronger predictor."</p>
+</div></details>
+
+<details class="answer" open><summary>Problem 4 — Smolt survival vs temperature</summary><div class="answer-body">
+<p>(a) Survival at 12 °C: $\text{plogis}(2.20 - 0.18 \cdot 12) = \text{plogis}(0.04) = 0.510$. At 18 °C: $\text{plogis}(2.20 - 0.18 \cdot 18) = \text{plogis}(-1.04) = 0.261$.</p>
+<p>(b) 50% threshold: $2.20 - 0.18 T = 0 \Rightarrow T = 12.22$ °C.</p>
+<p>(c) OR per 5 °C: $\exp(-0.18 \cdot 5) = \exp(-0.90) = 0.407$. Five degrees of warming cuts survival odds by ~59%.</p>
+<p>(d) Divide-by-4: $-0.18/4 = -0.045$ probability per °C at the inflection. Formal: $\beta p(1-p) = -0.18 \cdot 0.5 \cdot 0.5 = -0.045$. About a 4.5 percentage point drop per °C right at the threshold.</p>
+<pre><code>plogis(2.20 - 0.18 * c(12, 18)) # 0.510 0.261
+2.20 / 0.18 # 12.22 (threshold)
+exp(-0.18 * 5) # 0.407
+-0.18 * 0.5 * 0.5 # -0.045</code></pre>
+<p><strong>Say it as biology:</strong> "Outmigrating Chinook smolts cross the 50% survival threshold near 12.2 °C. Each additional degree of pre-release temperature drops the odds of through-reach survival by ~17%; a 5 °C warming nearly halves the odds of survival, with the largest probability losses occurring through the steep middle of the response curve."</p>
+</div></details>
+
+<details class="answer" open><summary>Problem 5 — Pink shrimp catch: NB vs Poisson</summary><div class="answer-body">
+<p>(a) Dispersion = 1200/80 = 15. Strongly overdispersed.</p>
+<p>(b) $80 + 6400/k = 1200 \Rightarrow k = 6400/1120 = 5.71$.</p>
+<pre><code>set.seed(1); n &lt;- 1000
+pois &lt;- rpois(n, 80)
+nb &lt;- rnbinom(n, mu = 80, size = 5.71)
+mean(pois == 0); mean(nb == 0) # ~ 0 vs ~ 0.001
+mean(pois &gt; 200); mean(nb &gt; 200) # ~ 0 vs ~ 0.06
+var(pois); var(nb) # ~ 80 vs ~ 1200</code></pre>
+<p>(c) Poisson assigns essentially zero probability to tows with &gt; 200 shrimp; NB places ~6% probability there — matching the actual fishery experience of occasional bumper tows.</p>
+<p>(d) The Poisson SE underestimates by a factor of $\sqrt{15} \approx 3.9$. Poisson CIs would be roughly 4× too narrow.</p>
+<p><strong>Say it as biology:</strong> "Shrimp catch per tow is overdispersed about 15× relative to Poisson, consistent with patchy aggregations across the survey grid. The NB model ($k \approx 5.7$) captures the long upper tail of bumper tows that the Poisson model treats as essentially impossible; using Poisson SEs would understate uncertainty by roughly a factor of four."</p>
+</div></details>
+
+<details class="answer" open><summary>Problem 6 — Stream discharge × season interaction</summary><div class="answer-body">
+<p>(a) Spring discharge slope = $-0.30$. Per m³/s: $\exp(-0.30) = 0.741$ → 26% drop per m³/s.</p>
+<p>(b) Fall discharge slope = $-0.30 + 0.50 = +0.20$. Per m³/s: $\exp(0.20) = 1.221$ → 22% increase per m³/s.</p>
+<p>(c) Expected at discharge = 0, fall: $\exp(3.50 + 0.40) = \exp(3.90) = 49.4$.</p>
+<p>(d) Crossover where spring and fall predictions match: $3.50 - 0.30 Q = 3.90 + 0.20 Q$ → $-0.50 Q = 0.40$ → $Q = -0.80$ m³/s. Negative — meaning fall predictions exceed spring at all observed discharges (the lines do not cross within the data range). Biologically, fall stands consistently above spring across the discharge gradient, with the gap widening at higher flows.</p>
+<pre><code>exp(-0.30); exp(0.20) # 0.741 1.221
+exp(3.50 + 0.40) # 49.4
+# crossover algebra
+(3.90 - 3.50) / (-0.30 - 0.20) # -0.8 (outside observed range)</code></pre>
+<p><strong>Say it as biology:</strong> "The discharge–macroinvertebrate relationship reverses sign between seasons: spring counts fall 26% per m³/s of additional flow (scour-driven displacement), while fall counts <em>rise</em> 22% per m³/s (recolonization after summer low flows). Reporting a pooled discharge effect would mask this seasonally opposite dynamic — a textbook reason to fit the interaction."</p>
+</div></details>
+
+<details class="answer" open><summary>Problem 7 — Longline CPUE offsets</summary><div class="answer-body">
+<p>(a) Analyst B's intercept is the log <em>bycatch-per-hook rate</em> at depth = 0. Analyst A's intercept is the log <em>total-bycatch-per-set</em> at depth = 0, confounded with hook count.</p>
+<p>(b) The linear predictor is on the log scale. We want $\log(\mu) = \log(\text{hooks}) + \beta_0 + \beta_1 x$, equivalently $\mu/\text{hooks} = \exp(\beta_0 + \beta_1 x)$ — a per-hook rate. Subtracting the offset on the linear scale is precisely how this rate framing enters the GLM.</p>
+<p>(c) <strong>Say it as biology:</strong> "Each additional meter of depth was associated with a 1.2% increase in the per-hook yelloweye bycatch rate ($\exp(0.012) = 1.012$). Over a 100-m depth change that compounds to $\exp(1.2) = 3.32$ — a 3.3× higher per-hook bycatch rate."</p>
+<p>(d) Without the offset, depth absorbs any covariation between depth and effort. If shallow sets use fewer hooks, the unoffset model would under-estimate the per-hook rate at shallow depths and over-estimate the depth effect on bycatch rate. The offset disentangles "more bycatch because more hooks" from "more bycatch because the depth has more rockfish."</p>
+<pre><code>m &lt;- glm(bycatch ~ depth_m + offset(log(hooks)),
+ family = poisson, data = longline)
+exp(coef(m)) # per-unit rate multipliers</code></pre>
+</div></details>
+
+<details class="answer" open><summary>Problem 8 — Sockeye redd success vs gravel size</summary><div class="answer-body">
+<table>
+<tr><th scope="col">Gravel (mm)</th><th scope="col">Linear predictor</th><th scope="col">Odds</th><th scope="col">$\hat p$</th></tr>
+<tr><td>10</td><td>−0.90</td><td>0.407</td><td>0.289</td></tr>
+<tr><td>25</td><td>0.00</td><td>1.000</td><td>0.500</td></tr>
+<tr><td>40</td><td>+0.90</td><td>2.460</td><td>0.711</td></tr>
+<tr><td>60</td><td>+2.10</td><td>8.166</td><td>0.891</td></tr>
+</table>
+<p>(b) OR per 1 mm = $\exp(0.06) = 1.062$; OR per 10 mm = $\exp(0.6) = 1.822$.</p>
+<p>(c) $p(40) - p(25) = 0.711 - 0.500 = 0.211$ → about 21 percentage points.</p>
+<pre><code>plogis(-1.5 + 0.06 * c(10, 25, 40, 60))
+# 0.289 0.500 0.711 0.891
+exp(0.06); exp(0.6) # 1.062 1.822</code></pre>
+<p>(d) The logistic curve is steepest at $p = 0.5$ and flattens toward 0 and 1. A 15-mm gravel increase moves survival from 0.50 to 0.71 (21 points), but the same 15-mm increase from 60 to 75 mm moves $p$ from ~0.89 to ~0.95 (only ~6 points). The biology is finite: once gravel is "big enough" for adequate intragravel flow, additional size buys little.</p>
+<p><strong>Say it as biology:</strong> "Median gravel diameter dominates sockeye intragravel survival: each 10-mm increase nearly doubles the odds of emergence. The largest absolute probability gains occur in the 20–40 mm range, where the curve is steepest; gains above 60 mm are saturating, suggesting a biologically realistic flow-mediated threshold."</p>
+</div></details>
+
+<details class="answer" open><summary>Problem 9 — Eelgrass biomass back-transform</summary><div class="answer-body">
+<p>(a) $\exp(-0.65) = 0.522$. Fine-sediment sites produce about 52% of the biomass of medium-sediment sites — a 48% reduction.</p>
+<p>(b) CI: $(\exp(-0.95), \exp(-0.35)) = (0.387, 0.705)$. So fine sediments produce 39% to 70% of the biomass of medium sediments.</p>
+<p>(c) Percent decrease: point estimate 48%; 95% CI 30% to 61% decrease.</p>
+<pre><code>exp(-0.65) # 0.522
+exp(c(-0.95, -0.35)) # 0.387 0.705
+1 - exp(-0.65) # 0.478 → 48% decrease</code></pre>
+<p><strong>(d) Say it as biology:</strong> "Eelgrass aboveground biomass on fine-sediment sites averaged 48% (95% CI 30% to 61%) less than on medium-sediment sites, consistent with anaerobic-rooting-zone limitation and sulfide stress in fine substrates."</p>
+</div></details>
+
+<details class="answer" open><summary>Problem 10 — Green sturgeon estuarine occupancy</summary><div class="answer-body">
+<p>(a) At 5-m depth: $-2.5 + 0.10 S + 0.20 \cdot 5 = 0 \Rightarrow S = 15$ ppt.</p>
+<p>(b) At 2-m depth: $-2.5 + 0.10 S + 0.20 \cdot 2 = 0 \Rightarrow S = 21$ ppt.</p>
+<p>(c) Marginal effect of salinity at inflection: $0.10 \cdot 0.5 \cdot 0.5 = 0.025$ per ppt → 2.5 percentage points of occupancy per ppt.</p>
+<p>(d) At $p = 0.2$, marginal effects per unit:
+<ul>
+<li>Salinity: $0.10 \cdot 0.2 \cdot 0.8 = 0.016$ per ppt → 5 ppt gives $\approx +0.080$ probability.</li>
+<li>Depth: $0.20 \cdot 0.2 \cdot 0.8 = 0.032$ per m → 1 m gives $\approx +0.032$ probability.</li>
+</ul>
+The salinity intervention (+0.08) outperforms the channel-deepening intervention (+0.03) at this baseline.</p>
+<pre><code>(2.5 - 0.20*5) / 0.10 # 15
+(2.5 - 0.20*2) / 0.10 # 21
+plogis(qlogis(0.2) + 0.10 * 5) # ~ 0.286
+plogis(qlogis(0.2) + 0.20 * 1) # ~ 0.237</code></pre>
+<p><strong>Say it as biology:</strong> "Green sturgeon occupancy responds jointly to salinity and depth. Deeper sites can sustain occupancy at lower salinities — a 5-m site reaches 50% occupancy at 15 ppt, vs 21 ppt at a 2-m site. At a marginal site ($p = 0.20$), a 5-ppt salinity restoration produces roughly 2.5× the probability gain of a 1-m channel-deepening — useful when triaging restoration investment."</p>
+</div></details>
+
+</section>
+</main>
+</div>
+<footer>FW 536 · Statistical Modeling for Ecology and Conservation · Oregon State University</footer>
+</body>
+</html>

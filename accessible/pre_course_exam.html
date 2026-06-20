@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en" data-a11y="done">
+<head>
+<meta charset="UTF-8" />
+<title>FW 536 · Pre-course exam</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="_Shared/css/accessible.css" />
+<script defer src="_Shared/js/accessible.js"></script>
+<script>
+MathJax = {
+  tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
+  options: {
+    menuOptions: { settings: { assistiveMml: true, explorer: true } }
+  },
+  loader: { load: ['a11y/assistive-mml', 'a11y/explorer'] }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script"></script>
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<div class="a11y-bar" role="region" aria-label="Accessibility">Accessible version &middot; <a href="accessibility.html">How to use this site with a screen reader</a> &middot; <a href="index.html">Course home</a></div>
+
+<div class="shell">
+
+<aside class="sidebar">
+ <p class="brand"><a href="index.html" title="Back to course home">FW 536</a></p>
+ <div class="subtitle">Pre-course exam</div>
+ <nav aria-label="On this page and related documents">
+ <ul>
+ <li><a href="#instructions">Instructions</a></li>
+ <li><a href="#part-a">Part A · Probability</a></li>
+ <li><a href="#part-b">Part B · Distributions</a></li>
+ <li><a href="#part-c">Part C · Regression</a></li>
+ <li><a href="#part-d">Part D · Mixed models / hierarchy</a></li>
+ <li><a href="#part-e">Part E · Likelihood</a></li>
+ <li><a href="#part-f">Part F · Bayes</a></li>
+ <li><a href="#part-g">Part G · Free response</a></li>
+ </ul>
+ <div class="section">Course</div>
+ <ul>
+ <li><a href="index.html">All materials</a></li>
+ <li><a class="featured" href="syllabus.html">Syllabus</a></li>
+ <li><a class="featured" href="rmarkdown_tutorial.html">R Markdown tutorial</a></li>
+ <li><a href="pre_course_exam.Rmd">Download .Rmd template</a></li>
+ <li><a href="post_course_exam_off.html">Post-course exam</a></li>
+ </ul>
+ </nav>
+</aside>
+
+<main class="content" id="main-content" tabindex="-1">
+<header class="lab-header">
+ <div class="eyebrow">FW 536 · Day 1 morning · 50 points</div>
+ <h1>Pre-course exam</h1>
+ <p class="lede">This exam measures where you're starting from. It is graded generously — you are not expected to know all of this material yet. Do your best, leave blank what you can't answer, and we'll re-take a parallel version on Day 5 to measure your growth across the workshop.</p>
+</header>
+
+<section id="instructions">
+<h2>Instructions</h2>
+<ol>
+<li>Download the matching <a href="pre_course_exam.Rmd"><code>pre_course_exam.Rmd</code></a> template.</li>
+<li>Open it in RStudio and answer each question by adding text, code, or a photo of hand-written work in the indicated section.</li>
+<li>Knit to HTML and upload the <code>.html</code> to the Canvas Pre-Course Exam assignment.</li>
+<li>Time guideline: 60 minutes. Do not consult outside materials or your classmates.</li>
+<li>If you don't know an answer, write "I don't know" or skip — guessing is not penalized and will help the instructor calibrate.</li>
+</ol>
+</section>
+
+<section id="part-a">
+<h2>Part A — Probability fundamentals (8 points)</h2>
+
+<div class="exercise">
+<span class="ex-tag">A1</span> <span class="pill easy">2 pts</span>
+<h3>Conditional probability</h3>
+<p>A wildlife disease has prevalence 0.05 in a population. A field-portable test has sensitivity 0.92 (P(positive | infected) = 0.92) and specificity 0.95 (P(negative | not infected) = 0.95).</p>
+<p>A randomly sampled animal tests positive. What is the probability the animal is actually infected? Show your reasoning.</p>
+</div>
+
+<div class="exercise">
+<span class="ex-tag">A2</span> <span class="pill easy">2 pts</span>
+<h3>Independence vs mutually exclusive</h3>
+<p>In one or two sentences, explain the difference between two events being <em>independent</em> and being <em>mutually exclusive</em>. Give one ecological example of each.</p>
+</div>
+
+<div class="exercise">
+<span class="ex-tag">A3</span> <span class="pill medium">2 pts</span>
+<h3>Joint probability</h3>
+<p>Two camera traps each independently have a 30% chance of detecting a fisher on a given night, given a fisher is present. What is the probability that <em>at least one</em> camera detects the fisher, given presence?</p>
+</div>
+
+<div class="exercise">
+<span class="ex-tag">A4</span> <span class="pill medium">2 pts</span>
+<h3>Expected value</h3>
+<p>A management decision pays \$10,000 if a population survives and costs \$2,000 if not. The probability of survival under the management plan is 0.7. What is the expected payoff?</p>
+</div>
+</section>
+
+<section id="part-b">
+<h2>Part B — Distributions (8 points)</h2>
+
+<div class="exercise">
+<span class="ex-tag">B1</span> <span class="pill easy">2 pts</span>
+<h3>Pick the distribution</h3>
+<p>For each scenario, name the discrete distribution you would use:</p>
+<ol type="a">
+<li>The number of nests that successfully fledge out of 12 monitored, each with the same independent success probability.</li>
+<li>The number of whale sightings per 1-hour acoustic monitoring period.</li>
+<li>The classification of 100 surveyed elk into bulls/cows/calves/yearlings.</li>
+</ol>
+</div>
+
+<div class="exercise">
+<span class="ex-tag">B2</span> <span class="pill medium">2 pts</span>
+<h3>Mean and variance</h3>
+<p>If $X \sim \text{Poisson}(\lambda = 4)$, what is its mean and variance? Give both numbers, and state in plain English what their relationship implies (one sentence).</p>
+</div>
+
+<div class="exercise">
+<span class="ex-tag">B3</span> <span class="pill medium">2 pts</span>
+<h3>Continuous distribution choice</h3>
+<p>You have a response variable that is strictly positive and right-skewed (e.g., fish biomass per haul). Name one continuous distribution that is appropriate and explain in one sentence why.</p>
+</div>
+
+<div class="exercise">
+<span class="ex-tag">B4</span> <span class="pill medium">2 pts</span>
+<h3>Normal probability</h3>
+<p>Heights of a population of male elk are approximately Normal with mean 152 cm and SD 8 cm. Roughly what fraction of the population is taller than 160 cm? (You may sketch a Normal curve, mark the threshold, and estimate; calculator not required.)</p>
+</div>
+</section>
+
+<section id="part-c">
+<h2>Part C — Regression (10 points)</h2>
+
+<div class="exercise">
+<span class="ex-tag">C1</span> <span class="pill easy">2 pts</span>
+<h3>Reading a coefficient</h3>
+<p>You fit <code>lm(weight ~ length)</code> on fish data and get an intercept of 5 and a slope of 0.8 (units: g per mm). Write a one-sentence biological interpretation of the slope.</p>
+</div>
+
+<div class="exercise">
+<span class="ex-tag">C2</span> <span class="pill medium">3 pts</span>
+<h3>Choosing a GLM</h3>
+<p>For each response variable, name the GLM family and link you would use:</p>
+<ol type="a">
+<li>Whether each of 100 nests succeeded (yes/no).</li>
+<li>Count of birds detected per 5-minute point count.</li>
+<li>Continuous body mass in grams, right-skewed and strictly positive.</li>
+</ol>
+</div>
+
+<div class="exercise">
+<span class="ex-tag">C3</span> <span class="pill medium">3 pts</span>
+<h3>Log-link interpretation</h3>
+<p>You fit a Poisson regression and the coefficient on a continuous predictor $x$ is $\hat\beta = 0.30$. What is the biological effect of a 1-unit increase in $x$ on the expected response? (Hint: think exponentiated effect.)</p>
+</div>
+
+<div class="exercise">
+<span class="ex-tag">C4</span> <span class="pill hard">2 pts</span>
+<h3>Logit-link interpretation</h3>
+<p>You fit a logistic regression of survival on age. The age coefficient on the logit scale is $\hat\beta = -0.5$. Roughly how much does the <em>odds</em> of survival change per year of age? You may answer "I don't know how to interpret a logit coefficient" if appropriate.</p>
+</div>
+</section>
+
+<section id="part-d">
+<h2>Part D — Mixed models / hierarchy (8 points)</h2>
+
+<div class="exercise">
+<span class="ex-tag">D1</span> <span class="pill easy">2 pts</span>
+<h3>When to use a random effect</h3>
+<p>You have count data from 12 sites, with 6 plots per site. Why might it be problematic to fit a single regression that ignores site identity?</p>
+</div>
+
+<div class="exercise">
+<span class="ex-tag">D2</span> <span class="pill medium">3 pts</span>
+<h3>Random vs fixed</h3>
+<p>For each predictor, would you treat it as a fixed effect, a random effect, or possibly either? Briefly justify.</p>
+<ol type="a">
+<li>Sex (male/female).</li>
+<li>Year (12 years of monitoring, treated as repeats of the same population).</li>
+<li>Treatment (control vs. exclosure).</li>
+</ol>
+</div>
+
+<div class="exercise">
+<span class="ex-tag">D3</span> <span class="pill medium">3 pts</span>
+<h3>Shrinkage intuition</h3>
+<p>In a mixed-effects model, group-level estimates "shrink toward the grand mean." In two or three sentences, describe what that means and why it might be desirable. You may answer "I'm not sure" if the term is unfamiliar.</p>
+</div>
+</section>
+
+<section id="part-e">
+<h2>Part E — Likelihood (5 points)</h2>
+
+<div class="exercise">
+<span class="ex-tag">E1</span> <span class="pill easy">2 pts</span>
+<h3>What is a likelihood?</h3>
+<p>Define "likelihood" in plain English in 1–2 sentences. Distinguish it from a probability.</p>
+</div>
+
+<div class="exercise">
+<span class="ex-tag">E2</span> <span class="pill medium">3 pts</span>
+<h3>MLE for a proportion</h3>
+<p>You observe 30 successes in 50 trials of a binomial process with unknown success probability $p$. What is the maximum likelihood estimate of $p$? Show your reasoning (it's fine to argue by intuition or by algebra).</p>
+</div>
+</section>
+
+<section id="part-f">
+<h2>Part F — Bayes (8 points)</h2>
+
+<div class="exercise">
+<span class="ex-tag">F1</span> <span class="pill easy">2 pts</span>
+<h3>Prior, likelihood, posterior</h3>
+<p>In Bayesian inference, what are the prior, the likelihood, and the posterior? One sentence each is fine.</p>
+</div>
+
+<div class="exercise">
+<span class="ex-tag">F2</span> <span class="pill medium">3 pts</span>
+<h3>Posterior interpretation</h3>
+<p>You fit a Bayesian model and get a 95% credible interval for a parameter of $(0.2, 0.8)$. Write a one-sentence interpretation of this interval. How does it differ from a frequentist 95% confidence interval?</p>
+</div>
+
+<div class="exercise">
+<span class="ex-tag">F3</span> <span class="pill medium">3 pts</span>
+<h3>Why MCMC</h3>
+<p>Why do Bayesian analyses typically use MCMC (Markov chain Monte Carlo) instead of computing the posterior in closed form? You may answer "I don't know" — this is a topic we'll spend significant time on.</p>
+</div>
+</section>
+
+<section id="part-g">
+<h2>Part G — Free response (3 points)</h2>
+
+<div class="exercise">
+<span class="ex-tag">G1</span> <span class="pill easy">3 pts</span>
+<h3>Tell me about your data</h3>
+<p>Briefly describe (3–5 sentences) the kind of data you work with — or expect to work with — and one statistical question you would like to be able to answer by the end of this course. There are no wrong answers; this helps the instructor tune examples for the workshop.</p>
+</div>
+</section>
+
+<div class="callout key" style="margin-top:60px;"><p class="callout-label">Key idea</p>
+<p>That's the exam. Knit your <code>.Rmd</code> to HTML and upload to Canvas. The post-course exam on Day 5 afternoon will use parallel questions covering the same topics — you'll see how much you learned.</p>
+</div>
+
+</main>
+</div>
+
+<footer>FW 536 · Statistical Modeling for Ecology and Conservation · Oregon State University</footer>
+</body>
+</html>

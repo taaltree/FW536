@@ -1,0 +1,218 @@
+---
+title: "FW 536 — Pre-course exam"
+author: "Your Name Here"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    self_contained: true
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    code_folding: show
+    theme: cosmo
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+# Instructions
+
+This template matches the [Pre-course exam](pre_course_exam.html). Fill in
+each section with your answer. You can use prose, R code, math, or an
+embedded photo of hand-written work — whatever is clearest for each
+question.
+
+You have 60 minutes. Do not consult outside materials or your classmates.
+This exam is graded generously; **guessing is not penalized**, and "I
+don't know" is an acceptable answer.
+
+When done: **Knit** to HTML and upload the `.html` to the Canvas
+Pre-Course Exam assignment.
+
+---
+
+# Part A — Probability fundamentals (8 points)
+
+## A1. Conditional probability (2 pts)
+
+*Disease prevalence 0.05; test sensitivity 0.92; specificity 0.95.
+Given a positive test, what is the probability the animal is infected?*
+
+```{r}
+# your work here
+```
+
+**Answer:**
+
+## A2. Independence vs mutually exclusive (2 pts)
+
+**Answer:**
+
+## A3. Joint probability (2 pts)
+
+*Two cameras, each detect with probability 0.30. What is P(at least one detects | present)?*
+
+```{r}
+# your work here
+```
+
+**Answer:**
+
+## A4. Expected value (2 pts)
+
+*Pays \$10,000 if survives, costs \$2,000 if not. P(survival) = 0.7. Expected payoff?*
+
+```{r}
+# your work here
+```
+
+**Answer:**
+
+---
+
+# Part B — Distributions (8 points)
+
+## B1. Pick the distribution (2 pts)
+
+**a. Number of successful nests out of 12 monitored, with shared independent success probability:**
+
+**b. Number of whale sightings per 1-hour acoustic monitoring period:**
+
+**c. Classification of 100 elk into bulls/cows/calves/yearlings:**
+
+## B2. Mean and variance of Poisson(λ=4) (2 pts)
+
+**Answer:**
+
+## B3. Continuous distribution choice (2 pts)
+
+*Strictly positive, right-skewed response.*
+
+**Answer:**
+
+## B4. Normal probability (2 pts)
+
+*Heights N(152, 8²). Fraction taller than 160 cm?*
+
+```{r}
+# you may sketch a Normal curve, mark the threshold, and estimate;
+# or use pnorm() to compute exactly.
+```
+
+**Answer:**
+
+---
+
+# Part C — Regression (10 points)
+
+## C1. Reading a coefficient (2 pts)
+
+*Slope = 0.8 g/mm. Biological interpretation?*
+
+**Answer:**
+
+## C2. Choosing a GLM (3 pts)
+
+**a. Nest success (yes/no) for 100 nests:**
+
+**b. Birds per 5-minute point count:**
+
+**c. Body mass (g), right-skewed and strictly positive:**
+
+## C3. Log-link interpretation (3 pts)
+
+*Poisson regression coefficient β̂ = 0.30. Effect of a 1-unit increase in x?*
+
+```{r}
+# compute exp(0.30) if you remember to
+```
+
+**Answer:**
+
+## C4. Logit-link interpretation (2 pts)
+
+*Logistic regression, age coefficient β̂ = -0.5 on logit scale. Effect on odds per year?*
+
+**Answer:**
+
+---
+
+# Part D — Mixed models / hierarchy (8 points)
+
+## D1. When to use a random effect (2 pts)
+
+*12 sites, 6 plots per site. Problem with a single regression that ignores site?*
+
+**Answer:**
+
+## D2. Random vs fixed (3 pts)
+
+**a. Sex (male/female):**
+
+**b. Year (12 years):**
+
+**c. Treatment (control vs exclosure):**
+
+## D3. Shrinkage intuition (3 pts)
+
+**Answer:**
+
+---
+
+# Part E — Likelihood (5 points)
+
+## E1. What is a likelihood? (2 pts)
+
+**Answer:**
+
+## E2. MLE for a proportion (3 pts)
+
+*30 successes in 50 trials. MLE of p?*
+
+```{r}
+# your work
+```
+
+**Answer:**
+
+---
+
+# Part F — Bayes (8 points)
+
+## F1. Prior, likelihood, posterior (2 pts)
+
+**Prior:**
+
+**Likelihood:**
+
+**Posterior:**
+
+## F2. Posterior interpretation (3 pts)
+
+*95% credible interval (0.2, 0.8). Interpretation and difference from frequentist CI?*
+
+**Answer:**
+
+## F3. Why MCMC (3 pts)
+
+**Answer:**
+
+---
+
+# Part G — Free response (3 points)
+
+## G1. Tell me about your data
+
+*3–5 sentences on the kind of data you work with and a question you'd like to be able to answer after this course.*
+
+**Answer:**
+
+---
+
+# Submission checklist
+
+- [ ] Filled in every section (including "I don't know" where applicable).
+- [ ] Knitted to HTML without errors.
+- [ ] Embedded any photos with `self_contained: true` (see YAML header).
+- [ ] Uploaded the `.html` to Canvas.

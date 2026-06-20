@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en" data-a11y="done">
+<head>
+<meta charset="UTF-8" />
+<title>FW 536 — Statistical Modeling for Ecology and Conservation (Accessible)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="_Shared/css/accessible.css" />
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<div class="a11y-bar" role="region" aria-label="Accessibility">Accessible version &middot; <a href="accessibility.html">How to use this site with a screen reader</a></div>
+
+<aside class="sidebar">
+<p class="brand">FW 536 · Accessible edition</p>
+<div class="subtitle">Statistical Modeling for Ecology and Conservation</div>
+<nav aria-label="Course-wide links">
+<div class="section">Course documents</div>
+<ul>
+  <li><a class="featured" href="accessibility.html">Accessibility guide (start here)</a></li>
+  <li><a class="featured" href="syllabus.html">Syllabus</a></li>
+  <li><a class="featured" href="rmarkdown_tutorial.html">R Markdown tutorial</a></li>
+  <li><a href="pre_course_exam.html">Pre-course exam</a></li>
+  <li><a href="post_course_exam_off.html">Post-course exam</a></li>
+  <li><a href="README.md">README</a></li>
+</ul>
+<div class="section">Jump to a day</div>
+<ul>
+  <li><a href="#day1">Day 1 — Probability &amp; distributions</a></li>
+  <li><a href="#day2">Day 2 — Continuous distributions &amp; GLMs</a></li>
+  <li><a href="#day3">Day 3 — Mixed models &amp; model selection</a></li>
+  <li><a href="#day4">Day 4 — Maximum likelihood &amp; Bayes I</a></li>
+  <li><a href="#day5">Day 5 — Bayesian hierarchical modeling</a></li>
+</ul>
+</nav>
+</aside>
+
+<main class="content" id="main-content" tabindex="-1">
+<header class="lab-header">
+  <div class="eyebrow">FW 536 · Oregon State University · accessible edition</div>
+  <h1>Statistical Modeling for Ecology and Conservation</h1>
+  <p class="lede">A five-day workshop covering probability, distributions, GLMs, mixed models, model selection, maximum likelihood, and Bayesian hierarchical modeling in R, JAGS, and Nimble. This is the screen-reader-optimized version of the course site.</p>
+</header>
+
+<div class="callout key">
+<p class="callout-label">New here?</p>
+Read the <a href="accessibility.html">accessibility guide</a> first &mdash; it explains how every page is laid out, how to navigate the math, and how assignments are submitted.
+</div>
+
+<section aria-labelledby="how-h">
+<h2 id="how-h">How each day works</h2>
+<p>Each day has a morning and an afternoon session. Every session includes:</p>
+<ul>
+  <li>An <strong>accessible lecture-notes</strong> page (a text transcript of the slides).</li>
+  <li>A <strong>plain-language summary</strong> of the concepts.</li>
+  <li>A <strong>practice lab</strong> with answers you can reveal (for in-class work).</li>
+  <li>Two <strong>assessed problem sets</strong> (version 2 and version 3) on the same concepts in different ecological themes &mdash; you pick whichever theme you prefer. These are the 20-point graded assignments.</li>
+  <li>A matching <strong>R Markdown hand-in template</strong> for each problem-set version.</li>
+  <li>Any <strong>datasets and R scripts</strong> used, in the day's <code>data/</code> folder.</li>
+</ul>
+</section>
+
+<ul class="day-list">
+
+  <li id="day1">
+    <h2>Day 1 — Probability &amp; discrete distributions</h2>
+    <p><strong>Pre-course exam</strong> is taken at the start of Day 1 morning: <a href="pre_course_exam.html">pre-course exam</a> (template: <a href="pre_course_exam.Rmd">pre_course_exam.Rmd</a>).</p>
+    <h3>Morning — Probability (20 points)</h3>
+    <ul>
+      <li>Lecture notes: <a href="Day1_Probability/lecture_day1_morning.html">Introduction to probability</a></li>
+      <li>Plain-language summary: <a href="Day1_Probability/plain_language_summary.html">summary</a></li>
+      <li>Practice lab (answers visible): <a href="Day1_Probability/lab.html#morning">morning practice</a></li>
+      <li>Assessed, choose one theme: <a href="Day1_Probability/problem_set_v2.html#morning">v2 marine &amp; fisheries</a> or <a href="Day1_Probability/problem_set_v3.html#morning">v3 terrestrial wildlife &amp; disease</a></li>
+      <li>Hand-in template: <a href="Day1_Probability/morning_lab_template_v2.Rmd">v2 template</a> or <a href="Day1_Probability/morning_lab_template_v3.Rmd">v3 template</a></li>
+    </ul>
+    <h3>Afternoon — Discrete distributions (20 points)</h3>
+    <ul>
+      <li>Lecture notes: <a href="Day1_Probability/lecture_day1_afternoon.html">Discrete distributions</a></li>
+      <li>Practice lab: <a href="Day1_Probability/lab.html#afternoon">afternoon practice</a></li>
+      <li>Assessed, choose one theme: <a href="Day1_Probability/problem_set_v2.html#afternoon">v2 marine &amp; fisheries</a> or <a href="Day1_Probability/problem_set_v3.html#afternoon">v3 terrestrial wildlife &amp; disease</a></li>
+      <li>Hand-in template: <a href="Day1_Probability/afternoon_lab_template_v2.Rmd">v2 template</a> or <a href="Day1_Probability/afternoon_lab_template_v3.Rmd">v3 template</a></li>
+    </ul>
+  </li>
+
+  <li id="day2">
+    <h2>Day 2 — Continuous distributions, linear models &amp; GLMs</h2>
+    <p>Companion guide: <a href="Day2_GLM/log_logit_intuition.html">Log &amp; logit link intuition</a> (16 worked biological examples).</p>
+    <h3>Morning — Continuous distributions (20 points)</h3>
+    <ul>
+      <li>Lecture notes: <a href="Day2_GLM/lecture_day2_morning.html">Continuous distributions</a></li>
+      <li>Plain-language summary: <a href="Day2_GLM/plain_language_summary.html">summary</a></li>
+      <li>Practice lab: <a href="Day2_GLM/lab.html#morning">morning practice</a></li>
+      <li>Assessed, choose one theme: <a href="Day2_GLM/problem_set_v2.html#morning">v2 forest &amp; songbird</a> or <a href="Day2_GLM/problem_set_v3.html#morning">v3 aquatic &amp; fisheries</a></li>
+      <li>Hand-in template: <a href="Day2_GLM/morning_lab_template_v2.Rmd">v2 template</a> or <a href="Day2_GLM/morning_lab_template_v3.Rmd">v3 template</a></li>
+    </ul>
+    <h3>Afternoon — Linear models &amp; GLMs (20 points)</h3>
+    <ul>
+      <li>Lecture notes: <a href="Day2_GLM/lecture_day2_afternoon.html">Generalized linear models</a></li>
+      <li>Practice lab: <a href="Day2_GLM/lab.html#afternoon">afternoon practice</a></li>
+      <li>Assessed, choose one theme: <a href="Day2_GLM/problem_set_v2.html#afternoon">v2 forest &amp; songbird</a> or <a href="Day2_GLM/problem_set_v3.html#afternoon">v3 aquatic &amp; fisheries</a></li>
+      <li>Hand-in template: <a href="Day2_GLM/afternoon_lab_template_v2.Rmd">v2 template</a> or <a href="Day2_GLM/afternoon_lab_template_v3.Rmd">v3 template</a></li>
+    </ul>
+  </li>
+
+  <li id="day3">
+    <h2>Day 3 — Mixed models &amp; model selection</h2>
+    <h3>Morning — Mixed models (20 points)</h3>
+    <ul>
+      <li>Lecture notes: <a href="Day3_MixedModels_ModelSelection/lecture_day3_morning.html">Mixed effects models</a></li>
+      <li>Plain-language summary: <a href="Day3_MixedModels_ModelSelection/plain_language_summary.html">summary</a></li>
+      <li>Practice lab: <a href="Day3_MixedModels_ModelSelection/lab.html#morning">morning practice</a></li>
+      <li>Assessed, choose one theme: <a href="Day3_MixedModels_ModelSelection/problem_set_v2.html#morning">v2 terrestrial wildlife</a> or <a href="Day3_MixedModels_ModelSelection/problem_set_v3.html#morning">v3 aquatic &amp; fisheries</a></li>
+      <li>Hand-in template: <a href="Day3_MixedModels_ModelSelection/morning_lab_template_v2.Rmd">v2 template</a> or <a href="Day3_MixedModels_ModelSelection/morning_lab_template_v3.Rmd">v3 template</a></li>
+    </ul>
+    <h3>Afternoon — Model selection (20 points)</h3>
+    <ul>
+      <li>Lecture notes: <a href="Day3_MixedModels_ModelSelection/lecture_day3_afternoon.html">Hypothesis tests &amp; model selection</a></li>
+      <li>Practice lab: <a href="Day3_MixedModels_ModelSelection/lab.html#afternoon">afternoon practice</a></li>
+      <li>Assessed, choose one theme: <a href="Day3_MixedModels_ModelSelection/problem_set_v2.html#afternoon">v2 terrestrial wildlife</a> or <a href="Day3_MixedModels_ModelSelection/problem_set_v3.html#afternoon">v3 aquatic &amp; fisheries</a></li>
+      <li>Hand-in template: <a href="Day3_MixedModels_ModelSelection/afternoon_lab_template_v2.Rmd">v2 template</a> or <a href="Day3_MixedModels_ModelSelection/afternoon_lab_template_v3.Rmd">v3 template</a></li>
+    </ul>
+  </li>
+
+  <li id="day4">
+    <h2>Day 4 — Maximum likelihood &amp; Bayes I</h2>
+    <div class="callout warn">
+    <p class="callout-label">Topic split</p>
+    The morning covers maximum likelihood only (problems 1&ndash;3). Bayesian methods are introduced in the afternoon (problems 4&ndash;10).
+    </div>
+    <h3>Morning — Maximum likelihood (20 points)</h3>
+    <ul>
+      <li>Lecture notes: <a href="Day4_Likelihood_BayesI/lecture_day4_morning.html">Maximum likelihood</a></li>
+      <li>Plain-language summary: <a href="Day4_Likelihood_BayesI/plain_language_summary.html">summary</a></li>
+      <li>Practice lab: <a href="Day4_Likelihood_BayesI/lab.html#morning">morning practice</a></li>
+      <li>Assessed, choose one theme: <a href="Day4_Likelihood_BayesI/problem_set_v2.html#morning">v2 avian / songbird</a> or <a href="Day4_Likelihood_BayesI/problem_set_v3.html#morning">v3 marine &amp; stock assessment</a></li>
+      <li>Hand-in template: <a href="Day4_Likelihood_BayesI/morning_lab_template_v2.Rmd">v2 template</a> or <a href="Day4_Likelihood_BayesI/morning_lab_template_v3.Rmd">v3 template</a></li>
+    </ul>
+    <h3>Afternoon — Bayes I (20 points)</h3>
+    <ul>
+      <li>Lecture notes: <a href="Day4_Likelihood_BayesI/lecture_day4_afternoon.html">Bayesian statistics I</a></li>
+      <li>Practice lab: <a href="Day4_Likelihood_BayesI/lab.html#afternoon">afternoon practice</a></li>
+      <li>Assessed, choose one theme: <a href="Day4_Likelihood_BayesI/problem_set_v2.html#afternoon">v2 avian / songbird</a> or <a href="Day4_Likelihood_BayesI/problem_set_v3.html#afternoon">v3 marine &amp; stock assessment</a></li>
+      <li>Hand-in template: <a href="Day4_Likelihood_BayesI/afternoon_lab_template_v2.Rmd">v2 template</a> or <a href="Day4_Likelihood_BayesI/afternoon_lab_template_v3.Rmd">v3 template</a></li>
+      <li>Nimble script: <a href="Day4_Likelihood_BayesI/Logistic_BayesianGrowth_Nimble.R">logistic growth</a></li>
+    </ul>
+  </li>
+
+  <li id="day5">
+    <h2>Day 5 — Bayesian hierarchical modeling</h2>
+    <h3>Morning — Bayes II (20 points)</h3>
+    <ul>
+      <li>Lecture notes: <a href="Day5_BayesII/lecture_day5.html">Bayesian statistics II</a></li>
+      <li>Plain-language summary: <a href="Day5_BayesII/plain_language_summary.html">summary</a></li>
+      <li>Practice lab: <a href="Day5_BayesII/lab.html#morning">morning practice</a></li>
+      <li>Assessed, choose one theme: <a href="Day5_BayesII/problem_set_v2.html#morning">v2 forest carnivore</a> or <a href="Day5_BayesII/problem_set_v3.html#morning">v3 anadromous fish &amp; freshwater</a></li>
+      <li>Hand-in template: <a href="Day5_BayesII/morning_lab_template_v2.Rmd">v2 template</a> or <a href="Day5_BayesII/morning_lab_template_v3.Rmd">v3 template</a></li>
+      <li>Nimble scripts: <a href="Day5_BayesII/Lizards_Nimble.R">lizards</a>, <a href="Day5_BayesII/SpawnerRecruit_Nimble.R">spawner-recruit</a>, <a href="Day5_BayesII/DynamicOccupancy_Nimble.R">dynamic occupancy</a>, <a href="Day5_BayesII/NMixture_Nimble.R">N-mixture</a>, <a href="Day5_BayesII/Multilevel_Nimble.R">multilevel</a></li>
+    </ul>
+    <h3>Afternoon — Post-course exam</h3>
+    <ul>
+      <li><a href="post_course_exam_off.html">Post-course exam</a> (template: <a href="post_course_exam.Rmd">post_course_exam.Rmd</a>)</li>
+    </ul>
+  </li>
+
+</ul>
+
+<section aria-labelledby="notes-h">
+<h2 id="notes-h">Notes for this accessible edition</h2>
+<ul>
+  <li>The original PowerPoint files are still in each day's folder, but the <strong>lecture-notes pages</strong> above are the recommended, screen-reader-friendly way to read the lectures.</li>
+  <li>Some lecture figures still need text descriptions; if you reach one you need, ask the instructor.</li>
+  <li>Where a problem says to plot and inspect, you may report and interpret the numeric results instead. See the <a href="accessibility.html#work">accessibility guide</a> for details.</li>
+</ul>
+</section>
+
+</main>
+
+<footer>FW 536 &middot; Statistical Modeling for Ecology and Conservation &middot; Oregon State University &middot; Accessible edition. Original course by Taal Levi.</footer>
+</body>
+</html>

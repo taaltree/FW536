@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en" data-a11y="done">
+<head>
+<meta charset="UTF-8" />
+<title>Day 2 · Answer key | FW 536</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../_Shared/css/accessible.css" />
+<script defer src="../_Shared/js/accessible.js"></script>
+<script>
+MathJax = {
+  tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
+  options: {
+    menuOptions: { settings: { assistiveMml: true, explorer: true } }
+  },
+  loader: { load: ['a11y/assistive-mml', 'a11y/explorer'] }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script"></script>
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<div class="a11y-bar" role="region" aria-label="Accessibility">Accessible version &middot; <a href="../accessibility.html">How to use this site with a screen reader</a> &middot; <a href="../index.html">Course home</a></div>
+
+<div class="shell">
+
+<aside class="sidebar">
+ <p class="brand"><a href="../index.html" title="Back to course home">FW 536 · Day 2</a></p>
+ <div class="subtitle">Answer key</div>
+ <nav aria-label="On this page and related documents">
+ <div class="section">Morning lab</div>
+ <ul>
+ <li><a href="#m1">M1 — orangutan transects</a></li>
+ <li><a href="#m2">M2 — Normal transforms</a></li>
+ <li><a href="#m3">M3 — beta-binomial cameras</a></li>
+ </ul>
+ <div class="section">Afternoon lab</div>
+ <ul>
+ <li><a href="#a1">A1 — sockeye eDNA</a></li>
+ <li><a href="#a2">A2 — Titanic long vs prop</a></li>
+ <li><a href="#a3">A3 — Titanic interactions</a></li>
+ </ul>
+ <div class="section">Log/logit guide</div>
+ <ul>
+ <li><a href="#log-notes">Log-link examples L1-L8</a></li>
+ <li><a href="#logit-notes">Logit examples B1-B8</a></li>
+ <li><a href="#try-notes">Try-it answers</a></li>
+ </ul>
+ <div class="section">Day 2 docs</div>
+ <ul>
+ <li><a href="lab.html">Main lab</a></li>
+ <li><a class="featured" href="plain_language_summary.html">Plain-language summary</a></li>
+ <li><a href="log_logit_intuition.html">Log/logit intuition guide</a></li>
+ <li><a href="problem_set_v2.html">Problem set v2 (forest/songbird)</a></li>
+ <li><a href="problem_set_v3.html">Problem set v3 (aquatic/fisheries)</a></li>
+ </ul>
+ </nav>
+</aside>
+
+<main class="content" id="main-content" tabindex="-1">
+<header class="lab-header">
+ <div class="eyebrow">Day 2 · Answer Key (instructor)</div>
+ <h1>Worked solutions — Linear Models, Links, and GLMs</h1>
+ <p class="lede">Full numeric and biological answers to every Day 2 exercise. Each answer ships with R code, expected output, a biological interpretation paragraph, and a "what to look for in a student response" note for instructors.</p>
+</header>
+
+<section><div class="callout key"><p class="callout-label">Key idea</p>
+<strong>How to use this document.</strong> Walk through each exercise in order. When a student produces a numeric answer, check whether they can also state the <em>biological</em> interpretation in one sentence. Day 2's pedagogical goal is not "fit the GLM"; it is "read the GLM as biology." Reward the student who says "a doubling of eDNA is associated with a 62% increase in expected adult sockeye." Push back on the student who says "the slope is 0.7 (SE 0.04)."
+</div></section>
+
+<!-- ============================================================ -->
+<!-- MORNING -->
+<!-- ============================================================ -->
+<section id="m1">
+<h2>Exercise M1 — Orangutan line transects (Exponential)</h2>
+<p><strong>Setup.</strong> Detection function $f(x) = \lambda e^{-\lambda x}$ with $\lambda = 0.02$ per meter.</p>
+<p>The <em>survival function</em> (probability of <em>not yet</em> being detected by distance $x$) is</p>
+<div class="eq-block">$S(x) = P(X \ge x) = e^{-\lambda x}$</div>
+<p>At $x = 50$:</p>
+<pre><code>lambda &lt;- 0.02
+exp(-lambda * 50) # 0.3679</code></pre>
+<p><strong>Biological interpretation.</strong> A 37% probability of missing an orangutan that is 50 m off the trackline is huge. This is exactly why distance-sampling analyses must <em>correct</em> raw counts by a fitted detection function instead of treating raw counts as abundance estimates. The "effective strip half-width" — the integral of $S(x)$ — gives you a single number to multiply transect length by to get the area effectively searched. For $\lambda = 0.02$, that effective half-width is $1/\lambda = 50$ m, even though the truncation distance might be 100 m or more.</p>
+<div class="callout key"><p class="callout-label">Key idea</p><strong>What to look for:</strong> students should derive $S(x)$ from $f(x)$ (or recall it directly) and explain why ignoring the detection function inflates apparent declines in abundance with distance — a classic source of bias in transect work.</div>
+</section>
+
+<section id="m2">
+<h2>Exercise M2 — Linear transformations of Normals</h2>
+<p>Let $Z \sim \mathcal{N}(0,1)$ and $Y = \mu + \sigma Z$.</p>
+<p><strong>Mean:</strong> $E[Y] = E[\mu + \sigma Z] = \mu + \sigma E[Z] = \mu + 0 = \mu$.</p>
+<p><strong>Variance:</strong> $\mathrm{Var}(Y) = \mathrm{Var}(\mu + \sigma Z) = \sigma^2 \mathrm{Var}(Z) = \sigma^2 \cdot 1 = \sigma^2$.</p>
+<p>The <em>shape</em> stays Gaussian because the characteristic function (or MGF) of $\mu + \sigma Z$ is still that of a Normal — a linear combination of a Normal random variable is Normal.</p>
+<pre><code>set.seed(1)
+z &lt;- rnorm(1e6)
+y &lt;- 10 + 3 * z
+mean(y); sd(y) # ~ 10 and ~ 3
+hist(y, breaks=80) # symmetric bell</code></pre>
+<p><strong>Biological interpretation.</strong> This is the mathematical reason every regression diagnostic plot puts standardized residuals on a $\mathcal{N}(0,1)$ axis. Any Normal can be rescaled to a standard Normal — so all the percentile thresholds (the $\pm 1.96$ for a 95% interval, the $\pm 2.58$ for 99%) are universal once you standardize. Students who internalize this also understand why <em>standardizing</em> predictors is so often useful: it makes effect-size comparisons across covariates dimensionally meaningful.</p>
+<div class="callout key"><p class="callout-label">Key idea</p><strong>What to look for:</strong> a student should be able to state both the algebraic identity and the practical consequence ("z-scores let me compare effects across variables").</div>
+</section>
+
+<section id="m3">
+<h2>Exercise M3 — Beta-Binomial trail cameras</h2>
+<p><strong>(a) Mean of Beta$(0.03, 0.97)$:</strong> $\alpha/(\alpha + \beta) = 0.03/1 = 0.03$. Same expected detection probability as the plain binomial.</p>
+<p><strong>(b) Simulation.</strong></p>
+<pre><code>set.seed(1); reps &lt;- 5000
+bin &lt;- rbinom(reps, 200, 0.03)
+betbin &lt;- replicate(reps, sum(rbinom(200, 1, rbeta(200, 0.03, 0.97))))
+mean(bin == 0); mean(betbin == 0) # ~ 0.0024 vs ~ 0.045
+mean(bin); mean(betbin) # ~ 6.0 vs ~ 6.0
+sd(bin); sd(betbin) # ~ 2.4 vs ~ 14</code></pre>
+<p><strong>(c) Why so much "all-zero" mass?</strong> With $\alpha + \beta = 1$ the Beta is U-shaped: most cameras draw either a tiny $p_i$ (essentially 0) or a huge $p_i$ (essentially 1). On a given night, if every camera happened to land near zero, you get an all-zero deployment. That outcome is essentially impossible under a plain Bin(200, 0.03) where every camera has the same modest probability and the law of large numbers smooths things out. The variance jumps from $\approx 5.8$ (binomial) to $\approx 200$ (beta-binomial) — a 35-fold inflation, all driven by individual heterogeneity.</p>
+<p><strong>Biological interpretation.</strong> This is the camera-trap version of what Day 1 taught with mixtures of Poissons: heterogeneity among sampling units inflates variance even when the marginal mean is correct. If your wildlife survey is "we deployed 200 cameras for one night each," the right model is almost never a plain binomial — cameras differ in placement, lure, weather, and species behaviour near each unit. Beta-binomial (or random-effect logistic) corrects the SEs that a plain binomial would underestimate.</p>
+<div class="callout key"><p class="callout-label">Key idea</p><strong>What to look for:</strong> students should connect the U-shaped Beta to "lots of bad cameras + a few great cameras," and to the broader Day-1 lesson that heterogeneity → overdispersion. Bonus if they note that the mean is preserved but the SE is not.</div>
+</section>
+
+<!-- ============================================================ -->
+<!-- AFTERNOON -->
+<!-- ============================================================ -->
+<section id="a1">
+<h2>Exercise A1 — Sockeye eDNA: choosing the distribution</h2>
+
+<pre><code>library(MASS)
+sock &lt;- read.csv("../../LecturesandLabs/Labs/Day2/sockeye_adult.csv")
+min_pos &lt;- min(sock$Qcorr_qPCR[sock$Qcorr_qPCR &gt; 0])
+
+# 1. Log-Normal regression on log(count+1)
+f_lm &lt;- lm(log(Sockeye_Adults + 1) ~ log(Qcorr_qPCR + min_pos), data = sock)
+summary(f_lm)
+
+# 2. Plain Poisson
+f_p &lt;- glm(Sockeye_Adults ~ log(Qcorr_qPCR + min_pos) + factor(Year),
+ family = poisson, data = sock)
+summary(f_p)
+sum(residuals(f_p, "pearson")^2) / df.residual(f_p) # dispersion ~ 50-200
+
+# 3. Quasipoisson
+f_qp &lt;- glm(Sockeye_Adults ~ log(Qcorr_qPCR + min_pos) + factor(Year),
+ family = quasipoisson, data = sock)
+summary(f_qp)
+
+# 4. Negative binomial
+f_nb &lt;- glm.nb(Sockeye_Adults ~ log(Qcorr_qPCR + min_pos) + factor(Year), data = sock)
+summary(f_nb)</code></pre>
+
+<p><strong>Diagnostic check.</strong> The plain Poisson typically returns a Pearson dispersion well above 1 — often 50 or more — which immediately disqualifies it. The quasipoisson keeps the same point estimates but rescales the SEs by $\sqrt{\hat\phi}$, producing realistic uncertainty. The negative binomial provides a proper likelihood (so you can compare via AIC) and a finite-sample dispersion parameter $\theta$.</p>
+
+<p><strong>Coefficient back-transform.</strong> Say the eDNA slope from the NB fit is $\hat\beta = 0.70$ on the $\log(\text{Qcorr})$ predictor. A "doubling of eDNA" corresponds to a one-unit change on the $\log_2$ scale, or equivalently $\ln 2 = 0.693$ on the natural-log scale. So the multiplicative effect of a doubling is</p>
+<div class="eq-block">$\exp(0.693 \cdot 0.70) = \exp(0.485) = 1.62$</div>
+<p>A doubling of eDNA concentration is associated with a 62% increase in expected daily adult sockeye count.</p>
+
+<p><strong>Biological interpretation.</strong> eDNA is shed proportionally to biomass (per unit volume of water), so an eDNA-to-count slope below 1 on the log scale tells you the relationship is sublinear — possibly because fish in dense schools shed less per fish (boundary-layer effects), or because qPCR saturates at high concentrations. A slope above 1 would suggest the opposite — eDNA "amplifies" the count signal, perhaps because larger fish (which dominate the run-timing tails) shed disproportionately more eDNA per individual. The 1.62× number is what goes in your abstract; the SE matters only insofar as it tells you whether the slope is distinguishable from 0 or from 1.</p>
+
+<div class="callout bio"><p class="callout-label">Biological intuition</p><strong>The pedagogical moment.</strong> A Poisson with overdispersion gives an SE that is too small by a factor of $\sqrt{50} \approx 7$. The qualitative story (positive eDNA–count association) is correct but the confidence statement is wrong by an order of magnitude. The afternoon exercise is meant to make students <em>feel</em> that gap.</div>
+
+<div class="callout key"><p class="callout-label">Key idea</p><strong>What to look for:</strong> students must (a) diagnose overdispersion, (b) refit with quasipoisson or NB, (c) back-transform the slope to a fold-change interpretation, and (d) name the biological mechanism the slope encodes.</div>
+</section>
+
+<section id="a2">
+<h2>Exercise A2 — Titanic: long vs aggregated form</h2>
+
+<pre><code>long &lt;- read.csv("../../LecturesandLabs/Labs/Day2/titanic_long.csv")
+prop &lt;- read.csv("../../LecturesandLabs/Labs/Day2/titanic_prop.csv")
+
+f1 &lt;- glm(survived ~ class, family = binomial, data = long)
+f2 &lt;- glm(cbind(Yes, No) ~ Class, family = binomial, data = prop)
+coef(f1); coef(f2) # identical to numerical precision
+
+# Convert intercept + each contrast to probability
+classes &lt;- c("1st", "2nd", "3rd", "Crew")
+lp &lt;- coef(f1)[1] + c(0, coef(f1)[-1])
+plogis(lp) # fitted p per class
+
+prop$Yes / (prop$Yes + prop$No) # raw proportions = same</code></pre>
+
+<p>Typical output:</p>
+<table>
+<tr><th scope="col">Class</th><th scope="col">Log-odds</th><th scope="col">Odds</th><th scope="col">$\hat p$</th><th scope="col">Raw proportion</th></tr>
+<tr><td>1st</td><td>+0.51</td><td>1.66</td><td>0.625</td><td>0.625</td></tr>
+<tr><td>2nd</td><td>−0.30</td><td>0.74</td><td>0.414</td><td>0.414</td></tr>
+<tr><td>3rd</td><td>−1.27</td><td>0.28</td><td>0.252</td><td>0.252</td></tr>
+<tr><td>Crew</td><td>−1.31</td><td>0.27</td><td>0.240</td><td>0.240</td></tr>
+</table>
+
+<p><strong>Why are the coefficients identical?</strong> The Bernoulli likelihood is exactly the product of independent Bernoullis. Aggregating "67 yes out of 175 second-class" into one Binomial summary is mathematically the same likelihood up to a multinomial coefficient that does not depend on $p$. Only the deviance and AIC differ (by a constant offset). The maximum-likelihood estimates and SEs are unchanged.</p>
+
+<p><strong>Biological interpretation.</strong> The class coefficients trace a steep social gradient: 1st-class odds of survival are about 6× those of 3rd class ($1.66/0.28 \approx 5.9$), or equivalently a log-odds gap of about 1.78 ($+0.51 - (-1.27)$). Translating to probabilities, 1st-class passengers survived at 62.5% vs 25.2% in 3rd — a 37 percentage-point gap. The model recovers the raw proportions exactly because with a single categorical predictor and no other constraints, the MLE just <em>is</em> the empirical proportion in each group. This is a useful sanity check: any time your saturated logistic model disagrees with the empirical fractions, something is wrong with your code.</p>
+
+<div class="callout key"><p class="callout-label">Key idea</p><strong>What to look for:</strong> students should explicitly note the equivalence of long-form and aggregated-form data, and verify by reading off the same predicted probabilities. Bonus if they connect "saturated model = empirical proportions" to the deviance/df calculation.</div>
+</section>
+
+<section id="a3">
+<h2>Exercise A3 — Titanic with interactions</h2>
+
+<pre><code>library(effects); library(emmeans)
+f3 &lt;- glm(survived ~ class * sex + age, family = binomial, data = long)
+summary(f3)
+plot(allEffects(f3))
+emmeans(f3, pairwise ~ class | sex, type = "response")</code></pre>
+
+<p><strong>(a) Largest pairwise odds ratio.</strong> The female 1st-class vs female 3rd-class contrast is enormous — typically OR &gt; 25 (log-odds difference around 3.3). Females in 1st class survived at $p \approx 0.97$; females in 3rd at $p \approx 0.49$.</p>
+
+<p><strong>(b) Why not TukeyHSD on an aov?</strong> TukeyHSD treats the model as a Gaussian linear model with constant variance and an identity link. On a binary outcome, the variance is $p(1-p)$ — heteroskedastic by construction — and the response is on the wrong scale (0/1) for Normal-theory inference. <code>emmeans</code> applies the correct binomial likelihood and lets you choose whether to report contrasts on the link scale (log-odds) or the response scale (probability), with the correct delta-method standard errors.</p>
+
+<p><strong>(c) Female 1st-vs-3rd, age 30, probability difference.</strong> Suppose the model gives</p>
+<pre><code>predict(f3, newdata = data.frame(class = c("1st","3rd"), sex = "female", age = 30),
+ type = "response")
+# 1st: 0.969 3rd: 0.486</code></pre>
+<p>A 30-year-old female 1st-class passenger was modeled as ~48 percentage points more likely to survive than a 30-year-old female 3rd-class passenger — by far the largest demographic gap in the dataset.</p>
+
+<p><strong>Biological interpretation.</strong> The interaction encodes the famous "women and children first" effect being <em>selectively</em> applied. The protective effect of being female (the main sex coefficient) is amplified for higher-class passengers and partially erased for 3rd-class — because the structural barriers (gates, distance to boats, language) overwhelmed the sex-prioritized evacuation in 3rd class. Reading the model on the odds-ratio scale tells you the social pattern; reading it on the probability scale tells you the human cost.</p>
+
+<div class="callout key"><p class="callout-label">Key idea</p><strong>What to look for:</strong> students must (1) explain why TukeyHSD is wrong (link function, non-Normal variance), (2) generate a probability prediction for a specific covariate combination, and (3) describe the interaction as a <em>biological</em> effect, not just a coefficient sign.</div>
+</section>
+
+<!-- ============================================================ -->
+<!-- LOG/LOGIT GUIDE NOTES -->
+<!-- ============================================================ -->
+<section id="log-notes">
+<h2>Notes on the log-link examples (L1–L8)</h2>
+
+<table>
+<tr><th scope="col">Ex</th><th scope="col">Coefficient</th><th scope="col">$e^\beta$</th><th scope="col">Biology to emphasize</th></tr>
+<tr><td>L1 salmonberry</td><td>$-0.003$ /m elev</td><td>0.997</td><td>Half-elevation 231 m; tiny per-meter effect but big over a hillside.</td></tr>
+<tr><td>L2 whale calls</td><td>$+0.04$ /ship</td><td>1.041</td><td>Sign is a confounder warning — productive waters have both more ships and more whales.</td></tr>
+<tr><td>L3 caterpillars</td><td>$+0.85$ fert</td><td>2.34</td><td>"Fold change" is the natural ecologist's idiom; don't say "the coefficient is 0.85."</td></tr>
+<tr><td>L4 bobcats</td><td>$+0.025$ /% canopy; $-0.40$ /road</td><td>1.025; 0.67</td><td>Roads have a much larger per-unit effect than canopy; 3 roads/km² cuts detections to 30%.</td></tr>
+<tr><td>L5 mortality</td><td>$+0.08$ /yr</td><td>1.083</td><td>Gompertz-style mortality doubling time = 8.7 years.</td></tr>
+<tr><td>L6 time-to-detection</td><td>$-0.30$ /SD prey</td><td>0.74</td><td>Lognormal slope: each SD of prey cuts time by 26%.</td></tr>
+<tr><td>L7 temp × gear</td><td>main $-0.05$, int $+0.08$</td><td>—</td><td>Opposite signs on the two gears; do not report a "temperature effect" without specifying gear.</td></tr>
+<tr><td>L8 offset(log(hours))</td><td>habitat $+0.5$</td><td>1.65</td><td>Offset converts a count model into a per-unit-effort rate model; one of the most under-used tricks in ecology.</td></tr>
+</table>
+
+<div class="callout key"><p class="callout-label">Key idea</p><strong>Instructor cue.</strong> When students do these as a quiz, the failure mode is almost always "they report the raw coefficient." Insist on a sentence of the form "a 1-unit change in <em>x</em> multiplies expected <em>y</em> by <em>e<sup>β</sup></em>, which means…"</div>
+</section>
+
+<section id="logit-notes">
+<h2>Notes on the logit-link examples (B1–B8)</h2>
+
+<table>
+<tr><th scope="col">Ex</th><th scope="col">Coefficient</th><th scope="col">Numerical translation</th><th scope="col">Biology to emphasize</th></tr>
+<tr><td>B1 marten canopy</td><td>$+0.04$ /% canopy</td><td>$p$: 0.12 → 0.50 → 0.88 across 0–100% canopy</td><td>Per-unit OR = 1.041; intuition through endpoints, not raw coef.</td></tr>
+<tr><td>B2 smolt temp</td><td>$-0.30$ /°C</td><td>OR = 0.74 per °C; $0.74^5 = 0.22$</td><td>5°C warming drops odds 78%; probability drop depends on baseline.</td></tr>
+<tr><td>B3 nest age</td><td>$+0.15$ /yr</td><td>$p$ at age 10 ≈ 0.68 (up from 0.50 at age 5)</td><td>"Divide by 4" approximation works near $p = 0.5$.</td></tr>
+<tr><td>B4 trap response</td><td>$-1.5$</td><td>OR = 0.22; $p$ 0.40 → 0.13</td><td>Trap-shy effect; standard MR model parameter.</td></tr>
+<tr><td>B5 threshold</td><td>int $-3$, slope $+0.06$</td><td>$x_{50} = 50$</td><td>Inflection point as the "habitat threshold."</td></tr>
+<tr><td>B6 marginal effect</td><td>—</td><td>$\beta p (1-p)$</td><td>Communicate to managers in percentage points per unit, not in log-odds.</td></tr>
+<tr><td>B7 sex × class</td><td>—</td><td>Sex penalty smaller in 3rd class</td><td>Interactions on the logit scale ≠ interactions on probability scale.</td></tr>
+<tr><td>B8 case-control</td><td>—</td><td>Slopes valid; intercept biased</td><td>Prentice & Pyke (1979); why epidemiologists love logistic regression.</td></tr>
+</table>
+
+<div class="callout key"><p class="callout-label">Key idea</p><strong>Instructor cue.</strong> Push students to give every answer on <em>three</em> scales: log-odds, odds ratio, and probability change at a stated baseline. The third one is what they will report.</div>
+</section>
+
+<section id="try-notes">
+<h2>Try-it exercises (log + logit)</h2>
+
+<h3>Log-link "Try" answers</h3>
+<ul>
+<li><strong>Try 1.</strong> $e^{0.12 \cdot 5} = e^{0.6} = 1.82$. Five degrees of warming multiplies expected counts by 1.82.</li>
+<li><strong>Try 2.</strong> $\beta = \ln(1.5) = 0.405$ on the $\log_2$ predictor.</li>
+<li><strong>Try 3.</strong> Point estimate $e^{0.40} = 1.49$; CI $(e^{0.18}, e^{0.62}) = (1.20, 1.86)$. Asymmetric on the response scale.</li>
+</ul>
+
+<h3>Logit-link "Try" answers</h3>
+<ul>
+<li><strong>Try L1.</strong> $e^{0.69} = 2.00$. The odds double.</li>
+<li><strong>Try L2.</strong> $p = $ <code>plogis(c(-1, 2, 5))</code> = (0.269, 0.881, 0.993).</li>
+<li><strong>Try L3.</strong> $\text{logit}(0.75) = \ln 3 = 1.099$; $x = (1.099 + 0.5)/0.03 = 53.3$.</li>
+<li><strong>Try L4.</strong> Marginal effect at $p = 0.2$: $0.5 \cdot 0.2 \cdot 0.8 = 0.08$, or 8 percentage points per unit $x$.</li>
+</ul>
+
+<div class="callout key"><p class="callout-label">Key idea</p><strong>Instructor cue.</strong> If a student gets the arithmetic right but cannot say what the answer <em>means</em> ecologically, the exercise has not been learned. Ask: "If this were your study system, what would you tell a manager who funded the work?"</div>
+</section>
+
+<div style="margin-top:60px;">
+<button id="reveal-all" style="background:var(--accent); color:white; border:none; padding:10px 20px; border-radius:4px; cursor:pointer;">Expand all</button>
+<a href="lab.html" style="background:var(--osu-orange); color:white; padding:10px 20px; border-radius:4px; text-decoration:none; margin-left:8px;">← Back to lab</a>
+<a href="log_logit_intuition.html" style="background:#2E6B2A; color:white; padding:10px 20px; border-radius:4px; text-decoration:none; margin-left:8px;">→ Log/logit intuition guide</a>
+</div>
+
+</main>
+</div>
+
+<footer>FW 536 · Statistical Modeling for Ecology and Conservation · Oregon State University</footer>
+</body>
+</html>

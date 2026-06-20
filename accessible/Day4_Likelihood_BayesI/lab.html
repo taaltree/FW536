@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="en" data-a11y="done">
+<head>
+<meta charset="UTF-8" />
+<title>Day 4 Lab — Maximum Likelihood & Bayesian I | FW 536</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../_Shared/css/accessible.css" />
+<script defer src="../_Shared/js/accessible.js"></script>
+<script>
+MathJax = {
+  tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
+  options: {
+    menuOptions: { settings: { assistiveMml: true, explorer: true } }
+  },
+  loader: { load: ['a11y/assistive-mml', 'a11y/explorer'] }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script"></script>
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<div class="a11y-bar" role="region" aria-label="Accessibility">Accessible version &middot; <a href="../accessibility.html">How to use this site with a screen reader</a> &middot; <a href="../index.html">Course home</a></div>
+
+<div class="shell">
+
+<aside class="sidebar">
+ <p class="brand"><a href="../index.html" title="Back to course home">FW 536 · Day 4</a></p>
+ <div class="subtitle">Maximum Likelihood &amp; Bayesian I</div>
+ <nav aria-label="On this page and related documents">
+ <div class="section">Morning · Likelihood</div>
+ <ul>
+ <li><a href="#orient">Why we care about likelihood</a></li>
+ <li><a href="#concepts-mle">Core concepts</a></li>
+ <li><a href="#bernoulli">Bernoulli warmup</a></li>
+ <li><a href="#grid-vbgf">Grid search · Von Bertalanffy</a></li>
+ <li><a href="#mle-vbgf">Numerical MLE · Vonbert</a></li>
+ <li><a href="#whale-mix">Poisson mixture · whales</a></li>
+ <li><a href="#lrt-profile">LRT &amp; profile likelihood</a></li>
+ <li><a href="#logit-byhand">Bonus: logistic GLM by hand</a></li>
+ <li><a href="#zip">Bonus: zero-inflated Poisson</a></li>
+ </ul>
+ <div class="section">Afternoon · Bayes I</div>
+ <ul>
+ <li><a href="#bayes-orient">From likelihood to posterior</a></li>
+ <li><a href="#bayes-rule">Bayes' rule worked out</a></li>
+ <li><a href="#beta-binom">Beta-Binomial conjugacy</a></li>
+ <li><a href="#gamma-pois">Gamma-Poisson conjugacy</a></li>
+ <li><a href="#why-mcmc">Why conjugacy breaks</a></li>
+ <li><a href="#metropolis">Metropolis in 30 lines</a></li>
+ <li><a href="#nimble-logistic">Logistic growth in Nimble</a></li>
+ <li><a href="#bci-hpdi">BCI vs HPDI</a></li>
+ <li><a href="#bayes-survival">Bonus: Bayesian survival</a></li>
+ <li><a href="#bayes-regression">Bonus: Bayesian regression</a></li>
+ </ul>
+ <div class="section">Exercises</div>
+ <ul>
+ <li><a href="#exercises">All exercises</a></li>
+ </ul>
+ <div class="section">Other docs</div>
+ <ul>
+ <li><a class="featured" href="plain_language_summary.html">Plain-language summary</a></li>
+ <li><a href="answer_key.html">Answer key</a></li>
+ <li><a href="problem_set_v2.html">Problem set · v2 (songbirds)</a></li>
+ <li><a href="problem_set_v3.html">Problem set · v3 (marine)</a></li>
+ </ul>
+ <div class="section">Course</div>
+ <ul>
+ <li><a href="../index.html">All days</a></li>
+ </ul>
+ </nav>
+</aside>
+
+<main class="content" id="main-content" tabindex="-1">
+
+<header class="lab-header">
+ <div class="eyebrow">Day 4 · Lab</div>
+ <h1>Maximum likelihood in the morning, Bayes in the afternoon</h1>
+ <p class="lede">A double-feature day. We start with "which parameter values would have most plausibly produced my data?" and end with "given my data, what is the probability distribution over the parameters?" Two questions, two paradigms, one body of mathematics. We will fit models by grid search, by numerical optimization, and — for the first time this week — by Markov chain Monte Carlo with <span class="pill nimble">Nimble</span>.</p>
+</header>
+
+<div class="lab-toc" id="lab-toc">
+  <h2>What's in this lab and what to hand in</h2>
+  <p class="toc-intro">This page is your <strong>in-class practice</strong> problem set — worked examples with visible answers. Your <strong>graded 20-point assignment</strong> is a separate problem set (v2 or v3); write up your answers in the matching R Markdown template and submit on Canvas.</p>
+  
+<div class="session">
+  <div class="session-label">Morning · 20 pts</div>
+  
+<section class="data-card" id="data-files">
+<h2>Data files &amp; R scripts</h2>
+<p>Everything referenced in this lab's exercises lives in this folder. Click any link below to download.</p>
+<div class="data-section">
+  <h3 class="data-h">Datasets</h3>
+  <div class="data-row"><a href="data/Vonbert.dat"><code>Vonbert.dat</code></a><span class="data-desc">Length-at-age data for von Bertalanffy growth fitting (sex, age, length).</span></div>
+  <div class="data-row"><a href="data/Whale.dat"><code>Whale.dat</code></a><span class="data-desc">Whale blow counts used for the two-component Poisson mixture example.</span></div>
+  <div class="data-row"><a href="data/Logistic.csv"><code>Logistic.csv</code></a><span class="data-desc">Population size and per-capita growth rate (used for the r/K Bayesian fit).</span></div>
+</div>
+<div class="data-section">
+  <h3 class="data-h">R scripts</h3>
+  <div class="data-row"><a href="Jags_logistic_rK_Lab1.R"><code>Jags_logistic_rK_Lab1.R</code></a><span class="data-desc">Jags_logistic_rK_Lab1.R · original JAGS version of the logistic-growth example, for comparison</span></div>
+  <div class="data-row"><a href="Logistic_BayesianGrowth_Nimble.R"><code>Logistic_BayesianGrowth_Nimble.R</code></a><span class="data-desc">Logistic_BayesianGrowth_Nimble.R · Nimble re-implementation</span></div>
+</div>
+</section>
+<div>
+    <div class="session-title">Maximum likelihood problem set</div>
+    <div class="row"><span class="tag practice">Practice</span>
+      <span><a href="#morning">Walk through the morning problems on this page</a> <span class="note">— answers visible, in-class</span></span></div>
+    <div class="row"><span class="tag assessed">Assessed</span>
+      <span><a href="problem_set_v2.html#morning">Assessed v2 &middot; avian / songbird</a> &nbsp;or&nbsp; <a href="problem_set_v3.html#morning">Assessed v3 &middot; marine &amp; stock assessment</a>
+            <span class="note">— answers NOT shown; choose whichever theme fits your interests</span></span></div>
+    <div class="row"><span class="tag template">Hand-in</span><span>Choose template matching your theme: <a href="morning_lab_template_v2.Rmd">morning v2 (avian / songbird).Rmd</a> <span class="note">or</span> <a href="morning_lab_template_v3.Rmd">morning v3 (marine &amp; stock assessment).Rmd</a> <span class="note">— knit to HTML and upload to Canvas</span></span></div>
+    <div class="row"><span class="tag lecture">Lecture</span>
+      <span><a href="lecture_day4_morning.html">Morning lecture · maximum likelihood</a></span></div>
+  </div>
+</div>
+
+<div class="session">
+  <div class="session-label">Afternoon · 20 pts</div>
+  <div>
+    <div class="session-title">Bayesian modeling problem set 1</div>
+    <div class="row"><span class="tag practice">Practice</span>
+      <span><a href="#afternoon">Walk through the afternoon problems on this page</a> <span class="note">— answers visible, in-class</span></span></div>
+    <div class="row"><span class="tag assessed">Assessed</span>
+      <span><a href="problem_set_v2.html#afternoon">Assessed v2 &middot; avian / songbird</a> &nbsp;or&nbsp; <a href="problem_set_v3.html#afternoon">Assessed v3 &middot; marine &amp; stock assessment</a>
+            <span class="note">— answers NOT shown; choose whichever theme fits your interests</span></span></div>
+    <div class="row"><span class="tag template">Hand-in</span><span>Choose template matching your theme: <a href="afternoon_lab_template_v2.Rmd">afternoon v2 (avian / songbird).Rmd</a> <span class="note">or</span> <a href="afternoon_lab_template_v3.Rmd">afternoon v3 (marine &amp; stock assessment).Rmd</a> <span class="note">— knit to HTML and upload to Canvas</span></span></div>
+    <div class="row"><span class="tag lecture">Lecture</span>
+      <span><a href="lecture_day4_afternoon.html">Afternoon lecture · Bayes I</a></span></div>
+  </div>
+</div>
+
+  <p style="font-size:13px; color:var(--muted); margin: 18px 0 0 0;">
+    Need help with R Markdown? See the <a href="../rmarkdown_tutorial.html">R Markdown tutorial</a>.
+    Other docs for this day: <a href="plain_language_summary.html">plain-language summary</a> &middot;
+    <a href="answer_key.html">practice answer key</a>.
+  </p>
+<p style="font-size:13px; color:var(--bad); margin: 12px 0 0 0; padding: 10px; background: #FBE3DD; border-radius: 6px;"><strong>Day 4 topic split:</strong> the morning problem set (problems 1&ndash;3) uses <strong>maximum likelihood only</strong>. The afternoon problem set (problems 4&ndash;10) uses <strong>Bayesian methods</strong>, introduced in the afternoon lecture.</p>
+</div>
+
+
+
+
+
+<!-- ================================================================== -->
+<!-- ====================== MORNING: LIKELIHOOD ======================= -->
+<!-- ================================================================== -->
+
+<a id="morning"></a>
+<div class="practice-banner"><div class="label">Practice — answers visible</div><h3>Morning practice problems</h3><p>The exercises below are walk-through practice. Your graded morning assignment uses a separate, novel problem set &mdash; <strong>choose either theme below</strong> and write your answers in the matching theme template (<code>morning_lab_template_v2.Rmd</code> or <code>morning_lab_template_v3.Rmd</code>).</p><p style="margin: 8px 0 0 0;"><a class="hand-in" href="problem_set_v2.html#morning">v2 &middot; avian / songbird &rarr;</a> &nbsp;or&nbsp; <a class="hand-in" href="problem_set_v3.html#morning">v3 &middot; marine &amp; stock assessment &rarr;</a> &nbsp;&nbsp; <a class="hand-in" href="morning_lab_template_v2.Rmd" style="background:#1C638A; color:white; border-color:#1C638A;">v2 template &darr;</a> <a class="hand-in" href="morning_lab_template_v3.Rmd" style="background:#1C638A; color:white; border-color:#1C638A;">v3 template &darr;</a></p></div>
+<section id="orient">
+<h2>Morning · Why we care about likelihood</h2>
+
+<p>Every model you fit in this course is, secretly, a statement of the form $Y \sim f(\theta)$: data $Y$ are random draws from a distribution whose shape is controlled by parameters $\theta$. Once you write down $f$, the data become a function of $\theta$:</p>
+
+<div class="eq-block">$L(\theta \mid y) \;=\; f(y \mid \theta)$</div>
+
+<p>Same formula, same numbers — only the interpretation flips. As a function of <em>$y$</em> it is a probability (or probability density). As a function of <em>$\theta$</em> with $y$ held fixed at the value you actually observed, it is the <strong>likelihood</strong>. The likelihood is not a probability over $\theta$. It is a measure of how compatible different $\theta$ values are with the data you have.</p>
+
+<div class="callout key"><p class="callout-label">Key idea</p>
+<p><strong>Maximum likelihood</strong> chooses the $\theta$ that makes the observed data as plausible as possible. Formally,</p>
+<div class="eq">$\hat\theta_{\text{MLE}} \;=\; \arg\max_\theta L(\theta \mid y) \;=\; \arg\min_\theta \, -\!\log L(\theta \mid y)$.</div>
+<p>The minus-log version is what your computer actually does: minimize <em>negative log-likelihood</em> (NLL) using a stable, additive scale.</p>
+</div>
+
+<div class="callout bio"><p class="callout-label">Biological intuition</p>
+Why log? Because likelihoods are products of many small probabilities — a single product of 500 terms each ~0.1 underflows to zero on a 64-bit machine. Sums of logs do not underflow. Every numerical likelihood routine in R works on $-\log L$, not $L$.
+</div>
+</section>
+
+<section id="concepts-mle">
+<h2>Core concepts you will use all morning</h2>
+
+<table>
+<tr><th scope="col">Concept</th><th scope="col">What it means</th><th scope="col">Where it shows up today</th></tr>
+<tr><td>Joint likelihood under independence</td><td>$L(\theta) = \prod_i f(y_i \mid \theta)$, so $-\log L = -\sum_i \log f(y_i \mid \theta)$</td><td>Everywhere</td></tr>
+<tr><td>Grid search</td><td>Enumerate $\theta$ on a grid, evaluate $L$ at each, pick the best</td><td>Vonbert, whales</td></tr>
+<tr><td>Numerical optimization</td><td>Use <code>mle()</code> / <code>optim()</code> to climb the likelihood surface</td><td>All non-trivial models</td></tr>
+<tr><td>Score and Hessian</td><td>First and second derivatives of $\log L$; the Hessian gives standard errors</td><td>SEs returned by <code>mle()</code></td></tr>
+<tr><td>Likelihood ratio test (LRT)</td><td>For nested models $M_0 \subset M_1$, $2\Delta\ell \sim \chi^2_{\Delta\,\text{df}}$ under $H_0$</td><td>Vonbert with sex effect</td></tr>
+<tr><td>AIC</td><td>$\text{AIC} = -2\log L + 2k$; smaller is better; not a test, a ranking</td><td>Same Vonbert comparison</td></tr>
+<tr><td>Profile likelihood CI</td><td>All $\theta$ for which $\Delta\!-\!\log L \le 1.92$ (one parameter, 95%); $1.92 = \tfrac{1}{2}\chi^2_{1,0.95}$</td><td>Red-light proportion, all examples</td></tr>
+</table>
+</section>
+
+<!-- =================== EXAMPLE 1: BERNOULLI ======================== -->
+<section id="bernoulli">
+<h2>Walk-through 1 · Bernoulli warmup: proportion of successes</h2>
+
+<p>Cleanest possible example. We watch 50 cars approach an intersection on a yellow-then-red light; 30 run the red, 20 stop. Each car is an independent Bernoulli trial with unknown probability $p$. The data $y = (y_1, \dots, y_{50})$ are 0s and 1s, with $\sum y_i = 30$.</p>
+
+<p>The likelihood is</p>
+<div class="eq-block">$L(p) = \prod_{i=1}^{50} p^{y_i}(1-p)^{1-y_i} = p^{30}(1-p)^{20}$.</div>
+
+<p>Take the log:</p>
+<div class="eq-block">$\ell(p) = 30 \log p + 20 \log(1-p)$.</div>
+
+<p>Differentiate, set to zero:</p>
+<div class="eq-block">$\dfrac{d\ell}{dp} = \dfrac{30}{p} - \dfrac{20}{1-p} = 0 \;\;\Longrightarrow\;\; \hat p_{\text{MLE}} = \dfrac{30}{50} = 0.6$.</div>
+
+<p>The proportion of successes <em>is</em> the MLE under Bernoulli/Binomial sampling. Same answer if we used a single Binomial$(n=50, p)$ likelihood — only the binomial coefficient differs, and it doesn't depend on $p$.</p>
+
+<div class="code-label">R · plot the likelihood and the negative log-likelihood</div>
+<pre><code>p_grid &lt;- <span class="fn">seq</span>(<span class="nu">0.01</span>, <span class="nu">0.99</span>, by = <span class="nu">0.001</span>)
+L &lt;- p_grid^<span class="nu">30</span> * (<span class="nu">1</span> - p_grid)^<span class="nu">20</span>
+nLL &lt;- -<span class="nu">30</span> * <span class="fn">log</span>(p_grid) - <span class="nu">20</span> * <span class="fn">log</span>(<span class="nu">1</span> - p_grid)
+
+<span class="fn">par</span>(mfrow = <span class="kw">c</span>(<span class="nu">1</span>, <span class="nu">2</span>))
+<span class="fn">plot</span>(p_grid, L, type = <span class="st">"l"</span>, lwd = <span class="nu">2</span>, xlab = <span class="st">"p"</span>, ylab = <span class="st">"Likelihood"</span>)
+<span class="fn">abline</span>(v = <span class="nu">0.6</span>, col = <span class="st">"red"</span>)
+<span class="fn">plot</span>(p_grid, nLL, type = <span class="st">"l"</span>, lwd = <span class="nu">2</span>, xlab = <span class="st">"p"</span>, ylab = <span class="st">"-log L"</span>)
+<span class="fn">abline</span>(v = <span class="nu">0.6</span>, col = <span class="st">"red"</span>)</code></pre>
+
+<div class="callout key"><p class="callout-label">Key idea</p>
+The MLE under <em>any</em> Bernoulli/Binomial model is the sample proportion. This is the single most important MLE in applied statistics — every logistic regression below is built on top of it.
+</div>
+</section>
+
+<!-- =================== EXAMPLE 2: GRID VBGF ======================== -->
+<section id="grid-vbgf">
+<h2>Walk-through 2 · Grid search: Von Bertalanffy growth</h2>
+
+<p>The Von Bertalanffy growth function (VBGF) describes asymptotic growth in fishes:</p>
+<div class="eq-block">$L_a = L_\infty \left(1 - e^{-\kappa a}\right) + \varepsilon, \qquad \varepsilon \sim \mathcal{N}(0, \sigma^2).$</div>
+
+<p>where $a$ is age, $L_a$ is length at age $a$, $L_\infty$ is asymptotic maximum length, and $\kappa$ is the growth coefficient. Given $n$ aged individuals, the likelihood is</p>
+<div class="eq-block">$L(L_\infty, \kappa, \sigma \mid \text{data}) = \prod_{i=1}^n \dfrac{1}{\sqrt{2\pi}\sigma}\exp\!\left[-\dfrac{(L_i - L_\infty(1 - e^{-\kappa a_i}))^2}{2\sigma^2}\right].$</div>
+
+<p>The original course code holds $\sigma = 10$ and $L_\infty = 100$ fixed and grids over $\kappa \in \{0.1, 0.2, 0.3, 0.4\}$ to show how the likelihood changes with the parameter. Here is that grid search, complete and runnable.</p>
+
+<div class="code-label">R · grid search for Vonbert κ</div>
+<pre><code><span class="cm"># Load the Vonbert data (3 columns: sex, age, length). Keep sex==1.</span>
+TheData &lt;- <span class="fn">matrix</span>(<span class="fn">scan</span>(<span class="st">"data/Vonbert.dat"</span>, skip = <span class="nu">1</span>), byrow = <span class="kw">TRUE</span>, ncol = <span class="nu">3</span>)
+TheData &lt;- TheData[TheData[, <span class="nu">1</span>] == <span class="nu">1</span>, ]
+age &lt;- TheData[, <span class="nu">2</span>]; len &lt;- TheData[, <span class="nu">3</span>]
+
+<span class="cm"># negative log-likelihood as a function of (Linf, kappa, sigma)</span>
+nll_vbgf &lt;- <span class="kw">function</span>(Linf, kappa, sigma) {
+ pred &lt;- Linf * (<span class="nu">1</span> - <span class="fn">exp</span>(-kappa * age))
+ -<span class="fn">sum</span>(<span class="fn">dnorm</span>(len, mean = pred, sd = sigma, log = <span class="kw">TRUE</span>))
+}
+
+<span class="cm"># Grid search over kappa with Linf and sigma fixed (as in the original lab).</span>
+kappa_grid &lt;- <span class="fn">seq</span>(<span class="nu">0.05</span>, <span class="nu">0.50</span>, by = <span class="nu">0.005</span>)
+nll_vec &lt;- <span class="fn">sapply</span>(kappa_grid, <span class="kw">function</span>(k) <span class="fn">nll_vbgf</span>(Linf = <span class="nu">100</span>, kappa = k, sigma = <span class="nu">10</span>))
+<span class="fn">plot</span>(kappa_grid, nll_vec, type = <span class="st">"l"</span>, lwd = <span class="nu">2</span>,
+ xlab = <span class="kw">expression</span>(kappa), ylab = <span class="st">"Negative log-likelihood"</span>)
+<span class="fn">abline</span>(v = kappa_grid[<span class="fn">which.min</span>(nll_vec)], col = <span class="st">"red"</span>)</code></pre>
+
+<div class="callout bio"><p class="callout-label">Biological intuition</p>
+A grid search is conceptually clean but does not scale. With 3 parameters at 50 grid points each you evaluate the likelihood $50^3 = 125{,}000$ times. With 10 parameters it is hopeless. That is exactly the problem numerical optimizers solve.
+</div>
+</section>
+
+<!-- =============== EXAMPLE 3: NUMERICAL MLE VBGF =================== -->
+<section id="mle-vbgf">
+<h2>Walk-through 3 · Numerical optimization: <code>mle()</code> and <code>optim()</code></h2>
+
+<p>The <code>stats4::mle()</code> wrapper around <code>optim()</code> takes a function of named parameters and a list of starting values. It returns the MLE, the Hessian-based standard errors, and lets you compute Wald or profile confidence intervals.</p>
+
+<div class="code-label">R · MLE of the full 3-parameter Vonbert model</div>
+<pre><code><span class="kw">library</span>(stats4)
+
+nll_vbgf3 &lt;- <span class="kw">function</span>(Linf, kappa, sigma) {
+ pred &lt;- Linf * (<span class="nu">1</span> - <span class="fn">exp</span>(-kappa * age))
+ -<span class="fn">sum</span>(<span class="fn">dnorm</span>(len, mean = pred, sd = sigma, log = <span class="kw">TRUE</span>))
+}
+
+fit &lt;- <span class="fn">mle</span>(nll_vbgf3,
+ start = <span class="kw">list</span>(Linf = <span class="nu">100</span>, kappa = <span class="nu">0.2</span>, sigma = <span class="nu">10</span>),
+ method = <span class="st">"L-BFGS-B"</span>,
+ lower = <span class="kw">c</span>(<span class="nu">10</span>, <span class="nu">0.001</span>, <span class="nu">0.01</span>),
+ upper = <span class="kw">c</span>(<span class="nu">500</span>, <span class="nu">2</span>, <span class="nu">100</span>))
+<span class="fn">summary</span>(fit)
+<span class="fn">confint</span>(fit) <span class="cm"># profile-likelihood CIs (the right kind for nonlinear models)</span>
+-<span class="fn">logLik</span>(fit)[<span class="nu">1</span>] <span class="cm"># minimum NLL at the MLE</span></code></pre>
+
+<div class="callout warn"><p class="callout-label">Watch out</p>
+Pick starting values in the same ballpark as the data. <code>L-BFGS-B</code> with sensible bounds protects against negative <code>sigma</code> and other nonsense. If <code>summary()</code> tells you the Hessian is singular, your model is unidentified or you're at a boundary — diagnose, don't ignore.
+</div>
+</section>
+
+<!-- =============== EXAMPLE 4: WHALE POISSON MIXTURE ================ -->
+<section id="whale-mix">
+<h2>Walk-through 4 · Two-component Poisson mixture (whales)</h2>
+
+<p>Bowhead whale blow counts at a hydrophone fall into two regimes — quiet behavior and vocally-active behavior — with rates $\lambda_1$ and $\lambda_2$. Each observation is from regime 1 with probability $\pi$ and regime 2 with probability $1-\pi$, and the regime is <em>unobserved</em>. The likelihood for one count $y$ is a mixture:</p>
+
+<div class="eq-block">$f(y \mid \lambda_1, \lambda_2, \pi) \;=\; \pi\, \text{Pois}(y; \lambda_1) + (1 - \pi)\, \text{Pois}(y; \lambda_2).$</div>
+
+<p>Three parameters, no closed form. We minimize the joint negative log-likelihood with <code>mle()</code>.</p>
+
+<div class="code-label">R · MLE for a 2-component Poisson mixture</div>
+<pre><code>TheData &lt;- <span class="fn">matrix</span>(<span class="fn">scan</span>(<span class="st">"data/Whale.dat"</span>, skip = <span class="nu">1</span>), byrow = <span class="kw">TRUE</span>, ncol = <span class="nu">2</span>)
+blows &lt;- TheData[, <span class="nu">2</span>]
+
+nll_mix &lt;- <span class="kw">function</span>(lam1, lam2, p) {
+ comp &lt;- p * <span class="fn">dpois</span>(blows, lam1) + (<span class="nu">1</span> - p) * <span class="fn">dpois</span>(blows, lam2)
+ -<span class="fn">sum</span>(<span class="fn">log</span>(comp))
+}
+
+fit_mix &lt;- <span class="fn">mle</span>(nll_mix,
+ start = <span class="kw">list</span>(lam1 = <span class="nu">10</span>, lam2 = <span class="nu">30</span>, p = <span class="nu">0.4</span>),
+ method = <span class="st">"L-BFGS-B"</span>,
+ lower = <span class="kw">c</span>(<span class="nu">0.01</span>, <span class="nu">0.01</span>, <span class="nu">0.001</span>),
+ upper = <span class="kw">c</span>(<span class="kw">Inf</span>, <span class="kw">Inf</span>, <span class="nu">0.999</span>))
+<span class="fn">summary</span>(fit_mix)</code></pre>
+
+<div class="callout warn"><p class="callout-label">Watch out</p>
+<p><strong>Identifiability.</strong> A two-component mixture is invariant under relabeling: $(\lambda_1, \lambda_2, \pi) = (3, 25, 0.4)$ and $(25, 3, 0.6)$ are the <em>same</em> model. Start with $\lambda_1 < \lambda_2$ and (often) constrain it; otherwise different chains/optimizers can land on relabeled solutions and your standard errors are nonsense.</p>
+<p>Even with relabeling fixed, mixtures have <em>local optima</em>. Always run from several starting values and keep the best.</p>
+</div>
+</section>
+
+<!-- ============ EXAMPLE 5: LRT AND PROFILE LIKELIHOOD ============== -->
+<section id="lrt-profile">
+<h2>Walk-through 5 · Likelihood ratio tests &amp; profile likelihood</h2>
+
+<h3>LRT: do males and females share a growth curve?</h3>
+<p>Fit two nested Vonbert models to the full dataset (sex 1 and sex 2 combined):</p>
+<ul>
+<li><strong>Model A</strong> (null, 3 parameters): one $L_\infty$, one $\kappa$, one $\sigma$, shared across sexes.</li>
+<li><strong>Model B</strong> (alternative, 5 parameters): sex-specific $L_\infty$ and $\kappa$, shared $\sigma$.</li>
+</ul>
+<p>Likelihood-ratio statistic: $\Lambda = 2(\ell_B - \ell_A)$. Under $H_0$: $\Lambda \sim \chi^2_{\Delta\,\text{df} = 2}$.</p>
+
+<div class="code-label">R · LRT for sex-specific Vonbert</div>
+<pre><code>TheData &lt;- <span class="fn">matrix</span>(<span class="fn">scan</span>(<span class="st">"data/Vonbert.dat"</span>, skip = <span class="nu">1</span>), byrow = <span class="kw">TRUE</span>, ncol = <span class="nu">3</span>)
+Sex &lt;- TheData[, <span class="nu">1</span>]; Age &lt;- TheData[, <span class="nu">2</span>]; Len &lt;- TheData[, <span class="nu">3</span>]
+
+nll_A &lt;- <span class="kw">function</span>(Linf, kappa, sigma) {
+ pred &lt;- Linf * (<span class="nu">1</span> - <span class="fn">exp</span>(-kappa * Age))
+ -<span class="fn">sum</span>(<span class="fn">dnorm</span>(Len, pred, sigma, log = <span class="kw">TRUE</span>))
+}
+nll_B &lt;- <span class="kw">function</span>(Linf1, kappa1, Linf2, kappa2, sigma) {
+ pred &lt;- <span class="kw">ifelse</span>(Sex == <span class="nu">1</span>,
+ Linf1 * (<span class="nu">1</span> - <span class="fn">exp</span>(-kappa1 * Age)),
+ Linf2 * (<span class="nu">1</span> - <span class="fn">exp</span>(-kappa2 * Age)))
+ -<span class="fn">sum</span>(<span class="fn">dnorm</span>(Len, pred, sigma, log = <span class="kw">TRUE</span>))
+}
+
+fitA &lt;- <span class="fn">mle</span>(nll_A, start = <span class="kw">list</span>(Linf = <span class="nu">100</span>, kappa = <span class="nu">0.2</span>, sigma = <span class="nu">10</span>),
+ method = <span class="st">"L-BFGS-B"</span>, lower = <span class="kw">c</span>(<span class="nu">10</span>, <span class="nu">0.001</span>, <span class="nu">0.01</span>))
+fitB &lt;- <span class="fn">mle</span>(nll_B, start = <span class="kw">list</span>(Linf1 = <span class="nu">100</span>, kappa1 = <span class="nu">0.2</span>, Linf2 = <span class="nu">100</span>, kappa2 = <span class="nu">0.2</span>, sigma = <span class="nu">10</span>),
+ method = <span class="st">"L-BFGS-B"</span>, lower = <span class="kw">c</span>(<span class="nu">10</span>, <span class="nu">0.001</span>, <span class="nu">10</span>, <span class="nu">0.001</span>, <span class="nu">0.01</span>))
+
+LRT &lt;- <span class="nu">2</span> * (-<span class="fn">logLik</span>(fitA)[<span class="nu">1</span>] - (-<span class="fn">logLik</span>(fitB)[<span class="nu">1</span>]))
+pval &lt;- <span class="fn">pchisq</span>(LRT, df = <span class="nu">2</span>, lower.tail = <span class="kw">FALSE</span>)
+<span class="fn">c</span>(LRT = LRT, p_value = pval)
+
+<span class="cm"># AIC ranking on the same models</span>
+<span class="fn">AIC</span>(fitA, fitB)</code></pre>
+
+<h3>Profile likelihood confidence intervals</h3>
+<p>Most likelihood surfaces in ecology are <em>not symmetric</em> around the MLE, so Wald CIs (MLE ± 1.96·SE) lie. The <strong>profile likelihood</strong> CI is the set of parameter values for which</p>
+<div class="eq-block">$\ell(\hat\theta) - \ell(\theta) \;\le\; \tfrac{1}{2}\chi^2_{1,\,0.95} = 1.92.$</div>
+
+<p>i.e. all values whose deviance is within 1.92 NLL units of the minimum. <code>confint()</code> on an <code>mle</code> object gives exactly this. You can also draw it.</p>
+
+<div class="code-label">R · profile likelihood plot for red-light p̂</div>
+<pre><code>nll_p &lt;- <span class="kw">function</span>(p) -(<span class="nu">30</span> * <span class="fn">log</span>(p) + <span class="nu">20</span> * <span class="fn">log</span>(<span class="nu">1</span> - p))
+phat &lt;- <span class="nu">0.6</span>
+best &lt;- <span class="fn">nll_p</span>(phat)
+pp &lt;- <span class="fn">seq</span>(<span class="nu">0.40</span>, <span class="nu">0.80</span>, length.out = <span class="nu">400</span>)
+<span class="fn">plot</span>(pp, <span class="fn">nll_p</span>(pp) - best, type = <span class="st">"l"</span>, lwd = <span class="nu">2</span>,
+ ylab = expression(-Delta * <span class="fn">log</span>~L), xlab = <span class="st">"p"</span>)
+<span class="fn">abline</span>(h = <span class="nu">1.92</span>, lty = <span class="nu">2</span>, col = <span class="st">"red"</span>)
+<span class="fn">abline</span>(v = phat, col = <span class="st">"grey"</span>)</code></pre>
+<p>Read the 95% CI off where the curve crosses the horizontal line at 1.92.</p>
+</section>
+
+<!-- ====== ADDITIONAL EXAMPLE 1: LOGISTIC GLM BY HAND ============== -->
+<section id="logit-byhand">
+<h2>Bonus walk-through 6 · MLE for logistic regression, by hand vs <code>glm()</code></h2>
+
+<p>This example shows that <code>glm(y ~ x, family=binomial)</code> is not magic — it is iteratively minimizing the same negative log-likelihood you can write down in five lines of R. Simulating data lets us check that <code>glm()</code> and your hand-rolled MLE agree to many decimal places.</p>
+
+<div class="callout bio"><p class="callout-label">Biological intuition</p>
+Why this matters: when you fit a non-standard model later (zero-inflated, occupancy, state-space), there is no canned <code>glm()</code>. You will write your own NLL exactly like this one and feed it to <code>optim()</code> or to Nimble. The Bernoulli kernel never changes.
+</div>
+
+<p>Simulate $n=200$ presence/absence observations of a songbird detected as a function of forest cover $x$:</p>
+
+<div class="eq-block">$\text{logit}\,\Pr(Y_i = 1) \;=\; \beta_0 + \beta_1 x_i, \qquad Y_i \sim \text{Bernoulli}(p_i).$</div>
+
+<div class="code-label">R · MLE for logistic regression two ways</div>
+<pre><code><span class="kw">library</span>(stats4)
+<span class="fn">set.seed</span>(<span class="nu">123</span>)
+n &lt;- <span class="nu">200</span>
+x &lt;- <span class="fn">rnorm</span>(n)
+beta0_true &lt;- -<span class="nu">0.5</span>; beta1_true &lt;- <span class="nu">1.2</span>
+p &lt;- <span class="nu">1</span> / (<span class="nu">1</span> + <span class="fn">exp</span>(-(beta0_true + beta1_true * x)))
+y &lt;- <span class="fn">rbinom</span>(n, size = <span class="nu">1</span>, prob = p)
+
+<span class="cm"># --- 1. Hand-rolled MLE ----------------------------------------------</span>
+nll_logit &lt;- <span class="kw">function</span>(beta0, beta1) {
+ eta &lt;- beta0 + beta1 * x
+ mu &lt;- <span class="nu">1</span> / (<span class="nu">1</span> + <span class="fn">exp</span>(-eta)) <span class="cm"># inverse-logit</span>
+ -<span class="fn">sum</span>(<span class="fn">dbinom</span>(y, size = <span class="nu">1</span>, prob = mu, log = <span class="kw">TRUE</span>))
+}
+fit_mle &lt;- <span class="fn">mle</span>(nll_logit, start = <span class="kw">list</span>(beta0 = <span class="nu">0</span>, beta1 = <span class="nu">0</span>))
+
+<span class="cm"># --- 2. The R one-liner ----------------------------------------------</span>
+fit_glm &lt;- <span class="fn">glm</span>(y ~ x, family = <span class="fn">binomial</span>(link = <span class="st">"logit"</span>))
+
+<span class="cm"># --- 3. Side-by-side -------------------------------------------------</span>
+<span class="fn">cbind</span>(MLE = <span class="fn">coef</span>(fit_mle), GLM = <span class="fn">coef</span>(fit_glm), truth = <span class="kw">c</span>(beta0_true, beta1_true))
+<span class="cm"># Standard errors:</span>
+<span class="fn">cbind</span>(MLE = <span class="fn">sqrt</span>(<span class="fn">diag</span>(<span class="fn">vcov</span>(fit_mle))),
+ GLM = <span class="fn">sqrt</span>(<span class="fn">diag</span>(<span class="fn">vcov</span>(fit_glm))))</code></pre>
+
+<p>The estimates agree to 6+ decimal places. The standard errors agree because both methods invert the same observed Fisher information.</p>
+
+<div class="callout key"><p class="callout-label">Key idea</p>
+<strong>Generalize.</strong> Replace <code>dbinom(..., log=TRUE)</code> with <code>dpois(..., log=TRUE)</code>, swap <code>1/(1+exp(-η))</code> for <code>exp(η)</code>, and you've just written your own Poisson regression. Every link/distribution combination in <code>glm()</code> is a different choice of <em>those two lines</em>.
+</div>
+</section>
+
+<!-- ====== ADDITIONAL EXAMPLE 2: ZERO-INFLATED POISSON ============== -->
+<section id="zip">
+<h2>Bonus walk-through 7 · Zero-inflated Poisson (a non-standard mixture)</h2>
+
+<p>You count fledglings per nest. Some nests fail entirely (true structural zeros: nest abandoned, depredated). The successful nests produce a Poisson count of fledglings — including occasional Poisson zeros. The mixture has two sources of zeros and is called a <strong>zero-inflated Poisson</strong> (ZIP):</p>
+
+<div class="eq-block">$\Pr(Y_i = 0) = \pi + (1 - \pi) e^{-\lambda}, \qquad \Pr(Y_i = k) = (1 - \pi) \dfrac{e^{-\lambda} \lambda^k}{k!}\ \text{for}\ k \ge 1.$</div>
+
+<p>Here $\pi$ is the probability of structural zero and $\lambda$ is the Poisson mean among <em>non-structural</em> nests. There is no canned <code>glm()</code> for ZIP — but the negative log-likelihood is one line.</p>
+
+<div class="code-label">R · ZIP simulated and fit by MLE</div>
+<pre><code><span class="kw">library</span>(stats4)
+<span class="fn">set.seed</span>(<span class="nu">11</span>)
+n &lt;- <span class="nu">300</span>
+pi_true &lt;- <span class="nu">0.35</span>; lam_true &lt;- <span class="nu">2.5</span>
+z &lt;- <span class="fn">rbinom</span>(n, <span class="nu">1</span>, pi_true) <span class="cm"># 1 = structural zero</span>
+y &lt;- <span class="kw">ifelse</span>(z == <span class="nu">1</span>, <span class="nu">0</span>, <span class="fn">rpois</span>(n, lam_true))
+
+<span class="cm"># Plain Poisson MLE underestimates the mean and misses the zero inflation:</span>
+<span class="fn">mean</span>(y); <span class="fn">var</span>(y)
+<span class="fn">mean</span>(y == <span class="nu">0</span>); <span class="fn">dpois</span>(<span class="nu">0</span>, <span class="fn">mean</span>(y)) <span class="cm"># observed zeros >> Poisson-predicted zeros</span>
+
+<span class="cm"># ZIP negative log-likelihood:</span>
+nll_zip &lt;- <span class="kw">function</span>(p, lambda) {
+ if (p &lt;= <span class="nu">0</span> || p &gt;= <span class="nu">1</span> || lambda &lt;= <span class="nu">0</span>) <span class="kw">return</span>(<span class="nu">1e10</span>)
+ prob_zero &lt;- p + (<span class="nu">1</span> - p) * <span class="fn">exp</span>(-lambda)
+ ll_pos &lt;- <span class="fn">log</span>(<span class="nu">1</span> - p) + <span class="fn">dpois</span>(y, lambda, log = <span class="kw">TRUE</span>)
+ ll &lt;- <span class="kw">ifelse</span>(y == <span class="nu">0</span>, <span class="fn">log</span>(prob_zero), ll_pos)
+ -<span class="fn">sum</span>(ll)
+}
+fit_zip &lt;- <span class="fn">mle</span>(nll_zip, start = <span class="kw">list</span>(p = <span class="nu">0.2</span>, lambda = <span class="nu">1</span>),
+ method = <span class="st">"L-BFGS-B"</span>,
+ lower = <span class="kw">c</span>(<span class="nu">0.001</span>, <span class="nu">0.001</span>),
+ upper = <span class="kw">c</span>(<span class="nu">0.999</span>, <span class="nu">50</span>))
+<span class="fn">summary</span>(fit_zip)
+<span class="fn">confint</span>(fit_zip)</code></pre>
+
+<div class="callout bio"><p class="callout-label">Biological intuition</p>
+The point of this example is not the ZIP per se — it is that mixture likelihoods are an everyday tool. Once you can write <em>any</em> NLL function in R, you can fit <em>any</em> custom model. This is the bridge to Nimble later today, where the model code is literally a generative story written down.
+</div>
+</section>
+
+<!-- ================================================================== -->
+<!-- ====================== AFTERNOON: BAYES =========================== -->
+<!-- ================================================================== -->
+
+<a id="afternoon"></a>
+<div class="practice-banner"><div class="label">Practice — answers visible</div><h3>Afternoon practice problems</h3><p>The exercises below are walk-through practice. Your graded afternoon assignment uses a separate, novel problem set &mdash; <strong>choose either theme below</strong> and write your answers in the matching theme template (<code>afternoon_lab_template_v2.Rmd</code> or <code>afternoon_lab_template_v3.Rmd</code>).</p><p style="margin: 8px 0 0 0;"><a class="hand-in" href="problem_set_v2.html#afternoon">v2 &middot; avian / songbird &rarr;</a> &nbsp;or&nbsp; <a class="hand-in" href="problem_set_v3.html#afternoon">v3 &middot; marine &amp; stock assessment &rarr;</a> &nbsp;&nbsp; <a class="hand-in" href="afternoon_lab_template_v2.Rmd" style="background:#1C638A; color:white; border-color:#1C638A;">v2 template &darr;</a> <a class="hand-in" href="afternoon_lab_template_v3.Rmd" style="background:#1C638A; color:white; border-color:#1C638A;">v3 template &darr;</a></p></div>
+<section id="bayes-orient">
+<h2>Afternoon · From likelihood to posterior</h2>
+
+<p>You spent the morning maximizing $L(\theta \mid y)$ — finding the single $\theta$ that makes the data most plausible. Bayesian inference goes further: it gives you a <strong>distribution over $\theta$</strong> that combines the data with what you knew (or assumed) before. Same likelihood, plus a prior, equals a posterior:</p>
+
+<div class="eq-block">$\underbrace{p(\theta \mid y)}_{\text{posterior}} \;=\; \dfrac{\overbrace{p(y \mid \theta)}^{\text{likelihood}}\;\overbrace{p(\theta)}^{\text{prior}}}{\underbrace{p(y)}_{\text{marginal}}} \;\propto\; p(y\mid\theta)\, p(\theta).$</div>
+
+<p>The marginal $p(y) = \int p(y\mid\theta) p(\theta)\,d\theta$ does not depend on $\theta$, so it acts only as a normalizing constant. For most realistic models it is impossible to compute in closed form — and that is exactly why MCMC exists. MCMC samples from the unnormalized product on the right, dodging the integral entirely.</p>
+
+<div class="callout key"><p class="callout-label">Key idea</p>
+<p>Three shifts you make moving from frequentist to Bayesian:</p>
+<ol>
+<li><strong>Parameters become random variables.</strong> $\theta$ has a distribution that expresses your uncertainty about it.</li>
+<li><strong>Probabilities are about $\theta$, conditional on data.</strong> You can finally write $\Pr(r > 0.22 \mid \text{data})$ and mean it.</li>
+<li><strong>You must specify a prior.</strong> Often weakly informative. Always justified. The prior is not optional baggage — it is part of the model.</li>
+</ol>
+</div>
+</section>
+
+<section id="bayes-rule">
+<h2>Bayes' rule, worked out for a single coin</h2>
+
+<p>To anchor the algebra, fit a Bernoulli model to one binomial observation: $y = 7$ successes in $n = 10$ trials. With a flat prior $p \sim \text{Uniform}(0,1)$:</p>
+
+<div class="eq-block">$p(\theta \mid y) \propto \binom{10}{7}\theta^7(1-\theta)^3 \cdot 1 = \theta^7(1-\theta)^3.$</div>
+
+<p>Recognize this kernel? It is a <strong>Beta(8, 4)</strong> density (up to a constant). The normalizing constant exists in closed form via the Beta function:</p>
+
+<div class="eq-block">$p(\theta \mid y) = \dfrac{1}{B(8, 4)} \theta^{7}(1-\theta)^{3}, \qquad B(\alpha,\beta) = \dfrac{\Gamma(\alpha)\Gamma(\beta)}{\Gamma(\alpha+\beta)}.$</div>
+
+<p>This is the magic of <strong>conjugacy</strong>: the prior family was chosen so that the posterior stays in the same family. In this case, Beta prior + Binomial likelihood → Beta posterior.</p>
+
+<div class="code-label">R · plot the prior, the likelihood, and the posterior</div>
+<pre><code>theta &lt;- <span class="fn">seq</span>(<span class="nu">0.001</span>, <span class="nu">0.999</span>, length.out = <span class="nu">500</span>)
+prior &lt;- <span class="fn">dbeta</span>(theta, <span class="nu">1</span>, <span class="nu">1</span>)
+likelihood &lt;- <span class="fn">dbinom</span>(<span class="nu">7</span>, size = <span class="nu">10</span>, prob = theta)
+posterior &lt;- <span class="fn">dbeta</span>(theta, <span class="nu">8</span>, <span class="nu">4</span>)
+<span class="fn">plot</span>(theta, posterior, type = <span class="st">"l"</span>, lwd = <span class="nu">2</span>, col = <span class="st">"darkred"</span>,
+ ylab = <span class="st">"density (or scaled likelihood)"</span>, xlab = expression(theta))
+<span class="fn">lines</span>(theta, prior, lty = <span class="nu">2</span>)
+<span class="fn">lines</span>(theta, likelihood / <span class="fn">max</span>(likelihood) * <span class="fn">max</span>(posterior), col = <span class="st">"darkblue"</span>)
+<span class="fn">legend</span>(<span class="st">"topleft"</span>, lty = <span class="kw">c</span>(<span class="nu">2</span>, <span class="nu">1</span>, <span class="nu">1</span>), col = <span class="kw">c</span>(<span class="st">"black"</span>, <span class="st">"darkblue"</span>, <span class="st">"darkred"</span>),
+ legend = <span class="kw">c</span>(<span class="st">"Prior Beta(1,1)"</span>, <span class="st">"Likelihood (scaled)"</span>, <span class="st">"Posterior Beta(8,4)"</span>), bty = <span class="st">"n"</span>)</code></pre>
+</section>
+
+<!-- =============== BETA-BINOMIAL CONJUGACY ========================= -->
+<section id="beta-binom">
+<h2>Conjugacy 1 · Beta–Binomial in full</h2>
+
+<p>For $y \mid p \sim \text{Bin}(n, p)$ and $p \sim \text{Beta}(\alpha, \beta)$,</p>
+<div class="eq-block">$p(p \mid y) \;=\; \text{Beta}(\alpha + y,\; \beta + n - y).$</div>
+
+<p>The posterior just adds <em>successes</em> to $\alpha$ and <em>failures</em> to $\beta$.</p>
+
+<div class="callout key"><p class="callout-label">Key idea</p>
+<strong>Prior as pseudo-observations.</strong> A Beta($\alpha,\beta$) prior is exactly equivalent to having previously seen $\alpha$ "successes" and $\beta$ "failures" in an imaginary pre-experiment. Beta(1,1) means "I've seen no one before." Beta(50,50) means "I've already seen 100 trials with $p=0.5$." That is the prior's information content — measurable in trials.
+</div>
+
+<p>Worked example: spotted-owl nest survival. You monitored 12 nests; 9 fledged. Choose three priors and see how each posterior moves.</p>
+
+<div class="code-label">R · three priors, one likelihood</div>
+<pre><code>y &lt;- <span class="nu">9</span>; n &lt;- <span class="nu">12</span>
+theta &lt;- <span class="fn">seq</span>(<span class="nu">0.001</span>, <span class="nu">0.999</span>, length.out = <span class="nu">500</span>)
+priors &lt;- <span class="kw">list</span>(
+ flat = <span class="kw">c</span>(<span class="nu">1</span>, <span class="nu">1</span>), <span class="cm"># Uniform</span>
+ skeptical = <span class="kw">c</span>(<span class="nu">2</span>, <span class="nu">8</span>), <span class="cm"># prior centered at 0.2</span>
+ informative = <span class="kw">c</span>(<span class="nu">30</span>, <span class="nu">10</span>) <span class="cm"># tight, centered at 0.75</span>
+)
+<span class="fn">par</span>(mfrow = <span class="kw">c</span>(<span class="nu">1</span>, <span class="nu">3</span>))
+<span class="kw">for</span> (nm <span class="kw">in</span> <span class="fn">names</span>(priors)) {
+ ab &lt;- priors[[nm]]; post &lt;- <span class="kw">c</span>(ab[<span class="nu">1</span>] + y, ab[<span class="nu">2</span>] + n - y)
+ <span class="fn">plot</span>(theta, <span class="fn">dbeta</span>(theta, post[<span class="nu">1</span>], post[<span class="nu">2</span>]), type = <span class="st">"l"</span>, lwd = <span class="nu">2</span>,
+ main = <span class="fn">paste</span>(nm, <span class="st">": Beta("</span>, post[<span class="nu">1</span>], <span class="st">", "</span>, post[<span class="nu">2</span>], <span class="st">")"</span>, sep = <span class="st">""</span>),
+ xlab = expression(theta), ylab = <span class="st">"posterior density"</span>)
+ <span class="fn">lines</span>(theta, <span class="fn">dbeta</span>(theta, ab[<span class="nu">1</span>], ab[<span class="nu">2</span>]), lty = <span class="nu">2</span>, col = <span class="st">"grey"</span>)
+ <span class="fn">abline</span>(v = y / n, col = <span class="st">"red"</span>)
+}
+<span class="fn">par</span>(mfrow = <span class="kw">c</span>(<span class="nu">1</span>, <span class="nu">1</span>))</code></pre>
+</section>
+
+<!-- ============== GAMMA-POISSON CONJUGACY ========================== -->
+<section id="gamma-pois">
+<h2>Conjugacy 2 · Gamma–Poisson</h2>
+
+<p>For $y_1, \dots, y_n \mid \lambda \sim \text{Pois}(\lambda)$ and $\lambda \sim \text{Gamma}(\alpha, \beta)$ (shape-rate),</p>
+<div class="eq-block">$p(\lambda \mid y) = \text{Gamma}\!\left(\alpha + \sum y_i,\; \beta + n\right).$</div>
+
+<p>Again, the prior plays the role of pseudo-observations: $\alpha$ events accumulated over $\beta$ units of effort. After observing $n$ new units and $\sum y_i$ events, you just add them in.</p>
+
+<p>Worked example: a parasitologist counts $y = (3, 1, 4, 2, 0, 5, 2, 3, 1, 4)$ ticks on 10 birds (total 25 in 10 birds). Prior $\lambda \sim \text{Gamma}(2, 1)$ (weakly informative around mean 2 per bird).</p>
+
+<div class="code-label">R · Gamma–Poisson posterior</div>
+<pre><code>y &lt;- <span class="kw">c</span>(<span class="nu">3</span>, <span class="nu">1</span>, <span class="nu">4</span>, <span class="nu">2</span>, <span class="nu">0</span>, <span class="nu">5</span>, <span class="nu">2</span>, <span class="nu">3</span>, <span class="nu">1</span>, <span class="nu">4</span>); n &lt;- <span class="fn">length</span>(y)
+alpha0 &lt;- <span class="nu">2</span>; beta0 &lt;- <span class="nu">1</span>
+alpha1 &lt;- alpha0 + <span class="fn">sum</span>(y)
+beta1 &lt;- beta0 + n
+<span class="fn">c</span>(post_mean = alpha1 / beta1,
+ post_sd = <span class="fn">sqrt</span>(alpha1 / beta1^<span class="nu">2</span>),
+ MLE = <span class="fn">mean</span>(y)) <span class="cm"># compare to MLE</span>
+
+lam &lt;- <span class="fn">seq</span>(<span class="nu">0</span>, <span class="nu">6</span>, length.out = <span class="nu">400</span>)
+<span class="fn">plot</span>(lam, <span class="fn">dgamma</span>(lam, alpha1, beta1), type = <span class="st">"l"</span>, lwd = <span class="nu">2</span>,
+ xlab = expression(lambda), ylab = <span class="st">"posterior"</span>)
+<span class="fn">lines</span>(lam, <span class="fn">dgamma</span>(lam, alpha0, beta0), lty = <span class="nu">2</span>, col = <span class="st">"grey"</span>)
+<span class="fn">abline</span>(v = <span class="fn">mean</span>(y), col = <span class="st">"red"</span>)</code></pre>
+</section>
+
+<section id="why-mcmc">
+<h2>Why conjugacy is not enough — and what MCMC buys you</h2>
+
+<p>Conjugacy gives elegant closed forms for one-parameter problems. Real models have:</p>
+<ul>
+<li>Nonlinear functions of parameters (logistic growth: $\mu = r - r/K \cdot x$ depends on the <em>ratio</em> $r/K$).</li>
+<li>Many parameters interacting (random effects, hierarchical means and variances).</li>
+<li>Awkward likelihoods (mixtures, occupancy, capture-recapture, state-space).</li>
+</ul>
+
+<p>For these models the marginal $p(y) = \int p(y,\theta)\,d\theta$ is intractable. <strong>MCMC</strong> sidesteps the integral by generating dependent samples from the unnormalized posterior; the long-run frequency of those samples is the posterior itself. The two algorithms you will meet today and tomorrow:</p>
+
+<table>
+<tr><th scope="col">Algorithm</th><th scope="col">Idea</th><th scope="col">When you'd use it</th></tr>
+<tr><td>Metropolis(-Hastings)</td><td>Propose, accept/reject by a posterior ratio</td><td>Any density — pedagogical, slower for high-d</td></tr>
+<tr><td>Gibbs</td><td>Sample each parameter from its full conditional</td><td>Conjugate sub-blocks (default in JAGS)</td></tr>
+<tr><td>Adaptive block / slice / HMC</td><td>What Nimble &amp; Stan use by default</td><td>Production work</td></tr>
+</table>
+</section>
+
+<!-- ============ METROPOLIS HOMEMADE ============== -->
+<section id="metropolis">
+<h2>The Metropolis algorithm in 30 lines of R</h2>
+
+<p>Same Beta–Binomial spotted-owl example, but pretending we don't know the closed form. The Metropolis recipe at each iteration:</p>
+<ol>
+<li>Propose $\theta^\star \sim \text{Normal}(\theta_{\text{current}}, s)$ (symmetric proposal).</li>
+<li>Compute the acceptance ratio $\alpha = \min\!\left(1, \dfrac{p(\theta^\star)\, L(\theta^\star \mid y)}{p(\theta_{\text{current}})\, L(\theta_{\text{current}} \mid y)}\right)$.</li>
+<li>Draw $u \sim \text{Uniform}(0,1)$. If $u < \alpha$, accept; otherwise stay.</li>
+</ol>
+
+<div class="code-label">R · homemade Metropolis for Beta–Binomial</div>
+<pre><code>y &lt;- <span class="nu">9</span>; n &lt;- <span class="nu">12</span>; alpha0 &lt;- <span class="nu">2</span>; beta0 &lt;- <span class="nu">2</span>
+
+log_post &lt;- <span class="kw">function</span>(p) {
+ <span class="kw">if</span> (p &lt;= <span class="nu">0</span> || p &gt;= <span class="nu">1</span>) <span class="kw">return</span>(-<span class="kw">Inf</span>)
+ <span class="fn">dbeta</span>(p, alpha0, beta0, log = <span class="kw">TRUE</span>) +
+ <span class="fn">dbinom</span>(y, size = n, prob = p, log = <span class="kw">TRUE</span>)
+}
+
+niter &lt;- <span class="nu">20000</span>; chain &lt;- <span class="fn">numeric</span>(niter); chain[<span class="nu">1</span>] &lt;- <span class="nu">0.5</span>
+accept &lt;- <span class="nu">0</span>; s &lt;- <span class="nu">0.10</span> <span class="cm"># proposal SD</span>
+<span class="fn">set.seed</span>(<span class="nu">2</span>)
+<span class="kw">for</span> (i in <span class="nu">2</span>:niter) {
+ prop &lt;- <span class="fn">rnorm</span>(<span class="nu">1</span>, mean = chain[i - <span class="nu">1</span>], sd = s)
+ log_alpha &lt;- <span class="fn">log_post</span>(prop) - <span class="fn">log_post</span>(chain[i - <span class="nu">1</span>])
+ <span class="kw">if</span> (<span class="fn">log</span>(<span class="fn">runif</span>(<span class="nu">1</span>)) &lt; log_alpha) { chain[i] &lt;- prop; accept &lt;- accept + <span class="nu">1</span> }
+ <span class="kw">else</span> chain[i] &lt;- chain[i - <span class="nu">1</span>]
+}
+
+burn &lt;- <span class="nu">2000</span>
+<span class="fn">cat</span>(<span class="st">"acceptance rate ="</span>, <span class="fn">round</span>(accept / niter, <span class="nu">3</span>), <span class="st">"\n"</span>)
+<span class="fn">hist</span>(chain[-(1:burn)], breaks = <span class="nu">60</span>, freq = <span class="kw">FALSE</span>, main = <span class="st">"Posterior of p"</span>,
+ xlab = <span class="st">"p"</span>, col = <span class="st">"grey90"</span>, border = <span class="st">"white"</span>)
+<span class="cm"># Overlay the closed-form Beta(alpha0+y, beta0+n-y) posterior</span>
+<span class="fn">curve</span>(<span class="fn">dbeta</span>(x, alpha0 + y, beta0 + n - y), col = <span class="st">"red"</span>, lwd = <span class="nu">2</span>, add = <span class="kw">TRUE</span>)</code></pre>
+
+<div class="callout key"><p class="callout-label">Key idea</p>
+Tuning: acceptance rate of about 25–40% is healthy for random-walk Metropolis in moderate dimensions. Too high → tiny proposals, slow mixing. Too low → wasted iterations. Real samplers (Nimble's default) adapt the proposal scale during burn-in for you.
+</div>
+</section>
+
+<!-- ================ NIMBLE LOGISTIC ================================ -->
+<section id="nimble-logistic">
+<h2>The main event · logistic growth with <span class="pill nimble">Nimble</span></h2>
+
+<p>We now fit the ecological example the morning's <code>lm()</code> couldn't honestly answer: posterior distributions for the logistic-growth parameters $r$, $K$, and $\sigma$, plus <em>derived quantities</em> $K/2$ (population size at maximum growth) and $\text{MSY} = rK/4$ (theoretical maximum sustainable yield).</p>
+
+<p>The model is the per-capita form of $dN/dt = rN(1 - N/K)$:</p>
+<div class="eq-block">$\dfrac{1}{N}\dfrac{dN}{dt} \;=\; r - \dfrac{r}{K}\,N, \qquad y_i \sim \mathcal{N}\!\left(r - \dfrac{r}{K} x_i,\; \sigma^2\right).$</div>
+
+<div class="callout bio"><p class="callout-label">Biological intuition</p>
+This is a textbook ecological model and is full of conceptual punchlines: $r$ is the per-capita rate at low density; $K$ is the carrying capacity; $K/2$ maximizes population-level growth $dN/dt$; $rK/4$ is the theoretical sustainable harvest. Bayesian fitting gives us full posterior distributions for <em>all of these</em>, with proper uncertainty propagation — try doing that with <code>lm()</code>!
+</div>
+
+<h3>The complete <span class="pill nimble">Nimble</span> workflow</h3>
+
+<div class="code-label">R · packages + data</div>
+<pre><code><span class="kw">library</span>(nimble); <span class="kw">library</span>(MCMCvis); <span class="kw">library</span>(HDInterval); <span class="kw">library</span>(coda)
+Logistic &lt;- <span class="fn">read.csv</span>(<span class="st">"data/Logistic.csv"</span>, header = <span class="kw">TRUE</span>)
+Logistic &lt;- Logistic[<span class="fn">order</span>(Logistic$PopulationSize), ]
+N_grid &lt;- <span class="fn">seq</span>(<span class="nu">0</span>, <span class="nu">1500</span>, by = <span class="nu">10</span>); N_grid[<span class="nu">1</span>] &lt;- <span class="nu">1</span></code></pre>
+
+<div class="code-label">R · the Nimble model</div>
+<pre><code>logistic_code &lt;- <span class="fn">nimbleCode</span>({
+ <span class="cm"># priors</span>
+ K ~ <span class="fn">dunif</span>(<span class="nu">0</span>, <span class="nu">4000</span>)
+ r ~ <span class="fn">dunif</span>(<span class="nu">0</span>, <span class="nu">2</span>)
+ sigma ~ <span class="fn">dunif</span>(<span class="nu">0</span>, <span class="nu">2</span>)
+ tau &lt;- <span class="nu">1</span> / sigma^<span class="nu">2</span> <span class="cm"># BUGS-style precision</span>
+
+ <span class="cm"># likelihood</span>
+ <span class="kw">for</span> (i <span class="kw">in</span> <span class="nu">1</span>:n) {
+ mu[i] &lt;- r - (r / K) * x[i]
+ y[i] ~ <span class="fn">dnorm</span>(mu[i], tau)
+ }
+
+ <span class="cm"># derived quantities</span>
+ N_at_maxdNdt &lt;- K / <span class="nu">2</span>
+ MSY &lt;- r * K / <span class="nu">4</span>
+
+ <span class="kw">for</span> (j <span class="kw">in</span> <span class="nu">1</span>:nN) {
+ dNdt[j] &lt;- r * N[j] * (<span class="nu">1</span> - N[j] / K)
+ }
+})</code></pre>
+
+<div class="code-label">R · constants vs data, inits, MCMC</div>
+<pre><code><span class="cm"># Nimble splits the JAGS "data" list into:</span>
+<span class="cm"># constants : sizes, indices, fixed covariates, prediction grids</span>
+<span class="cm"># data : observed stochastic nodes (y[i] here)</span>
+constants &lt;- <span class="kw">list</span>(
+ n = <span class="fn">nrow</span>(Logistic),
+ x = <span class="fn">as.double</span>(Logistic$PopulationSize),
+ N = N_grid,
+ nN = <span class="fn">length</span>(N_grid)
+)
+data &lt;- <span class="kw">list</span>(y = <span class="fn">as.double</span>(Logistic$GrowthRate))
+
+inits_list &lt;- <span class="kw">list</span>(
+ <span class="kw">list</span>(K = <span class="nu">1500</span>, r = <span class="nu">0.20</span>, sigma = <span class="nu">1.0</span>),
+ <span class="kw">list</span>(K = <span class="nu">1000</span>, r = <span class="nu">0.15</span>, sigma = <span class="nu">0.1</span>),
+ <span class="kw">list</span>(K = <span class="nu">900</span>, r = <span class="nu">0.30</span>, sigma = <span class="nu">0.01</span>)
+)
+
+<span class="fn">set.seed</span>(<span class="nu">10</span>)
+samples &lt;- <span class="fn">nimbleMCMC</span>(
+ code = logistic_code,
+ constants = constants,
+ data = data,
+ inits = inits_list,
+ monitors = <span class="kw">c</span>(<span class="st">"K"</span>, <span class="st">"r"</span>, <span class="st">"sigma"</span>, <span class="st">"mu"</span>, <span class="st">"N_at_maxdNdt"</span>, <span class="st">"MSY"</span>, <span class="st">"dNdt"</span>),
+ nchains = <span class="nu">3</span>,
+ nburnin = <span class="nu">5000</span>,
+ niter = <span class="nu">25000</span>,
+ thin = <span class="nu">1</span>,
+ samplesAsCodaMCMC = <span class="kw">TRUE</span>
+)</code></pre>
+
+<div class="callout warn"><p class="callout-label">Watch out</p>
+<strong>JAGS → <span class="pill nimble">Nimble</span> translation checklist:</strong>
+<ul>
+<li><code>cat("model{...}", file="x.txt")</code> + <code>jags.model()</code> + <code>coda.samples()</code> &nbsp;→&nbsp; <code>nimbleCode({...})</code> + <code>nimbleMCMC(code=, constants=, data=, inits=, monitors=, nchains=, nburnin=, niter=)</code></li>
+<li>The body of the model (priors, likelihood, derived) translates <em>verbatim</em>: same <code>dnorm</code>, <code>dunif</code>, <code>dbeta</code>, <code>dbinom</code>, <code>dpois</code>; same precision parameterization for <code>dnorm(mu, tau)</code>.</li>
+<li>One JAGS <code>data</code> list splits into Nimble's <code>constants</code> (sizes/indices/fixed covariates) and <code>data</code> (observed RVs).</li>
+<li><code>nimbleMCMC</code> returns a list of MCMC matrices (or a coda <code>mcmc.list</code> with <code>samplesAsCodaMCMC=TRUE</code>). <code>MCMCvis</code> functions (<code>MCMCsummary</code>, <code>MCMCtrace</code>, <code>MCMCchains</code>) work unchanged on either.</li>
+</ul>
+</div>
+
+<div class="code-label">R · diagnostics, summaries, derived quantities</div>
+<pre><code><span class="fn">MCMCtrace</span>(samples, params = <span class="kw">c</span>(<span class="st">"K"</span>, <span class="st">"r"</span>, <span class="st">"sigma"</span>), pdf = <span class="kw">FALSE</span>, Rhat = <span class="kw">TRUE</span>, n.eff = <span class="kw">TRUE</span>)
+<span class="fn">MCMCsummary</span>(samples, params = <span class="kw">c</span>(<span class="st">"K"</span>, <span class="st">"r"</span>, <span class="st">"sigma"</span>, <span class="st">"N_at_maxdNdt"</span>, <span class="st">"MSY"</span>), round = <span class="nu">3</span>)
+
+<span class="cm"># P(r > 0.22 | data)</span>
+r_chain &lt;- <span class="fn">MCMCchains</span>(samples, params = <span class="st">"r"</span>)
+<span class="fn">mean</span>(r_chain &gt; <span class="nu">0.22</span>)</code></pre>
+</section>
+
+<!-- ================ BCI VS HPDI =================================== -->
+<section id="bci-hpdi">
+<h2>Two kinds of credible interval: BCI vs HPDI</h2>
+
+<p>A 95% <strong>Bayesian credible interval</strong> (BCI, equal-tailed) cuts 2.5% off each tail of the posterior. A 95% <strong>highest posterior density interval</strong> (HPDI) is the <em>shortest</em> interval containing 95% of the posterior — by construction, every point inside has higher posterior density than every point outside.</p>
+
+<ul>
+<li>For symmetric posteriors (a typical sample-size-large $r$ posterior here), BCI and HPDI are nearly identical.</li>
+<li>For skewed posteriors (often $\sigma$, $K$ when the prior bound bites, ratios of parameters), HPDI is shorter and shifted toward the mode.</li>
+<li>HPDI is the right interval when you want to say "the 95% most-credible values of $\theta$."</li>
+<li>BCI is the right interval when you want a quantile-symmetric summary (e.g. for forecasts where the median matters).</li>
+</ul>
+
+<div class="code-label">R · BCI and HPDI for the fitted line</div>
+<pre><code>BCI &lt;- <span class="fn">MCMCpstr</span>(samples, params = <span class="st">"mu"</span>,
+ func = <span class="kw">function</span>(x) <span class="fn">quantile</span>(x, <span class="kw">c</span>(<span class="nu">.025</span>, <span class="nu">.50</span>, <span class="nu">.975</span>)))
+HPDI &lt;- <span class="fn">MCMCpstr</span>(samples, params = <span class="st">"mu"</span>,
+ func = <span class="kw">function</span>(x) <span class="fn">hdi</span>(x, <span class="nu">.95</span>))
+
+<span class="fn">plot</span>(constants$x, data$y, pch = <span class="nu">19</span>,
+ xlab = <span class="st">"Population size N"</span>, ylab = <span class="st">"Per-capita growth (1/yr)"</span>)
+<span class="fn">lines</span>(constants$x, BCI$mu[, <span class="nu">2</span>], lwd = <span class="nu">2</span>)
+<span class="fn">lines</span>(constants$x, BCI$mu[, <span class="nu">1</span>], lty = <span class="nu">2</span>, col = <span class="st">"red"</span>)
+<span class="fn">lines</span>(constants$x, BCI$mu[, <span class="nu">3</span>], lty = <span class="nu">2</span>, col = <span class="st">"red"</span>)
+<span class="fn">lines</span>(constants$x, HPDI$mu[, <span class="nu">1</span>], lty = <span class="nu">2</span>, col = <span class="st">"blue"</span>)
+<span class="fn">lines</span>(constants$x, HPDI$mu[, <span class="nu">2</span>], lty = <span class="nu">2</span>, col = <span class="st">"blue"</span>)</code></pre>
+</section>
+
+<!-- ====== ADDITIONAL EXAMPLE 1 (BAYES): SURVIVAL ============== -->
+<section id="bayes-survival">
+<h2>Bonus walk-through 8 · Bayesian binomial estimation of survival</h2>
+
+<p>This example shows beta-binomial conjugacy from end to end, with the prior justification spelled out and a comparison between (i) the closed-form posterior, (ii) a Nimble fit, and (iii) Metropolis. All three give the same answer — they have to, because the model is the same.</p>
+
+<p><strong>Setting.</strong> You banded 25 juvenile Western Bluebirds in spring; 18 were resighted alive the following spring. The biological literature suggests annual juvenile survival in this species is "around 0.45 with a fair amount of variability." We encode this prior as Beta(9, 11), which has mean $9/20 = 0.45$ and an effective sample size of 20 trials.</p>
+
+<div class="code-label">R · closed-form posterior</div>
+<pre><code>y &lt;- <span class="nu">18</span>; n &lt;- <span class="nu">25</span>; alpha0 &lt;- <span class="nu">9</span>; beta0 &lt;- <span class="nu">11</span>
+alpha1 &lt;- alpha0 + y <span class="cm"># 27</span>
+beta1 &lt;- beta0 + n - y <span class="cm"># 18</span>
+<span class="fn">c</span>(mean = alpha1 / (alpha1 + beta1),
+ median = <span class="fn">qbeta</span>(<span class="nu">0.5</span>, alpha1, beta1),
+ BCI_lo = <span class="fn">qbeta</span>(<span class="nu">0.025</span>, alpha1, beta1),
+ BCI_hi = <span class="fn">qbeta</span>(<span class="nu">0.975</span>, alpha1, beta1))</code></pre>
+
+<div class="code-label">R · same model in <span class="pill nimble">Nimble</span></div>
+<pre><code>surv_code &lt;- <span class="fn">nimbleCode</span>({
+ phi ~ <span class="fn">dbeta</span>(<span class="nu">9</span>, <span class="nu">11</span>) <span class="cm"># prior</span>
+ y ~ <span class="fn">dbinom</span>(phi, n) <span class="cm"># likelihood</span>
+})
+
+set.seed(<span class="nu">7</span>)
+surv_samps &lt;- <span class="fn">nimbleMCMC</span>(
+ code = surv_code,
+ constants = <span class="kw">list</span>(n = <span class="nu">25</span>),
+ data = <span class="kw">list</span>(y = <span class="nu">18</span>),
+ inits = <span class="kw">list</span>(<span class="kw">list</span>(phi = <span class="nu">0.5</span>), <span class="kw">list</span>(phi = <span class="nu">0.3</span>), <span class="kw">list</span>(phi = <span class="nu">0.7</span>)),
+ monitors = <span class="st">"phi"</span>,
+ nchains = <span class="nu">3</span>, nburnin = <span class="nu">2000</span>, niter = <span class="nu">10000</span>,
+ samplesAsCodaMCMC = <span class="kw">TRUE</span>)
+<span class="fn">MCMCsummary</span>(surv_samps, round = <span class="nu">3</span>)
+
+<span class="cm"># P(phi > 0.5 | data)?</span>
+<span class="fn">mean</span>(<span class="fn">MCMCchains</span>(surv_samps, <span class="st">"phi"</span>) &gt; <span class="nu">0.5</span>)
+<span class="cm"># closed-form check:</span>
+<span class="nu">1</span> - <span class="fn">pbeta</span>(<span class="nu">0.5</span>, alpha1, beta1)</code></pre>
+
+<div class="callout bio"><p class="callout-label">Biological intuition</p>
+A common student question: "If I had no prior information, would I get the MLE?" Yes — Beta(1,1) (Uniform) prior gives posterior mode = MLE = $y/n = 0.72$. The prior we used here (Beta(9,11)) <em>shrinks</em> the estimate from 0.72 toward 0.45. The closer your prior pseudo-sample size to your actual data, the more shrinkage you get. With $n=25$ and prior "sample size" 20, you can see almost 50% shrinkage.
+</div>
+</section>
+
+<!-- ====== ADDITIONAL EXAMPLE 2 (BAYES): NORMAL REGRESSION ============== -->
+<section id="bayes-regression">
+<h2>Bonus walk-through 9 · Bayesian Normal regression, with posterior predictive checks</h2>
+
+<p>Body mass as a function of body length in Pacific giant salamanders. We will (i) think carefully about priors on the scale of the data, (ii) fit the regression in <span class="pill nimble">Nimble</span>, and (iii) do a posterior predictive check by simulating replicate datasets from the posterior and comparing them to the real one. This is the workflow you should use on every Bayesian model you fit.</p>
+
+<div class="code-label">R · simulate + priors</div>
+<pre><code><span class="fn">set.seed</span>(<span class="nu">21</span>)
+n &lt;- <span class="nu">120</span>
+length_mm &lt;- <span class="fn">runif</span>(n, <span class="nu">80</span>, <span class="nu">250</span>)
+true_int &lt;- -<span class="nu">35</span>
+true_slope &lt;- <span class="nu">0.32</span>
+true_sigma &lt;- <span class="nu">6.0</span>
+mass_g &lt;- true_int + true_slope * length_mm + <span class="fn">rnorm</span>(n, <span class="nu">0</span>, true_sigma)
+<span class="fn">plot</span>(length_mm, mass_g, pch = <span class="nu">19</span>, xlab = <span class="st">"length (mm)"</span>, ylab = <span class="st">"mass (g)"</span>)
+
+<span class="cm"># Prior reasoning:</span>
+<span class="cm"># * intercept: at length=0 the mean mass should be plausibly small; N(0, 100^2) is mild.</span>
+<span class="cm"># * slope: a mm of length should add at most a few grams; N(0, 1) is very wide on this scale.</span>
+<span class="cm"># * sigma: residual SD must be positive and on the same scale as mass (grams).</span>
+<span class="cm"># half-N(0, 20) keeps it positive with most mass below 50.</span></code></pre>
+
+<div class="code-label">R · Nimble model with posterior predictive node</div>
+<pre><code>reg_code &lt;- <span class="fn">nimbleCode</span>({
+ <span class="cm"># priors</span>
+ beta0 ~ <span class="fn">dnorm</span>(<span class="nu">0</span>, sd = <span class="nu">100</span>)
+ beta1 ~ <span class="fn">dnorm</span>(<span class="nu">0</span>, sd = <span class="nu">1</span>)
+ sigma ~ <span class="fn">T</span>(<span class="fn">dnorm</span>(<span class="nu">0</span>, sd = <span class="nu">20</span>), <span class="nu">0</span>, ) <span class="cm"># half-normal via truncation</span>
+
+ <span class="cm"># likelihood + posterior predictive draws</span>
+ <span class="kw">for</span> (i <span class="kw">in</span> <span class="nu">1</span>:n) {
+ mu[i] &lt;- beta0 + beta1 * length_mm[i]
+ mass[i] ~ <span class="fn">dnorm</span>(mu[i], sd = sigma)
+ mass_rep[i] ~ <span class="fn">dnorm</span>(mu[i], sd = sigma) <span class="cm"># replicate dataset</span>
+ }
+
+ <span class="cm"># discrepancy statistic: posterior predictive SD of residuals</span>
+ obs_sd &lt;- <span class="fn">sd</span>(mass[<span class="nu">1</span>:n])
+ rep_sd &lt;- <span class="fn">sd</span>(mass_rep[<span class="nu">1</span>:n])
+})
+
+constants &lt;- <span class="kw">list</span>(n = n, length_mm = length_mm)
+data &lt;- <span class="kw">list</span>(mass = mass_g)
+inits &lt;- <span class="kw">list</span>(
+ <span class="kw">list</span>(beta0 = <span class="nu">0</span>, beta1 = <span class="nu">0</span>, sigma = <span class="nu">10</span>),
+ <span class="kw">list</span>(beta0 = -<span class="nu">50</span>, beta1 = <span class="nu">0.5</span>, sigma = <span class="nu">5</span>),
+ <span class="kw">list</span>(beta0 = <span class="nu">20</span>, beta1 = -<span class="nu">0.1</span>, sigma = <span class="nu">15</span>))
+
+reg_samps &lt;- <span class="fn">nimbleMCMC</span>(
+ code = reg_code,
+ constants = constants,
+ data = data,
+ inits = inits,
+ monitors = <span class="kw">c</span>(<span class="st">"beta0"</span>, <span class="st">"beta1"</span>, <span class="st">"sigma"</span>, <span class="st">"mass_rep"</span>, <span class="st">"obs_sd"</span>, <span class="st">"rep_sd"</span>),
+ nchains = <span class="nu">3</span>, nburnin = <span class="nu">3000</span>, niter = <span class="nu">15000</span>,
+ samplesAsCodaMCMC = <span class="kw">TRUE</span>)
+<span class="fn">MCMCsummary</span>(reg_samps, params = <span class="kw">c</span>(<span class="st">"beta0"</span>, <span class="st">"beta1"</span>, <span class="st">"sigma"</span>), round = <span class="nu">3</span>)</code></pre>
+
+<div class="code-label">R · posterior predictive check</div>
+<pre><code>obs_sd_post &lt;- <span class="fn">MCMCchains</span>(reg_samps, <span class="st">"obs_sd"</span>)
+rep_sd_post &lt;- <span class="fn">MCMCchains</span>(reg_samps, <span class="st">"rep_sd"</span>)
+<span class="cm"># Bayesian p-value: should be near 0.5 if the model fits the SD adequately</span>
+<span class="fn">mean</span>(rep_sd_post &gt;= obs_sd_post)
+
+<span class="cm"># Visual PPC: overlay 100 replicate datasets on the data</span>
+mass_rep_chain &lt;- <span class="fn">MCMCchains</span>(reg_samps, <span class="st">"mass_rep"</span>)
+<span class="fn">plot</span>(length_mm, mass_g, pch = <span class="nu">19</span>, xlab = <span class="st">"length (mm)"</span>, ylab = <span class="st">"mass (g)"</span>)
+<span class="kw">for</span> (i in <span class="fn">sample</span>(<span class="fn">nrow</span>(mass_rep_chain), <span class="nu">100</span>)) {
+ <span class="fn">points</span>(length_mm, mass_rep_chain[i, ], col = <span class="fn">rgb</span>(<span class="nu">0</span>, <span class="nu">0</span>, <span class="nu">0</span>, <span class="nu">0.04</span>), pch = <span class="nu">19</span>, cex = <span class="nu">0.5</span>)
+}
+<span class="fn">points</span>(length_mm, mass_g, pch = <span class="nu">19</span>, col = <span class="st">"red"</span>)</code></pre>
+
+<div class="callout key"><p class="callout-label">Key idea</p>
+A Bayesian p-value near 0.5 says: "replicate datasets simulated from the posterior have the same residual SD as my observed dataset." Values near 0 or 1 are red flags. Posterior predictive checks are how you catch under- or over-dispersion, wrong link functions, missing variance components — all before you publish.
+</div>
+</section>
+
+<!-- ================================================================== -->
+<!-- ======================= EXERCISES ================================ -->
+<!-- ================================================================== -->
+
+<section id="exercises">
+<h2>Exercises</h2>
+<p>Eight numbered exercises spanning the day. Work them with a partner; check the answer key only after you've drafted your own solution. Difficulty pills indicate rough time commitment.</p>
+
+<!-- Exercise 1 -->
+<div class="exercise" id="ex-1">
+<span class="ex-tag">Exercise 1</span><span class="difficulty easy"> · 15 min · MLE by hand</span>
+<h3>Bernoulli MLE from scratch</h3>
+<p>You observe $y_1, \dots, y_n$ independent Bernoulli($p$) trials with $s = \sum y_i$ successes.</p>
+<ol type="a">
+<li>Write the joint likelihood $L(p)$ as a function of $p$, $s$, and $n$.</li>
+<li>Take the log and the derivative; show that the MLE is $\hat p = s/n$.</li>
+<li>Take the second derivative of $\ell(p)$ at $\hat p$. Show that the Fisher information is $I(\hat p) = n / [\hat p(1-\hat p)]$ and hence the Wald SE is $\sqrt{\hat p(1-\hat p)/n}$.</li>
+<li>Compute the MLE, its Wald SE, and a 95% profile-likelihood CI for the red-light data: $s = 30, n = 50$. (Use <code>mle()</code> for the profile.)</li>
+</ol>
+<details class="answer"><summary>Reveal solution</summary><div class="answer-body">
+<p>(a) $L(p) = p^s(1-p)^{n-s}$. (b) $\ell'(p) = s/p - (n-s)/(1-p) = 0 \Rightarrow \hat p = s/n$.</p>
+<p>(c) $\ell''(p) = -s/p^2 - (n-s)/(1-p)^2$, so $-\ell''(\hat p) = n/[\hat p(1-\hat p)]$.</p>
+<p>(d) $\hat p = 0.6$, Wald SE $= \sqrt{0.6 \cdot 0.4/50} \approx 0.069$. Profile CI from <code>confint(mle(...))</code> ≈ (0.461, 0.726).</p>
+<pre><code><span class="kw">library</span>(stats4)
+nll &lt;- <span class="kw">function</span>(p) -(<span class="nu">30</span> * <span class="fn">log</span>(p) + <span class="nu">20</span> * <span class="fn">log</span>(<span class="nu">1</span> - p))
+fit &lt;- <span class="fn">mle</span>(nll, start = <span class="kw">list</span>(p = <span class="nu">0.5</span>),
+ method = <span class="st">"L-BFGS-B"</span>, lower = <span class="nu">0.001</span>, upper = <span class="nu">0.999</span>)
+<span class="fn">summary</span>(fit); <span class="fn">confint</span>(fit)</code></pre>
+</div></details>
+</div>
+
+<!-- Exercise 2 -->
+<div class="exercise" id="ex-2">
+<span class="ex-tag">Exercise 2</span><span class="difficulty medium"> · 25 min · Vonbert</span>
+<h3>Profile likelihood for κ</h3>
+<p>Using the full Vonbert dataset (both sexes pooled) and the three-parameter model, compute and plot the <em>profile likelihood</em> for $\kappa$. For each $\kappa$ in a grid, optimize <em>over</em> $L_\infty$ and $\sigma$; record the minimum negative log-likelihood. Plot $-\Delta\ell$ vs $\kappa$; mark the 95% CI at the 1.92 line.</p>
+<details class="answer"><summary>Reveal solution</summary><div class="answer-body">
+<pre><code><span class="kw">library</span>(stats4)
+TheData &lt;- <span class="fn">matrix</span>(<span class="fn">scan</span>(<span class="st">"data/Vonbert.dat"</span>, skip = <span class="nu">1</span>), byrow = <span class="kw">TRUE</span>, ncol = <span class="nu">3</span>)
+Age &lt;- TheData[, <span class="nu">2</span>]; Len &lt;- TheData[, <span class="nu">3</span>]
+
+profile_kappa &lt;- <span class="kw">function</span>(k) {
+ nll &lt;- <span class="kw">function</span>(Linf, sigma) {
+ pred &lt;- Linf * (<span class="nu">1</span> - <span class="fn">exp</span>(-k * Age))
+ -<span class="fn">sum</span>(<span class="fn">dnorm</span>(Len, pred, sigma, log = <span class="kw">TRUE</span>))
+ }
+ fit &lt;- <span class="fn">mle</span>(nll, start = <span class="kw">list</span>(Linf = <span class="nu">100</span>, sigma = <span class="nu">10</span>),
+ method = <span class="st">"L-BFGS-B"</span>, lower = <span class="kw">c</span>(<span class="nu">10</span>, <span class="nu">0.01</span>))
+ -<span class="fn">logLik</span>(fit)[<span class="nu">1</span>]
+}
+grid &lt;- <span class="fn">seq</span>(<span class="nu">0.05</span>, <span class="nu">0.45</span>, by = <span class="nu">0.005</span>)
+prof &lt;- <span class="fn">sapply</span>(grid, profile_kappa)
+best &lt;- <span class="fn">min</span>(prof)
+<span class="fn">plot</span>(grid, prof - best, type = <span class="st">"l"</span>, lwd = <span class="nu">2</span>, xlab = expression(kappa),
+ ylab = expression(-Delta * <span class="fn">log</span>~L))
+<span class="fn">abline</span>(h = <span class="nu">1.92</span>, lty = <span class="nu">2</span>, col = <span class="st">"red"</span>)</code></pre>
+<p>Read 95% CI off where the profile crosses 1.92. The CI is asymmetric — Wald would have lied.</p>
+</div></details>
+</div>
+
+<!-- Exercise 3 -->
+<div class="exercise" id="ex-3">
+<span class="ex-tag">Exercise 3</span><span class="difficulty medium"> · 20 min · LRT + AIC</span>
+<h3>Sex-specific VBGF revisited</h3>
+<p>Use the LRT code from the walk-through above. Report (a) the LRT statistic and p-value, (b) AIC for both models, (c) your conclusion. Then refit Model B with $L_\infty$ shared but $\kappa$ sex-specific (4 parameters) and run a second LRT against the same null. Comment on what you learn.</p>
+<details class="answer"><summary>Reveal expected output</summary><div class="answer-body">
+<p>The full vs intercept-only LRT will produce a large $\Lambda$ (typically &gt; 6) and reject the null at $\alpha = 0.05$ with 2 df. AIC will agree (the 5-parameter model is &gt; 2 AIC units below the 3-parameter one). The intermediate (shared $L_\infty$, sex-specific $\kappa$) model usually has the best AIC: most of the sex effect is in growth rate, not asymptotic length.</p>
+</div></details>
+</div>
+
+<!-- Exercise 4 -->
+<div class="exercise" id="ex-4">
+<span class="ex-tag">Exercise 4</span><span class="difficulty medium"> · 25 min · ZIP</span>
+<h3>Zero-inflated Poisson — diagnostics</h3>
+<p>Using the ZIP walk-through code, simulate three datasets with $\pi = 0.35$ and $\lambda \in \{1, 2.5, 8\}$. For each:</p>
+<ol type="a">
+<li>Fit a plain Poisson and a ZIP. Compare AIC.</li>
+<li>Compute and report the proportion of zeros under each fitted model and compare to the observed proportion.</li>
+<li>Why is the gap between Poisson and ZIP largest at small $\lambda$?</li>
+</ol>
+<details class="answer"><summary>Reveal</summary><div class="answer-body">
+<p>(c) When $\lambda$ is small, the Poisson already produces many zeros, so the extra zero inflation looks like "Poisson with smaller mean." The ZIP and Poisson likelihoods become hard to distinguish, and you need a lot of data to detect the inflation. When $\lambda$ is large, the Poisson predicts essentially no zeros, so any zero inflation jumps out.</p>
+</div></details>
+</div>
+
+<!-- Exercise 5 -->
+<div class="exercise" id="ex-5">
+<span class="ex-tag">Exercise 5</span><span class="difficulty easy"> · 15 min · Conjugacy</span>
+<h3>Beta–Binomial posterior arithmetic</h3>
+<p>You start with prior Beta(3, 7) for the probability of a snag containing a cavity-nesting bird (skeptical: prior mean 0.30). You survey 40 snags and find 22 with a bird.</p>
+<ol type="a">
+<li>Write the posterior in closed form.</li>
+<li>Compute the posterior mean, median, 95% BCI, and 95% HPDI in R.</li>
+<li>How would your answer change if the prior had been Beta(1, 1) (flat)?</li>
+</ol>
+<details class="answer"><summary>Reveal</summary><div class="answer-body">
+<p>(a) Posterior is Beta(3 + 22, 7 + 40 - 22) = Beta(25, 25).</p>
+<pre><code><span class="kw">library</span>(HDInterval)
+post &lt;- <span class="fn">rbeta</span>(<span class="nu">1e5</span>, <span class="nu">25</span>, <span class="nu">25</span>)
+<span class="fn">c</span>(mean = <span class="fn">mean</span>(post), median = <span class="fn">median</span>(post),
+ <span class="fn">quantile</span>(post, <span class="kw">c</span>(<span class="nu">.025</span>, <span class="nu">.975</span>)),
+ hpdi = <span class="fn">hdi</span>(post, <span class="nu">.95</span>))</code></pre>
+<p>(c) Flat prior gives Beta(23, 19); posterior mean $\approx 23/42 = 0.548$ — slightly higher and not pulled toward 0.3. With $n=40$ data, the prior matters but doesn't dominate.</p>
+</div></details>
+</div>
+
+<!-- Exercise 6 -->
+<div class="exercise" id="ex-6">
+<span class="ex-tag">Exercise 6</span><span class="difficulty medium"> · 30 min · Metropolis</span>
+<h3>Roll your own Metropolis for Gamma–Poisson</h3>
+<p>Tick count data (the Gamma–Poisson walk-through). Implement Metropolis on a single parameter $\lambda > 0$:</p>
+<ol type="a">
+<li>Use $\log \lambda$ as the unconstrained variable (propose Normal jumps in log-space). Why is this a good idea?</li>
+<li>Run 30,000 iterations. Plot the trace, the running mean, and a histogram with the closed-form Gamma posterior overlaid.</li>
+<li>Report your acceptance rate and tune the proposal SD to ~30%.</li>
+</ol>
+<details class="answer"><summary>Reveal</summary><div class="answer-body">
+<p>(a) Working in $\log\lambda$ makes the proposal Normal symmetric in the unconstrained space and automatically respects $\lambda > 0$; otherwise you need a rejection step for proposals $\le 0$.</p>
+<pre><code>y &lt;- <span class="kw">c</span>(<span class="nu">3</span>,<span class="nu">1</span>,<span class="nu">4</span>,<span class="nu">2</span>,<span class="nu">0</span>,<span class="nu">5</span>,<span class="nu">2</span>,<span class="nu">3</span>,<span class="nu">1</span>,<span class="nu">4</span>)
+log_post &lt;- <span class="kw">function</span>(log_lam) {
+ lam &lt;- <span class="fn">exp</span>(log_lam)
+ <span class="fn">dgamma</span>(lam, <span class="nu">2</span>, <span class="nu">1</span>, log = <span class="kw">TRUE</span>) + <span class="fn">sum</span>(<span class="fn">dpois</span>(y, lam, log = <span class="kw">TRUE</span>)) + log_lam <span class="cm"># Jacobian</span>
+}
+ll &lt;- <span class="fn">numeric</span>(<span class="nu">3e4</span>); ll[<span class="nu">1</span>] &lt;- <span class="fn">log</span>(<span class="nu">2</span>); acc &lt;- <span class="nu">0</span>; s &lt;- <span class="nu">0.30</span>
+<span class="kw">for</span> (i <span class="kw">in</span> <span class="nu">2</span>:<span class="fn">length</span>(ll)) {
+ prop &lt;- <span class="fn">rnorm</span>(<span class="nu">1</span>, ll[i - <span class="nu">1</span>], s)
+ <span class="kw">if</span> (<span class="fn">log</span>(<span class="fn">runif</span>(<span class="nu">1</span>)) &lt; <span class="fn">log_post</span>(prop) - <span class="fn">log_post</span>(ll[i - <span class="nu">1</span>])) { ll[i] &lt;- prop; acc &lt;- acc + <span class="nu">1</span> } <span class="kw">else</span> ll[i] &lt;- ll[i - <span class="nu">1</span>]
+}
+lam &lt;- <span class="fn">exp</span>(ll[-(<span class="nu">1</span>:<span class="nu">3000</span>)])
+<span class="fn">hist</span>(lam, breaks = <span class="nu">60</span>, freq = <span class="kw">FALSE</span>)
+<span class="fn">curve</span>(<span class="fn">dgamma</span>(x, <span class="nu">2</span> + <span class="fn">sum</span>(y), <span class="nu">1</span> + <span class="fn">length</span>(y)), add = <span class="kw">TRUE</span>, col = <span class="st">"red"</span>, lwd = <span class="nu">2</span>)
+acc / <span class="fn">length</span>(ll)</code></pre>
+</div></details>
+</div>
+
+<!-- Exercise 7 -->
+<div class="exercise" id="ex-7">
+<span class="ex-tag">Exercise 7</span><span class="difficulty hard"> · 45 min · Nimble · core lab</span>
+<h3>Logistic growth in <span class="pill nimble">Nimble</span> — derived quantities</h3>
+<p>Fit the logistic-growth model (walk-through above). Then:</p>
+<ol type="a">
+<li>Compute the posterior of $K/2$ and $MSY$. Report the median and 95% HPDI for each.</li>
+<li>Plot $dN/dt$ vs $N$ with median and 95% HPDI shading.</li>
+<li>Compute $\Pr(r > 0.22 \mid \text{data})$.</li>
+<li>Compute $\Pr(\text{MSY} > 50 \mid \text{data})$.</li>
+<li>Pick one parameter where BCI and HPDI noticeably differ. Plot both intervals on top of a histogram and explain in 2 sentences why they differ for that parameter.</li>
+</ol>
+<details class="answer"><summary>Reveal expected output</summary><div class="answer-body">
+<p>With this dataset, typical results: $\hat r \approx 0.20$ with 95% HPDI roughly (0.16, 0.24); $\hat K \approx 1{,}100$–$1{,}300$ with wide interval; $\Pr(r > 0.22 \mid y) \approx 0.10$–0.20. Plotting code is in <code>Logistic_BayesianGrowth_Nimble.R</code>. $\sigma$ is the classic asymmetric case where BCI and HPDI separate.</p>
+</div></details>
+</div>
+
+<!-- Exercise 8 -->
+<div class="exercise" id="ex-8">
+<span class="ex-tag">Exercise 8</span><span class="difficulty medium"> · 30 min · Nimble</span>
+<h3>Bayesian survival with three priors</h3>
+<p>Repeat the bluebird-survival walk-through using priors Beta(1,1), Beta(9,11), and Beta(50,50). For each prior:</p>
+<ol type="a">
+<li>Report the posterior mean and 95% BCI.</li>
+<li>Compute $\Pr(\phi > 0.5 \mid \text{data})$.</li>
+<li>Write one sentence explaining how the prior "tug" trades off with the data — i.e. how the effective sample size of the prior compares to $n=25$.</li>
+</ol>
+<details class="answer"><summary>Reveal</summary><div class="answer-body">
+<p>Beta(1,1): posterior $\approx$ Beta(19, 8), mean $\approx 0.70$. Beta(9,11): mean $\approx 0.60$ (shrunk). Beta(50,50): mean $\approx 0.59$ → wait, that doesn't shrink as much as you'd think because both prior and data center near 0.6. Replace with Beta(50, 100) (mean 0.33) and you'd see massive shrinkage to ~0.49 — illustrating that the prior matters most when prior pseudo-sample size $\gg n$.</p>
+</div></details>
+</div>
+
+</section>
+
+<div style="margin-top:50px; display:flex; gap:12px; flex-wrap:wrap;">
+ <button id="reveal-all" style="background:var(--accent); color:white; border:none; padding:10px 20px; border-radius:4px; cursor:pointer; font-family:'Helvetica Neue',Arial,sans-serif; font-size:14px;">Reveal all answers</button>
+ <button id="hide-all" style="background:var(--osu-stone); color:white; border:none; padding:10px 20px; border-radius:4px; cursor:pointer; font-family:'Helvetica Neue',Arial,sans-serif; font-size:14px;">Hide all answers</button>
+ <a href="answer_key.html" style="background:var(--osu-orange); color:white; padding:10px 20px; border-radius:4px; text-decoration:none; font-family:'Helvetica Neue',Arial,sans-serif; font-size:14px;">Open full answer key →</a>
+ <a href="problem_set_v2.html" style="background:#2B6E61; color:white; padding:10px 20px; border-radius:4px; text-decoration:none; font-family:'Helvetica Neue',Arial,sans-serif; font-size:14px;">Songbird problem set →</a>
+ <a href="problem_set_v3.html" style="background:#1C638A; color:white; padding:10px 20px; border-radius:4px; text-decoration:none; font-family:'Helvetica Neue',Arial,sans-serif; font-size:14px;">Marine problem set →</a>
+</div>
+
+</main>
+</div>
+
+<footer>
+ FW 536 · Statistical Modeling for Ecology and Conservation · Oregon State University · Day 4
+</footer>
+</body>
+</html>

@@ -1,0 +1,136 @@
+---
+title: "FW 536 — Day 3 morning lab (v2 · terrestrial wildlife) — Your Name"
+author: "Your Name Here"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    self_contained: true
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    code_folding: show
+    theme: cosmo
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+# Day 3 morning lab — Hierarchical modeling problem set
+
+**Problem set version:** **v2 — terrestrial wildlife theme**.
+(The companion version is [v3 — aquatic & fisheries](problem_set_v3.html); you choose whichever theme fits your interests.)
+
+This template matches [`problem_set_v2.html`](problem_set_v2.html). Read each problem statement there, write your work below, **Knit** to HTML, and upload the `.html` to the matching Canvas assignment.
+
+For setup help see the [R Markdown tutorial](../rmarkdown_tutorial.html).
+
+---
+
+# Setup
+
+```{r}
+# Load packages you'll need. Add or remove as appropriate.
+library(ggplot2)
+library(dplyr)
+library(lme4)
+library(nlme)
+library(AICcmodavg)
+library(MuMIn)
+```
+
+---
+
+# Problem 1 — Cougar home-range size across mountain ranges
+
+> A wildlife biologist measures the 95% MCP home-range size (km$^2$) of 60 GPS-collared cougars, distributed across 8 mountain ranges (5–10 cougars per range). The biological question: is there a real difference in mean home-range size among mountain ranges?
+
+**My work:**
+
+```{r}
+# Your R code here
+```
+
+**Answer / biological interpretation:**
+
+
+---
+
+# Problem 2 — Spotted owl pair productivity across forests
+
+> Over 6 years you monitor breeding success of 240 spotted owl pairs nested in 24 national forests. Each pair has its territory size (ha) measured. The response is fledglings produced. You fit:
+
+**My work:**
+
+```{r}
+# Your R code here
+```
+
+**Answer / biological interpretation:**
+
+
+---
+
+# Problem 3 — Elk body mass vs age, across herds
+
+> Body mass (kg) is measured on 480 elk across 12 herds. The biological question: how does body mass scale with age, and does the slope differ by herd?
+
+**My work:**
+
+```{r}
+# Your R code here
+```
+
+**Answer / biological interpretation:**
+
+
+---
+
+# Problem 4 — Mule deer aerial counts nested in management units
+
+> The Oregon Department of Fish & Wildlife flies aerial surveys: 3 flights × 6 transects per flight × 4 management units = 72 transect-flights, each producing a deer count. Counts vary among units, among transects within units, and among flights within transects.
+
+**My work:**
+
+```{r}
+# Your R code here
+```
+
+**Answer / biological interpretation:**
+
+
+---
+
+# Problem 5 — Pacific marten detection probabilities across regions
+
+> You fit a logistic mixed model to camera-trap data:
+
+**My work:**
+
+```{r}
+# Your R code here
+```
+
+**Answer / biological interpretation:**
+
+
+---
+
+# (Optional) Embed a photo of hand-written work
+
+For problems easier to do on paper, photograph and embed:
+
+```{r, echo=FALSE, eval=FALSE, out.width="60%", fig.cap="Hand-derivation for Problem N"}
+knitr::include_graphics("images/problemN_derivation.jpg")
+```
+
+(Change `eval=FALSE` to `eval=TRUE` after saving an image. See the [R Markdown tutorial](../rmarkdown_tutorial.html) for details.)
+
+---
+
+# Submission checklist
+
+- [ ] Answered every morning problem from `problem_set_v2.html`.
+- [ ] Knitted to HTML without errors.
+- [ ] Photos (if any) embedded with `self_contained: true` in the YAML.
+- [ ] Uploaded the `.html` to the matching Canvas assignment.

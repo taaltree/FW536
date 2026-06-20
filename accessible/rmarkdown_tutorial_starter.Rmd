@@ -1,0 +1,117 @@
+---
+title: "FW 536 — R Markdown tutorial starter"
+author: "Your Name Here"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    self_contained: true
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    code_folding: show
+    theme: cosmo
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo    = TRUE,    # show your code (graders will read it)
+  message = FALSE,   # hide package start-up noise
+  warning = FALSE,   # hide warnings (be careful — sometimes warnings matter!)
+  fig.width = 6,
+  fig.height = 4
+)
+```
+
+# Welcome
+
+This is a starter R Markdown file for FW 536. Open it in RStudio, click
+**Knit** (the yarn-and-needles icon at the top of the editor), and confirm
+that you get an HTML output. If you do, you're ready for the workshop.
+
+If knitting fails, see the troubleshooting section of the
+[R Markdown tutorial HTML](rmarkdown_tutorial.html) for common fixes.
+
+# 1. A code chunk
+
+Below is an R code chunk. When you knit, R executes the code and the
+output appears beneath it.
+
+```{r}
+x <- rnorm(100, mean = 5, sd = 2)
+mean(x)
+sd(x)
+```
+
+# 2. A plot
+
+```{r, fig.cap="Histogram of 100 draws from a Normal(5, 2) distribution."}
+hist(x, breaks = 15, col = "steelblue", border = "white",
+     main = "", xlab = "x")
+abline(v = mean(x), col = "darkred", lwd = 2)
+```
+
+# 3. Inline R
+
+You can also write code inline. The mean of `x` is `r round(mean(x), 2)`
+and the standard deviation is `r round(sd(x), 2)`.
+
+This is useful in problem-set answers: instead of hard-coding numbers in
+your prose, compute them with inline R so they update automatically when
+the data change.
+
+# 4. Math
+
+Inline math: the standardized score is $z_i = (x_i - \mu) / \sigma$.
+
+Display math:
+
+$$
+P(\theta \mid y) \; = \; \frac{P(y \mid \theta)\, P(\theta)}{P(y)}
+$$
+
+# 5. Embedding a photo of hand-written work
+
+For derivations that are faster on paper, photograph the page and embed
+the image. Save the photo as `images/example.jpg` in the same folder as
+this `.Rmd`.
+
+```{r, echo=FALSE, eval=FALSE, out.width="60%", fig.cap="Hand-derivation of Problem N"}
+knitr::include_graphics("images/example.jpg")
+```
+
+(Note: the chunk above has `eval=FALSE` so it doesn't fail when there's
+no image. Once you save a real image, change to `eval=TRUE`.)
+
+# 6. A small statistical example
+
+Here's a complete worked example to confirm the rendering pipeline works:
+
+```{r}
+# Simulate a small Poisson regression
+set.seed(2026)
+n <- 80
+x <- rnorm(n)
+mu <- exp(0.5 + 0.4 * x)
+y <- rpois(n, mu)
+
+# Fit and summarize
+fit <- glm(y ~ x, family = poisson)
+coef(fit)
+exp(coef(fit))            # multiplicative effect of a 1-unit increase in x
+```
+
+The intercept on the natural scale is approximately
+`r round(exp(coef(fit)[1]), 2)`, and a one-unit increase in `x`
+multiplies expected `y` by approximately
+`r round(exp(coef(fit)[2]), 2)`.
+
+# 7. Submitting your work
+
+1. Knit this file to HTML (Ctrl/Cmd-Shift-K, or the **Knit** button).
+2. Confirm that `rmarkdown_tutorial_starter.html` appears in the same
+   folder as the `.Rmd`.
+3. Upload the `.html` to the Canvas assignment.
+
+Tip — always **Restart R** (Session menu) and re-knit from a fresh
+session before submitting, to catch bugs that depend on hidden console
+state.

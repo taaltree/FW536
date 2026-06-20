@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en" data-a11y="done">
+<head>
+<meta charset="UTF-8" />
+<title>Day 2 Afternoon — Generalized linear models lecture notes | FW 536</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../_Shared/css/accessible.css" />
+<script>
+MathJax = {
+  tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
+  options: { menuOptions: { settings: { assistiveMml: true, explorer: true } } },
+  loader: { load: ['a11y/assistive-mml', 'a11y/explorer'] }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script"></script>
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<div class="a11y-bar" role="region" aria-label="Accessibility">Accessible version &middot; <a href="../accessibility.html">How to use this site with a screen reader</a> &middot; <a href="../index.html">Course home</a></div>
+
+<aside class="sidebar">
+<p class="brand"><a href="../index.html">FW 536 · Day 2 Afternoon</a></p>
+<div class="subtitle">Lecture notes: Generalized linear models</div>
+<nav aria-label="Slides in this lecture">
+<div class="section">Slides</div><ul>
+<li><a href="#slide-1">1. Generalized Linear Models</a></li>
+<li><a href="#slide-2">2. General Linear Model</a></li>
+<li><a href="#slide-3">3. Slide 3</a></li>
+<li><a href="#slide-4">4. Slide 4</a></li>
+<li><a href="#slide-5">5. Regression is ONE KIND of General Linear Model</a></li>
+<li><a href="#slide-6">6. What does it mean to be linear?</a></li>
+<li><a href="#slide-7">7. All models have stochastic part for errors and deterministic “scientific” model defined by both algebra and geometry</a></li>
+<li><a href="#slide-8">8. General Linear Model</a></li>
+<li><a href="#slide-9">9. What influences partying in college?</a></li>
+<li><a href="#slide-10">10. What influences partying in college?</a></li>
+<li><a href="#slide-11">11. Slide 11</a></li>
+<li><a href="#slide-12">12. Interaction term</a></li>
+<li><a href="#slide-13">13. More than two levels – Drinking by religion</a></li>
+<li><a href="#slide-14">14. More than two levels – Drinking by religion</a></li>
+<li><a href="#slide-15">15. Sometimes we can’t be Normal</a></li>
+<li><a href="#slide-16">16. Titanic Data – Try a General Linear Model</a></li>
+<li><a href="#slide-17">17. Titanic Data – General Linear Model</a></li>
+<li><a href="#slide-18">18. Titanic Data – Generalized Linear Model</a></li>
+<li><a href="#slide-19">19. From probability to odds to log of odds</a></li>
+<li><a href="#slide-20">20. Titanic Data – Generalized Linear Model</a></li>
+<li><a href="#slide-21">21. Titanic Data – Generalized Linear Model</a></li>
+<li><a href="#slide-22">22. Titanic Data – Let’s look at the data</a></li>
+<li><a href="#slide-23">23. Binomial GLM (i.e. Logistic Regression)</a></li>
+<li><a href="#slide-24">24. Interpreting the effect size with odds ratio</a></li>
+<li><a href="#slide-25">25. Questions</a></li>
+<li><a href="#slide-26">26. Slide 26</a></li>
+<li><a href="#slide-27">27. Slide 27</a></li>
+<li><a href="#slide-28">28. Slide 28</a></li>
+<li><a href="#slide-29">29. Did males have higher survival than females?</a></li>
+<li><a href="#slide-30">30. Slide 30</a></li>
+<li><a href="#slide-31">31. Slide 31</a></li>
+<li><a href="#slide-32">32. Did survival vary by class and sex?</a></li>
+<li><a href="#slide-33">33. Slide 33</a></li>
+<li><a href="#slide-34">34. How do we interpret this?</a></li>
+<li><a href="#slide-35">35. Slide 35</a></li>
+<li><a href="#slide-36">36. Slide 36</a></li>
+<li><a href="#slide-37">37. Instead of looking at individual passengers, can’t we look at proportion by group?</a></li>
+<li><a href="#slide-38">38. Slide 38</a></li>
+<li><a href="#slide-39">39. Slide 39</a></li>
+<li><a href="#slide-40">40. Models for count data</a></li>
+<li><a href="#slide-41">41. Slide 41</a></li>
+<li><a href="#slide-42">42. Slide 42</a></li>
+<li><a href="#slide-43">43. Slide 43</a></li>
+<li><a href="#slide-44">44. Slide 44</a></li>
+<li><a href="#slide-45">45. Slide 45</a></li>
+<li><a href="#slide-46">46. Slide 46</a></li>
+<li><a href="#slide-47">47. Slide 47</a></li>
+<li><a href="#slide-48">48. Slide 48</a></li>
+<li><a href="#slide-49">49. Slide 49</a></li>
+<li><a href="#slide-50">50. Can we predict salmon counts using eDNA</a></li>
+<li><a href="#slide-51">51. What is happening here?</a></li>
+<li><a href="#slide-52">52. Model output</a></li>
+<li><a href="#slide-53">53. Model output</a></li>
+<li><a href="#slide-54">54. How does this look? Concerns? What now? Are we done?</a></li>
+<li><a href="#slide-55">55. How does this look? Concerns? What now? Are we done?</a></li>
+<li><a href="#slide-56">56. We are not done!</a></li>
+<li><a href="#slide-57">57. 1. X vs. Y</a></li>
+<li><a href="#slide-58">58. 2. Good models make good predictions</a></li>
+<li><a href="#slide-59">59. What is being fit here exactly?</a></li>
+<li><a href="#slide-60">60. eDNA rate should be transformed from positive to the whole real line! How?</a></li>
+<li><a href="#slide-61">61. log(Y) = a + b*log(X)</a></li>
+<li><a href="#slide-62">62. New model output</a></li>
+<li><a href="#slide-63">63. New model output</a></li>
+<li><a href="#slide-64">64. Good models make good predictions</a></li>
+<li><a href="#slide-65">65. Quasipoisson GLM</a></li>
+<li><a href="#slide-66">66. Quasipoisson GLM</a></li>
+<li><a href="#slide-67">67. Quasipoisson GLM</a></li>
+<li><a href="#slide-68">68. Quasipoisson figures</a></li>
+<li><a href="#slide-69">69. Quasipoisson figures</a></li>
+<li><a href="#slide-70">70. This is great, but….</a></li>
+<li><a href="#slide-71">71. Negative binomial</a></li>
+<li><a href="#slide-72">72. Negative binomial</a></li>
+<li><a href="#slide-73">73. Negative binomial</a></li>
+<li><a href="#slide-74">74. Negative binomial</a></li>
+<li><a href="#slide-75">75. Negative binomial</a></li>
+<li><a href="#slide-76">76. Anything else we’re ignoring?</a></li>
+<li><a href="#slide-77">77. There was a world before GLMs</a></li>
+<li><a href="#slide-78">78. There was a world before GLMs</a></li>
+<li><a href="#slide-79">79. There was a world before GLMs</a></li>
+<li><a href="#slide-80">80. Gamma</a></li>
+<li><a href="#slide-81">81. Gamma</a></li>
+<li><a href="#slide-82">82. Interaction Terms</a></li>
+<li><a href="#slide-83">83. Interpretation and Symmetry of Interactions</a></li>
+<li><a href="#slide-84">84. Interpretation and Symmetry of Interactions</a></li>
+<li><a href="#slide-85">85. Interpretation and Symmetry of Interactions</a></li>
+<li><a href="#slide-86">86. Dependence on scaling and transformation I</a></li>
+<li><a href="#slide-87">87. Dependence on scaling and transformation II</a></li>
+<li><a href="#slide-88">88. Additivity not preserved across nonlinear transformations!</a></li>
+<li><a href="#slide-89">89. Confusion in action with major policy implications!</a></li>
+<li><a href="#slide-90">90. What was the point made by Barnas et al.?</a></li>
+<li><a href="#slide-91">91. What was the point made by Barnas et al.?</a></li>
+<li><a href="#slide-92">92. Models, especially with interactions, require algebra and especially geometry. Interpret the predictions!</a></li>
+</ul></nav></aside>
+<main class="content" id="main-content" tabindex="-1">
+<header class="lab-header">
+<div class="eyebrow">Day 2 Afternoon · Accessible lecture notes</div>
+<h1>Generalized linear models</h1>
+<p class="lede">A screen-reader-friendly transcript of the lecture slides: all slide text and speaker notes are included. Figures are flagged where a text description still needs to be added.</p>
+</header>
+<div class="callout key"><p class="callout-label">About these notes</p>These notes are generated from the lecture slides. Each section below is one slide. Where a slide contained a picture, plot, or equation image, you will see a "Figure needs description" note &mdash; ask your instructor for the description of that figure. For the underlying concepts with worked examples, also read the <a href="plain_language_summary.html">plain-language summary</a> and <a href="lab.html">lab</a> for this session.</p></div>
+<section aria-labelledby="slide-1-h">
+<h2 id="slide-1-h"><span id="slide-1"></span>Slide 1: Generalized Linear Models</h2>
+<p>Some material from Olivier Gimenez 2020</p>
+</section>
+<section aria-labelledby="slide-2-h">
+<h2 id="slide-2-h"><span id="slide-2"></span>Slide 2: General Linear Model</h2>
+<p>Often written as:</p>
+<p>But even clearer:</p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 2.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 2.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>From this we can see assumption of constant variance</p>
+</section>
+<section aria-labelledby="slide-3-h">
+<h2 id="slide-3-h"><span id="slide-3"></span>Slide 3</h2>
+<p>Slide from Federico Vegetti</p>
+</section>
+<section aria-labelledby="slide-4-h">
+<h2 id="slide-4-h"><span id="slide-4"></span>Slide 4</h2>
+<p>Slide from Federico Vegetti</p>
+</section>
+<section aria-labelledby="slide-5-h">
+<h2 id="slide-5-h"><span id="slide-5"></span>Slide 5: Regression is ONE KIND of General Linear Model</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 5.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-6-h">
+<h2 id="slide-6-h"><span id="slide-6"></span>Slide 6: What does it mean to be linear?</h2>
+<ul>
+<li>#1 is a linear model.</li>
+<li>The COEFFICIENTS need to be linear. Not the predictors!</li>
+</ul>
+</section>
+<section aria-labelledby="slide-7-h">
+<h2 id="slide-7-h"><span id="slide-7"></span>Slide 7: All models have stochastic part for errors and deterministic “scientific” model defined by both algebra and geometry</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 7.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>What is the associated R code for this?</p>
+</section>
+<section aria-labelledby="slide-8-h">
+<h2 id="slide-8-h"><span id="slide-8"></span>Slide 8: General Linear Model</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 8.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-9-h">
+<h2 id="slide-9-h"><span id="slide-9"></span>Slide 9: What influences partying in college?</h2>
+<ul>
+<li>partyHr</li>
+<li style="margin-left:1em">student’s party hours per week</li>
+<li>drinks</li>
+<li style="margin-left:1em">average number of drinks per week</li>
+<li>Is there also a difference among male and female students?</li>
+</ul>
+<p class="callout warn" role="note"><span class="callout-label">Figure 9.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>From Yuk Tung Liu’s STAT 390EF</p>
+<details class="answer"><summary>Speaker notes for this slide</summary><div class="answer-body"><p>What kind of model is this? (regression)  How would bad scientists interpret?  Let’s interpret correctly</p></div></details>
+</section>
+<section aria-labelledby="slide-10-h">
+<h2 id="slide-10-h"><span id="slide-10"></span>Slide 10: What influences partying in college?</h2>
+<ul>
+<li>What is the average number of party hours for males and females who don’t drink?</li>
+<li>What is the average number of party hours for males and females who have an average of 5 drinks per week?</li>
+<li>What does the algebra and geometry (graph) of this model look like?</li>
+</ul>
+<p class="callout warn" role="note"><span class="callout-label">Figure 10.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>Group Work</p>
+<details class="answer"><summary>Speaker notes for this slide</summary><div class="answer-body"><p>What is this model called in stats classes? (ANCOVA)</p></div></details>
+</section>
+<section aria-labelledby="slide-11-h">
+<h2 id="slide-11-h"><span id="slide-11"></span>Slide 11</h2>
+<ul>
+<li>Can change the reference level to female</li>
+<li style="margin-left:1em">survey$gender2 &lt;- relevel(survey$gender,&quot;female&quot;)</li>
+</ul>
+<p class="callout warn" role="note"><span class="callout-label">Figure 11.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-12-h">
+<h2 id="slide-12-h"><span id="slide-12"></span>Slide 12: Interaction term</h2>
+<ul>
+<li>What is the interpretation?</li>
+<li>What is the average number of party hours for males and females who have an average of 5 drinks per week?</li>
+<li>What does the algebra and geometry (graph) of this model look like?</li>
+</ul>
+<p>Group Work</p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 12.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-13-h">
+<h2 id="slide-13-h"><span id="slide-13"></span>Slide 13: More than two levels – Drinking by religion</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 13.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>Start with reference level “Christian”</p>
+</section>
+<section aria-labelledby="slide-14-h">
+<h2 id="slide-14-h"><span id="slide-14"></span>Slide 14: More than two levels – Drinking by religion</h2>
+<p>Now with reference level “Atheist”</p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 14.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<ul>
+<li>Why might this model not by ideal?</li>
+<li>Is there a problem with releveling to assess all pairwise interactions?</li>
+</ul>
+<details class="answer"><summary>Speaker notes for this slide</summary><div class="answer-body"><p>Remember to think about sample size</p></div></details>
+</section>
+<section aria-labelledby="slide-15-h">
+<h2 id="slide-15-h"><span id="slide-15"></span>Slide 15: Sometimes we can’t be Normal</h2>
+<p><em>(No text on this slide.)</em></p>
+</section>
+<section aria-labelledby="slide-16-h">
+<h2 id="slide-16-h"><span id="slide-16"></span>Slide 16: Titanic Data – Try a General Linear Model</h2>
+<ul>
+<li>Survival (1/0) for passengers with known age, sex, and class</li>
+<li>We could try fitting the linear model for class (crew, first, second, third)</li>
+<li style="margin-left:1em">titanic.lm &lt;- lm(survived ~ class, data = titanic)</li>
+<li style="margin-left:1em">But the residuals, of course, are not remotely normally distributed.</li>
+<li style="margin-left:2em">And model is grossly misspecified because “survival” can only be 0 or 1</li>
+</ul>
+<p class="callout warn" role="note"><span class="callout-label">Figure 16.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>The actual probability model under the hood</p>
+</section>
+<section aria-labelledby="slide-17-h">
+<h2 id="slide-17-h"><span id="slide-17"></span>Slide 17: Titanic Data – General Linear Model</h2>
+<p>Let’s interpret this output</p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 17.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-18-h">
+<h2 id="slide-18-h"><span id="slide-18"></span>Slide 18: Titanic Data – Generalized Linear Model</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 18.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-19-h">
+<h2 id="slide-19-h"><span id="slide-19"></span>Slide 19: From probability to odds to log of odds</h2>
+<ul>
+<li>Imagine the probability of success of some event is .8.  Then the probability of failure is 1 – .8 = .2.  The odds of success is the ratio of the probability of success over the probability of failure.  0.8/0.2 = 4.  That is to say that the odds of success are  4 to 1.  If the probability of success is .5, i.e., 50-50 percent chance, then the odds of success is 1 to 1.</li>
+<li>The transformation from probability to odds is a monotonic transformation, meaning the odds increase as the probability increases or vice versa.  Probability ranges from 0 and 1.  Odds range from 0 and positive infinity. Log odds from negative Inf to Inf</li>
+<li>MUCH easier to interpret probability</li>
+</ul>
+</section>
+<section aria-labelledby="slide-20-h">
+<h2 id="slide-20-h"><span id="slide-20"></span>Slide 20: Titanic Data – Generalized Linear Model</h2>
+<ul>
+<li>The logit link function. If:</li>
+<li>Then what is p? Find it.</li>
+</ul>
+<p>Group Work</p>
+</section>
+<section aria-labelledby="slide-21-h">
+<h2 id="slide-21-h"><span id="slide-21"></span>Slide 21: Titanic Data – Generalized Linear Model</h2>
+<ul>
+<li>The logit link function. If:</li>
+<li>Then what is p?</li>
+<li>Note: We have transformed p to the whole real line, and can now fit a linear combination of our predictors, which in this case are discrete factors</li>
+</ul>
+</section>
+<section aria-labelledby="slide-22-h">
+<h2 id="slide-22-h"><span id="slide-22"></span>Slide 22: Titanic Data – Let’s look at the data</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 22.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-23-h">
+<h2 id="slide-23-h"><span id="slide-23"></span>Slide 23: Binomial GLM (i.e. Logistic Regression)</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 23.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>How do we interpret this?</p>
+</section>
+<section aria-labelledby="slide-24-h">
+<h2 id="slide-24-h"><span id="slide-24"></span>Slide 24: Interpreting the effect size with odds ratio</h2>
+<p>Group Work</p>
+<p>Show that this is also true for any continuous variables, x, by using the odds ratio of x + 1 to x</p>
+</section>
+<section aria-labelledby="slide-25-h">
+<h2 id="slide-25-h"><span id="slide-25"></span>Slide 25: Questions</h2>
+<ul>
+<li>Based on the model output, what is the probability that a member of the crew, first, second, third class survived? How much higher is the probability of survival for first class relative to crew?</li>
+<li>How should these probabilities relate to the data in this model?</li>
+<li>What are the p-values telling you?</li>
+</ul>
+<p>Group Work</p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 25.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-26-h">
+<h2 id="slide-26-h"><span id="slide-26"></span>Slide 26</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 26.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-27-h">
+<h2 id="slide-27-h"><span id="slide-27"></span>Slide 27</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 27.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>So this model was trivial for estimation but was still needed for inference!</p>
+</section>
+<section aria-labelledby="slide-28-h">
+<h2 id="slide-28-h"><span id="slide-28"></span>Slide 28</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 28.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-29-h">
+<h2 id="slide-29-h"><span id="slide-29"></span>Slide 29: Did males have higher survival than females?</h2>
+<p><em>(No text on this slide.)</em></p>
+</section>
+<section aria-labelledby="slide-30-h">
+<h2 id="slide-30-h"><span id="slide-30"></span>Slide 30</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 30.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-31-h">
+<h2 id="slide-31-h"><span id="slide-31"></span>Slide 31</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 31.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-32-h">
+<h2 id="slide-32-h"><span id="slide-32"></span>Slide 32: Did survival vary by class and sex?</h2>
+<p><em>(No text on this slide.)</em></p>
+</section>
+<section aria-labelledby="slide-33-h">
+<h2 id="slide-33-h"><span id="slide-33"></span>Slide 33</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 33.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-34-h">
+<h2 id="slide-34-h"><span id="slide-34"></span>Slide 34: How do we interpret this?</h2>
+<ul>
+<li>What are the log(odds) for first class males and females?</li>
+<li style="margin-left:1em">What are the corresponding survival probabilities?</li>
+<li>What are the log(odds) for male and female crew?</li>
+<li style="margin-left:1em">What are the corresponding survival probabilities?</li>
+</ul>
+<p>Group Work</p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 34.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-35-h">
+<h2 id="slide-35-h"><span id="slide-35"></span>Slide 35</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 35.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-36-h">
+<h2 id="slide-36-h"><span id="slide-36"></span>Slide 36</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 36.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-37-h">
+<h2 id="slide-37-h"><span id="slide-37"></span>Slide 37: Instead of looking at individual passengers, can’t we look at proportion by group?</h2>
+<p><em>(No text on this slide.)</em></p>
+</section>
+<section aria-labelledby="slide-38-h">
+<h2 id="slide-38-h"><span id="slide-38"></span>Slide 38</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 38.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>Not 1 anymore</p>
+</section>
+<section aria-labelledby="slide-39-h">
+<h2 id="slide-39-h"><span id="slide-39"></span>Slide 39</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 39.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>Check to make sure results are identical. I’ve made it not 100% easy to check</p>
+</section>
+<section aria-labelledby="slide-40-h">
+<h2 id="slide-40-h"><span id="slide-40"></span>Slide 40: Models for count data</h2>
+<ul>
+<li>Poisson</li>
+<li>Quasipoisson</li>
+<li>Negative Binomial</li>
+<li>Binomial</li>
+</ul>
+<p>Unbounded</p>
+<p>Bounded</p>
+</section>
+<section aria-labelledby="slide-41-h">
+<h2 id="slide-41-h"><span id="slide-41"></span>Slide 41</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 41.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>Oncorhynchus nerka (sockeye salmon)</p>
+<p>Does environmental DNA (eDNA) contain enough information to estimate salmon escapement and smolt abundance?</p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 41.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 41.3 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 41.4 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 41.5 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 41.6 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>=</p>
+<p>One person, one sample /day</p>
+<p>Several people, all day</p>
+<details class="answer"><summary>Speaker notes for this slide</summary><div class="answer-body"><p>A minor revolution in ecology is using eDNA from water to sample aquatic species.  I have started a project with He Daming of the Asian International Rivers Center at Yunnan University to use this technology to map fish populations.</p></div></details>
+</section>
+<section aria-labelledby="slide-42-h">
+<h2 id="slide-42-h"><span id="slide-42"></span>Slide 42</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 42.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>Levi. T., Allen, J. M., Bell, D., Joyce, J. Russel, J. R., Tallmon, D. A., Vulstek, S. C., Yahan, Y., Yu, D. W. 2019. Environmental DNA for the enumeration and management of Pacific salmon. Molecular Ecology Resources</p>
+</section>
+<section aria-labelledby="slide-43-h">
+<h2 id="slide-43-h"><span id="slide-43"></span>Slide 43</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 43.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 43.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<ul>
+<li>Validation data from Auke Creek Station in Juneau, Alaska</li>
+<li>Daily counts of</li>
+<li>returning Coho and Sockeye adults</li>
+<li>out-migrating Sockeye smolts</li>
+</ul>
+<p class="callout warn" role="note"><span class="callout-label">Figure 43.3 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 43.4 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-44-h">
+<h2 id="slide-44-h"><span id="slide-44"></span>Slide 44</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 44.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>Sockeye returning adults</p>
+</section>
+<section aria-labelledby="slide-45-h">
+<h2 id="slide-45-h"><span id="slide-45"></span>Slide 45</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 45.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>Sockeye returning adults</p>
+</section>
+<section aria-labelledby="slide-46-h">
+<h2 id="slide-46-h"><span id="slide-46"></span>Slide 46</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 46.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>Sockeye returning adults</p>
+</section>
+<section aria-labelledby="slide-47-h">
+<h2 id="slide-47-h"><span id="slide-47"></span>Slide 47</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 47.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>Sockeye returning adults</p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 47.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 47.3 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 47.4 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 47.5 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>Water flux (cubic_ft/sec) X DNA concentration (ng/ul) = ng/sec X cubic_ft/ul</p>
+</section>
+<section aria-labelledby="slide-48-h">
+<h2 id="slide-48-h"><span id="slide-48"></span>Slide 48</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 48.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>Sockeye returning adults</p>
+<p>eDNA rate:  ng/sec</p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 48.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 48.3 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 48.4 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 48.5 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-49-h">
+<h2 id="slide-49-h"><span id="slide-49"></span>Slide 49</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 49.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>Sockeye out-migrating smolts</p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 49.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-50-h">
+<h2 id="slide-50-h"><span id="slide-50"></span>Slide 50: Can we predict salmon counts using eDNA</h2>
+<p>Let’s start with Poisson model using flow-corrected eDNA concentration as a predictor.</p>
+</section>
+<section aria-labelledby="slide-51-h">
+<h2 id="slide-51-h"><span id="slide-51"></span>Slide 51: What is happening here?</h2>
+<ul>
+<li>Data are Poisson distributed with varying rate parameter</li>
+<li>This parameter is the mean (and variance)</li>
+<li>We model the mean as a linear function of predictors, but we need a link function</li>
+<li>Why do we use log link here?</li>
+</ul>
+</section>
+<section aria-labelledby="slide-52-h">
+<h2 id="slide-52-h"><span id="slide-52"></span>Slide 52: Model output</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 52.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-53-h">
+<h2 id="slide-53-h"><span id="slide-53"></span>Slide 53: Model output</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 53.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-54-h">
+<h2 id="slide-54-h"><span id="slide-54"></span>Slide 54: How does this look? Concerns? What now? Are we done?</h2>
+<p><em>(No text on this slide.)</em></p>
+</section>
+<section aria-labelledby="slide-55-h">
+<h2 id="slide-55-h"><span id="slide-55"></span>Slide 55: How does this look? Concerns? What now? Are we done?</h2>
+<ul>
+<li>Poisson assumes variance = mean</li>
+<li>Overdispersion evident if residual deviance &gt; degrees of freedom</li>
+<li>We clearly have overdispersion here because deviance is 100 times larger than degrees of freedom</li>
+<li>Let’s deal with the overdispersion later.</li>
+<li>Is the model otherwise ok?</li>
+</ul>
+</section>
+<section aria-labelledby="slide-56-h">
+<h2 id="slide-56-h"><span id="slide-56"></span>Slide 56: We are not done!</h2>
+<ul>
+<li>Let’s plot the response</li>
+<li>What are two ways we can do this? How?</li>
+<li style="margin-left:1em">Reminder: We have daily flow-corrected qPCR (eDNA rate) and counts</li>
+</ul>
+</section>
+<section aria-labelledby="slide-57-h">
+<h2 id="slide-57-h"><span id="slide-57"></span>Slide 57: 1. X vs. Y</h2>
+<ul>
+<li>Why isn’t this a line if we fit</li>
+<li style="margin-left:1em">glm(Count ~ Qcorr_qPCR , family = &quot;poisson&quot;)</li>
+<li>CI is far too narrow because of overdispersion (variance &gt; mean)</li>
+<li>Nothing else obvious</li>
+</ul>
+<p class="callout warn" role="note"><span class="callout-label">Figure 57.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-58-h">
+<h2 id="slide-58-h"><span id="slide-58"></span>Slide 58: 2. Good models make good predictions</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 58.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<ul>
+<li>Ah, look at that. We are consistently overpredicting the low/no counts!</li>
+<li>Why? Let’s think more carefully</li>
+<li>Is this model mispecified somehow?</li>
+</ul>
+</section>
+<section aria-labelledby="slide-59-h">
+<h2 id="slide-59-h"><span id="slide-59"></span>Slide 59: What is being fit here exactly?</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 59.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<ul>
+<li>What would eDNA rate have to be to match zero counts? Do you see it?</li>
+<li>Yeah, that’s a problem! How do we fix it?</li>
+</ul>
+</section>
+<section aria-labelledby="slide-60-h">
+<h2 id="slide-60-h"><span id="slide-60"></span>Slide 60: eDNA rate should be transformed from positive to the whole real line! How?</h2>
+<ul>
+<li>Log(eDNA) &gt; 0 when eDNA &gt; 1</li>
+<li>Log(eDNA) = 0 when eDNA = 1</li>
+<li>Log(eDNA) &lt; 0 when eDNA = &lt;1</li>
+<li>Log(eDNA) = -Inf when eDNA = 0</li>
+</ul>
+<ul>
+<li>Log transforming a positive variable stretches it to the real line.</li>
+<li>But what functional form are we really fitting here?</li>
+</ul>
+</section>
+<section aria-labelledby="slide-61-h">
+<h2 id="slide-61-h"><span id="slide-61"></span>Slide 61: log(Y) = a + b*log(X)</h2>
+<p><em>(No text on this slide.)</em></p>
+</section>
+<section aria-labelledby="slide-62-h">
+<h2 id="slide-62-h"><span id="slide-62"></span>Slide 62: New model output</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 62.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-63-h">
+<h2 id="slide-63-h"><span id="slide-63"></span>Slide 63: New model output</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 63.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-64-h">
+<h2 id="slide-64-h"><span id="slide-64"></span>Slide 64: Good models make good predictions</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 64.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<ul>
+<li>Much better at predicting zeros now</li>
+<li>But still very narrow confidence intervals that don’t make sense</li>
+<li>Clear overdispersion because deviance &gt;&gt; degrees of freedom</li>
+<li>Now let’s fix the overdispersion problem</li>
+</ul>
+</section>
+<section aria-labelledby="slide-65-h">
+<h2 id="slide-65-h"><span id="slide-65"></span>Slide 65: Quasipoisson GLM</h2>
+<ul>
+<li>The Normal distribution has the mean and variance as separate parameters, but this is unusual</li>
+<li>Poisson distribution has variance equal to the mean</li>
+<li>Quasipoisson allows the variance to be proportional to the mean</li>
+<li>This ”dispersion parameter” is the constant of proportionality that defines how much larger or smaller the variance is than the mean</li>
+</ul>
+</section>
+<section aria-labelledby="slide-66-h">
+<h2 id="slide-66-h"><span id="slide-66"></span>Slide 66: Quasipoisson GLM</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 66.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>Identical estimate</p>
+<p>Variance 78 times larger than the mean</p>
+<p>Larger p-value</p>
+</section>
+<section aria-labelledby="slide-67-h">
+<h2 id="slide-67-h"><span id="slide-67"></span>Slide 67: Quasipoisson GLM</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 67.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>Identical estimate</p>
+<p>Variance 39.5 times larger than the mean</p>
+<p>Larger p-value</p>
+</section>
+<section aria-labelledby="slide-68-h">
+<h2 id="slide-68-h"><span id="slide-68"></span>Slide 68: Quasipoisson figures</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 68.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-69-h">
+<h2 id="slide-69-h"><span id="slide-69"></span>Slide 69: Quasipoisson figures</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 69.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-70-h">
+<h2 id="slide-70-h"><span id="slide-70"></span>Slide 70: This is great, but….</h2>
+<ul>
+<li>No AIC.</li>
+<li>We’ll talk about AIC later, but if you need AIC then we need another distribution</li>
+<li>Which one?</li>
+</ul>
+</section>
+<section aria-labelledby="slide-71-h">
+<h2 id="slide-71-h"><span id="slide-71"></span>Slide 71: Negative binomial</h2>
+<p>Can’t use glm(). Need to use glm.nb() in the MASS package</p>
+<ul>
+<li>sockeye.adult.2015.reg.NB &lt;- glm.nb(Count ~ log(Qcorr_qPCR) ,</li>
+<li>data = sockeye.adult[sockeye.adult$Year == &quot;2015&quot;  , ])</li>
+<li>sockeye.adult.2016.reg.NB &lt;- glm.nb(Count ~ log(Qcorr_qPCR) ,</li>
+<li>data = sockeye.adult[sockeye.adult$Year == &quot;2016&quot;  , ])</li>
+</ul>
+<ul>
+<li>Default log link</li>
+<li>Still use logarithm here</li>
+</ul>
+</section>
+<section aria-labelledby="slide-72-h">
+<h2 id="slide-72-h"><span id="slide-72"></span>Slide 72: Negative binomial</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 72.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>We now have AIC</p>
+</section>
+<section aria-labelledby="slide-73-h">
+<h2 id="slide-73-h"><span id="slide-73"></span>Slide 73: Negative binomial</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 73.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>We now have AIC</p>
+</section>
+<section aria-labelledby="slide-74-h">
+<h2 id="slide-74-h"><span id="slide-74"></span>Slide 74: Negative binomial</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 74.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-75-h">
+<h2 id="slide-75-h"><span id="slide-75"></span>Slide 75: Negative binomial</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 75.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-76-h">
+<h2 id="slide-76-h"><span id="slide-76"></span>Slide 76: Anything else we’re ignoring?</h2>
+<ul>
+<li>A key assumption is that residuals are independent, and identically distributed (iid)</li>
+<li>What about this problem calls this into question?</li>
+</ul>
+</section>
+<section aria-labelledby="slide-77-h">
+<h2 id="slide-77-h"><span id="slide-77"></span>Slide 77: There was a world before GLMs</h2>
+<ul>
+<li>VERY recently people avoided this</li>
+<li>How did we deal with this type of data back then?</li>
+</ul>
+</section>
+<section aria-labelledby="slide-78-h">
+<h2 id="slide-78-h"><span id="slide-78"></span>Slide 78: There was a world before GLMs</h2>
+<ul>
+<li>Ordinary least squares with transformed data!</li>
+<li>How does that work here?</li>
+<li>Let’s start with untransformed data. What are the problems for OLS?</li>
+</ul>
+<p class="callout warn" role="note"><span class="callout-label">Figure 78.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-79-h">
+<h2 id="slide-79-h"><span id="slide-79"></span>Slide 79: There was a world before GLMs</h2>
+<ul>
+<li>Does the variance look constant here?</li>
+<li>This is called “heteroskedasticity”</li>
+<li>Does this look linear?</li>
+</ul>
+<p class="callout warn" role="note"><span class="callout-label">Figure 79.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-80-h">
+<h2 id="slide-80-h"><span id="slide-80"></span>Slide 80: Gamma</h2>
+<ul>
+<li>Another common GLM.</li>
+<li>Useful for positive and continuous data</li>
+<li>What is mean variance relationship?</li>
+</ul>
+</section>
+<section aria-labelledby="slide-81-h">
+<h2 id="slide-81-h"><span id="slide-81"></span>Slide 81: Gamma</h2>
+<ul>
+<li>Another common GLM.</li>
+<li>Useful for positive and continuous data</li>
+<li>What is mean variance relationship?</li>
+</ul>
+<p class="callout warn" role="note"><span class="callout-label">Figure 81.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 81.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 81.3 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<ul>
+<li>Variance is proportional to the mean</li>
+<li>As theta gets big or beta smaller, the variance increases relative to the mean</li>
+</ul>
+</section>
+<section aria-labelledby="slide-82-h">
+<h2 id="slide-82-h"><span id="slide-82"></span>Slide 82: Interaction Terms</h2>
+<p>“Context dependence” – The effect of one predictor depends on the value of another predictor</p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 82.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-83-h">
+<h2 id="slide-83-h"><span id="slide-83"></span>Slide 83: Interpretation and Symmetry of Interactions</h2>
+<ul>
+<li>How does the effect of x1 on y change depending on the value of x2</li>
+<li>How does the effect of x2 on y change depending on the value of x1</li>
+</ul>
+<p>Let’s focus on deterministic part</p>
+<p>Factor out x1</p>
+<p>Factor out x2</p>
+</section>
+<section aria-labelledby="slide-84-h">
+<h2 id="slide-84-h"><span id="slide-84"></span>Slide 84: Interpretation and Symmetry of Interactions</h2>
+<p>Vs.</p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 84.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 84.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-85-h">
+<h2 id="slide-85-h"><span id="slide-85"></span>Slide 85: Interpretation and Symmetry of Interactions</h2>
+<p>Vs.</p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 85.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 85.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-86-h">
+<h2 id="slide-86-h"><span id="slide-86"></span>Slide 86: Dependence on scaling and transformation I</h2>
+<ul>
+<li>Simulate data with no interaction</li>
+<li>Y = 200+3*x1 - 4*x2</li>
+</ul>
+<p class="callout warn" role="note"><span class="callout-label">Figure 86.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>lm(y~x1*x2)</p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 86.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-87-h">
+<h2 id="slide-87-h"><span id="slide-87"></span>Slide 87: Dependence on scaling and transformation II</h2>
+<p>Log transform dependent variable</p>
+<p>lm(log(y)~x1*x2)</p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 87.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 87.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>What is happening and why?!</p>
+</section>
+<section aria-labelledby="slide-88-h">
+<h2 id="slide-88-h"><span id="slide-88"></span>Slide 88: Additivity not preserved across nonlinear transformations!</h2>
+<p>If log(y) is a function of additive x1 and x2, will y generate an interaction?</p>
+<p>Equations for reference, work through on paper</p>
+</section>
+<section aria-labelledby="slide-89-h">
+<h2 id="slide-89-h"><span id="slide-89"></span>Slide 89: Confusion in action with major policy implications!</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 89.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>Q: Deer are expanding, driving decline of caribou by supporting wolves. Is this due to logging or climate or both?</p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 89.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 89.3 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>(1)</p>
+<p>(2)</p>
+<p>(3)</p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 89.4 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-90-h">
+<h2 id="slide-90-h"><span id="slide-90"></span>Slide 90: What was the point made by Barnas et al.?</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 90.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 90.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-91-h">
+<h2 id="slide-91-h"><span id="slide-91"></span>Slide 91: What was the point made by Barnas et al.?</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 91.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>Weird. Why? Who is right?</p>
+</section>
+<section aria-labelledby="slide-92-h">
+<h2 id="slide-92-h"><span id="slide-92"></span>Slide 92: Models, especially with interactions, require algebra and especially geometry. Interpret the predictions!</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 92.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<ul>
+<li>As they SHOULD, the two approaches produce IDENTICAL predictions.</li>
+<li>-What are the predictions?</li>
+<li>-Was there a transformation?</li>
+</ul>
+<p>What lesson should we take from this?</p>
+</section>
+</main>
+
+<footer>FW 536 &middot; Statistical Modeling for Ecology and Conservation &middot; Oregon State University &middot; Accessible lecture notes</footer>
+</body>
+</html>

@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en" data-a11y="done">
+<head>
+<meta charset="UTF-8" />
+<title>Day 3 Morning — Mixed effects models lecture notes | FW 536</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../_Shared/css/accessible.css" />
+<script>
+MathJax = {
+  tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
+  options: { menuOptions: { settings: { assistiveMml: true, explorer: true } } },
+  loader: { load: ['a11y/assistive-mml', 'a11y/explorer'] }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script"></script>
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<div class="a11y-bar" role="region" aria-label="Accessibility">Accessible version &middot; <a href="../accessibility.html">How to use this site with a screen reader</a> &middot; <a href="../index.html">Course home</a></div>
+
+<aside class="sidebar">
+<p class="brand"><a href="../index.html">FW 536 · Day 3 Morning</a></p>
+<div class="subtitle">Lecture notes: Mixed effects models</div>
+<nav aria-label="Slides in this lecture">
+<div class="section">Slides</div><ul>
+<li><a href="#slide-1">1. Slide 1</a></li>
+<li><a href="#slide-2">2. What are Fixed and Random Effects?</a></li>
+<li><a href="#slide-3">3. Mixed Effects Models</a></li>
+<li><a href="#slide-4">4. A Simple Example</a></li>
+<li><a href="#slide-5">5. Three Options for Structured Data</a></li>
+<li><a href="#slide-6">6. Complete pooling: Fit of the Standard Linear Model(complete pooling of observations)</a></li>
+<li><a href="#slide-7">7. No pooling: Fit a Model with a “Stream-Effect”</a></li>
+<li><a href="#slide-8">8. Partial pooling: A Mixed Effects Model</a></li>
+<li><a href="#slide-9">9. Finally: A Mixed Effects Model(Some notes-I)</a></li>
+<li><a href="#slide-10">10. Finally: A Mixed Effects Model</a></li>
+<li><a href="#slide-11">11. Time for some R</a></li>
+<li><a href="#slide-12">12. Packages</a></li>
+<li><a href="#slide-13">13. The LME Function</a></li>
+<li><a href="#slide-14">14. Linear Mixed Models (Notes)</a></li>
+<li><a href="#slide-15">15. Linear Mixed Models (Understanding the output)</a></li>
+<li><a href="#slide-16">16. Fixed and Random Effects Together</a></li>
+<li><a href="#slide-17">17. A guide to model selection with fixed and random effects (Zuur et al)</a></li>
+<li><a href="#slide-18">18. Rule of thumb</a></li>
+<li><a href="#slide-19">19. Example:Fixed and Random Effects Together(Length-weight regressions)</a></li>
+<li><a href="#slide-20">20. Where does the variation in weight arise from?</a></li>
+<li><a href="#slide-21">21. Fixed and Random Effects Together(Length-weight regressions)</a></li>
+<li><a href="#slide-22">22. Fixed and Random Effects Together(Length-weight regressions)</a></li>
+<li><a href="#slide-23">23. Tricks and Traps</a></li>
+<li><a href="#slide-24">24. Mixed Effects Models</a></li>
+<li><a href="#slide-25">25. Another Mixed Model Example</a></li>
+<li><a href="#slide-26">26. How we should not analyze this dataset</a></li>
+<li><a href="#slide-27">27. Data exploration</a></li>
+<li><a href="#slide-28">28. Data exploration</a></li>
+<li><a href="#slide-29">29. Let’s look for structure in residuals</a></li>
+<li><a href="#slide-30">30. Ignore structure in residuals?</a></li>
+<li><a href="#slide-31">31. Allow intercept to vary by species</a></li>
+<li><a href="#slide-32">32. Allow intercept to vary by species</a></li>
+<li><a href="#slide-33">33. Should we use fixed or random effects for groups?</a></li>
+<li><a href="#slide-34">34. Allow intercept to vary by lake</a></li>
+<li><a href="#slide-35">35. But what if the effect of length on TP varies by species or lake?All our prior models were “random intercept” models. Now also “random slope”</a></li>
+<li><a href="#slide-36">36. Borrowing strength</a></li>
+<li><a href="#slide-37">37. Which model to use for prediction?</a></li>
+<li><a href="#slide-38">38. Crossed vs Nested random effects</a></li>
+<li><a href="#slide-39">39. Labeling matters!Remove ambiguity with distinct labelling</a></li>
+<li><a href="#slide-40">40. Glmer ExampleProportions are Rarely Proportions</a></li>
+<li><a href="#slide-41">41. White Stork Example</a></li>
+<li><a href="#slide-42">42. Slide 42</a></li>
+<li><a href="#slide-43">43. Slide 43</a></li>
+<li><a href="#slide-44">44. What if we have substantial additional interannual variation not explained by weather?</a></li>
+<li><a href="#slide-45">45. Slide 45</a></li>
+<li><a href="#slide-46">46. Slide 46</a></li>
+<li><a href="#slide-47">47. Slide 47</a></li>
+<li><a href="#slide-48">48. Slide 48</a></li>
+<li><a href="#slide-49">49. Example 2 – Nonlinear mixed model for length and age</a></li>
+<li><a href="#slide-50">50. Example – length and age</a></li>
+<li><a href="#slide-51">51. Example – length and age</a></li>
+<li><a href="#slide-52">52. Fitting Length and Age Data(Background)</a></li>
+<li><a href="#slide-53">53. Fitting Length and Age Data(The basic data)</a></li>
+<li><a href="#slide-54">54. Fitting Length and Age Data(Standard non-linear model-I)</a></li>
+<li><a href="#slide-55">55. Fitting Length and Age Data(Standard non-linear model-II)</a></li>
+<li><a href="#slide-56">56. The NLME Function-I</a></li>
+<li><a href="#slide-57">57. The NLME Function-II</a></li>
+<li><a href="#slide-58">58. The NLME Function-III</a></li>
+<li><a href="#slide-59">59. Fitting Length and Age Data(Non-linear mixed model-I)</a></li>
+<li><a href="#slide-60">60. Fitting Length and Age Data(Non-linear mixed model-II)</a></li>
+<li><a href="#slide-61">61. Fitting Length and Age Data(Non-linear mixed model-III)</a></li>
+<li><a href="#slide-62">62. Fitting Length and Age Data(Non-linear mixed model-IV)</a></li>
+<li><a href="#slide-63">63. Fitting Length and Age Data(Non-linear mixed model-V)</a></li>
+</ul></nav></aside>
+<main class="content" id="main-content" tabindex="-1">
+<header class="lab-header">
+<div class="eyebrow">Day 3 Morning · Accessible lecture notes</div>
+<h1>Mixed effects models</h1>
+<p class="lede">A screen-reader-friendly transcript of the lecture slides: all slide text and speaker notes are included. Figures are flagged where a text description still needs to be added.</p>
+</header>
+<div class="callout key"><p class="callout-label">About these notes</p>These notes are generated from the lecture slides. Each section below is one slide. Where a slide contained a picture, plot, or equation image, you will see a "Figure needs description" note &mdash; ask your instructor for the description of that figure. For the underlying concepts with worked examples, also read the <a href="plain_language_summary.html">plain-language summary</a> and <a href="lab.html">lab</a> for this session.</p></div>
+<section aria-labelledby="slide-1-h">
+<h2 id="slide-1-h"><span id="slide-1"></span>Slide 1</h2>
+<p>Mixed Effects Modeling</p>
+<details class="answer"><summary>Speaker notes for this slide</summary><div class="answer-body"><p>a</p></div></details>
+</section>
+<section aria-labelledby="slide-2-h">
+<h2 id="slide-2-h"><span id="slide-2"></span>Slide 2: What are Fixed and Random Effects?</h2>
+<ul>
+<li>Fixed Effects:</li>
+<li style="margin-left:1em">Parameters associated with the entire population or with certain repeatable levels of experimental units.</li>
+<li style="margin-left:2em">The value for the vessel factor for the SS Titantic.</li>
+<li>Random Effects:</li>
+<li style="margin-left:1em">Parameters associated with individual experimental units drawn at random from a population.</li>
+<li style="margin-left:2em">The value of the vessel factor for the 23rd vessel in a database.</li>
+</ul>
+</section>
+<section aria-labelledby="slide-3-h">
+<h2 id="slide-3-h"><span id="slide-3"></span>Slide 3: Mixed Effects Models</h2>
+<ul>
+<li>A mixed effects model is a model that has both fixed effects and random effects.</li>
+<li>Often a random effect is assigned to observations sharing a common classification factor.</li>
+<li style="margin-left:1em">Goal is to model both variation within GROUPS and variation among GROUPS</li>
+</ul>
+</section>
+<section aria-labelledby="slide-4-h">
+<h2 id="slide-4-h"><span id="slide-4"></span>Slide 4: A Simple Example</h2>
+<ul>
+<li>We select six streams at random and determine the density of fish at each stream three times.</li>
+<li>The questions:</li>
+<li style="margin-left:1em">What is the density in a typical stream?</li>
+<li style="margin-left:1em">What is the variation in density among streams?</li>
+<li style="margin-left:1em">What is the variation in density estimates within a stream?</li>
+</ul>
+</section>
+<section aria-labelledby="slide-5-h">
+<h2 id="slide-5-h"><span id="slide-5"></span>Slide 5: Three Options for Structured Data</h2>
+<ul>
+<li>Your options are:</li>
+<li style="margin-left:1em">1. Complete pooling: Pool density estimates from all streams for analysis</li>
+<li style="margin-left:1em">2. No pooling: Include a factor for each stream. This will estimate a separate parameter for each stock.</li>
+<li style="margin-left:1em">3. Partial pooling: Model the factor as a random effect with some variance around the mean among streams. This separates variation within streams (j = 3 observations) and variation among streams (i = 6 streams)</li>
+</ul>
+</section>
+<section aria-labelledby="slide-6-h">
+<h2 id="slide-6-h"><span id="slide-6"></span>Slide 6: Complete pooling: Fit of the Standard Linear Model(complete pooling of observations)</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 6.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>This analysis attributed all the error to within-stream variation. However, it is clear that there is between-stream variation in density but we have no way to comment on it.</p>
+</section>
+<section aria-labelledby="slide-7-h">
+<h2 id="slide-7-h"><span id="slide-7"></span>Slide 7: No pooling: Fit a Model with a “Stream-Effect”</h2>
+<p>The residual pattern has been removed with fixed effects, but we have no overall mean and no way to comment on between-stream variance, i.e. we cannot say anything about the population of streams.</p>
+</section>
+<section aria-labelledby="slide-8-h">
+<h2 id="slide-8-h"><span id="slide-8"></span>Slide 8: Partial pooling: A Mixed Effects Model</h2>
+<ul>
+<li>We construct a random effects model as follows:</li>
+<li> is the mean density across the population,</li>
+<li>bi is a random variable representing the deviation from the population mean:</li>
+<li>i,j is a random variable representing the deviation for observation j from mean density for stream i, i.e.</li>
+</ul>
+<p>Within stream variation relative to stream mean</p>
+<p>Variation in stream mean</p>
+</section>
+<section aria-labelledby="slide-9-h">
+<h2 id="slide-9-h"><span id="slide-9"></span>Slide 9: Finally: A Mixed Effects Model(Some notes-I)</h2>
+<ul>
+<li>The residuals are assumed to be independent, normally distributed random variables with constant variance.</li>
+<li>The random effects are assumed to be normally distributed.</li>
+<li>The number of parameters in this model is three (,  and b) because stream is just another level of random variation (with fixed effects model, each stream gets a parameter).</li>
+</ul>
+</section>
+<section aria-labelledby="slide-10-h">
+<h2 id="slide-10-h"><span id="slide-10"></span>Slide 10: Finally: A Mixed Effects Model</h2>
+<p>The results from fitting the mixed effects model are:</p>
+<p>What can we learn from this?</p>
+</section>
+<section aria-labelledby="slide-11-h">
+<h2 id="slide-11-h"><span id="slide-11"></span>Slide 11: Time for some R</h2>
+<ul>
+<li>Fitting the fixed effects models:</li>
+<li style="margin-left:1em">lm1 &lt;- lm(Density~1,data=Streams)</li>
+<li style="margin-left:1em">lm2 &lt;- lm(Density~Stream-1,data=Streams)</li>
+<li>Fitting the mixed effects model:</li>
+<li style="margin-left:1em">lm3 &lt;- lme(Density ~ 1,data=Streams, random = ~ 1 | Stream)</li>
+<li style="margin-left:1em">lme() is from the nlme package</li>
+<li>The call to LME first gives the fixed effects (the intercept in this case), followed by the data set, and finally the random component of the model.</li>
+</ul>
+<p>Group</p>
+<p>What varies by group</p>
+</section>
+<section aria-labelledby="slide-12-h">
+<h2 id="slide-12-h"><span id="slide-12"></span>Slide 12: Packages</h2>
+<ul>
+<li>The function lmer (in package lme4) also implements linear mixed models (including generalized linear models with glmer).</li>
+<li>lmer doesn’t have all the functionality of lme – however, both should be considered in any application.</li>
+</ul>
+</section>
+<section aria-labelledby="slide-13-h">
+<h2 id="slide-13-h"><span id="slide-13"></span>Slide 13: The LME Function</h2>
+<ul>
+<li>The full call is:</li>
+<li>lme(fixed, data, random, correlation, weights, subset, method, na.action, control)</li>
+<li>fixed – formula for the fixed effects;</li>
+<li>data – must be a data frame;</li>
+<li>random – the random effects (random effects can be nested);</li>
+<li>correlation – correlation structure of the residuals (optional);</li>
+<li style="margin-left:1em">For example “correlation=corAR1()” for autoregressive term</li>
+<li>weights – variance structure of the residuals (optional);</li>
+<li>subset – which rows of the data set to include (vector of boolean)</li>
+<li>method – ML or REML</li>
+<li>control – optional control specifications (some of these are pretty useful).</li>
+</ul>
+</section>
+<section aria-labelledby="slide-14-h">
+<h2 id="slide-14-h"><span id="slide-14"></span>Slide 14: Linear Mixed Models (Notes)</h2>
+<ul>
+<li>The linear mixed model can be fit using Maximum Likelihood (ML) or Restricted Maximum Likelihood (REML). If you have many experimental units, this hardly matters, but if you have few replicates, this can make a major difference (use REML).</li>
+<li>REML is default</li>
+<li>The distinction is due to the fact that the MLE for the variance is biased (it has 1/n rather than 1/n-1)</li>
+<li>REML uses an unbiased estimator for the variance</li>
+<li style="margin-left:1em">This is nitpicky, but can matter with small sample size</li>
+</ul>
+<details class="answer"><summary>Speaker notes for this slide</summary><div class="answer-body"><p>REML (Restricted Maximum Likelihood): Estimates variance components (random effects + residual variance) after removing the influence of fixed effects. This makes variance component estimates less biased, especially in small samples. However, because the likelihood is computed after conditioning out fixed effects, REML likelihood values are not comparable across models with different fixed effects structures. The “scale” of the REML likelihood changes with the fixed effects design matrix.  ML (Maximum Likelihood): Fits both variance components and fixed effects together. ML likelihoods are comparable across models with different fixed effects, so you can use AIC (or likelihood ratio tests) to decide among competing fixed-effects structures.</p></div></details>
+</section>
+<section aria-labelledby="slide-15-h">
+<h2 id="slide-15-h"><span id="slide-15"></span>Slide 15: Linear Mixed Models (Understanding the output)</h2>
+<ul>
+<li>Linear mixed-effects model fit by REML</li>
+<li>Data: Streams</li>
+<li>AIC      BIC    logLik</li>
+<li>133.7973 136.2969 -63.89865</li>
+<li>Random effects:</li>
+<li>Formula:  ~ 1 | Stream</li>
+<li>(Intercept) Residual</li>
+<li>StdDev:    15.78877 6.083881</li>
+<li>Fixed effects: Density ~ 1</li>
+<li>Value Std.Error DF  t-value p-value</li>
+<li>(Intercept) 78.62872   6.60332 12 11.90745  0</li>
+<li>Standardized Within-Group Residuals:</li>
+<li>Min         Q1       Med        Q3      Max</li>
+<li>-1.670431 -0.8239512 0.1256738 0.5295573 1.298799</li>
+<li>Number of Observations: 18</li>
+<li>Number of Groups: 6</li>
+</ul>
+<ul>
+<li>AIC and BIC</li>
+<li>for model selection</li>
+</ul>
+<p>The among-stream SD</p>
+<p>The within-stream SD</p>
+<p>The fixed effects</p>
+</section>
+<section aria-labelledby="slide-16-h">
+<h2 id="slide-16-h"><span id="slide-16"></span>Slide 16: Fixed and Random Effects Together</h2>
+<ul>
+<li>Typically we will have cases in which there are some known sources of variability (the random effects) and some factors that may have different impacts.</li>
+<li>These mixed models will have both fixed and random effects.</li>
+</ul>
+</section>
+<section aria-labelledby="slide-17-h">
+<h2 id="slide-17-h"><span id="slide-17"></span>Slide 17: A guide to model selection with fixed and random effects (Zuur et al)</h2>
+<ul>
+<li>Set the fixed effects based on “as many explanatory variables as possible”.</li>
+<li>Select a random effects structure using AIC (using REML) if variance structure unclear.</li>
+<li>Fix the random effects structure and compare fixed effects options (using ML estimation). [Likelihood tests do not work with REML]</li>
+<li>Compute the final model using REML because ML has biased variance for small sample sizes.</li>
+</ul>
+</section>
+<section aria-labelledby="slide-18-h">
+<h2 id="slide-18-h"><span id="slide-18"></span>Slide 18: Rule of thumb</h2>
+<ul>
+<li>Compare random effects structures with REML.</li>
+<li>Compare fixed effects structures with ML.</li>
+<li>Report final results with REML.</li>
+</ul>
+</section>
+<section aria-labelledby="slide-19-h">
+<h2 id="slide-19-h"><span id="slide-19"></span>Slide 19: Example:Fixed and Random Effects Together(Length-weight regressions)</h2>
+<ul>
+<li>The Problem:</li>
+<li style="margin-left:1em">We select 10 individual fish and measure the relationships between their lengths and weights as they grow. The relationship between length and weight is:</li>
+<li style="margin-left:1em">We have repeated measurements from the same individual “Subject”.</li>
+<li style="margin-left:1em">Should we use a fixed effect for “Subject” or a random effect?</li>
+<li style="margin-left:1em">Modeling decision – do we care about estimate for each individual fish? Not at all. So let’s let intercept be random</li>
+<li style="margin-left:1em">lme(Weight~Length,data=LenW,random = ~1 |Subject,method=&quot;REML&quot;)</li>
+</ul>
+</section>
+<section aria-labelledby="slide-20-h">
+<h2 id="slide-20-h"><span id="slide-20"></span>Slide 20: Where does the variation in weight arise from?</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 20.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-21-h">
+<h2 id="slide-21-h"><span id="slide-21"></span>Slide 21: Fixed and Random Effects Together(Length-weight regressions)</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 21.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-22-h">
+<h2 id="slide-22-h"><span id="slide-22"></span>Slide 22: Fixed and Random Effects Together(Length-weight regressions)</h2>
+<ul>
+<li>Linear mixed-effects model fit by REML</li>
+<li>Data: LenW</li>
+<li>AIC      BIC  logLik</li>
+<li>6.72662 17.06649 0.63669</li>
+<li>Random effects:</li>
+<li>Formula:  ~ 1 | Subject</li>
+<li>(Intercept) Residual</li>
+<li>StdDev:   0.2113517 0.205754</li>
+<li>Fixed effects: Weight ~ Length</li>
+<li>Value  Std.Error DF   t-value p-value</li>
+<li>(Intercept) -0.026674 0.09560888 89   -0.2790  0.7809</li>
+<li>Length  3.017151 0.02958709 89  101.9753  &lt;.0001</li>
+<li>Standardized Within-Group Residuals:</li>
+<li>Min         Q1         Med        Q3      Max</li>
+<li>-2.419116 -0.5799786 -0.05204277 0.5719096 2.320844</li>
+<li>Number of Observations: 100</li>
+<li>Number of Groups: 10</li>
+</ul>
+</section>
+<section aria-labelledby="slide-23-h">
+<h2 id="slide-23-h"><span id="slide-23"></span>Slide 23: Tricks and Traps</h2>
+<ul>
+<li>If you use REML estimation, you can only compare models with the same fixed-effects structure.</li>
+<li>The standard output does not provide:</li>
+<li style="margin-left:1em">the “best estimates” of the group-level random effects - use coef(lmout) to find them.</li>
+<li style="margin-left:1em">the confidence intervals for the variance parameters – use intervals(lmout, 0.95)</li>
+</ul>
+</section>
+<section aria-labelledby="slide-24-h">
+<h2 id="slide-24-h"><span id="slide-24"></span>Slide 24: Mixed Effects Models</h2>
+<ul>
+<li>LOTS OF UNANSWERED QUESTIONS! ESPECIALLY FOR NON-NORMAL RESIDUALS, NONLINEAR MODELS, AND MODEL SELECTION!</li>
+<li>Let’s let Ben Bolker help us:</li>
+</ul>
+<p>https://bbolker.github.io/mixedmodels-misc/glmmFAQ.html</p>
+</section>
+<section aria-labelledby="slide-25-h">
+<h2 id="slide-25-h"><span id="slide-25"></span>Slide 25: Another Mixed Model Example</h2>
+<ul>
+<li>Dataset: Measure fish trophic position = Dependent variable.</li>
+<li>Individuals from 3 fish species in 6 lakes sampled over a range of body lengths.</li>
+<li>10 individuals per species.</li>
+<li>Question: Does trophic position increase with length?</li>
+</ul>
+<p class="callout warn" role="note"><span class="callout-label">Figure 25.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-26-h">
+<h2 id="slide-26-h"><span id="slide-26"></span>Slide 26: How we should not analyze this dataset</h2>
+<ul>
+<li>1. No pooling. Separate regressions for every species in every lake</li>
+<li style="margin-left:1em">estimate a slope and intercept parameter for each regression (2 parameters x 3 species X 6 lakes = 36 parameter estimates) and the sample size for each analysis would be 10.</li>
+<li style="margin-left:1em">We’re also not scientifically interested in variation among lakes.</li>
+<li>2. Complete pooling</li>
+<li style="margin-left:1em">Only need to estimate 2 parameters.</li>
+<li style="margin-left:1em">Pseudoreplication? Measurements within same lake or species correlated.</li>
+<li style="margin-left:1em">Noise – Surely some is due to interlake or species variation</li>
+</ul>
+<p class="callout warn" role="note"><span class="callout-label">Figure 26.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 26.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-27-h">
+<h2 id="slide-27-h"><span id="slide-27"></span>Slide 27: Data exploration</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 27.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-28-h">
+<h2 id="slide-28-h"><span id="slide-28"></span>Slide 28: Data exploration</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 28.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-29-h">
+<h2 id="slide-29-h"><span id="slide-29"></span>Slide 29: Let’s look for structure in residuals</h2>
+<ul>
+<li>Complete pooling</li>
+<li>Trophic_Position ~ Length</li>
+</ul>
+<p class="callout warn" role="note"><span class="callout-label">Figure 29.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>Lots of structure in residuals grouped by species, but not as bad for lake</p>
+<details class="answer"><summary>Speaker notes for this slide</summary><div class="answer-body"><p>Consequences if you ignore it Biased standard errors and confidence intervals (typically underestimated). Inflated type I error for tests of significance. Wrong effect estimates if slope varies strongly between groups and you force a single slope. Poor predictive performance.</p></div></details>
+</section>
+<section aria-labelledby="slide-30-h">
+<h2 id="slide-30-h"><span id="slide-30"></span>Slide 30: Ignore structure in residuals?</h2>
+<ul>
+<li>Biased standard errors and confidence intervals (typically underestimated).</li>
+<li>Inflated type I error for tests of significance.</li>
+<li>Wrong effect estimates if slope varies strongly between groups and you force a single slope.</li>
+<li>Poor predictive performance.</li>
+</ul>
+<p>An lm() assumes independent, identically distributed residuals. If fish from the same species or lake are more similar, residuals will be correlated and lm() SEs and p-values will be wrong</p>
+</section>
+<section aria-labelledby="slide-31-h">
+<h2 id="slide-31-h"><span id="slide-31"></span>Slide 31: Allow intercept to vary by species</h2>
+<p>lmer(Z_TP~Z_Length + (1|Fish_Species))</p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 31.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-32-h">
+<h2 id="slide-32-h"><span id="slide-32"></span>Slide 32: Allow intercept to vary by species</h2>
+<ul>
+<li>lmer(Z_TP~Z_Length + (1|Fish_Species))</li>
+<li>You might also use</li>
+<li style="margin-left:1em">lm(Z_TP~Z_Length + Fish_Species)</li>
+<li style="margin-left:1em">What’s the difference?</li>
+</ul>
+<p class="callout warn" role="note"><span class="callout-label">Figure 32.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-33-h">
+<h2 id="slide-33-h"><span id="slide-33"></span>Slide 33: Should we use fixed or random effects for groups?</h2>
+<ul>
+<li>Ask yourself what you want to infer:</li>
+<li>Do you want estimates/contrasts for the specific species or lakes in your dataset → Fixed effects.</li>
+<li>Do you want to generalize to a larger population of species/lakes (i.e., treat species/lake as a random sample from a population and estimate between-group variance)? → Random effects, if you can estimate them reliably.</li>
+</ul>
+</section>
+<section aria-labelledby="slide-34-h">
+<h2 id="slide-34-h"><span id="slide-34"></span>Slide 34: Allow intercept to vary by lake</h2>
+<ul>
+<li>lmer(Z_TP~Z_Length + (1|Lake))</li>
+<li style="margin-left:1em">Can also do both species and length</li>
+<li style="margin-left:1em">lmer(Z_TP~Z_Length + (1|Fish_Species)+(1|Lake))</li>
+</ul>
+<p class="callout warn" role="note"><span class="callout-label">Figure 34.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-35-h">
+<h2 id="slide-35-h"><span id="slide-35"></span>Slide 35: But what if the effect of length on TP varies by species or lake?All our prior models were “random intercept” models. Now also “random slope”</h2>
+<p>lmer(Z_TP~Z_Length + (1+Z_Length|Fish_Species)+(1+Z_Length|Lake))</p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 35.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-36-h">
+<h2 id="slide-36-h"><span id="slide-36"></span>Slide 36: Borrowing strength</h2>
+<ul>
+<li>“Shrinkage” toward the mean</li>
+<li>Species with few data rely more on average parameter values</li>
+<li>Here we have balanced design, so not issue</li>
+<li>Inappropriate use of random effects with unbalanced designs + shrinkage can lead to incorrect conclusions.</li>
+</ul>
+<p class="callout warn" role="note"><span class="callout-label">Figure 36.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-37-h">
+<h2 id="slide-37-h"><span id="slide-37"></span>Slide 37: Which model to use for prediction?</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 37.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>Model 8 (AICc=36.3) and Model 2 (AICc=39.6) much lower than others</p>
+<p>REML to compare random effects</p>
+</section>
+<section aria-labelledby="slide-38-h">
+<h2 id="slide-38-h"><span id="slide-38"></span>Slide 38: Crossed vs Nested random effects</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 38.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<ul>
+<li>Note that fish species appear in multiple lakes. This is a crossed random effect, but effects can also be nested</li>
+<li>Consider measurements on student within classes within schools</li>
+<li style="margin-left:1em">If the classes are “remedial”, “average”, and “gifted”, then they could be crossed among schools.</li>
+<li style="margin-left:1em">But if they are just different teachers, then this would be a nested design, R uses different syntax for each.</li>
+</ul>
+<p class="callout warn" role="note"><span class="callout-label">Figure 38.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<ul>
+<li>Nested</li>
+<li>Use (1|School/Class)</li>
+</ul>
+<ul>
+<li>Crossed</li>
+<li>(1|School) + (1|Class)</li>
+</ul>
+</section>
+<section aria-labelledby="slide-39-h">
+<h2 id="slide-39-h"><span id="slide-39"></span>Slide 39: Labeling matters!Remove ambiguity with distinct labelling</h2>
+<ul>
+<li>Nested Specification</li>
+<li>Use (1|School/Class)</li>
+</ul>
+<ul>
+<li>Crossed Specification</li>
+<li>(1|School) + (1|Class)</li>
+</ul>
+<ul>
+<li>SAME RESULTS</li>
+<li>Both nested due to labelling</li>
+</ul>
+</section>
+<section aria-labelledby="slide-40-h">
+<h2 id="slide-40-h"><span id="slide-40"></span>Slide 40: Glmer ExampleProportions are Rarely Proportions</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 40.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<ul>
+<li>Imagine 4 out of 10 observed animals survive, or contract disease, or give birth</li>
+<li>Does this have the same information content as 40 of 100 animals?</li>
+<li>Now imagine 4 of 10 in one study area, 60 of 100 in another, 2 of 9 in another, and so so. Within study area is a binomial process with probability partially determined by covariates.</li>
+<li>Additional variation not explained by covariates can be modeled with random intercepts</li>
+</ul>
+</section>
+<section aria-labelledby="slide-41-h">
+<h2 id="slide-41-h"><span id="slide-41"></span>Slide 41: White Stork Example</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 41.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>Oliver Gimenez’s Example</p>
+</section>
+<section aria-labelledby="slide-42-h">
+<h2 id="slide-42-h"><span id="slide-42"></span>Slide 42</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 42.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-43-h">
+<h2 id="slide-43-h"><span id="slide-43"></span>Slide 43</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 43.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-44-h">
+<h2 id="slide-44-h"><span id="slide-44"></span>Slide 44: What if we have substantial additional interannual variation not explained by weather?</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 44.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-45-h">
+<h2 id="slide-45-h"><span id="slide-45"></span>Slide 45</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 45.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-46-h">
+<h2 id="slide-46-h"><span id="slide-46"></span>Slide 46</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 46.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-47-h">
+<h2 id="slide-47-h"><span id="slide-47"></span>Slide 47</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 47.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-48-h">
+<h2 id="slide-48-h"><span id="slide-48"></span>Slide 48</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 48.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-49-h">
+<h2 id="slide-49-h"><span id="slide-49"></span>Slide 49: Example 2 – Nonlinear mixed model for length and age</h2>
+<ul>
+<li>We shall assume that:</li>
+<li style="margin-left:1em">Growth follows a von Bertalanffy growth equation</li>
+</ul>
+<p class="callout warn" role="note"><span class="callout-label">Figure 49.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-50-h">
+<h2 id="slide-50-h"><span id="slide-50"></span>Slide 50: Example – length and age</h2>
+<ul>
+<li>We shall assume that:</li>
+<li style="margin-left:1em">Growth follows a von Bertalanffy growth equation</li>
+<li style="margin-left:1em">t0 and  are the same for all animals in the population while the asymptotic size differs among individuals.</li>
+<li style="margin-left:1em">There is normally distributed measurement error.</li>
+<li style="margin-left:1em">R can be used to fit non-linear mixed effects models (function nlme).</li>
+</ul>
+</section>
+<section aria-labelledby="slide-51-h">
+<h2 id="slide-51-h"><span id="slide-51"></span>Slide 51: Example – length and age</h2>
+<p>The response variable</p>
+<p>The random effect</p>
+<p>The fixed effects</p>
+<p>The covariate</p>
+</section>
+<section aria-labelledby="slide-52-h">
+<h2 id="slide-52-h"><span id="slide-52"></span>Slide 52: Fitting Length and Age Data(Background)</h2>
+<ul>
+<li>We have 10 subjects (animals).</li>
+<li>Each animal is measured 10 times between age 1 and age 10.</li>
+<li>Growth follows a von Bertalanffy growth equation where the asymptotic size is subject-specific and the growth rate and age at zero size are the same across subjects.</li>
+</ul>
+</section>
+<section aria-labelledby="slide-53-h">
+<h2 id="slide-53-h"><span id="slide-53"></span>Slide 53: Fitting Length and Age Data(The basic data)</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 53.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>Let L-inf (saturation) vary by individual</p>
+</section>
+<section aria-labelledby="slide-54-h">
+<h2 id="slide-54-h"><span id="slide-54"></span>Slide 54: Fitting Length and Age Data(Standard non-linear model-I)</h2>
+<ul>
+<li>lm1 &lt;- nls(formula=Length~Linf*(1-exp(-1*Kappa*(Age-Tzero))),</li>
+<li>data=AgeLen, start=c(Linf=100,Kappa=0.2,Tzero=0))</li>
+</ul>
+<ul>
+<li>There is evidence in the</li>
+<li>residuals for model-</li>
+<li>mispecification. This is</li>
+<li>not heteroscedastic errors</li>
+<li>rather it is correlation</li>
+<li>among observations for the</li>
+<li>same animal.</li>
+</ul>
+<p class="callout warn" role="note"><span class="callout-label">Figure 54.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-55-h">
+<h2 id="slide-55-h"><span id="slide-55"></span>Slide 55: Fitting Length and Age Data(Standard non-linear model-II)</h2>
+<p>boxplot(split(residuals(lm1),AgeLen$Subject),ylab=&quot;Residual&quot;,</p>
+<p>xlab=&quot;Subject&quot;,csi=0.2)</p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 55.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-56-h">
+<h2 id="slide-56-h"><span id="slide-56"></span>Slide 56: The NLME Function-I</h2>
+<ul>
+<li>The NLME function has several options:</li>
+<li>nlme(model, data, fixed, random, groups, start, correlation, weights, subset, method,na.action,naPattern, control,verbose)</li>
+<li>model: “response ~ fn(fixed effects)”</li>
+<li>fixed: “fixed = c(fix1~var1,fix2~var2)”.</li>
+<li style="margin-left:1em">There are several ways to specify the fixed effects structure.</li>
+</ul>
+</section>
+<section aria-labelledby="slide-57-h">
+<h2 id="slide-57-h"><span id="slide-57"></span>Slide 57: The NLME Function-II</h2>
+<ul>
+<li>random: “random=c(rnd1 ~ var1, rnd1 ~ 1)”. Leaving out a “random” specification implies all fixed effects have an associated random effect.</li>
+<li>start: “start = c(fix1=x1,fix2=x2,..)” – the initial values for the fixed parameters of the model.</li>
+<li>Be wary of using NLME to make predictions when some of the parameters are non-linear.</li>
+</ul>
+<ul>
+<li>nlme(model, data, fixed, random, groups,</li>
+<li>start, correlation, weights, subset, method, control)</li>
+</ul>
+</section>
+<section aria-labelledby="slide-58-h">
+<h2 id="slide-58-h"><span id="slide-58"></span>Slide 58: The NLME Function-III</h2>
+<ul>
+<li>update</li>
+<li>logLik</li>
+<li>plot</li>
+<li>predict</li>
+</ul>
+<ul>
+<li>You can use many of the functions defined for linear models</li>
+<li>with nlme, e.g.:</li>
+</ul>
+<ul>
+<li>intervals</li>
+<li>anova</li>
+<li>residuals</li>
+</ul>
+</section>
+<section aria-labelledby="slide-59-h">
+<h2 id="slide-59-h"><span id="slide-59"></span>Slide 59: Fitting Length and Age Data(Non-linear mixed model-I)</h2>
+<ul>
+<li>lm2 &lt;- nlme(model=Length~Linf*(1-exp(-1*Kappa*(Age-Tzero))), data=AgeLen,</li>
+<li>random=Linf~1, fixed=Linf+Kappa+Tzero~1,start=c(Linf=100,Kappa=0.2,Tzero=0))</li>
+<li>Print(lm1$modelStruct)</li>
+</ul>
+<ul>
+<li>Random effect:</li>
+<li>Linf by subject</li>
+</ul>
+<ul>
+<li>Fixed effects:</li>
+<li>Linf population mean</li>
+<li>Kappa</li>
+<li>t0</li>
+</ul>
+<p class="callout warn" role="note"><span class="callout-label">Figure 59.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-60-h">
+<h2 id="slide-60-h"><span id="slide-60"></span>Slide 60: Fitting Length and Age Data(Non-linear mixed model-II)</h2>
+<p>plot(lm2,Subject ~ resid(.),abline=0)</p>
+<ul>
+<li>Try “intervals (lm2)” to see</li>
+<li>the confidence intervals</li>
+</ul>
+<p class="callout warn" role="note"><span class="callout-label">Figure 60.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-61-h">
+<h2 id="slide-61-h"><span id="slide-61"></span>Slide 61: Fitting Length and Age Data(Non-linear mixed model-III)</h2>
+<ul>
+<li>Nonlinear mixed-effects model fit by maximum likelihood</li>
+<li>Model: Length ~ Linf * (1 - exp(-1 * Kappa * (Age - Tzero)))</li>
+<li>Data: AgeLen</li>
+<li>AIC       BIC   logLik</li>
+<li>-53.64647 -40.62062 31.82323</li>
+<li>Random effects:</li>
+<li>Formula: Linf ~ 1 | Subject</li>
+<li>Linf  Residual</li>
+<li>StdDev: 8.28837 0.1060163</li>
+<li>Fixed effects: Linf + Kappa + Tzero ~ 1</li>
+<li>Value Std.Error DF  t-value p-value</li>
+<li>Linf  97.02240 2.6629267 88  36.4345  0.0000</li>
+<li>Kappa  0.19960 0.0005324 88 374.8752  0.0000</li>
+<li>Tzero -0.00453 0.0040570 88  -1.1176  0.2668</li>
+<li>Correlation:</li>
+<li>Linf   Kappa</li>
+<li>Kappa -0.034</li>
+<li>Tzero -0.027  0.876</li>
+</ul>
+</section>
+<section aria-labelledby="slide-62-h">
+<h2 id="slide-62-h"><span id="slide-62"></span>Slide 62: Fitting Length and Age Data(Non-linear mixed model-IV)</h2>
+<ul>
+<li>plot(LinfEst+lm2$coefficients$random$Subject,</li>
+<li>pch=16,csi=0.3)</li>
+</ul>
+<ul>
+<li>plot(lm2, form = resid(., type = &quot;p&quot;)</li>
+<li>~ fitted(.) | Subject,</li>
+<li>abline = 0,pch=16)</li>
+</ul>
+<p class="callout warn" role="note"><span class="callout-label">Figure 62.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 62.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-63-h">
+<h2 id="slide-63-h"><span id="slide-63"></span>Slide 63: Fitting Length and Age Data(Non-linear mixed model-V)</h2>
+<p>plot(augPred(lm2),csi=0.3,pch=16,lwd=2)</p>
+<ul>
+<li>Plots the data and</li>
+<li>the model</li>
+<li>predictions</li>
+</ul>
+<p class="callout warn" role="note"><span class="callout-label">Figure 63.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+</main>
+
+<footer>FW 536 &middot; Statistical Modeling for Ecology and Conservation &middot; Oregon State University &middot; Accessible lecture notes</footer>
+</body>
+</html>

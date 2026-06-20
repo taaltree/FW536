@@ -1,0 +1,135 @@
+---
+title: "FW 536 — Day 2 afternoon lab (v3 · aquatic & fisheries) — Your Name"
+author: "Your Name Here"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    self_contained: true
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    code_folding: show
+    theme: cosmo
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+# Day 2 afternoon lab — Linear models problem set
+
+**Problem set version:** **v3 — aquatic & fisheries theme**.
+(The companion version is [v2 — forest & songbird](problem_set_v2.html); you choose whichever theme fits your interests.)
+
+This template matches [`problem_set_v3.html`](problem_set_v3.html). Read each problem statement there, write your work below, **Knit** to HTML, and upload the `.html` to the matching Canvas assignment.
+
+For setup help see the [R Markdown tutorial](../rmarkdown_tutorial.html).
+
+---
+
+# Setup
+
+```{r}
+# Load packages you'll need. Add or remove as appropriate.
+library(ggplot2)
+library(dplyr)
+library(MASS)        # for glm.nb
+library(effects)
+library(emmeans)
+```
+
+---
+
+# Problem 6 — Stream discharge × season interaction on macroinvertebrate counts
+
+> Macroinvertebrate counts per Surber sample from 90 collections; predictors are discharge (m³/s, continuous) and season (factor: spring reference, fall). Poisson fit:
+
+**My work:**
+
+```{r}
+# Your R code here
+```
+
+**Answer / biological interpretation:**
+
+
+---
+
+# Problem 7 — CPUE for a longline fishery — variable hook numbers
+
+> Across 200 longline sets, the number of hooks varies from 500 to 5000. You record bycatch counts of yelloweye rockfish per set. Two analyses:
+
+**My work:**
+
+```{r}
+# Your R code here
+```
+
+**Answer / biological interpretation:**
+
+
+---
+
+# Problem 8 — Sockeye redd success vs. substrate gravel size
+
+> Logistic regression of redd-survival to emergence on median gravel diameter (mm). Intercept $-1.5$, slope $+0.06$ per mm.
+
+**My work:**
+
+```{r}
+# Your R code here
+```
+
+**Answer / biological interpretation:**
+
+
+---
+
+# Problem 9 — Eelgrass biomass vs sediment grain size
+
+> A Gamma GLM with log link returns, for the contrast "fine sediment vs medium sediment", $\hat\beta = -0.65$ with 95% CI $(-0.95, -0.35)$ on the log scale.
+
+**My work:**
+
+```{r}
+# Your R code here
+```
+
+**Answer / biological interpretation:**
+
+
+---
+
+# Problem 10 — Estuarine green sturgeon occupancy
+
+> Occupancy (1/0) at 250 estuarine sites modeled as glm(present ~ salinity + depth, family = binomial). Intercept $-2.5$; salinity slope $+0.10$ per ppt; depth slope $+0.20$ per m.
+
+**My work:**
+
+```{r}
+# Your R code here
+```
+
+**Answer / biological interpretation:**
+
+
+---
+
+# (Optional) Embed a photo of hand-written work
+
+For problems easier to do on paper, photograph and embed:
+
+```{r, echo=FALSE, eval=FALSE, out.width="60%", fig.cap="Hand-derivation for Problem N"}
+knitr::include_graphics("images/problemN_derivation.jpg")
+```
+
+(Change `eval=FALSE` to `eval=TRUE` after saving an image. See the [R Markdown tutorial](../rmarkdown_tutorial.html) for details.)
+
+---
+
+# Submission checklist
+
+- [ ] Answered every afternoon problem from `problem_set_v3.html`.
+- [ ] Knitted to HTML without errors.
+- [ ] Photos (if any) embedded with `self_contained: true` in the YAML.
+- [ ] Uploaded the `.html` to the matching Canvas assignment.

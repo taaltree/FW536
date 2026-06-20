@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en" data-a11y="done">
+<head>
+<meta charset="UTF-8" />
+<title>FW 536 · Syllabus | Statistical Modeling for Ecology and Conservation</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="_Shared/css/accessible.css" />
+<style>
+ .syl-table { width: 100%; }
+ .syl-table td { vertical-align: top; }
+ .syl-table .day-col { width: 130px; font-family: 'Helvetica Neue', Arial, sans-serif; font-weight: 600; color: var(--osu-orange-dark); }
+ .syl-table .session { font-family: 'Helvetica Neue', Arial, sans-serif; text-transform: uppercase; font-size: 11px; letter-spacing: 1.5px; color: var(--muted); }
+ .grade-table th, .grade-table td { text-align: center; }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<div class="a11y-bar" role="region" aria-label="Accessibility">Accessible version &middot; <a href="accessibility.html">How to use this site with a screen reader</a> &middot; <a href="index.html">Course home</a></div>
+
+<div class="shell">
+
+<aside class="sidebar">
+ <p class="brand"><a href="index.html" title="Back to course home">FW 536</a></p>
+ <div class="subtitle">Syllabus · 2026</div>
+ <nav aria-label="On this page and related documents">
+ <ul>
+ <li><a href="#info">Course info</a></li>
+ <li><a href="#description">Catalog description</a></li>
+ <li><a href="#schedule">Daily schedule</a></li>
+ <li><a href="#outcomes">Learning outcomes</a></li>
+ <li><a href="#evaluation">Evaluation</a></li>
+ <li><a href="#format">Submission format</a></li>
+ <li><a href="#exams">Pre- and post-course exams</a></li>
+ <li><a href="#resources">Learning resources</a></li>
+ <li><a href="#policies">Course policies</a></li>
+ </ul>
+ <div class="section">Course</div>
+ <ul>
+ <li><a href="index.html">All materials</a></li>
+ <li><a class="featured" href="rmarkdown_tutorial.html">R Markdown tutorial</a></li>
+ <li><a href="pre_course_exam.html">Pre-course exam</a></li>
+ <li><a href="post_course_exam_off.html">Post-course exam</a></li>
+ </ul>
+ </nav>
+</aside>
+
+<main class="content" id="main-content" tabindex="-1">
+<header class="lab-header">
+ <div class="eyebrow">FW 536 · 3 credits · Oregon State University</div>
+ <h1>Statistical Modeling for Ecology and Conservation</h1>
+ <p class="lede">A five-day intensive workshop held immediately before fall term. Builds the probability, GLM, mixed-model, maximum-likelihood, and Bayesian-modeling foundation that ecologists and conservation scientists need to analyze their own data.</p>
+</header>
+
+<section id="info">
+<h2>Course information</h2>
+<table>
+ <tr><th scope="col">Course name</th><td>Statistical Modeling for Ecology and Conservation</td></tr>
+ <tr><th scope="col">Course number</th><td>FW 536</td></tr>
+ <tr><th scope="col">Credits</th><td>3</td></tr>
+ <tr><th scope="col">Meeting times</th><td>Five days prior to start of fall term classes (typically Friday through Tuesday, including the weekend). 9 am – 12 pm and 1 pm – 5 pm, with a midday break for lunch.</td></tr>
+ <tr><th scope="col">Prerequisites</th><td>None. Familiarity with the R programming language and prior introductory statistics courses are strongly recommended.</td></tr>
+ <tr><th scope="col">Instructor</th><td>Taal Levi, Department of Fisheries, Wildlife, and Conservation Sciences</td></tr>
+</table>
+</section>
+
+<section id="description">
+<h2>Catalog course description</h2>
+<p>Explores statistical modeling and practical analysis of data typical of ecology, conservation, and natural resources. Facilitates deep interpretation and application by covering probability, continuous and discrete probability distributions and their use for ecology, generalized linear models and their interpretation, mixed effects models for ecological data, model selection, and applications of maximum likelihood and Bayesian statistics for common hierarchical modeling problems in ecology. Includes hands-on exercises in the R programming language and the BUGS language implemented in Nimble and JAGS.</p>
+</section>
+
+<section id="schedule">
+<h2>Daily schedule</h2>
+<p>Each day has a morning lecture + morning lab and an afternoon lecture + afternoon lab. The morning lab is the assignment that goes with the morning lecture, completed and submitted before the next session; the afternoon lab is similar. Each lab is worth 20 points.</p>
+
+<table class="syl-table">
+<tr><th scope="col">Day</th><th scope="col">Session</th><th scope="col">Lecture content</th><th scope="col">Lab activity</th></tr>
+
+<tr>
+ <td class="day-col" rowspan="2">Day 1</td>
+ <td><span class="session">Morning</span></td>
+ <td>Probability theory; random variables; probability density functions; cumulative distribution functions; expectation; variance.</td>
+ <td><strong>Probability problem set</strong> (Day 1 morning lab — 20 pts)<br/><span class="session">Pre-course exam at start of day</span></td>
+</tr>
+<tr>
+ <td><span class="session">Afternoon</span></td>
+ <td>Discrete distributions: Bernoulli, Binomial, Poisson, Negative Binomial; their use for ecological data.</td>
+ <td><strong>Discrete distributions problem set</strong> (Day 1 afternoon lab — 20 pts)</td>
+</tr>
+
+<tr>
+ <td class="day-col" rowspan="2">Day 2</td>
+ <td><span class="session">Morning</span></td>
+ <td>Continuous distributions: Normal, t, Exponential, Uniform, Lognormal, Gamma, Beta; their use for ecological data.</td>
+ <td><strong>Continuous distributions problem set</strong> (Day 2 morning lab — 20 pts)</td>
+</tr>
+<tr>
+ <td><span class="session">Afternoon</span></td>
+ <td>Linear models and Generalized Linear Models I — using and interpreting GLMs for ecological problems; the log and logit links as biology.</td>
+ <td><strong>Linear models problem set</strong> (Day 2 afternoon lab — 20 pts)</td>
+</tr>
+
+<tr>
+ <td class="day-col" rowspan="2">Day 3</td>
+ <td><span class="session">Morning</span></td>
+ <td>Generalized Linear Models II / Hierarchical models — mixed effects models for ecological data.</td>
+ <td><strong>Hierarchical modeling problem set</strong> (Day 3 morning lab — 20 pts)</td>
+</tr>
+<tr>
+ <td><span class="session">Afternoon</span></td>
+ <td>Hypothesis tests and model selection in ecology — LRT, AIC, AICc, BIC, cross-validation.</td>
+ <td><strong>Model selection problem set</strong> (Day 3 afternoon lab — 20 pts)</td>
+</tr>
+
+<tr>
+ <td class="day-col" rowspan="2">Day 4</td>
+ <td><span class="session">Morning</span></td>
+ <td>Maximum likelihood for nonlinear models in ecology — grid search, numerical optimization, likelihood profiles.</td>
+ <td><strong>Maximum likelihood problem set</strong> (Day 4 morning lab — 20 pts)</td>
+</tr>
+<tr>
+ <td><span class="session">Afternoon</span></td>
+ <td>Introduction to Bayesian inference — likelihoods, priors, posteriors, conjugacy, MCMC; introduction to JAGS and Nimble.</td>
+ <td><strong>Bayesian modeling problem set 1</strong> (Day 4 afternoon lab — 20 pts)</td>
+</tr>
+
+<tr>
+ <td class="day-col" rowspan="2">Day 5</td>
+ <td><span class="session">Morning</span></td>
+ <td>Bayesian hierarchical modeling — priors, random effects structures, latent variables, occupancy, N-mixture.</td>
+ <td><strong>Bayesian modeling problem set 2</strong> (Day 5 morning lab — 20 pts)</td>
+</tr>
+<tr>
+ <td><span class="session">Afternoon</span></td>
+ <td>Bayesian hierarchical modeling, continued; wrap-up and pathways for continued learning.</td>
+ <td><span class="session">Post-course exam</span></td>
+</tr>
+
+</table>
+</section>
+
+<section id="outcomes">
+<h2>Course-specific measurable student learning outcomes</h2>
+<p>By the end of this course, students will be able to:</p>
+<ol>
+<li>Determine the appropriate probability distributions for distinct data types.</li>
+<li>Interpret and implement generalized linear models (GLMs) to analyze ecological and conservation data.</li>
+<li>Construct and evaluate generalized linear mixed-effects models (GLMMs) to address hierarchical ecological data.</li>
+<li>Implement model selection appropriately to evaluate multiple hypotheses for ecological data.</li>
+<li>Construct and evaluate nonlinear and hierarchical models common in the ecological and wildlife sciences in both maximum likelihood and Bayesian frameworks using JAGS and Nimble.</li>
+</ol>
+</section>
+
+<section id="evaluation">
+<h2>Evaluation of student performance</h2>
+<p>Your course grade is based on two exams (pre- and post-course) and nine problem-set assignments (one per morning or afternoon session except Day 5 afternoon).</p>
+
+<table>
+<tr><th scope="col">Component</th><th scope="col">Each</th><th scope="col">Count</th><th scope="col">Total</th></tr>
+<tr><td>Pre-course exam</td><td>50 pts</td><td>1</td><td>50 pts</td></tr>
+<tr><td>Post-course exam</td><td>50 pts</td><td>1</td><td>50 pts</td></tr>
+<tr><td>Problem sets (one per morning/afternoon lab)</td><td>20 pts</td><td>9</td><td>180 pts</td></tr>
+<tr><th scope="col">Course total</th><th scope="col"></th><th scope="col"></th><th scope="col">280 pts</th></tr>
+</table>
+
+<h3>Grading scale</h3>
+<table class="grade-table">
+<tr><th scope="col">A</th><th scope="col">A−</th><th scope="col">B+</th><th scope="col">B</th><th scope="col">B−</th><th scope="col">C+</th><th scope="col">C</th><th scope="col">C−</th><th scope="col">D+</th><th scope="col">D</th><th scope="col">D−</th><th scope="col">F</th></tr>
+<tr><td>92–100</td><td>90–92</td><td>88–90</td><td>82–88</td><td>80–82</td><td>78–80</td><td>72–78</td><td>70–72</td><td>68–70</td><td>62–68</td><td>60–62</td><td>&lt; 60</td></tr>
+</table>
+</section>
+
+<section id="format">
+<h2>Submission format</h2>
+<div class="callout key"><p class="callout-label">Key idea</p>
+<p>All assignments are submitted as <strong>R Markdown HTML outputs</strong> uploaded to Canvas. You can embed photos of hand-written derivations or diagrams directly into the R Markdown — many probability problems are easier to do on paper, and a photo of clean work plus a typed interpretation is acceptable for full credit.</p>
+<p>An R Markdown tutorial on <a href="rmarkdown_tutorial.html">how to install R Markdown, knit to HTML, and embed photos</a> is the first technical activity of Day 1 — please complete the install steps before the workshop begins so we don't lose time on setup.</p>
+</div>
+
+<h3>Per-problem-set workflow</h3>
+<ol>
+<li>Open the problem set in your browser to read the questions.</li>
+<li>Open the matching R Markdown template (provided alongside each problem set in the day's folder).</li>
+<li>Add your code, prose, and (if needed) photos of written work.</li>
+<li>Knit to HTML.</li>
+<li>Upload the resulting <code>.html</code> file to Canvas before the due time.</li>
+</ol>
+
+<p>For each lab session, you'll see three problem-set documents:</p>
+<ul>
+<li>One <strong>practice problem set</strong> with visible worked answers — this is what the instructor walks through during lab time.</li>
+<li>Two <strong>assessed problem sets</strong> (v2 and v3) with answers in separate instructor-only files. <strong>You pick whichever theme fits your interests</strong> — the two versions cover the same statistical concepts in different ecological contexts (e.g., forest vs. aquatic, terrestrial vs. marine).</li>
+</ul>
+</section>
+
+<section id="exams">
+<h2>Pre- and post-course exams</h2>
+<p>The course includes a <strong>pre-course exam</strong> given at the start of Day 1 morning and a <strong>post-course exam</strong> given on Day 5 afternoon. The two exams use parallel questions covering all course content — probability, distributions, GLMs, mixed models, model selection, MLE, and Bayesian inference.</p>
+
+<p>The pre/post pairing has two purposes:</p>
+<ul>
+<li><strong>Diagnostic at the start of the course.</strong> The pre-course exam tells the instructor where the class is starting from so the workshop can be paced and supplemented appropriately.</li>
+<li><strong>Measure of learning at the end of the course.</strong> The post-course exam, paired with the pre-course exam, lets us quantify how much each student gained.</li>
+</ul>
+
+<p>You will not be penalized for low performance on the pre-course exam — its scoring is intentionally generous because you are not expected to know all of the material going in. The post-course exam is graded normally.</p>
+<p>Links: <a href="pre_course_exam.html">Pre-course exam (student copy)</a> · <a href="post_course_exam_off.html">Post-course exam (student copy)</a>.</p>
+</section>
+
+<section id="resources">
+<h2>Learning resources</h2>
+<p>Students must have a laptop with the following installed and working:</p>
+<ul>
+<li><a href="https://cran.r-project.org/">R</a> and <a href="https://posit.co/download/rstudio-desktop/">RStudio</a>.</li>
+<li><a href="https://mcmc-jags.sourceforge.io/">JAGS</a>.</li>
+<li>A C++ compiler for Nimble — see <a href="https://r-nimble.org/html_manual/cha-installing-nimble.html">installing Nimble</a>.</li>
+</ul>
+
+<p>Once JAGS is installed, install and load the R packages <code>rjags</code>, <code>R2jags</code>, and <code>jagsUI</code> to confirm that JAGS and R are interfacing. Install and load the <code>nimble</code> package and confirm Nimble is interfacing with R.</p>
+
+<p>For R Markdown, install the <code>rmarkdown</code> and <code>knitr</code> packages (RStudio will prompt you the first time you create an Rmd file). Walking through the <a href="rmarkdown_tutorial.html">R Markdown tutorial</a> is the first activity of Day 1.</p>
+
+<p>Highly recommended (not required) books:</p>
+<ul>
+<li>Hobbs &amp; Hooten (2015). <em>Bayesian Models: A Statistical Primer for Ecologists</em>. Princeton.</li>
+<li>Kéry &amp; Schaub (2012). <em>Bayesian Population Analysis using WinBUGS</em>. Academic Press.</li>
+<li>Bolker (2008). <em>Ecological Models and Data in R</em>. Princeton.</li>
+<li>McElreath (2020). <em>Statistical Rethinking</em>. CRC Press.</li>
+</ul>
+</section>
+
+<section id="policies">
+<h2>Course policies</h2>
+
+<h3>Academic calendar</h3>
+<p>All students are subject to the registration and refund deadlines as stated in the <a href="https://registrar.oregonstate.edu/osu-academic-calendar">OSU Academic Calendar</a>.</p>
+
+<h3>Statement regarding students with disabilities</h3>
+<p>Oregon State University is committed to making learning experiences accessible to all, which includes consideration of the course design, course learning outcomes, and barriers experienced by the disabled student. Disability Access Services (DAS) staff and students work together to determine reasonable accommodations. Students connected with DAS who have questions about their accommodations should reach out to their DAS Adviser. Students who have not yet completed the process for setting up accommodations should contact DAS at 541-737-4098, visit the <a href="https://ds.oregonstate.edu/">DAS website</a>, or email disability.services@oregonstate.edu to explore accommodations. Students and faculty members are encouraged to collaborate around the implementation of accommodations.</p>
+
+<h3>Student conduct expectations</h3>
+<p><a href="https://beav.es/codeofconduct">https://beav.es/codeofconduct</a></p>
+
+<h3>Student Bill of Rights</h3>
+<p>OSU has twelve established student rights. They include due process in all university disciplinary processes, an equal opportunity to learn, and grading in accordance with the course syllabus: <a href="https://asosu.oregonstate.edu/advocacy/rights">https://asosu.oregonstate.edu/advocacy/rights</a>.</p>
+
+<h3>Reach out for success</h3>
+<p>University students encounter setbacks from time to time. If you encounter difficulties and need assistance, it's important to reach out. Consider discussing the situation with an instructor or academic advisor. Learn about resources that assist with wellness and academic success at <a href="https://counseling.oregonstate.edu/reach-out-success">oregonstate.edu/ReachOut</a>. If you are in immediate crisis, please call or text the Suicide &amp; Crisis Lifeline at 988.</p>
+</section>
+
+</main>
+</div>
+
+<footer>FW 536 · Statistical Modeling for Ecology and Conservation · Oregon State University</footer>
+</body>
+</html>

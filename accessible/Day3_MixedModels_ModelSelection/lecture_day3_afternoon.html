@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en" data-a11y="done">
+<head>
+<meta charset="UTF-8" />
+<title>Day 3 Afternoon — Hypothesis tests and model selection lecture notes | FW 536</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../_Shared/css/accessible.css" />
+<script>
+MathJax = {
+  tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
+  options: { menuOptions: { settings: { assistiveMml: true, explorer: true } } },
+  loader: { load: ['a11y/assistive-mml', 'a11y/explorer'] }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script"></script>
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<div class="a11y-bar" role="region" aria-label="Accessibility">Accessible version &middot; <a href="../accessibility.html">How to use this site with a screen reader</a> &middot; <a href="../index.html">Course home</a></div>
+
+<aside class="sidebar">
+<p class="brand"><a href="../index.html">FW 536 · Day 3 Afternoon</a></p>
+<div class="subtitle">Lecture notes: Hypothesis tests and model selection</div>
+<nav aria-label="Slides in this lecture">
+<div class="section">Slides</div><ul>
+<li><a href="#slide-1">1. Slide 1</a></li>
+<li><a href="#slide-2">2. Hypothesis Tests to Compare Models (not parameters)</a></li>
+<li><a href="#slide-3">3. Nested Models</a></li>
+<li><a href="#slide-4">4. Hypothesis Tests for Models</a></li>
+<li><a href="#slide-5">5. Hypothesis Tests for Models</a></li>
+<li><a href="#slide-6">6. Example where null is nonzero</a></li>
+<li><a href="#slide-7">7. Example-I</a></li>
+<li><a href="#slide-8">8. Example-II</a></li>
+<li><a href="#slide-9">9. Example-II</a></li>
+<li><a href="#slide-10">10. Slide 10</a></li>
+<li><a href="#slide-11">11. Information Theoretic Criteria for Model Selection (i.e. AIC, BIC, etc.)</a></li>
+<li><a href="#slide-12">12. Information Theoretic Criteria for Model Selection</a></li>
+<li><a href="#slide-13">13. Slide 13</a></li>
+<li><a href="#slide-14">14. Slide 14</a></li>
+<li><a href="#slide-15">15. Slide 15</a></li>
+<li><a href="#slide-16">16. Most common mistake in ecology!</a></li>
+<li><a href="#slide-17">17. Slide 17</a></li>
+<li><a href="#slide-18">18. Slide 18</a></li>
+<li><a href="#slide-19">19. Slide 19</a></li>
+<li><a href="#slide-20">20. Slide 20</a></li>
+<li><a href="#slide-21">21. Slide 21</a></li>
+<li><a href="#slide-22">22. Slide 22</a></li>
+<li><a href="#slide-23">23. Slide 23</a></li>
+<li><a href="#slide-24">24. Slide 24</a></li>
+<li><a href="#slide-25">25. Slide 25</a></li>
+<li><a href="#slide-26">26. Slide 26</a></li>
+<li><a href="#slide-27">27. Slide 27</a></li>
+<li><a href="#slide-28">28. Slide 28</a></li>
+<li><a href="#slide-29">29. Confidence intervals and p-values</a></li>
+<li><a href="#slide-30">30. P-values should be interpreted on a continuum. Not a step function at 0.05. AIC should be interpreted in the same way!</a></li>
+<li><a href="#slide-31">31. So why use AIC?</a></li>
+<li><a href="#slide-32">32. Slide 32</a></li>
+<li><a href="#slide-33">33. Slide 33</a></li>
+<li><a href="#slide-34">34. Slide 34</a></li>
+<li><a href="#slide-35">35. AIC in practice</a></li>
+<li><a href="#slide-36">36. Most common mistake in ecology!</a></li>
+<li><a href="#slide-37">37. Slide 37</a></li>
+<li><a href="#slide-38">38. Best recent paper as a resource to stop doing dumb stuff with AIC</a></li>
+<li><a href="#slide-39">39. Slide 39</a></li>
+<li><a href="#slide-40">40. Burnham and Anderson did not advocate model dredging (fitting all/many combinations of predictors)</a></li>
+<li><a href="#slide-41">41. Slide 41</a></li>
+<li><a href="#slide-42">42. Then what about BIC? Is it just a similar alternative?</a></li>
+<li><a href="#slide-43">43. AIC vs BIC</a></li>
+<li><a href="#slide-44">44. Crossvalidation: Split data, train model, compare predictions to actual using test data. Repeat.</a></li>
+<li><a href="#slide-45">45. Recommended Readings</a></li>
+<li><a href="#slide-46">46. Slide 46</a></li>
+<li><a href="#slide-47">47. Don’t take my word for it…</a></li>
+<li><a href="#slide-48">48. Slide 48</a></li>
+<li><a href="#slide-49">49. Don’t take my word for it…</a></li>
+<li><a href="#slide-50">50. Slide 50</a></li>
+<li><a href="#slide-51">51. Slide 51</a></li>
+<li><a href="#slide-52">52. Are any statistical procedures required?</a></li>
+<li><a href="#slide-53">53. Hmm…let’s think, will banning the use of p-values1. Reduce type I errors and help solve the replication crisis in Psychology?2. Allow absolute garbage conclusions to be published that would otherwise not have passed “significance testing”</a></li>
+<li><a href="#slide-54">54. Slide 54</a></li>
+<li><a href="#slide-55">55. Further buffoonery</a></li>
+<li><a href="#slide-56">56. Further buffoonery</a></li>
+<li><a href="#slide-57">57. The chief benefit of AIC/BIC</a></li>
+<li><a href="#slide-58">58. Slide 58</a></li>
+<li><a href="#slide-59">59. Slide 59</a></li>
+</ul></nav></aside>
+<main class="content" id="main-content" tabindex="-1">
+<header class="lab-header">
+<div class="eyebrow">Day 3 Afternoon · Accessible lecture notes</div>
+<h1>Hypothesis tests and model selection</h1>
+<p class="lede">A screen-reader-friendly transcript of the lecture slides: all slide text and speaker notes are included. Figures are flagged where a text description still needs to be added.</p>
+</header>
+<div class="callout key"><p class="callout-label">About these notes</p>These notes are generated from the lecture slides. Each section below is one slide. Where a slide contained a picture, plot, or equation image, you will see a "Figure needs description" note &mdash; ask your instructor for the description of that figure. For the underlying concepts with worked examples, also read the <a href="plain_language_summary.html">plain-language summary</a> and <a href="lab.html">lab</a> for this session.</p></div>
+<section aria-labelledby="slide-1-h">
+<h2 id="slide-1-h"><span id="slide-1"></span>Slide 1</h2>
+<p>1</p>
+<ul>
+<li>Likelihood Ratio Tests</li>
+<li>And</li>
+<li>Model Selection</li>
+</ul>
+<details class="answer"><summary>Speaker notes for this slide</summary><div class="answer-body"><p>a</p></div></details>
+</section>
+<section aria-labelledby="slide-2-h">
+<h2 id="slide-2-h"><span id="slide-2"></span>Slide 2: Hypothesis Tests to Compare Models (not parameters)</h2>
+<p>2</p>
+<ul>
+<li>One can use the likelihood ratio test to compare two models when</li>
+<li style="margin-left:1em">both are based on the same data</li>
+<li style="margin-left:1em">one of the models is “nested” within the other</li>
+<li style="margin-left:2em">That is, one model is a special case with a parameter equal to a specific value (usually zero) from the more general model.</li>
+</ul>
+</section>
+<section aria-labelledby="slide-3-h">
+<h2 id="slide-3-h"><span id="slide-3"></span>Slide 3: Nested Models</h2>
+<p>3</p>
+<ul>
+<li>The following models are nested:</li>
+<li>y = Time + Depth * Region</li>
+<li>y = Depth * Region</li>
+</ul>
+<ul>
+<li>The following models are not nested:</li>
+<li>y = Time + Depth * Region</li>
+<li>y = Temp + Depth * Region</li>
+</ul>
+</section>
+<section aria-labelledby="slide-4-h">
+<h2 id="slide-4-h"><span id="slide-4"></span>Slide 4: Hypothesis Tests for Models</h2>
+<ul>
+<li>Model A nested within more general model B can be compared as follows:</li>
+<li>H0: Model A fits the data as well as Model B</li>
+<li>(with fewer parameters)</li>
+<li>HA: Model A does not fit the data as well as Model B</li>
+<li>(you need those extra parameters)</li>
+<li>Fit models A and B and record:</li>
+<li style="margin-left:1em">the negative log-likelihood at the best fit</li>
+<li style="margin-left:1em">the number of parameters in models A and B, pA and pB.</li>
+</ul>
+<p>4</p>
+</section>
+<section aria-labelledby="slide-5-h">
+<h2 id="slide-5-h"><span id="slide-5"></span>Slide 5: Hypothesis Tests for Models</h2>
+<p>5</p>
+<p>Compute the likelihood ratio</p>
+</section>
+<section aria-labelledby="slide-6-h">
+<h2 id="slide-6-h"><span id="slide-6"></span>Slide 6: Example where null is nonzero</h2>
+<ul>
+<li>You monitor an intersection for cars that run the red light. Based on 50 days of observation, you detect 30 days on which “light running” took place. You repeat the “experiment” after a red light camera is installed and now observe 10 days on which “running” occurred.</li>
+<li>How do we know if there is a significant difference in the rate of running red lights after a camera is installed?</li>
+</ul>
+</section>
+<section aria-labelledby="slide-7-h">
+<h2 id="slide-7-h"><span id="slide-7"></span>Slide 7: Example-I</h2>
+<p>7</p>
+<ul>
+<li>Let us define P1 as the probability of running the light before the</li>
+<li>camera was installed and P2 the probability after the camera</li>
+<li>The Binomial likelihood function (ignoring the normalizing constant):</li>
+<li>Model A: The probability of running the light has not changed</li>
+<li>(P1=P2; The more specific model; you only need 1 parameter)</li>
+<li>Model B: P1 may differ from P2.</li>
+<li>(The more general model – more parameters)</li>
+</ul>
+</section>
+<section aria-labelledby="slide-8-h">
+<h2 id="slide-8-h"><span id="slide-8"></span>Slide 8: Example-II</h2>
+<p>Summary for this example</p>
+<ul>
+<li>Model A:                  0.4        0.4              67.30</li>
+<li>Model B:                  0.6        0.2             58.67</li>
+</ul>
+<ul>
+<li>The difference between the negative log likelihoods</li>
+<li>67.3 - 58.7 = 8.6</li>
+<li>Twice this difference is 17.2</li>
+<li>Is this significant given the difference in parameters is 1?</li>
+</ul>
+</section>
+<section aria-labelledby="slide-9-h">
+<h2 id="slide-9-h"><span id="slide-9"></span>Slide 9: Example-II</h2>
+<ul>
+<li>The difference between the negative log likelihoods is 8.6 – is</li>
+<li>this significant given the difference in parameters is 1?</li>
+<li>2*8.6=17.2, compare to chisq distribution with one d.f</li>
+</ul>
+<p class="callout warn" role="note"><span class="callout-label">Figure 9.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<ul>
+<li>REJECT THE NULL</li>
+<li>That the one parameter model fits that data. Much better to use two parameters, indicating that the probability of running the red light has changed!</li>
+</ul>
+<p class="callout warn" role="note"><span class="callout-label">Figure 9.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-10-h">
+<h2 id="slide-10-h"><span id="slide-10"></span>Slide 10</h2>
+<ul>
+<li>Likelihood ratio test can typically only be applied to nested models</li>
+<li>“Information theoretic” approaches (e.g. AIC, BIC) can be used to compare non-nested models.</li>
+<li>Models with smaller values of AIC or BIC are “better”, or “have more support” or “are more parsimonious”, but we’ll dig into what this really means for AIC and BIC.</li>
+</ul>
+</section>
+<section aria-labelledby="slide-11-h">
+<h2 id="slide-11-h"><span id="slide-11"></span>Slide 11: Information Theoretic Criteria for Model Selection (i.e. AIC, BIC, etc.)</h2>
+<p>The likelihood ratio statistic is twice the log of the likelihood ratio</p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 11.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>Can also be written as difference in log-likelihoods or deviances</p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 11.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>Compare to chi.sq distribution with degrees of freedom = # parameters</p>
+</section>
+<section aria-labelledby="slide-12-h">
+<h2 id="slide-12-h"><span id="slide-12"></span>Slide 12: Information Theoretic Criteria for Model Selection</h2>
+<p>Look familiar?</p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 12.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 12.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>Compare to chi.sq distribution with degrees of freedom = # parameters</p>
+<p>AIC and BIC are meaningless on their own, but models with lower values are more parsimonious (i.e. supported). They balance better fit with more parameters. This is exactly what the likelihood ratio test does.</p>
+</section>
+<section aria-labelledby="slide-13-h">
+<h2 id="slide-13-h"><span id="slide-13"></span>Slide 13</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 13.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 13.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>Compare to chi.sq distribution with degrees of freedom = # parameters</p>
+<p>Say you compare two models with k parameters and with k+1</p>
+<p>Information Theoretic Criteria for Model Selection</p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 13.3 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-14-h">
+<h2 id="slide-14-h"><span id="slide-14"></span>Slide 14</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 14.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>Convention within&gt;2 AIC units are “considered competitive”, and this is approximately the same as frequentist model selection using LRT</p>
+<p>If 1 parameter separate the model. AIC likes bigger models</p>
+</section>
+<section aria-labelledby="slide-15-h">
+<h2 id="slide-15-h"><span id="slide-15"></span>Slide 15</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 15.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>What if 3 parameters separate the model? AIC likes bigger models</p>
+<p>(reject the null that the parameters equal 0)</p>
+<p>2 deltaAIC still equivalent to p = 0.05</p>
+</section>
+<section aria-labelledby="slide-16-h">
+<h2 id="slide-16-h"><span id="slide-16"></span>Slide 16: Most common mistake in ecology!</h2>
+<ul>
+<li>Interpretation of relative AIC is not symmetric</li>
+<li>If a more complex model has higher AIC but less than 2 units, it is NOT competitive</li>
+<li style="margin-left:1em">Penalty for adding parameter is 2 units and fit improves with complexity, so models with random data as predictor will be within 2 AIC.</li>
+<li>The 2 AIC convention is about whether a more complex model with lower AIC is better enough relative to simpler model (in the sense that the parameters are informative)</li>
+</ul>
+<p class="callout warn" role="note"><span class="callout-label">Figure 16.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>Taal, show why with a simulation and math</p>
+</section>
+<section aria-labelledby="slide-17-h">
+<h2 id="slide-17-h"><span id="slide-17"></span>Slide 17</h2>
+<ul>
+<li>3700 Citations!</li>
+<li>72% of all papers incorrectly interpret uninformative parameters!</li>
+</ul>
+<p class="callout warn" role="note"><span class="callout-label">Figure 17.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-18-h">
+<h2 id="slide-18-h"><span id="slide-18"></span>Slide 18</h2>
+<p><em>(No text on this slide.)</em></p>
+</section>
+<section aria-labelledby="slide-19-h">
+<h2 id="slide-19-h"><span id="slide-19"></span>Slide 19</h2>
+<p>From statisticians Mark Brewer and Adam Butler</p>
+</section>
+<section aria-labelledby="slide-20-h">
+<h2 id="slide-20-h"><span id="slide-20"></span>Slide 20</h2>
+<p><em>(No text on this slide.)</em></p>
+</section>
+<section aria-labelledby="slide-21-h">
+<h2 id="slide-21-h"><span id="slide-21"></span>Slide 21</h2>
+<p><em>(No text on this slide.)</em></p>
+</section>
+<section aria-labelledby="slide-22-h">
+<h2 id="slide-22-h"><span id="slide-22"></span>Slide 22</h2>
+<p><em>(No text on this slide.)</em></p>
+</section>
+<section aria-labelledby="slide-23-h">
+<h2 id="slide-23-h"><span id="slide-23"></span>Slide 23</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 23.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-24-h">
+<h2 id="slide-24-h"><span id="slide-24"></span>Slide 24</h2>
+<p><em>(No text on this slide.)</em></p>
+</section>
+<section aria-labelledby="slide-25-h">
+<h2 id="slide-25-h"><span id="slide-25"></span>Slide 25</h2>
+<p><em>(No text on this slide.)</em></p>
+</section>
+<section aria-labelledby="slide-26-h">
+<h2 id="slide-26-h"><span id="slide-26"></span>Slide 26</h2>
+<p><em>(No text on this slide.)</em></p>
+</section>
+<section aria-labelledby="slide-27-h">
+<h2 id="slide-27-h"><span id="slide-27"></span>Slide 27</h2>
+<p><em>(No text on this slide.)</em></p>
+</section>
+<section aria-labelledby="slide-28-h">
+<h2 id="slide-28-h"><span id="slide-28"></span>Slide 28</h2>
+<ul>
+<li>P &lt; 0.05 is an arbitrary threshold</li>
+<li style="margin-left:1em">But ⍙AIC &lt; 2 is as well</li>
+<li>AIC doesn’t suffer from Type I error or problems with autocorrelation</li>
+<li style="margin-left:1em">This is just wrong, as we will see by simulation. Making inference by AIC has MUCH MORE Type I error</li>
+<li>P-values don’t tell us how important an effect is – i.e. whether the effect is biologically significant. Use effect sizes and confidence intervals instead</li>
+<li style="margin-left:1em">AIC doesn’t tell you that either. And I notice big tables full of models with no effect sizes or R2, sometimes without even an intercept only model. What if all the models are terrible?</li>
+<li style="margin-left:1em">We always need effect sizes for inference. These are the most important part of the science!</li>
+<li style="margin-left:1em">But let’s remember how confidence intervals and p-values are related</li>
+</ul>
+<p>Why does the cult of AIC hate p-values?</p>
+</section>
+<section aria-labelledby="slide-29-h">
+<h2 id="slide-29-h"><span id="slide-29"></span>Slide 29: Confidence intervals and p-values</h2>
+<p>-3   -2   -1   0   1   2   3</p>
+<p>Estimate and 95% CI. What is p?</p>
+<p>Estimate and 99% CI. What is p?</p>
+<p>Effect sizes and p tell you the same thing as effect sizes and CIs!</p>
+</section>
+<section aria-labelledby="slide-30-h">
+<h2 id="slide-30-h"><span id="slide-30"></span>Slide 30: P-values should be interpreted on a continuum. Not a step function at 0.05. AIC should be interpreted in the same way!</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 30.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>deltaAIC=2</p>
+<p>deltaAIC=7</p>
+</section>
+<section aria-labelledby="slide-31-h">
+<h2 id="slide-31-h"><span id="slide-31"></span>Slide 31: So why use AIC?</h2>
+<ul>
+<li>It is easy to assess non-nested models of highly variable structure.</li>
+<li>It is good for selecting models for prediction</li>
+<li>Useful when you have lots of potentially correlated predictors</li>
+<li>But it is widely used for inference, resulting in more Type I error</li>
+<li style="margin-left:1em">Often used incorrectly, resulting in more error (more on this later)</li>
+</ul>
+</section>
+<section aria-labelledby="slide-32-h">
+<h2 id="slide-32-h"><span id="slide-32"></span>Slide 32</h2>
+<p>Why did AIC take over wildlife science?</p>
+<ul>
+<li>Aggressive marketing of the method by Burnham and Anderson, who were in Fisheries and Wildlife and “wrote the book”</li>
+<li>People adopt new statistical methods, then find the holes, and then the pendulum swings back</li>
+<li>It feels rigorous because you have to run so many models</li>
+<li>People like ranking things</li>
+</ul>
+</section>
+<section aria-labelledby="slide-33-h">
+<h2 id="slide-33-h"><span id="slide-33"></span>Slide 33</h2>
+<p><em>(No text on this slide.)</em></p>
+</section>
+<section aria-labelledby="slide-34-h">
+<h2 id="slide-34-h"><span id="slide-34"></span>Slide 34</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 34.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>Which is the top model? Which models are competitive?</p>
+</section>
+<section aria-labelledby="slide-35-h">
+<h2 id="slide-35-h"><span id="slide-35"></span>Slide 35: AIC in practice</h2>
+<ul>
+<li>For small sample sizes, AIC is biased and so people use AICc. AICc is treated as “corrected AIC” and converges to AIC for large n.</li>
+<li>Model weights. Each model i of R is weighted based on its deltaAIC.</li>
+<li style="margin-left:1em">Variables included with lots of model weight considered important.</li>
+<li style="margin-left:1em">Model weight used for averaging across models for prediction</li>
+<li style="margin-left:1em">Both deltaAIC and weights depend on model set. Notice, no intercept model here, estimates, or R2. All the models could be garbage.</li>
+</ul>
+<p class="callout warn" role="note"><span class="callout-label">Figure 35.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 35.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 35.3 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>Why would I HATE this table as presentation of results?</p>
+</section>
+<section aria-labelledby="slide-36-h">
+<h2 id="slide-36-h"><span id="slide-36"></span>Slide 36: Most common mistake in ecology!</h2>
+<ul>
+<li>Interpretation of relative AIC is not symmetric</li>
+<li>If a more complex model has higher AIC but less than 2 units, it is NOT competitive</li>
+<li style="margin-left:1em">Penalty for adding parameter is 2 units and fit improves with complexity, so models with random data as predictor will be within 2 AIC.</li>
+<li>The 2 AIC convention is about whether a more complex model with lower AIC is better enough relative to simpler model</li>
+</ul>
+<p class="callout warn" role="note"><span class="callout-label">Figure 36.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-37-h">
+<h2 id="slide-37-h"><span id="slide-37"></span>Slide 37</h2>
+<ul>
+<li>3700 Citations!</li>
+<li>72% of all papers incorrectly interpret uninformative parameters!</li>
+</ul>
+<p class="callout warn" role="note"><span class="callout-label">Figure 37.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-38-h">
+<h2 id="slide-38-h"><span id="slide-38"></span>Slide 38: Best recent paper as a resource to stop doing dumb stuff with AIC</h2>
+<p><em>(No text on this slide.)</em></p>
+</section>
+<section aria-labelledby="slide-39-h">
+<h2 id="slide-39-h"><span id="slide-39"></span>Slide 39</h2>
+<p><em>(No text on this slide.)</em></p>
+</section>
+<section aria-labelledby="slide-40-h">
+<h2 id="slide-40-h"><span id="slide-40"></span>Slide 40: Burnham and Anderson did not advocate model dredging (fitting all/many combinations of predictors)</h2>
+<ul>
+<li>If you look at many models, you will have many Type I errors leading to “overfitting”.</li>
+<li>But did ecologists listen to B&amp;A and construct sensible model sets?</li>
+<li style="margin-left:1em">Hell no</li>
+<li>Do ecologists even think about whether the purpose of modeling is inference or prediction?</li>
+<li style="margin-left:1em">Also no</li>
+</ul>
+<p>“An investigator with, say, 10 explanatory variables cannot expect to learn much from his data and a multiple linear regression analysis unless there is some substantial supporting science that can be used to help narrow the number of models to consider. In this example, there would be 1,024 models (many more if transformations or interaction terms were allowed), and over-ﬁtting would surely be a serious risk. The analysis, by whatever method, should probably be considered exploratory and the results used to design further data gathering leading to a more conﬁrmatory analysis, based on some a priori considerations” (Burnham and Anderson 2002:85)</p>
+</section>
+<section aria-labelledby="slide-41-h">
+<h2 id="slide-41-h"><span id="slide-41"></span>Slide 41</h2>
+<p><em>(No text on this slide.)</em></p>
+</section>
+<section aria-labelledby="slide-42-h">
+<h2 id="slide-42-h"><span id="slide-42"></span>Slide 42: Then what about BIC? Is it just a similar alternative?</h2>
+<ul>
+<li>The penalty in BIC increases with the sample size</li>
+<li>AIC retains more complex models than BIC or p-values</li>
+<li>AIC chooses the model that gives the best prediction. It is efficient for prediction.</li>
+<li>BIC chooses the “correct” model if it is in the set.</li>
+</ul>
+<p class="callout warn" role="note"><span class="callout-label">Figure 42.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-43-h">
+<h2 id="slide-43-h"><span id="slide-43"></span>Slide 43: AIC vs BIC</h2>
+<ul>
+<li>“Theoretically, AIC is optimal in the sense of minimizing the mean square error of predictions, whereas a competing metric, the Bayesian Information Criterion (BIC; Schwarz 1978), is consistent – that is, it will tend to select the ‘true’ model as the sample size increases to infinity.”</li>
+<li>AIC is asymptotically equivalent to leave-one-out crossvalidation (prediction), and BIC is most similar to inference (p-values)</li>
+</ul>
+</section>
+<section aria-labelledby="slide-44-h">
+<h2 id="slide-44-h"><span id="slide-44"></span>Slide 44: Crossvalidation: Split data, train model, compare predictions to actual using test data. Repeat.</h2>
+<ul>
+<li>k-fold crossvalidation</li>
+<li>Leave-one-out (n-fold crossvalidation)</li>
+</ul>
+<p>Train</p>
+<p>Test</p>
+<p>Dataset</p>
+</section>
+<section aria-labelledby="slide-45-h">
+<h2 id="slide-45-h"><span id="slide-45"></span>Slide 45: Recommended Readings</h2>
+<ul>
+<li>Aho et al. 2014 “Model selection for ecologists: The worldviews of AIC and BIC”. Ecology</li>
+<li>Shmueli 2010 “To explain or to predict”. Statistical Science</li>
+<li>Murtaugh 2007 “Simplicity and complexity in ecological data analysis”. Ecology</li>
+<li>Arnold 2010 “Uninformative Parameters and Model Selection Using Akaike&#x27;s Information Criterion” JWM</li>
+<li>”Murtaugh 2014 “In defense of P-values”. Ecology</li>
+<li>Fieberg and Johnson 2015 “MMI: Multimodel Inference or Models With Management Implications?”. Journal of Wildlife Management</li>
+<li>Sutherland et al. 2023 “Practical advice on variable selection and reporting using Akaike information criterion. Proceedings B</li>
+<li>Bolker 2024 “Multimodel Approaches Are Not the Best Way to Understand Multifactorial Systems”. Entropy</li>
+</ul>
+</section>
+<section aria-labelledby="slide-46-h">
+<h2 id="slide-46-h"><span id="slide-46"></span>Slide 46</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 46.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 46.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-47-h">
+<h2 id="slide-47-h"><span id="slide-47"></span>Slide 47: Don’t take my word for it…</h2>
+<p>One way to avoid some of the problems associated with model selection is to “just say no” to data-driven model selection—in other words, ﬁt a single pre-speciﬁed model, one in which all explanatory variables are chosen prior to looking at their relationship with the response variable, and then use this model for inference (Harrell 2001, Babyak 2004, Whittingham et al. 2006, Guidice et al. 2012).</p>
+</section>
+<section aria-labelledby="slide-48-h">
+<h2 id="slide-48-h"><span id="slide-48"></span>Slide 48</h2>
+<p>“If researchers want to accurately estimate the strength of multiple competing ecological processes along with reliable confidence intervals, their best hope is to use full (maximal) statistical models after making principled, a priori decisions about which predictors to include. “</p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 48.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>Don’t take my word for it…</p>
+<p>Left as a preprint for years until Bolker finally submitted it to a journal after we chatted about this problem</p>
+</section>
+<section aria-labelledby="slide-49-h">
+<h2 id="slide-49-h"><span id="slide-49"></span>Slide 49: Don’t take my word for it…</h2>
+<p>The associated sums of AIC model weights recommended to assess relative importance of individual predictors are really a measure of relative importance of models, with little information about contributions by individual predictors compared to other measures of relative importance based on effects size or variance reduction.</p>
+<p>The standardized estimates or equivalently the t statistics on unstandardized estimates also can be used to provide more informative measures of relative importance than sums of AIC weights. Finally, I illustrate how seriously compromised statistical interpretations and predictions can be for all three of these flawed practices by critiquing their use in a recent species distribution modeling technique developed for predicting Greater Sage‐Grouse (Centrocercus urophasianus) distribution in Colorado, USA. These model averaging issues are common in other ecological literature and ought to be discontinued if we are to make effective scientific contributions to ecological knowledge and conservation of natural resources.</p>
+</section>
+<section aria-labelledby="slide-50-h">
+<h2 id="slide-50-h"><span id="slide-50"></span>Slide 50</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 50.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-51-h">
+<h2 id="slide-51-h"><span id="slide-51"></span>Slide 51</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 51.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-52-h">
+<h2 id="slide-52-h"><span id="slide-52"></span>Slide 52: Are any statistical procedures required?</h2>
+<p>No, because the state of the art remains uncertain. However, BASP will require strong descriptive statistics, including effect sizes. We also encourage the presentation of frequency or distributional data when this is feasible. Finally, we encourage the use of larger sample sizes than is typical in much psychology research, because as the sample size increases, descriptive statistics become increasingly stable and sampling error is less of a problem.</p>
+<p>banning the NHSTP will have the effect of increasing the quality of submitted manuscripts by liberating authors from the stultified structure of NHSTP thinking thereby eliminating an important obstacle to creative thinking</p>
+</section>
+<section aria-labelledby="slide-53-h">
+<h2 id="slide-53-h"><span id="slide-53"></span>Slide 53: Hmm…let’s think, will banning the use of p-values1. Reduce type I errors and help solve the replication crisis in Psychology?2. Allow absolute garbage conclusions to be published that would otherwise not have passed “significance testing”</h2>
+<p>Large-scale efforts (e.g., the Open Science Collaboration’s Reproducibility Project in 2015) showed that only about 35–40% of published effects could be replicated with similar effect sizes.</p>
+</section>
+<section aria-labelledby="slide-54-h">
+<h2 id="slide-54-h"><span id="slide-54"></span>Slide 54</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 54.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 54.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-55-h">
+<h2 id="slide-55-h"><span id="slide-55"></span>Slide 55: Further buffoonery</h2>
+<ul>
+<li>Journal: you should use Cohen’s d to compare two samples</li>
+<li style="margin-left:1em">0.2≤d&lt;0.5 indicates there is a “small” practical effect</li>
+<li style="margin-left:1em">0.5≤d&lt;0.8 indicates a “medium” practical effect</li>
+<li style="margin-left:1em">d≥0.8 indicates a “large” practical effect</li>
+<li>Does Cohen’s d look familiar?</li>
+</ul>
+<p class="callout warn" role="note"><span class="callout-label">Figure 55.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 55.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-56-h">
+<h2 id="slide-56-h"><span id="slide-56"></span>Slide 56: Further buffoonery</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 56.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<ul>
+<li>d values larger than Cohen’s minimum medium effect size were statistically significant and all below Cohen’s small effect size limit were not</li>
+<li>For d values that correspond to small effect sizes (45.3% of the d values), there is no way to decide whether a particular d value is consistent with random fluctuations in the data under the assumption of equal population means without some measure of statistical significance</li>
+<li>How do you think the media will report on these results? Cautious and measured?</li>
+</ul>
+</section>
+<section aria-labelledby="slide-57-h">
+<h2 id="slide-57-h"><span id="slide-57"></span>Slide 57: The chief benefit of AIC/BIC</h2>
+<p>Stresses the importance of evaluating multiple competing hypotheses when applied properly to actual competing hypothesis</p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 57.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>“While often used as a tool for statistical inference, a set of regression models containing partially overlapping sets of explanatory variables does not necessarily represent a valid evaluation of multiple hypotheses unless each statistical model represents a unique research hypothesis [31]. In other words, model competition, based on AIC and BIC, is not a stepwise regression procedure.”</p>
+</section>
+<section aria-labelledby="slide-58-h">
+<h2 id="slide-58-h"><span id="slide-58"></span>Slide 58</h2>
+<table>
+<thead><tr><th scope="col">Species</th><th scope="col">ΔAIC</th><th scope="col"></th></tr></thead>
+<tbody>
+<tr><td></td><td>Habitat Only</td><td>Habitat + Cougar</td></tr>
+<tr><td>Bobcat</td><td>0</td><td>2.69</td></tr>
+<tr><td>Bear</td><td>10.36</td><td>0</td></tr>
+<tr><td>Coyote</td><td>24.0</td><td>0</td></tr>
+</tbody>
+</table>
+<p>Compare habitat only models for resource selection vs. models that include interactions with cougars.</p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 58.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+</section>
+<section aria-labelledby="slide-59-h">
+<h2 id="slide-59-h"><span id="slide-59"></span>Slide 59</h2>
+<p class="callout warn" role="note"><span class="callout-label">Figure 59.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<p>How SHOULD we be making inference</p>
+<ul>
+<li>Interpret point estimates algebraically and geometrically with uncertainty</li>
+<li>Don’t ask “if” there is an effect. Ask how much a variable affects an outcome</li>
+<li>Quantify our uncertainty around this</li>
+</ul>
+</section>
+</main>
+
+<footer>FW 536 &middot; Statistical Modeling for Ecology and Conservation &middot; Oregon State University &middot; Accessible lecture notes</footer>
+</body>
+</html>

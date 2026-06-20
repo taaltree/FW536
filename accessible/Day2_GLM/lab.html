@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en" data-a11y="done">
+<head>
+<meta charset="UTF-8" />
+<title>Day 2 Lab — Linear Models, Links, and GLMs | FW 536</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../_Shared/css/accessible.css" />
+<script defer src="../_Shared/js/accessible.js"></script>
+<script>
+MathJax = {
+  tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
+  options: {
+    menuOptions: { settings: { assistiveMml: true, explorer: true } }
+  },
+  loader: { load: ['a11y/assistive-mml', 'a11y/explorer'] }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script"></script>
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<div class="a11y-bar" role="region" aria-label="Accessibility">Accessible version &middot; <a href="../accessibility.html">How to use this site with a screen reader</a> &middot; <a href="../index.html">Course home</a></div>
+
+<div class="shell">
+
+<aside class="sidebar">
+ <p class="brand"><a href="../index.html" title="Back to course home">FW 536 · Day 2</a></p>
+ <div class="subtitle">Linear Models & GLMs</div>
+ <nav aria-label="On this page and related documents">
+ <div class="section">Lab</div>
+ <ul>
+ <li><a href="#orient">Where we are</a></li>
+ <li><a href="#big-picture">Plain-language overview</a></li>
+ <li><a href="#linmod">Linear model anatomy</a></li>
+ <li><a href="#cont">Continuous distributions</a></li>
+ <li><a href="#log-link">The log link, biologically</a></li>
+ <li><a href="#logit-link">The logit link, biologically</a></li>
+ <li><a href="#morning">Morning exercises</a></li>
+ <li><a href="#afternoon">Afternoon exercises</a></li>
+ <li><a href="#interactions">Interaction terms</a></li>
+ <li><a href="#cheatsheet">R cheat sheet</a></li>
+ </ul>
+ <div class="section">Other docs</div>
+ <ul>
+ <li><a class="featured" href="plain_language_summary.html">Plain-language summary</a></li>
+ <li><a href="log_logit_intuition.html">Log/logit intuition guide</a></li>
+ <li><a href="answer_key.html">Answer key</a></li>
+ <li><a href="problem_set_v2.html">Problem set · v2</a></li>
+ <li><a href="problem_set_v3.html">Problem set · v3</a></li>
+ </ul>
+ <div class="section">Course</div>
+ <ul><li><a href="../index.html">All days</a></li></ul>
+ </nav>
+</aside>
+
+<main class="content" id="main-content" tabindex="-1">
+
+<header class="lab-header">
+ <div class="eyebrow">Day 2 · Lab</div>
+ <h1>Continuous distributions, linear models, and generalized linear models</h1>
+ <p class="lede">From a Normal regression to a logistic GLM to a negative-binomial count model — with explicit emphasis on how to <em>read</em> coefficients on the log and logit scales as biology.</p>
+</header>
+
+<div class="lab-toc" id="lab-toc">
+  <h2>What's in this lab and what to hand in</h2>
+  <p class="toc-intro">This page is your <strong>in-class practice</strong> problem set — worked examples with visible answers. Your <strong>graded 20-point assignment</strong> is a separate problem set (v2 or v3); write up your answers in the matching R Markdown template and submit on Canvas.</p>
+  
+<div class="session">
+  <div class="session-label">Morning · 20 pts</div>
+  
+<section class="data-card" id="data-files">
+<h2>Data files &amp; R scripts</h2>
+<p>Everything referenced in this lab's exercises lives in this folder. Click any link below to download.</p>
+<div class="data-section">
+  <h3 class="data-h">Datasets</h3>
+  <div class="data-row"><a href="data/sockeye_adult.csv"><code>sockeye_adult.csv</code></a><span class="data-desc">Daily sockeye salmon counts and flow-corrected qPCR eDNA concentrations (Levi et al. 2019).</span></div>
+  <div class="data-row"><a href="data/titanic_long.csv"><code>titanic_long.csv</code></a><span class="data-desc">One row per Titanic passenger (binary survived, class, sex, age).</span></div>
+  <div class="data-row"><a href="data/titanic_prop.csv"><code>titanic_prop.csv</code></a><span class="data-desc">Titanic survival aggregated to (Yes, No) counts per class for binomial-form GLM.</span></div>
+</div>
+<div class="data-section">
+  <h3 class="data-h">R scripts</h3>
+  <div class="data-row"><a href="InteractionTerms.R"><code>InteractionTerms.R</code></a><span class="data-desc">InteractionTerms.R · interaction algebra & geometry walkthrough</span></div>
+</div>
+</section>
+<div>
+    <div class="session-title">Continuous distributions problem set</div>
+    <div class="row"><span class="tag practice">Practice</span>
+      <span><a href="#morning">Walk through the morning problems on this page</a> <span class="note">— answers visible, in-class</span></span></div>
+    <div class="row"><span class="tag assessed">Assessed</span>
+      <span><a href="problem_set_v2.html#morning">Assessed v2 &middot; forest &amp; songbird</a> &nbsp;or&nbsp; <a href="problem_set_v3.html#morning">Assessed v3 &middot; aquatic &amp; fisheries</a>
+            <span class="note">— answers NOT shown; choose whichever theme fits your interests</span></span></div>
+    <div class="row"><span class="tag template">Hand-in</span><span>Choose template matching your theme: <a href="morning_lab_template_v2.Rmd">morning v2 (forest &amp; songbird).Rmd</a> <span class="note">or</span> <a href="morning_lab_template_v3.Rmd">morning v3 (aquatic &amp; fisheries).Rmd</a> <span class="note">— knit to HTML and upload to Canvas</span></span></div>
+    <div class="row"><span class="tag lecture">Lecture</span>
+      <span><a href="lecture_day2_morning.html">Morning lecture · continuous distributions</a></span></div>
+  </div>
+</div>
+
+<div class="session">
+  <div class="session-label">Afternoon · 20 pts</div>
+  <div>
+    <div class="session-title">Linear models problem set</div>
+    <div class="row"><span class="tag practice">Practice</span>
+      <span><a href="#afternoon">Walk through the afternoon problems on this page</a> <span class="note">— answers visible, in-class</span></span></div>
+    <div class="row"><span class="tag assessed">Assessed</span>
+      <span><a href="problem_set_v2.html#afternoon">Assessed v2 &middot; forest &amp; songbird</a> &nbsp;or&nbsp; <a href="problem_set_v3.html#afternoon">Assessed v3 &middot; aquatic &amp; fisheries</a>
+            <span class="note">— answers NOT shown; choose whichever theme fits your interests</span></span></div>
+    <div class="row"><span class="tag template">Hand-in</span><span>Choose template matching your theme: <a href="afternoon_lab_template_v2.Rmd">afternoon v2 (forest &amp; songbird).Rmd</a> <span class="note">or</span> <a href="afternoon_lab_template_v3.Rmd">afternoon v3 (aquatic &amp; fisheries).Rmd</a> <span class="note">— knit to HTML and upload to Canvas</span></span></div>
+    <div class="row"><span class="tag lecture">Lecture</span>
+      <span><a href="lecture_day2_afternoon.html">Afternoon lecture · generalized linear models</a></span></div>
+  </div>
+</div>
+
+  <p style="font-size:13px; color:var(--muted); margin: 18px 0 0 0;">
+    Need help with R Markdown? See the <a href="../rmarkdown_tutorial.html">R Markdown tutorial</a>.
+    Other docs for this day: <a href="plain_language_summary.html">plain-language summary</a> &middot;
+    <a href="answer_key.html">practice answer key</a>.
+  </p>
+</div>
+
+
+
+
+
+<section id="orient">
+<h2>Where we are</h2>
+<p>Yesterday we built probability and met the discrete distributions. This morning we'll meet the continuous distributions you need for regression: <strong>Normal, Lognormal, Gamma, Beta, Exponential</strong>. This afternoon we'll plug those distributions into a linear-model framework, generalize via link functions, and fit our first <strong>GLMs</strong>: logistic regression (Bernoulli/Binomial), Poisson regression with log link, and Negative-Binomial regression for overdispersed counts.</p>
+
+<div class="callout key"><p class="callout-label">Key idea</p>
+<p>The unifying idea today: a GLM is a regression in which the <strong>linear predictor</strong> $\eta_i = \beta_0 + \beta_1 x_i + \dots$ is connected to a distribution's <strong>mean</strong> through a <strong>link function</strong> $g$, so that $g(\mu_i) = \eta_i$. The Normal regression you already know is just a GLM with the identity link. Everything else is a small variation on that template.</p>
+</div>
+</section>
+
+<section id="big-picture">
+<h2>Plain-language overview</h2>
+<div class="callout plain"><p class="callout-label">Plain-language summary</p>
+<p>Regression is just "draw a line (or curve) through the cloud of data, then interpret what the slope means biologically." The catch is that the response variable might be a count, a proportion, or a strictly positive measurement — none of which behave like a Normal. The GLM framework lets you keep the line-drawing logic while choosing a distribution that fits the response.</p>
+<p>Two new ideas you'll learn today:</p>
+<ol>
+<li>A <strong>link function</strong> stretches the response to a scale where a straight line makes sense. The log link stretches positive numbers; the logit link stretches probabilities.</li>
+<li>Once you fit the model, you have to <strong>back-transform</strong> coefficients to talk about them biologically. A slope of $+0.5$ on the log scale means a $\times 1.65$ multiplicative effect on the raw scale.</li>
+</ol>
+</div>
+</section>
+
+<section id="linmod">
+<h2>Linear model anatomy</h2>
+<p>A linear model has three pieces:</p>
+<table>
+<tr><th scope="col">Piece</th><th scope="col">What it is</th><th scope="col">Symbol</th></tr>
+<tr><td>Linear predictor</td><td>What you add up from coefficients and predictors</td><td>$\eta_i = \beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \ldots$</td></tr>
+<tr><td>Link function</td><td>How $\eta$ relates to the mean of the response</td><td>$g(\mu_i) = \eta_i$</td></tr>
+<tr><td>Distribution</td><td>How observations vary around the mean</td><td>$y_i \sim D(\mu_i, \theta)$</td></tr>
+</table>
+
+<p>The Normal regression you know from intro statistics is the special case $g(\mu) = \mu$ (identity link) and $D = \text{Normal}$:</p>
+<div class="eq-block">$y_i \sim \mathcal{N}(\mu_i, \sigma^2), \quad \mu_i = \beta_0 + \beta_1 x_i$</div>
+
+<p>Once we relax the link and the distribution, we get the GLM "menu":</p>
+<table>
+<tr><th scope="col">Response</th><th scope="col">Distribution</th><th scope="col">Link</th><th scope="col">R family</th></tr>
+<tr><td>Continuous, unbounded</td><td>Normal (Gaussian)</td><td>Identity</td><td><code>gaussian("identity")</code></td></tr>
+<tr><td>Binary (0/1) or proportion of $n$</td><td>Bernoulli / Binomial</td><td>Logit</td><td><code>binomial("logit")</code></td></tr>
+<tr><td>Count, equidispersed</td><td>Poisson</td><td>Log</td><td><code>poisson("log")</code></td></tr>
+<tr><td>Count, overdispersed</td><td>Negative Binomial</td><td>Log</td><td><code>MASS::glm.nb</code></td></tr>
+<tr><td>Continuous, strictly positive</td><td>Gamma or Lognormal</td><td>Log (Gamma) or log on response (Lognormal)</td><td><code>Gamma("log")</code> or <code>lm(log(y) ~ ...)</code></td></tr>
+</table>
+</section>
+
+<section id="cont">
+<h2>Continuous distributions (morning preview)</h2>
+
+<div class="tabs">
+<div class="tab-buttons">
+ <button class="active">Normal</button>
+ <button>Lognormal</button>
+ <button>Gamma</button>
+ <button>Beta</button>
+ <button>Exponential</button>
+</div>
+
+<div class="tab-panel active">
+<h3>Normal — the workhorse continuous distribution</h3>
+<p><strong>Story:</strong> sums of many small independent contributions (central limit theorem). Symmetric, no boundary, support $(-\infty, \infty)$.</p>
+<p><strong>Parameters:</strong> mean $\mu$, variance $\sigma^2$.</p>
+<p><strong>Use it when:</strong> the response can take any real value, with roughly symmetric scatter.</p>
+<p><strong>Caveat:</strong> almost no ecological variable is truly unbounded; check residuals after fitting.</p>
+</div>
+
+<div class="tab-panel">
+<h3>Lognormal — when log(Y) is Normal</h3>
+<p><strong>Story:</strong> products of many small independent contributions. Always positive, right-skewed, with multiplicative variation.</p>
+<p><strong>Parameters:</strong> $\mu, \sigma$ on the log scale; on the raw scale, mean is $e^{\mu + \sigma^2/2}$.</p>
+<p><strong>Use it when:</strong> the response is positive and right-skewed; the variability scales with the mean.</p>
+<p><strong>Ecology:</strong> body sizes, abundances at sites, eDNA concentrations.</p>
+</div>
+
+<div class="tab-panel">
+<h3>Gamma — flexible positive continuous</h3>
+<p><strong>Story:</strong> waiting time for $k$ independent Poisson events (sum of exponentials).</p>
+<p><strong>Parameters:</strong> shape $\alpha$, rate $\beta$. Mean $= \alpha/\beta$; variance $= \alpha/\beta^2$.</p>
+<p><strong>Use it when:</strong> response is positive and continuous; can be right-skewed but doesn't have to be.</p>
+<p><strong>Common GLM choice:</strong> <code>glm(y ~ x, family=Gamma(link="log"))</code> for positive responses where variance grows with mean.</p>
+</div>
+
+<div class="tab-panel">
+<h3>Beta — for proportions between 0 and 1</h3>
+<p><strong>Story:</strong> a distribution over probabilities. Two shape parameters $\alpha, \beta$.</p>
+<p><strong>Mean</strong> $= \alpha/(\alpha+\beta)$. Beta(1,1) is uniform on [0,1].</p>
+<p><strong>Use it when:</strong> response is a proportion that can take any value strictly between 0 and 1 (not a count out of a fixed total).</p>
+<p><strong>Ecology:</strong> percent cover, individual-level detection probabilities (the heterogeneity component of beta-binomial).</p>
+</div>
+
+<div class="tab-panel">
+<h3>Exponential — waiting time for one event</h3>
+<p><strong>Story:</strong> time until the first event in a Poisson process at rate $\lambda$. Memoryless.</p>
+<p><strong>Mean</strong> $= 1/\lambda$.</p>
+<p><strong>Ecology:</strong> time-between-detections in a camera-trap; line-transect distances to first sighting.</p>
+</div>
+</div>
+</section>
+
+<!-- ============================================================ -->
+<section id="log-link">
+<h2>The log link, biologically (this is the big one)</h2>
+
+<div class="callout bio"><p class="callout-label">Biological intuition</p>
+<p>Log-link coefficients describe <strong>multiplicative</strong> effects, not additive ones. A one-unit change in $x$ multiplies the mean response by $e^\beta$. This single fact, once internalized, makes Poisson/NB regression and lognormal regression both interpretable in a way that "the slope is 0.43" never is.</p>
+</div>
+
+<h3>The translation table you should memorize</h3>
+<table>
+<tr><th scope="col">$\beta$ (slope on log scale)</th><th scope="col">$e^\beta$ (multiplicative effect per unit x)</th><th scope="col">Plain English</th></tr>
+<tr><td>0.00</td><td>1.00</td><td>no effect</td></tr>
+<tr><td>0.10</td><td>1.105</td><td>+10.5% per unit x</td></tr>
+<tr><td>0.20</td><td>1.221</td><td>+22%</td></tr>
+<tr><td>0.50</td><td>1.649</td><td>+65%</td></tr>
+<tr><td>0.69</td><td>2.00</td><td>doubles</td></tr>
+<tr><td>1.00</td><td>2.718</td><td>×2.7</td></tr>
+<tr><td>−0.10</td><td>0.905</td><td>−9.5%</td></tr>
+<tr><td>−0.69</td><td>0.50</td><td>halves</td></tr>
+</table>
+
+<h3>Worked biological examples</h3>
+<div class="exercise">
+<span class="ex-tag">Example 1</span>
+<h3>Salmon redds along a stream gradient</h3>
+<p>You fit <code>glm(redds ~ km_upstream, family=poisson(link="log"))</code> and get $\hat\beta_1 = -0.05$. What does this mean biologically?</p>
+<details class="answer"><summary>Interpret</summary><div class="answer-body">
+<p>$e^{-0.05} = 0.951$. So for each additional km upstream, expected redd counts <strong>fall by ~4.9%</strong>. After 14 km, the expected count is $e^{-0.05 \cdot 14} = e^{-0.70} = 0.50$ of the count at the stream mouth — half as many redds.</p>
+<p>A useful rule: $-0.05$ per km translates to a half-life of ${\sim}\ln(2)/0.05 = 13.9$ km. This "half-life" language is intuitive for biologists who think about exponential decay.</p>
+</div></details>
+</div>
+
+<div class="exercise">
+<span class="ex-tag">Example 2</span>
+<h3>Marine megafauna detections vs. sea state</h3>
+<p>Cetacean detections per 100 km of transect, modeled as Poisson with predictor <em>Beaufort sea state</em>. $\hat\beta = -0.41$ per unit sea state. What does this mean?</p>
+<details class="answer"><summary>Interpret</summary><div class="answer-body">
+<p>$e^{-0.41} = 0.664$. Each Beaufort unit reduces expected detection rate by ~34%. Going from sea state 1 to 4 multiplies the expected count by $0.664^3 = 0.293$, a 71% drop. This is a strong "detection-availability" effect — useful for surveying logistics.</p>
+</div></details>
+</div>
+
+<div class="exercise">
+<span class="ex-tag">Example 3</span>
+<h3>Log-link Poisson with a categorical predictor (treatment)</h3>
+<p>You fit <code>glm(caterpillars ~ treatment, family=poisson)</code> where <code>treatment</code> is a factor with levels <em>control</em> and <em>fertilizer</em>. The fertilizer coefficient is $+0.85$. What does this say?</p>
+<details class="answer"><summary>Interpret</summary><div class="answer-body">
+<p>$e^{0.85} = 2.34$. The fertilizer treatment more than <strong>doubles</strong> the expected caterpillar count compared to control. This is the kind of "fold change" language ecologists already speak in — but they have to remember to exponentiate.</p>
+</div></details>
+</div>
+
+<div class="exercise">
+<span class="ex-tag">Example 4</span>
+<h3>Log-link with continuous interaction</h3>
+<p>You fit <code>glm(catch ~ temp * gear, family=poisson)</code>. The main effect of temp is $-0.05$; the temp:gearTrawl interaction is $+0.08$.</p>
+<ol type="a">
+<li>What is the temperature effect on the reference gear (gillnet)?</li>
+<li>What is the temperature effect on the trawl gear?</li>
+</ol>
+<details class="answer"><summary>Interpret</summary><div class="answer-body">
+<p>(a) For gillnet: slope is $-0.05$ per degree, i.e., $e^{-0.05} = 0.951$ → 4.9% drop per degree warming.</p>
+<p>(b) For trawl: combined slope is $-0.05 + 0.08 = +0.03$ per degree, i.e., $e^{0.03} = 1.030$ → 3% increase per degree warming.</p>
+<p>So the gears respond <em>oppositely</em> to temperature — a finding you can't extract from a single coefficient.</p>
+</div></details>
+</div>
+
+<div class="callout warn"><p class="callout-label">Watch out</p>
+<strong>Common mistake.</strong> Students often report coefficients on the log scale as if they were proportional changes. Saying "the effect of treatment is 0.85" is true only on the log scale. Always exponentiate when communicating to biologists. <code>exp(coef(fit))</code> is your friend.
+</div>
+</section>
+
+<!-- ============================================================ -->
+<section id="logit-link">
+<h2>The logit link, biologically</h2>
+
+<div class="callout bio"><p class="callout-label">Biological intuition</p>
+<p>Logit-link coefficients describe <strong>odds ratios</strong>. A one-unit change in $x$ multiplies the odds by $e^\beta$. Odds aren't probabilities — they're $p/(1-p)$. This is one of the most-confused topics in applied stats, and we'll fix it today.</p>
+</div>
+
+<h3>Three scales, three interpretations</h3>
+<table>
+<tr><th scope="col">Scale</th><th scope="col">Definition</th><th scope="col">Range</th><th scope="col">Use to talk to…</th></tr>
+<tr><td>Probability $p$</td><td>chance of success</td><td>0 to 1</td><td>biologists, managers, the public</td></tr>
+<tr><td>Odds $p/(1-p)$</td><td>"how many times more likely success is than failure"</td><td>0 to $\infty$</td><td>statisticians, gamblers</td></tr>
+<tr><td>Log-odds $\log(p/(1-p))$</td><td>logit; what the linear predictor outputs</td><td>$-\infty$ to $\infty$</td><td>the model machinery</td></tr>
+</table>
+
+<h3>The "1.5 rule": coefficient size to probability change</h3>
+<p>For values of $p$ near 0.5, a log-odds coefficient of $\beta$ translates roughly to a $\beta/4$ change in probability per unit $x$. (E.g., $\beta = 1$ → about a 25-percentage-point increase at the inflection.) Use this rule for back-of-envelope reasoning; use <code>predict(fit, type="response")</code> for actual values.</p>
+
+<div class="exercise">
+<span class="ex-tag">Example 5</span>
+<h3>Marten occupancy vs. canopy cover</h3>
+<p>You fit <code>glm(occupied ~ canopy, family=binomial)</code> with canopy on a 0–100 scale and $\hat\beta_1 = +0.06$ per percent canopy. Interpret.</p>
+<details class="answer"><summary>Interpret</summary><div class="answer-body">
+<p>$e^{0.06} = 1.062$. Each additional percentage point of canopy <em>multiplies the odds</em> of occupancy by 1.062. A 10-point increase multiplies odds by $e^{0.6} = 1.82$.</p>
+<p>For a site that is currently occupied with $p = 0.3$ (odds = 0.43), a 10-point increase in canopy moves odds to $0.43 \cdot 1.82 = 0.78$, i.e., $p = 0.78 / 1.78 = 0.44$. That's a 14 percentage-point increase — sizable.</p>
+</div></details>
+</div>
+
+<div class="exercise">
+<span class="ex-tag">Example 6</span>
+<h3>Survival of fledgling sage grouse — categorical predictor</h3>
+<p>You fit <code>glm(fledge ~ sex, family=binomial)</code>. Coefficient for males vs. females is $-0.4$. Interpret in three ways.</p>
+<details class="answer"><summary>Interpret on three scales</summary><div class="answer-body">
+<ul>
+<li><strong>Log-odds:</strong> males have log-odds 0.4 lower than females.</li>
+<li><strong>Odds ratio:</strong> $e^{-0.4} = 0.67$. Males' odds of fledging are 67% of females' odds.</li>
+<li><strong>Probability:</strong> if females fledge with p = 0.6 (odds = 1.5), males have odds $0.67 \cdot 1.5 = 1.0$, so $p = 0.5$. A 10-percentage-point difference.</li>
+</ul>
+</div></details>
+</div>
+
+<div class="exercise">
+<span class="ex-tag">Example 7</span>
+<h3>Nonlinear shape of the logistic curve</h3>
+<p>Why does a fixed $\beta$ translate to <em>different</em> probability changes depending on where you are on the curve?</p>
+<details class="answer"><summary>Reveal</summary><div class="answer-body">
+<p>The logistic function $p(\eta) = e^\eta/(1+e^\eta)$ is steepest at $\eta = 0$ (where $p = 0.5$) and flattens out near $p = 0$ and $p = 1$. So one unit of $x$ moves $p$ a lot in the middle and only a little at the ends. This is biologically realistic — a 10-degree warming moves survival a lot when survival is near 50%, but barely changes it if survival is already 99%.</p>
+</div></details>
+</div>
+
+<p>For a much deeper dive — including marginal-effect computations, the choice between odds ratios and risk ratios, and a worked Titanic example — see <a href="log_logit_intuition.html">the log/logit intuition guide</a>.</p>
+</section>
+
+<!-- ============================================================ -->
+<div class="practice-banner"><div class="label">Practice — answers visible</div><h3>Morning practice problems</h3><p>The exercises below are walk-through practice. Your graded morning assignment (Continuous distributions problem set) uses a separate, novel problem set &mdash; <strong>choose either theme below</strong> and write your answers in the matching theme template (<code>morning_lab_template_v2.Rmd</code> or <code>morning_lab_template_v3.Rmd</code>).</p><p style="margin: 8px 0 0 0;"><a class="hand-in" href="problem_set_v2.html#morning">v2 &middot; forest &amp; songbird &rarr;</a> &nbsp;or&nbsp; <a class="hand-in" href="problem_set_v3.html#morning">v3 &middot; aquatic &amp; fisheries &rarr;</a> &nbsp;&nbsp; <a class="hand-in" href="morning_lab_template_v2.Rmd" style="background:#1C638A; color:white; border-color:#1C638A;">v2 template &darr;</a> <a class="hand-in" href="morning_lab_template_v3.Rmd" style="background:#1C638A; color:white; border-color:#1C638A;">v3 template &darr;</a></p></div>
+<section id="morning">
+<h2>Morning exercises</h2>
+
+<div class="exercise" id="m1">
+<span class="ex-tag">Exercise M1</span><span class="difficulty easy"> · Exponential</span>
+<h3>Orangutan line transects</h3>
+<p>The detection function for orangutans on a line transect is roughly exponential, with rate $\lambda = 0.02$ per meter of perpendicular distance. Derive the survival function (probability of not yet detecting at distance $x$) and use it to compute the probability of missing an orangutan at 50 m.</p>
+<details class="answer"><summary>Reveal</summary><div class="answer-body">
+<p>For an Exponential$(\lambda)$, $S(x) = P(X \ge x) = e^{-\lambda x}$. At $x = 50$, $S = e^{-1.0} = 0.368$. So a 50-m-distant orangutan has a 37% chance of being missed.</p>
+</div></details>
+</div>
+
+<div class="exercise" id="m2">
+<span class="ex-tag">Exercise M2</span><span class="difficulty medium"> · Normal linear transformations</span>
+<h3>Prove that linear transformations of Normals are Normal</h3>
+<p>Let $Z \sim \mathcal{N}(0,1)$ and $Y = \mu + \sigma Z$. Using $E[aZ + b] = a E[Z] + b$ and $\mathrm{Var}(aZ+b) = a^2 \mathrm{Var}(Z)$, show $E[Y] = \mu$ and $\mathrm{Var}(Y) = \sigma^2$.</p>
+<details class="answer"><summary>Reveal</summary><div class="answer-body">
+<p>$E[Y] = E[\mu + \sigma Z] = \mu + \sigma \cdot 0 = \mu$. $\mathrm{Var}(Y) = \mathrm{Var}(\mu + \sigma Z) = \sigma^2 \cdot 1 = \sigma^2$. The shape stays Normal because a linear transform of a Gaussian is Gaussian.</p>
+</div></details>
+</div>
+
+<div class="exercise" id="m3">
+<span class="ex-tag">Exercise M3</span><span class="difficulty hard"> · Beta-Binomial</span>
+<h3>Marten cameras with heterogeneous detection</h3>
+<p>200 trail cameras are deployed. Plain assumption: per-camera detection probability $p = 0.03$ each night. But cameras vary: $p_i \sim \text{Beta}(0.03 \cdot \phi, 0.97 \cdot \phi)$ with $\phi = 1$ (so beta is very spread out).</p>
+<ol type="a">
+<li>What is the mean of this Beta?</li>
+<li>Simulate 5000 deployments under plain Binomial(200, 0.03) and the Beta-Binomial. Compare P(all-zero) and mean/SD of the detection count.</li>
+<li>Why does the Beta-Binomial put much more mass on "all-zero"?</li>
+</ol>
+<details class="answer"><summary>Reveal</summary><div class="answer-body">
+<pre><code>set.seed(1); reps &lt;- 5000
+bin &lt;- rbinom(reps, 200, 0.03)
+betbin &lt;- replicate(reps, sum(rbinom(200, 1, rbeta(200, 0.03, 0.97))))
+mean(bin==0); mean(betbin==0) # ~ 0 vs ~ 0.04
+mean(bin); mean(betbin) # ~ 6 vs ~ 6
+sd(bin); sd(betbin) # ~ 2.4 vs ~ 14</code></pre>
+<p>(c) In the Beta-Binomial, the detection probability is concentrated near 0 or 1 with this $\phi$, so most cameras get nearly 0 chance, a few get nearly 1. The mass at all-zero is the case where every camera drew a tiny $p_i$.</p>
+</div></details>
+</div>
+</section>
+
+<!-- ============================================================ -->
+<div class="practice-banner"><div class="label">Practice — answers visible</div><h3>Afternoon practice problems</h3><p>The exercises below are walk-through practice. Your graded afternoon assignment (Linear models problem set) uses a separate, novel problem set &mdash; <strong>choose either theme below</strong> and write your answers in the matching theme template (<code>afternoon_lab_template_v2.Rmd</code> or <code>afternoon_lab_template_v3.Rmd</code>).</p><p style="margin: 8px 0 0 0;"><a class="hand-in" href="problem_set_v2.html#afternoon">v2 &middot; forest &amp; songbird &rarr;</a> &nbsp;or&nbsp; <a class="hand-in" href="problem_set_v3.html#afternoon">v3 &middot; aquatic &amp; fisheries &rarr;</a> &nbsp;&nbsp; <a class="hand-in" href="afternoon_lab_template_v2.Rmd" style="background:#1C638A; color:white; border-color:#1C638A;">v2 template &darr;</a> <a class="hand-in" href="afternoon_lab_template_v3.Rmd" style="background:#1C638A; color:white; border-color:#1C638A;">v3 template &darr;</a></p></div>
+<section id="afternoon">
+<h2>Afternoon exercises</h2>
+
+<div class="exercise" id="a1">
+<span class="ex-tag">Exercise A1</span><span class="difficulty medium"> · Normal vs Poisson vs NB on eDNA counts</span>
+<h3>Sockeye eDNA — find the right distribution</h3>
+<p>Load <code>sockeye_adult.csv</code> (in this Day's <code>data/</code> folder). The response is daily count of adult sockeye; the predictor is <code>Qcorr_qPCR</code> (flow-corrected eDNA concentration). Fit, in sequence:</p>
+<ol>
+<li><code>lm(log(Sockeye_Adults+1) ~ log(Qcorr_qPCR+min_pos))</code> — the old-school approach.</li>
+<li><code>glm(Sockeye_Adults ~ log(Qcorr_qPCR+min_pos) + factor(Year), family=poisson)</code>.</li>
+<li><code>glm(Sockeye_Adults ~ log(Qcorr_qPCR+min_pos) + factor(Year), family=quasipoisson)</code>.</li>
+<li><code>MASS::glm.nb(Sockeye_Adults ~ log(Qcorr_qPCR+min_pos) + factor(Year))</code>.</li>
+</ol>
+<p>For each fit:</p>
+<ul>
+<li>Examine residual deviance / df. Is overdispersion present?</li>
+<li>Look at SEs for the eDNA coefficient. Which models give realistically wide vs. unrealistically narrow CIs?</li>
+<li>Back-transform the log-link slope to a multiplicative effect: "a doubling of eDNA concentration is associated with a ×__ change in expected daily count."</li>
+</ul>
+
+<div class="callout bio"><p class="callout-label">Biological intuition</p>
+<strong>Where the biology lives.</strong> If the log-link slope is, say, 0.7, then $e^{0.7 \cdot \ln 2} = 2^{0.7} = 1.62$. So a doubling of eDNA is associated with a 62% increase in sockeye. That sentence is what you put in your paper — not "the slope was 0.7 (SE 0.04)."
+</div>
+</div>
+
+<div class="exercise" id="a2">
+<span class="ex-tag">Exercise A2</span><span class="difficulty medium"> · Titanic logistic regression — long vs aggregated</span>
+<h3>Titanic survival</h3>
+<p>Using <code>titanic_long.csv</code> and <code>titanic_prop.csv</code>:</p>
+<ol type="a">
+<li>Fit <code>glm(survived ~ class, family=binomial, data=titanic_long)</code>.</li>
+<li>Fit <code>glm(cbind(Yes, No) ~ Class, family=binomial, data=titanic_prop)</code>.</li>
+<li>Confirm that coefficients are identical. Why must they be?</li>
+<li>Convert each class's log-odds to a probability. Compare to raw proportions.</li>
+</ol>
+<details class="answer"><summary>Reveal solution</summary><div class="answer-body">
+<pre><code>library(dplyr)
+long &lt;- read.csv("data/titanic_long.csv")
+prop &lt;- read.csv("titanic_prop.csv")
+f1 &lt;- glm(survived ~ class, family=binomial, data=long)
+f2 &lt;- glm(cbind(Yes, No) ~ Class, family=binomial, data=prop)
+coef(f1); coef(f2) # same
+# Probabilities
+plogis(coef(f1)[1] + c(0, coef(f1)[-1]))
+prop$Yes / (prop$Yes + prop$No) # raw proportions match</code></pre>
+<p>(c) Because the binomial likelihood is the product of Bernoulli likelihoods — aggregating $n$ Bernoullis into one Binomial summary is mathematically equivalent. Only the deviance differs (the Bernoulli form includes a constant that the Binomial form doesn't).</p>
+</div></details>
+</div>
+
+<div class="exercise" id="a3">
+<span class="ex-tag">Exercise A3</span><span class="difficulty hard"> · Titanic with interactions</span>
+<h3>Sex × Class effects on survival</h3>
+<p>Fit <code>glm(survived ~ class * sex + age, family=binomial, data=titanic_long)</code>. Use <code>effects::allEffects()</code> to plot fitted probabilities, and use <code>emmeans::emmeans(fit, pairwise ~ class | sex)</code> to compare classes within each sex.</p>
+<ol type="a">
+<li>Which pairwise contrast is largest (in odds ratio)?</li>
+<li>Why is the simple TukeyHSD on an aov object the wrong way to do this comparison?</li>
+<li>Translate the female 1st-vs-3rd-class log-odds difference into a probability difference for a 30-year-old passenger.</li>
+</ol>
+<details class="answer"><summary>Hint and discussion</summary><div class="answer-body">
+<p>TukeyHSD assumes a Normal-error linear model; on a logistic GLM we need methods (like <code>emmeans</code> with type="link" or "response") that respect the binomial likelihood and the non-identity link. The ranking and uncertainty differ between scales.</p>
+</div></details>
+</div>
+</section>
+
+<!-- ============================================================ -->
+<section id="interactions">
+<h2>Interaction terms: algebra meets geometry</h2>
+<p>An interaction in a linear model means "the effect of one variable depends on the value of another." The lab walkthrough (<code>InteractionTerms.R</code> in your originals) demonstrates this with simulated data, 2D heatmaps, and 3D <code>plotly</code> surfaces. Four lessons to leave with:</p>
+<ol>
+<li>If the true surface is a <strong>plane</strong>, there is no interaction. A model with $y \sim x_1 \cdot x_2$ should return an interaction coefficient near zero.</li>
+<li>If the surface is <strong>twisted</strong> (saddle/warped), there is an interaction. The sign of the interaction tells you whether the effect of $x_1$ is amplified or dampened as $x_2$ grows.</li>
+<li>Interactions on a <strong>probability scale</strong> can look very different from interactions on a <strong>log-odds scale</strong> (compare the binary GLM heatmap with the linear predictor's heatmap).</li>
+<li>The phrase "is there an interaction?" depends on the <strong>response scale</strong>. A model that is additive on the log scale is multiplicative on the raw scale — that's not a bug, it's the link function at work.</li>
+</ol>
+
+<div class="callout bio"><p class="callout-label">Biological intuition</p>
+A useful sanity check: if you have to log-transform your response, then any "additive" model you fit on the log scale is actually a multiplicative model on the raw scale. So "no interaction" in your fit might mask a real biological interaction, and vice versa. Always be explicit about the scale.
+</div>
+</section>
+
+<section id="cheatsheet">
+<h2>R cheat sheet — GLMs</h2>
+<table>
+<tr><th scope="col">Model</th><th scope="col">R call</th><th scope="col">Link</th><th scope="col">Notes</th></tr>
+<tr><td>Normal regression</td><td><code>lm(y ~ x)</code></td><td>identity</td><td>residuals checked with <code>plot(fit)</code></td></tr>
+<tr><td>Logistic</td><td><code>glm(y ~ x, family=binomial)</code></td><td>logit</td><td><code>exp(coef)</code> = odds ratios</td></tr>
+<tr><td>Poisson</td><td><code>glm(y ~ x, family=poisson)</code></td><td>log</td><td><code>exp(coef)</code> = multiplicative rate</td></tr>
+<tr><td>Quasipoisson</td><td><code>family=quasipoisson</code></td><td>log</td><td>no AIC; SEs inflated for overdispersion</td></tr>
+<tr><td>Negative binomial</td><td><code>MASS::glm.nb(y ~ x)</code></td><td>log</td><td>proper likelihood; AIC OK</td></tr>
+<tr><td>Gamma</td><td><code>glm(y ~ x, family=Gamma(link="log"))</code></td><td>log</td><td>positive continuous responses</td></tr>
+</table>
+
+<div class="callout warn"><p class="callout-label">Watch out</p>
+<strong>If your residual deviance is much bigger than your residual df</strong> in a Poisson fit, you have overdispersion. Don't trust the SEs. Switch to NB.
+</div>
+</section>
+
+<div style="margin-top:50px; display:flex; gap:12px; flex-wrap:wrap;">
+ <button id="reveal-all" style="background:var(--accent); color:white; border:none; padding:10px 20px; border-radius:4px; cursor:pointer;">Reveal all answers</button>
+ <button id="hide-all" style="background:var(--osu-stone); color:white; border:none; padding:10px 20px; border-radius:4px; cursor:pointer;">Hide all</button>
+ <a href="log_logit_intuition.html" style="background:#2E6B2A; color:white; padding:10px 20px; border-radius:4px; text-decoration:none;">→ Log/logit intuition guide</a>
+ <a href="answer_key.html" style="background:var(--osu-orange); color:white; padding:10px 20px; border-radius:4px; text-decoration:none;">→ Full answer key</a>
+</div>
+
+</main>
+</div>
+
+<footer>FW 536 · Statistical Modeling for Ecology and Conservation · Oregon State University</footer>
+</body>
+</html>

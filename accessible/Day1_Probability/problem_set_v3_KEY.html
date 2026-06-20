@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en" data-a11y="done">
+<head>
+<meta charset="UTF-8" />
+<title>Day 1 · Problem Set v3 | FW 536 · INSTRUCTOR ANSWER KEY</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../_Shared/css/accessible.css" />
+<script defer src="../_Shared/js/accessible.js"></script>
+<script>
+MathJax = {
+  tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
+  options: {
+    menuOptions: { settings: { assistiveMml: true, explorer: true } }
+  },
+  loader: { load: ['a11y/assistive-mml', 'a11y/explorer'] }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script"></script>
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<div class="a11y-bar" role="region" aria-label="Accessibility">Accessible version &middot; <a href="../accessibility.html">How to use this site with a screen reader</a> &middot; <a href="../index.html">Course home</a></div>
+
+<div class="shell">
+<aside class="sidebar">
+ <p class="brand"><a href="../index.html" title="Back to course home">FW 536 · Day 1</a></p>
+ <div class="subtitle">Problem Set v3 — Terrestrial wildlife & disease</div>
+ <nav aria-label="On this page and related documents">
+ <ul>
+ <li><a href="#p1">1. Lynx tracks</a></li>
+ <li><a href="#p2">2. Avian flu testing</a></li>
+ <li><a href="#p3">3. Wolf den encounters</a></li>
+ <li><a href="#p4">4. Bobcat camera grid</a></li>
+ <li><a href="#p5">5. Songbird point counts</a></li>
+ <li><a href="#p6">6. Owl pellet contents</a></li>
+ <li><a href="#p7">7. Coyote scat NB</a></li>
+ <li><a href="#p8">8. Brucellosis surveillance</a></li>
+ <li><a href="#p9">9. Indicator counting</a></li>
+ <li><a href="#p10">10. Bear DNA hair snare</a></li>
+ </ul>
+ <div class="section">Day 1 docs</div>
+ <ul>
+ <li><a href="lab.html">Main lab</a></li>
+ <li><a class="featured" href="plain_language_summary.html">Plain-language summary</a></li>
+ <li><a href="answer_key.html">v1 answer key</a></li>
+ <li><a href="problem_set_v2.html">Problem set v2</a></li>
+ </ul>
+ </nav>
+</aside>
+
+<main class="content" id="main-content" tabindex="-1">
+<header class="lab-header">
+ <div class="eyebrow">Day 1 · Alternate Problem Set v3</div>
+ <h1>Terrestrial wildlife & disease themed problems</h1>
+ <p class="lede">Novel problems covering the same Day 1 concepts in a terrestrial wildlife and wildlife-disease ecology context.</p>
+</header>
+
+<div class="exercise" id="p1">
+<span class="ex-tag">Problem 1</span><span class="difficulty easy"> · Bernoulli/Binomial</span>
+<h3>Lynx tracks on a snow transect</h3>
+<p>A 5 km transect is divided into 50 segments of 100 m each. At a given snow depth and time of year, the probability of detecting at least one lynx track in any given segment is $p = 0.06$, independently.</p>
+<ol type="a">
+<li>Expected number of segments with detections? Variance?</li>
+<li>What is the probability of detecting tracks in ≥ 5 segments?</li>
+<li>What is the probability the whole transect has zero detections?</li>
+</ol>
+</div>
+
+<div class="exercise" id="p2">
+<span class="ex-tag">Problem 2</span><span class="difficulty medium"> · Bayes' rule</span>
+<h3>Avian influenza screening</h3>
+<p>A flock of waterfowl has prior infection prevalence 0.08. A swab test has sensitivity 0.95 and specificity 0.90.</p>
+<ol type="a">
+<li>Compute the posterior probability a swab-positive bird is infected.</li>
+<li>Suppose three independent swabs from the same bird all come back positive. What is the posterior?</li>
+<li>If two come back positive and one negative, what is the posterior? (Assume conditional independence.)</li>
+</ol>
+</div>
+
+<div class="exercise" id="p3">
+<span class="ex-tag">Problem 3</span><span class="difficulty easy"> · Poisson</span>
+<h3>Wolf encounters at active dens</h3>
+<p>An observer records wolf approaches to a den at an average rate of $\lambda = 1.8$ per 12-h observation period.</p>
+<ol type="a">
+<li>Write the model. What does it assume about independence of approaches?</li>
+<li>P(no approaches in a 12-h period)?</li>
+<li>P(more than 3 approaches in a 12-h period)?</li>
+<li>P(exactly 5 approaches in a 36-h period)?</li>
+</ol>
+</div>
+
+<div class="exercise" id="p4">
+<span class="ex-tag">Problem 4</span><span class="difficulty medium"> · Beta-binomial preview</span>
+<h3>Bobcat camera grid heterogeneity</h3>
+<p>Eight remote cameras are deployed for one week. Mean per-camera detection probability is $\bar p = 0.20$, but cameras vary widely in placement quality.</p>
+<ol type="a">
+<li>Under a plain Binomial(8, 0.20), what is P(0 cameras detect)?</li>
+<li>Suppose camera detection probabilities are drawn from Beta(1.6, 6.4) (mean 0.2, much variability). Simulate per-camera $p_i$, then per-camera Bernoulli outcomes. Repeat 10,000 times. What is the simulated P(0 detect)?</li>
+<li>Why does heterogeneity inflate the probability of "all zeros"?</li>
+</ol>
+</div>
+
+<div class="exercise" id="p5">
+<span class="ex-tag">Problem 5</span><span class="difficulty medium"> · Poisson + zero-inflation</span>
+<h3>Songbird point counts</h3>
+<p>At hermit thrush point counts, the average count is 2.4 birds, but ~25% of points are in unsuitable habitat where the true count is 0.</p>
+<ol type="a">
+<li>Write the data-generating mixture (suitable / unsuitable habitat).</li>
+<li>Simulate 1000 point counts. Plot the histogram.</li>
+<li>What is the marginal mean and variance? Compare to a pure Poisson(2.4).</li>
+</ol>
+</div>
+
+<div class="exercise" id="p6">
+<span class="ex-tag">Problem 6</span><span class="difficulty easy"> · Multinomial</span>
+<h3>Owl pellet contents</h3>
+<p>Barn owl pellet contents from a regional study are composed of voles 0.65, shrews 0.20, mice 0.10, birds 0.05. A pellet contains 15 identifiable prey items.</p>
+<ol type="a">
+<li>P(exact composition (10, 3, 1, 1))?</li>
+<li>Marginal distribution of "shrews" in a pellet?</li>
+<li>Across 50 pellets, expected total of mice consumed?</li>
+</ol>
+</div>
+
+<div class="exercise" id="p7">
+<span class="ex-tag">Problem 7</span><span class="difficulty medium"> · Negative binomial</span>
+<h3>Coyote scat counts on grid cells</h3>
+<p>Coyote scats per grid cell from a recent survey have mean 4 and variance 28.</p>
+<ol type="a">
+<li>What dispersion $k$ matches these moments?</li>
+<li>What is P(0)? P(&gt;15)?</li>
+<li>What ecological mechanisms might produce the over-dispersion?</li>
+</ol>
+</div>
+
+<div class="exercise" id="p8">
+<span class="ex-tag">Problem 8</span><span class="difficulty medium"> · Surveillance design</span>
+<h3>Brucellosis in Yellowstone bison</h3>
+<p>Hypothetical herd prevalence is 0.15. You sample $n$ bison. You want at least 95% probability of detecting at least one positive bison.</p>
+<ol type="a">
+<li>Write the binomial probability of detecting at least one positive.</li>
+<li>Solve algebraically (or numerically in R) for the smallest $n$ that delivers 95% detection probability.</li>
+<li>Repeat for prevalence = 0.02.</li>
+</ol>
+</div>
+
+<div class="exercise" id="p9">
+<span class="ex-tag">Problem 9</span><span class="difficulty hard"> · Expected value via indicators</span>
+<h3>Solitary cougars in a linear gradient</h3>
+<p>$n=30$ cougar territories are arranged linearly along a ridgeline. Each cougar independently has probability $p=0.3$ of "calling tonight." Count the expected number of <em>isolated callers</em> — a cougar that calls, but neither immediate neighbor calls. Consider only the 28 interior cougars.</p>
+<ol type="a">
+<li>Compute $E[X]$ using indicator variables.</li>
+<li>Verify by simulation (20,000 reps).</li>
+</ol>
+</div>
+
+<div class="exercise" id="p10">
+<span class="ex-tag">Problem 10</span><span class="difficulty hard"> · Joint probability + composite hypothesis</span>
+<h3>Grizzly bear DNA from hair snares</h3>
+<p>A hair snare grid has 40 stations. The probability of getting at least one usable hair sample at a station in one occasion is $p = 0.18$ when a bear is present. Bears are present at 60% of stations.</p>
+<ol type="a">
+<li>Probability of "at least one sample" at a randomly chosen station? (Hint: condition on presence.)</li>
+<li>Given a station gets ≥ 1 sample, what is the probability a bear was present there?</li>
+<li>If you visit every station 3 times, what is the per-station probability of at least one sample across the three visits (assume independence between visits | presence)?</li>
+</ol>
+</div>
+
+<!-- =================== ANSWERS =================== -->
+<section>
+<h2 style="margin-top:80px;">Answers (with R)</h2>
+
+<details class="answer" open><summary>Problem 1</summary><div class="answer-body">
+<pre><code>n &lt;- 50; p &lt;- 0.06
+n*p; n*p*(1-p) # mean 3, var 2.82
+1 - pbinom(4, n, p) # P(>=5) = 0.181
+dbinom(0, n, p) # 0.0453</code></pre>
+</div></details>
+
+<details class="answer" open><summary>Problem 2</summary><div class="answer-body">
+<pre><code>p &lt;- 0.08; sens &lt;- 0.95; spec &lt;- 0.90; fpr &lt;- 1 - spec
+(sens*p)/(sens*p + fpr*(1-p)) # 0.452
+# Update three times: posterior becomes prior
+post1 &lt;- (sens*p)/(sens*p + fpr*(1-p))
+post2 &lt;- (sens*post1)/(sens*post1 + fpr*(1-post1))
+post3 &lt;- (sens*post2)/(sens*post2 + fpr*(1-post2))
+post3 # 0.987
+# two pos, one neg: update twice with sens/fpr, once with (1-sens)/(spec)
+post_neg &lt;- ((1-sens)*post2)/((1-sens)*post2 + spec*(1-post2))
+post_neg # ~ 0.439</code></pre>
+</div></details>
+
+<details class="answer" open><summary>Problem 3</summary><div class="answer-body">
+<pre><code>lambda &lt;- 1.8
+dpois(0, lambda) # 0.165
+1 - ppois(3, lambda) # 0.109
+dpois(5, lambda*3) # 0.171 (Poisson(5.4))</code></pre>
+<p>Independence assumption: an approach in one hour does not predict the next. In reality, wolves sometimes return in pulses — likely overdispersed.</p>
+</div></details>
+
+<details class="answer" open><summary>Problem 4</summary><div class="answer-body">
+<pre><code>dbinom(0, 8, 0.20) # 0.168
+set.seed(1)
+sims &lt;- replicate(1e4, {
+ p_i &lt;- rbeta(8, 1.6, 6.4)
+ any_detect &lt;- rbinom(8, 1, p_i)
+ all(any_detect == 0)
+})
+mean(sims) # ~ 0.27</code></pre>
+<p>(c) Heterogeneous $p$ puts more probability on extreme outcomes (all-zero and all-detect) than a single fixed $p$ would.</p>
+</div></details>
+
+<details class="answer" open><summary>Problem 5</summary><div class="answer-body">
+<pre><code>set.seed(1); n &lt;- 1000
+suitable &lt;- rbinom(n, 1, 0.75)
+counts &lt;- ifelse(suitable, rpois(n, 2.4), 0)
+mean(counts); var(counts) # ~ 1.8 and ~ 4
+hist(counts, breaks=0:max(counts)-0.5)</code></pre>
+<p>Mean shrinks (lots of zeros pull mean down). Variance inflates above mean. Same pattern as zero-inflated count data.</p>
+</div></details>
+
+<details class="answer" open><summary>Problem 6</summary><div class="answer-body">
+<pre><code>p &lt;- c(.65,.20,.10,.05)
+dmultinom(c(10,3,1,1), prob=p) # 0.099
+# shrew marginal: Bin(15, 0.20); mean 3, var 2.4
+# total mice across 50 pellets: ~ Bin(750, 0.10), expected 75</code></pre>
+</div></details>
+
+<details class="answer" open><summary>Problem 7</summary><div class="answer-body">
+<p>Solve $28 = 4 + 16/k$ → $k = 16/24 \approx 0.667$.</p>
+<pre><code>k &lt;- 16/24
+dnbinom(0, mu=4, size=k) # ~ 0.34
+1 - pnbinom(15, mu=4, size=k) # ~ 0.06</code></pre>
+<p>(c) Heterogeneous habitat use, territoriality, latrine clustering, sampling effort variability.</p>
+</div></details>
+
+<details class="answer" open><summary>Problem 8</summary><div class="answer-body">
+<p>$1 - (1-p)^n \ge 0.95 \Rightarrow n \ge \log(0.05)/\log(1-p)$.</p>
+<pre><code>ceiling(log(0.05)/log(1-0.15)) # 19
+ceiling(log(0.05)/log(1-0.02)) # 149</code></pre>
+</div></details>
+
+<details class="answer" open><summary>Problem 9</summary><div class="answer-body">
+<p>$E[X_i] = 0.3 \cdot 0.7 \cdot 0.7 = 0.147$. For 28 interior cougars, $E[X] = 4.116$.</p>
+<pre><code>set.seed(1); reps &lt;- 2e4
+counts &lt;- replicate(reps, {
+ y &lt;- rbinom(30, 1, 0.3)
+ sum(y[2:29] &amp; !y[1:28] &amp; !y[3:30])
+})
+mean(counts) # ~ 4.11</code></pre>
+</div></details>
+
+<details class="answer" open><summary>Problem 10</summary><div class="answer-body">
+<pre><code>pH &lt;- 0.18; pPres &lt;- 0.60
+# (a) marginal of ≥1 sample
+pPres*pH + (1-pPres)*0 # 0.108
+# (b) posterior pres given ≥1
+(pH*pPres) / 0.108 # = 1 (since no false positive)
+# (c) per-station P(>=1 in 3 visits | present) = 1 - (1-0.18)^3 = 0.448
+# Marginal over presence:
+0.6*(1 - (1-0.18)^3) # 0.269</code></pre>
+</div></details>
+
+</section>
+</main>
+</div>
+<footer>FW 536 · Statistical Modeling for Ecology and Conservation · Oregon State University</footer>
+</body>
+</html>

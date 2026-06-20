@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en" data-a11y="done">
+<head>
+<meta charset="UTF-8" />
+<title>Log & Logit Links — Biological Intuition | FW 536 Day 2</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../_Shared/css/accessible.css" />
+<script defer src="../_Shared/js/accessible.js"></script>
+<script>
+MathJax = {
+  tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
+  options: {
+    menuOptions: { settings: { assistiveMml: true, explorer: true } }
+  },
+  loader: { load: ['a11y/assistive-mml', 'a11y/explorer'] }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script"></script>
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<div class="a11y-bar" role="region" aria-label="Accessibility">Accessible version &middot; <a href="../accessibility.html">How to use this site with a screen reader</a> &middot; <a href="../index.html">Course home</a></div>
+
+<div class="shell">
+
+<aside class="sidebar">
+ <p class="brand"><a href="../index.html" title="Back to course home">FW 536 · Day 2</a></p>
+ <div class="subtitle">Log & logit intuition guide</div>
+ <nav aria-label="On this page and related documents">
+ <ul>
+ <li><a href="#intro">Why this guide exists</a></li>
+ <li><a href="#log-1">Log link · what it does</a></li>
+ <li><a href="#log-2">Reading a log-link slope</a></li>
+ <li><a href="#log-3">Eight biological examples</a></li>
+ <li><a href="#log-4">Log-link exercises</a></li>
+ <li><a href="#logit-1">Logit link · what it does</a></li>
+ <li><a href="#logit-2">Probability ↔ odds ↔ log-odds</a></li>
+ <li><a href="#logit-3">Eight biological examples</a></li>
+ <li><a href="#logit-4">Logit-link exercises</a></li>
+ <li><a href="#scales">Effect sizes on every scale</a></li>
+ <li><a href="#mistakes">Top 5 interpretation mistakes</a></li>
+ </ul>
+ <div class="section">Day 2 docs</div>
+ <ul>
+ <li><a href="lab.html">Main lab</a></li>
+ <li><a class="featured" href="plain_language_summary.html">Plain-language summary</a></li>
+ <li><a href="answer_key.html">Answer key</a></li>
+ </ul>
+ </nav>
+</aside>
+
+<main class="content" id="main-content" tabindex="-1">
+<header class="lab-header">
+ <div class="eyebrow">Day 2 · Companion guide</div>
+ <h1>The log and logit links — how to read coefficients as biology</h1>
+ <p class="lede">A dedicated workbook with worked biological examples for the two most-used link functions in ecology. The goal: when a colleague hands you a glm output, you can say what it means in one sentence.</p>
+</header>
+
+<section id="intro">
+<h2>Why this guide exists</h2>
+<p>Every wildlife graduate eventually fits a model like <code>glm(count ~ x, family=poisson)</code> or <code>glm(survival ~ x, family=binomial)</code> and stares at the coefficient table. The numbers look small. The standard errors look impressive. But what do they <em>mean</em>?</p>
+<p>This guide builds intuition through worked examples. Read it once, do the exercises, and then re-read it after the lab. By the end of Day 2 you should be able to look at a coefficient and immediately picture what the effect would look like if you plotted the fitted curve.</p>
+
+<div class="callout key"><p class="callout-label">Key idea</p>
+<strong>Two sentences to leave the day with:</strong>
+<ol>
+<li>"A log-link coefficient of $\beta$ means a one-unit change in $x$ multiplies the response by $e^\beta$."</li>
+<li>"A logit-link coefficient of $\beta$ means a one-unit change in $x$ multiplies the <em>odds</em> by $e^\beta$. The probability change depends on where you start."</li>
+</ol>
+</div>
+</section>
+
+<!-- ============== LOG LINK SECTION ============== -->
+<section id="log-1">
+<h2>The log link, conceptually</h2>
+
+<p>When you specify <code>family=poisson(link="log")</code> or <code>family=Gamma(link="log")</code>, you are telling R to fit the model</p>
+<div class="eq-block">$\log(\mu_i) = \beta_0 + \beta_1 x_i$</div>
+<p>or equivalently</p>
+<div class="eq-block">$\mu_i = e^{\beta_0 + \beta_1 x_i} = e^{\beta_0} \cdot e^{\beta_1 x_i}$</div>
+<p>That second form is the key. The mean is a <strong>product</strong> of two pieces: a baseline ($e^{\beta_0}$) and a multiplicative effect that depends on $x$. As $x$ increases by 1, the mean is multiplied by $e^{\beta_1}$.</p>
+
+<div class="callout bio"><p class="callout-label">Biological intuition</p>
+<strong>Why this is the right scale for ecology.</strong> Biological rates almost always scale multiplicatively. A 10% increase in some food source produces a percentage change in the population, not a fixed additive change. Doubling a resource doubles a per-capita rate, not adds 5 to it. The log link makes this multiplicative structure linear in the coefficients.
+</div>
+</section>
+
+<section id="log-2">
+<h2>How to read a log-link slope</h2>
+<p>Internalize this table:</p>
+
+<table>
+<tr><th scope="col">$\beta$ (log scale)</th><th scope="col">$e^\beta$</th><th scope="col">Plain English: per unit increase in $x$…</th></tr>
+<tr><td>−1.00</td><td>0.37</td><td>response falls to 37% (a 63% drop)</td></tr>
+<tr><td>−0.69</td><td>0.50</td><td>response is halved</td></tr>
+<tr><td>−0.40</td><td>0.67</td><td>response falls by ~33%</td></tr>
+<tr><td>−0.10</td><td>0.90</td><td>response falls by ~10%</td></tr>
+<tr><td>−0.05</td><td>0.95</td><td>response falls by ~5%</td></tr>
+<tr><td>0</td><td>1.00</td><td>no effect</td></tr>
+<tr><td>+0.05</td><td>1.05</td><td>response rises by ~5%</td></tr>
+<tr><td>+0.10</td><td>1.105</td><td>response rises by ~10%</td></tr>
+<tr><td>+0.20</td><td>1.22</td><td>response rises by ~22%</td></tr>
+<tr><td>+0.40</td><td>1.49</td><td>response rises by ~50%</td></tr>
+<tr><td>+0.69</td><td>2.00</td><td>response doubles</td></tr>
+<tr><td>+1.00</td><td>2.72</td><td>response increases by a factor of 2.72</td></tr>
+<tr><td>+2.00</td><td>7.39</td><td>response increases ~7.4×</td></tr>
+</table>
+
+<div class="callout key"><p class="callout-label">Key idea</p>
+<strong>Rule of thumb for small $|\beta|$.</strong> When $\beta$ is small (roughly $|\beta| &lt; 0.20$), $e^\beta \approx 1 + \beta$. So you can directly read $\beta$ as "approximately a $100 \cdot \beta$ percent change per unit." For $\beta = 0.07$, that's about a 7% increase.
+</div>
+
+<h3>Multi-unit changes</h3>
+<p>The multiplicative effect of moving $k$ units of $x$ is $e^{k\beta}$. So if $\beta = 0.05$ per km and you ask about a 10 km increase, the multiplicative effect is $e^{10 \cdot 0.05} = e^{0.5} = 1.65$, a 65% increase.</p>
+
+<h3>"Half-life" framing</h3>
+<p>If your slope is negative, the value of $x$ at which the response is halved (relative to $x = 0$) is</p>
+<div class="eq-block">$x_{1/2} = \dfrac{-\ln 2}{\beta} = \dfrac{-0.693}{\beta}$</div>
+<p>For $\beta = -0.05$ per km, $x_{1/2} = 13.9$ km. That's an intuitive number to report in a paper.</p>
+</section>
+
+<section id="log-3">
+<h2>Eight worked biological examples (log link)</h2>
+
+<div class="exercise">
+<span class="ex-tag">L1</span>
+<h3>Density of salmonberry along an elevation gradient</h3>
+<p>Negative binomial regression of stem count per plot on elevation (m). $\hat\beta = -0.0030$ per meter.</p>
+<details class="answer" open><summary>Read it</summary><div class="answer-body">
+<p>Each meter reduces expected count by 0.3% ($e^{-0.003} = 0.997$). Over a 1000 m climb, the expected count falls to $e^{-3} = 0.05$ — 5% of the lowland count. The half-elevation is $0.693/0.003 = 231$ m.</p>
+</div></details>
+</div>
+
+<div class="exercise">
+<span class="ex-tag">L2</span>
+<h3>Whale calls per hour vs. ship traffic</h3>
+<p>Poisson regression of calls/hour on ship-passes-per-day. $\hat\beta = +0.04$ per ship. Effect of a busy 50-ship day vs. a quiet 0-ship day?</p>
+<details class="answer" open><summary>Read it</summary><div class="answer-body">
+<p>$e^{0.04 \cdot 50} = e^{2} = 7.39$. Wait — that's a 7.4× <em>increase</em> with ships, which is biologically odd if you expected ships to be disturbing. The sign is positive (more ships, more calls) — probably an indicator that whale density and ship traffic both track an underlying productivity gradient. The math is fine; the model is missing a confounder.</p>
+</div></details>
+</div>
+
+<div class="exercise">
+<span class="ex-tag">L3</span>
+<h3>Caterpillar abundance vs. fertilizer treatment</h3>
+<p>Treatment is binary (control vs. fertilizer). Coefficient for fertilizer = $+0.85$.</p>
+<details class="answer" open><summary>Read it</summary><div class="answer-body">
+<p>$e^{0.85} = 2.34$. Fertilized plots have 2.3× the expected caterpillar count of control plots. If you'd like to report it as "percent increase," that's a 134% increase — but in ecology, "fold change" (×2.3) is cleaner.</p>
+</div></details>
+</div>
+
+<div class="exercise">
+<span class="ex-tag">L4</span>
+<h3>Bobcat detections vs. canopy cover and road density</h3>
+<p>Poisson model with two predictors. Canopy slope $+0.025$ per percent (so 0–100); road density $-0.40$ per (roads/km²).</p>
+<details class="answer" open><summary>Read it</summary><div class="answer-body">
+<p>A 50-percentage-point canopy increase multiplies expected detections by $e^{0.025 \cdot 50} = e^{1.25} = 3.49$. Adding 1 road/km² multiplies by $e^{-0.40} = 0.67$ (a 33% drop). At a typical urban-fringe site with 3 roads/km², detections are cut to $0.67^3 = 0.30$ of their roadless baseline.</p>
+</div></details>
+</div>
+
+<div class="exercise">
+<span class="ex-tag">L5</span>
+<h3>Mortality risk vs. age</h3>
+<p>Hazard model (a log-link Poisson approximation) for annual mortality. $\hat\beta = +0.08$ per year of age.</p>
+<details class="answer" open><summary>Read it</summary><div class="answer-body">
+<p>Annual mortality rate rises 8% per year. The mortality doubling time is $0.693/0.08 = 8.7$ years. This is the same as a Gompertz-style demographic model, written GLM-style.</p>
+</div></details>
+</div>
+
+<div class="exercise">
+<span class="ex-tag">L6</span>
+<h3>Time-to-detection on cameras (lognormal regression)</h3>
+<p>$\log(\text{time}) = \beta_0 + \beta_1 \cdot \text{prey availability}$. $\hat\beta_1 = -0.30$ per standardized prey index.</p>
+<details class="answer" open><summary>Read it</summary><div class="answer-body">
+<p>Each SD of prey availability cuts expected time-to-detection by $1 - e^{-0.30} = 26%$. Two SDs of prey doubles the rate of detection (cuts time in half).</p>
+</div></details>
+</div>
+
+<div class="exercise">
+<span class="ex-tag">L7</span>
+<h3>Multiplicative interaction with a categorical variable</h3>
+<p>Model: <code>glm(catch ~ temp * gear, family=poisson)</code>. Main temp = $-0.05$; gear (trawl vs gillnet ref) = $+0.20$; temp:gearTrawl = $+0.08$.</p>
+<details class="answer" open><summary>Read it</summary><div class="answer-body">
+<p>For gillnets: temp slope is $-0.05$ → 5% drop per degree.</p>
+<p>For trawls: temp slope is $-0.05 + 0.08 = +0.03$ → 3% rise per degree.</p>
+<p>Baseline shift for trawls: $e^{0.20} = 1.22$, so at temperature 0 the trawl catches 22% more.</p>
+<p>This is two completely different stories on the same axis. The interaction term is doing real biological work.</p>
+</div></details>
+</div>
+
+<div class="exercise">
+<span class="ex-tag">L8</span>
+<h3>Offset (effort correction) in a count model</h3>
+<p>Model: <code>glm(detections ~ habitat + offset(log(hours)), family=poisson)</code>. The offset says "the response is rate per hour, not total count." How do you interpret the habitat coefficient?</p>
+<details class="answer" open><summary>Read it</summary><div class="answer-body">
+<p>Including an offset of $\log(\text{hours})$ is equivalent to modeling the per-hour rate. The habitat coefficient then represents a <em>per-effort multiplicative</em> effect — not confounded with sampling intensity. If habitat coefficient is $+0.5$, the per-hour detection rate is $e^{0.5} = 1.65 \times$ as large in that habitat. <strong>Offsets are the single most under-used trick in applied ecology.</strong> Use them whenever effort varies across observations.</p>
+</div></details>
+</div>
+</section>
+
+<section id="log-4">
+<h2>Try it yourself — log-link exercises</h2>
+
+<div class="exercise">
+<span class="ex-tag">Try 1</span><span class="difficulty easy"></span>
+<h3>Translate</h3>
+<p>You fit a Poisson regression of mosquito counts on temperature. The temperature coefficient is $+0.12$ per °C. In one sentence, what does a 5° warming do to expected mosquito counts?</p>
+<details class="answer"><summary>Answer</summary><div class="answer-body">
+<p>$e^{0.12 \cdot 5} = e^{0.6} = 1.82$. Five degrees of warming multiplies expected mosquito counts by 1.82 (an 82% increase).</p>
+</div></details>
+</div>
+
+<div class="exercise">
+<span class="ex-tag">Try 2</span><span class="difficulty medium"></span>
+<h3>Back-engineer a coefficient</h3>
+<p>You observe that doubling stream productivity (kJ/m²/yr) is associated with a 50% increase in juvenile salmon density. If productivity enters the model as $\log_2(\text{productivity})$, what log-link slope should you expect?</p>
+<details class="answer"><summary>Answer</summary><div class="answer-body">
+<p>$e^\beta = 1.50 \Rightarrow \beta = \ln(1.5) = 0.405$. So you should expect a coefficient near 0.41 on the $\log_2$(productivity) predictor.</p>
+</div></details>
+</div>
+
+<div class="exercise">
+<span class="ex-tag">Try 3</span><span class="difficulty hard"></span>
+<h3>Confidence interval back-transformation</h3>
+<p>A Poisson coefficient is $\hat\beta = 0.40$ with 95% CI $(0.18, 0.62)$ on the log scale. Translate the point estimate and CI to the multiplicative scale.</p>
+<details class="answer"><summary>Answer</summary><div class="answer-body">
+<p>$e^{0.40} = 1.49$, with CI $(e^{0.18}, e^{0.62}) = (1.20, 1.86)$. So a one-unit change in $x$ multiplies expected counts by 1.49, with a CI of 1.20× to 1.86×. <strong>Never average the endpoints in log space and then exponentiate the average</strong> — exponentiate each endpoint and report the asymmetric CI.</p>
+</div></details>
+</div>
+</section>
+
+<!-- ============== LOGIT LINK SECTION ============== -->
+<section id="logit-1">
+<h2>The logit link, conceptually</h2>
+
+<p>When you specify <code>family=binomial(link="logit")</code> you are fitting</p>
+<div class="eq-block">$\log\!\left(\dfrac{p_i}{1 - p_i}\right) = \beta_0 + \beta_1 x_i$</div>
+<p>The thing inside the log is the <strong>odds</strong> — the ratio of the probability of success to the probability of failure. So</p>
+<div class="eq-block">$\text{odds}_i = e^{\beta_0 + \beta_1 x_i} \quad\text{and}\quad p_i = \dfrac{e^{\beta_0 + \beta_1 x_i}}{1 + e^{\beta_0 + \beta_1 x_i}}$</div>
+
+<p>As $x$ increases by 1, the <em>odds</em> are multiplied by $e^{\beta_1}$. This is the same multiplicative-effect logic as the log link, just applied to odds instead of means.</p>
+
+<div class="callout bio"><p class="callout-label">Biological intuition</p>
+<strong>The hard part for biologists.</strong> "Odds" feels foreign. Biologists want to talk about probabilities. The conversion isn't linear, and the <em>same</em> coefficient corresponds to a different probability change depending on the baseline probability. This guide is going to teach you to navigate that.
+</div>
+</section>
+
+<section id="logit-2">
+<h2>Probability ↔ Odds ↔ Log-odds — translation table</h2>
+<table>
+<tr><th scope="col">Probability $p$</th><th scope="col">Odds $p/(1-p)$</th><th scope="col">Log-odds $\eta = \mathrm{logit}(p)$</th></tr>
+<tr><td>0.01</td><td>0.0101</td><td>−4.60</td></tr>
+<tr><td>0.05</td><td>0.0526</td><td>−2.94</td></tr>
+<tr><td>0.10</td><td>0.111</td><td>−2.20</td></tr>
+<tr><td>0.25</td><td>0.333</td><td>−1.10</td></tr>
+<tr><td>0.50</td><td>1.000</td><td>0</td></tr>
+<tr><td>0.75</td><td>3.000</td><td>+1.10</td></tr>
+<tr><td>0.90</td><td>9.000</td><td>+2.20</td></tr>
+<tr><td>0.95</td><td>19.000</td><td>+2.94</td></tr>
+<tr><td>0.99</td><td>99.000</td><td>+4.60</td></tr>
+</table>
+
+<p>R helpers:</p>
+<pre><code>plogis(eta) <span class="cm"># log-odds → probability</span>
+qlogis(p) <span class="cm"># probability → log-odds</span>
+exp(beta) <span class="cm"># coefficient → odds ratio</span></code></pre>
+
+<div class="callout key"><p class="callout-label">Key idea</p>
+<strong>The "divide by 4" trick.</strong> For probabilities near 0.5, a logit-link coefficient $\beta$ corresponds to roughly a $\beta/4$ change in probability per unit $x$. So a coefficient of $+1$ moves $p$ by about 25 percentage points <em>at the inflection</em>. The trick fails near 0 or 1 (where the logistic curve flattens).
+</div>
+</section>
+
+<section id="logit-3">
+<h2>Eight worked biological examples (logit link)</h2>
+
+<div class="exercise">
+<span class="ex-tag">B1</span>
+<h3>Marten site occupancy vs. canopy cover</h3>
+<p><code>glm(occupied ~ canopy, family=binomial)</code>. Intercept $-2$, canopy slope $+0.04$ per percent (canopy on 0–100 scale).</p>
+<details class="answer" open><summary>Read it</summary><div class="answer-body">
+<p>At canopy = 0: log-odds = −2 → odds = 0.135 → $p = 0.12$. At canopy = 50: log-odds = 0 → $p = 0.5$. At canopy = 100: log-odds = +2 → $p = 0.88$.</p>
+<p>Each percentage-point canopy multiplies odds by $e^{0.04} = 1.041$ (a 4.1% odds increase). A 25-point jump multiplies odds by $e^{1} = 2.72$, almost tripling odds.</p>
+</div></details>
+</div>
+
+<div class="exercise">
+<span class="ex-tag">B2</span>
+<h3>Survival of tagged smolts vs. river temperature</h3>
+<p>$\hat\beta_{\text{temp}} = -0.30$ per °C. Translate.</p>
+<details class="answer" open><summary>Read it</summary><div class="answer-body">
+<p>$e^{-0.30} = 0.74$. Each degree of warming reduces the odds of survival by 26%. Compounded over a 5° warming, odds are multiplied by $0.74^5 = 0.22$ — a 78% drop in odds.</p>
+<p>If the baseline $p$ was 0.80 (odds 4), the new odds is $4 \cdot 0.22 = 0.88$, $p = 0.47$. The probability drops 33 percentage points.</p>
+</div></details>
+</div>
+
+<div class="exercise">
+<span class="ex-tag">B3</span>
+<h3>Nest success vs. female age</h3>
+<p>$\hat\beta_{\text{age}} = +0.15$ per year. Probability at age 5 is 0.5. Estimate $p$ at age 10.</p>
+<details class="answer" open><summary>Read it</summary><div class="answer-body">
+<p>At age 5, log-odds = 0. At age 10, log-odds = $0 + 5 \cdot 0.15 = 0.75$. Odds = $e^{0.75} = 2.12$. $p = 2.12/3.12 = 0.68$.</p>
+<p>So a 5-year increase moves $p$ from 0.5 to 0.68 — an 18 percentage-point increase. (The /4 rule: $0.15 \cdot 5 / 4 \approx 0.19$, close.)</p>
+</div></details>
+</div>
+
+<div class="exercise">
+<span class="ex-tag">B4</span>
+<h3>Trap response: dichotomous predictor</h3>
+<p>A factor predictor "previously trapped" has coefficient $-1.5$.</p>
+<details class="answer" open><summary>Read it</summary><div class="answer-body">
+<p>$e^{-1.5} = 0.22$. Animals previously trapped have 78% lower odds of being re-captured this period — a strong trap-shy effect. If naive animals are caught at $p = 0.4$ (odds 0.67), trap-experienced are at odds $0.67 \cdot 0.22 = 0.15$, $p = 0.13$. This is exactly the kind of behaviour you'd model with a "trap response" parameter in mark-recapture.</p>
+</div></details>
+</div>
+
+<div class="exercise">
+<span class="ex-tag">B5</span>
+<h3>Threshold thinking on the logit scale</h3>
+<p>You fit a logistic regression of presence on a continuous predictor and find $\hat\beta_0 = -3$, $\hat\beta_1 = +0.06$. At what value of $x$ does the predicted probability cross 0.5?</p>
+<details class="answer" open><summary>Read it</summary><div class="answer-body">
+<p>$p = 0.5$ when log-odds $= 0$. So $-3 + 0.06 x = 0 \Rightarrow x = 50$. This is the <strong>inflection point</strong> of the fitted curve — biologists often want this as a "threshold" for habitat suitability.</p>
+</div></details>
+</div>
+
+<div class="exercise">
+<span class="ex-tag">B6</span>
+<h3>Marginal effect — the most useful number for talking to managers</h3>
+<p>For the marten model from B1 with canopy slope $+0.04$, what is the <em>marginal effect</em> of canopy on probability at canopy = 50 (where $p = 0.5$)?</p>
+<details class="answer" open><summary>Read it</summary><div class="answer-body">
+<p>Marginal effect at $p$: $\dfrac{\partial p}{\partial x} = \beta \cdot p(1-p) = 0.04 \cdot 0.5 \cdot 0.5 = 0.01$ per percentage point of canopy. So at the inflection, each percentage point of canopy raises occupancy probability by 1 percentage point. At canopy = 100 (where $p = 0.88$): marginal effect is $0.04 \cdot 0.88 \cdot 0.12 = 0.0042$ per percentage point — much smaller because the curve is flattening.</p>
+</div></details>
+</div>
+
+<div class="exercise">
+<span class="ex-tag">B7</span>
+<h3>Sex × habitat interaction (Titanic-like)</h3>
+<p>Model: <code>glm(survived ~ sex * class, family=binomial)</code>. Main sex (Male) = $-2.5$; main class3 = $-1.2$; sex:class3 = $+0.6$.</p>
+<details class="answer" open><summary>Read it</summary><div class="answer-body">
+<p>Female 1st-class log-odds = intercept. Male 1st-class log-odds = intercept $- 2.5$.</p>
+<p>Female 3rd-class log-odds = intercept $- 1.2$. Male 3rd-class log-odds = intercept $- 2.5 - 1.2 + 0.6 = $ intercept $- 3.1$.</p>
+<p>So being male is a $-2.5$ log-odds effect in 1st class but only $-2.5 + 0.6 = -1.9$ in 3rd. <em>The sex disadvantage is smaller in 3rd class</em> — likely because everyone's survival is so low in 3rd class that there's less room for sex differentiation.</p>
+</div></details>
+</div>
+
+<div class="exercise">
+<span class="ex-tag">B8</span>
+<h3>Sampling fallacy — base rates again</h3>
+<p>You fit <code>glm(infected ~ habitat, family=binomial)</code> on a sample where infected animals were oversampled (case-control design). Which coefficients can you still interpret?</p>
+<details class="answer" open><summary>Read it</summary><div class="answer-body">
+<p>Slopes ($\hat\beta_1, \hat\beta_2, \dots$) are correctly estimated under case-control sampling. The intercept is biased by the sampling design and should not be interpreted as the population-level baseline probability. This is a feature of the logistic likelihood (a famous result from Prentice & Pyke, 1979). It's why epidemiologists love logistic regression for case-control studies.</p>
+</div></details>
+</div>
+</section>
+
+<section id="logit-4">
+<h2>Try it yourself — logit-link exercises</h2>
+
+<div class="exercise">
+<span class="ex-tag">Try L1</span><span class="difficulty easy"></span>
+<h3>Convert</h3>
+<p>If a logistic coefficient is $+0.69$, what does a 1-unit change in $x$ do to the odds?</p>
+<details class="answer"><summary>Answer</summary><div class="answer-body"><p>$e^{0.69} = 2.00$. The odds double.</p></div></details>
+</div>
+
+<div class="exercise">
+<span class="ex-tag">Try L2</span><span class="difficulty medium"></span>
+<h3>Probability from log-odds</h3>
+<p>Compute $p$ when the log-odds is $-1$. When it's $+2$. When it's $+5$. Use <code>plogis()</code> if needed.</p>
+<details class="answer"><summary>Answer</summary><div class="answer-body">
+<p><code>plogis(c(-1, 2, 5))</code> = 0.27, 0.88, 0.993.</p>
+</div></details>
+</div>
+
+<div class="exercise">
+<span class="ex-tag">Try L3</span><span class="difficulty hard"></span>
+<h3>Find the threshold</h3>
+<p>A logistic model has intercept $-0.5$ and slope $0.03$ on a covariate. At what covariate value does $p = 0.75$?</p>
+<details class="answer"><summary>Answer</summary><div class="answer-body">
+<p>$p = 0.75 \Rightarrow \mathrm{logit}(p) = \log(3) = 1.099$. Solve $-0.5 + 0.03 x = 1.099 \Rightarrow x = 53.3$.</p>
+</div></details>
+</div>
+
+<div class="exercise">
+<span class="ex-tag">Try L4</span><span class="difficulty medium"></span>
+<h3>Marginal probability change</h3>
+<p>At $p = 0.20$, what is the marginal effect on probability of a 1-unit change in $x$, given a logit coefficient $\beta = +0.5$?</p>
+<details class="answer"><summary>Answer</summary><div class="answer-body">
+<p>$\beta \cdot p \cdot (1-p) = 0.5 \cdot 0.2 \cdot 0.8 = 0.08$. About an 8 percentage-point increase per unit $x$ at this baseline.</p>
+</div></details>
+</div>
+</section>
+
+<!-- ============== SCALES ============== -->
+<section id="scales">
+<h2>Effect sizes on every scale, side by side</h2>
+
+<table>
+<tr><th scope="col">Link</th><th scope="col">What's linear</th><th scope="col">$\beta$ is…</th><th scope="col">Backtransform</th><th scope="col">Plain English of a small $\beta$</th></tr>
+<tr><td>identity</td><td>response</td><td>additive change in mean</td><td>none</td><td>"+1 unit x adds $\beta$ to the response"</td></tr>
+<tr><td>log</td><td>log(response)</td><td>multiplicative change in mean</td><td>$e^\beta$</td><td>"+1 unit x changes response by ~$100 \beta\%$"</td></tr>
+<tr><td>logit</td><td>log-odds</td><td>multiplicative change in odds</td><td>$e^\beta$ for OR; $\beta \cdot p(1-p)$ for marginal $p$</td><td>"+1 unit x changes <em>odds</em> by ~$100 \beta\%$; probability change depends on baseline"</td></tr>
+<tr><td>probit</td><td>probit(p)</td><td>SDs of a latent Normal</td><td>$\Phi$</td><td>"+1 unit x changes the latent score by $\beta$ SDs"</td></tr>
+<tr><td>cloglog</td><td>complementary log-log</td><td>multiplicative hazard</td><td>$e^\beta$</td><td>survival/hazard interpretation</td></tr>
+</table>
+</section>
+
+<section id="mistakes">
+<h2>Top 5 interpretation mistakes (and how to avoid them)</h2>
+
+<div class="callout warn"><p class="callout-label">Watch out</p>
+<strong>1. Reporting raw coefficients to non-statisticians.</strong> "The treatment effect was 0.85" tells nobody anything. Always exponentiate (log/logit) and back-transform.
+</div>
+
+<div class="callout warn"><p class="callout-label">Watch out</p>
+<strong>2. Averaging CI endpoints in transformed space.</strong> Don't compute $(\beta_{\text{lo}} + \beta_{\text{hi}})/2$, then exponentiate. Exponentiate <em>each endpoint</em> and report the asymmetric CI on the new scale. Logged data have logged CIs; back-transforming gives correct multiplicative CIs.
+</div>
+
+<div class="callout warn"><p class="callout-label">Watch out</p>
+<strong>3. Confusing odds ratio with risk ratio.</strong> For small $p$, OR $\approx$ RR. For $p$ near 0.5, they diverge dramatically. If your baseline probability is 0.4 and OR = 2, the risk ratio is only $\approx 1.43$. Be careful when explaining "twice as likely."
+</div>
+
+<div class="callout warn"><p class="callout-label">Watch out</p>
+<strong>4. Ignoring the baseline category in a factor predictor.</strong> A coefficient like "sexMale: $-0.4$" makes sense only relative to whatever the reference is (here, sexFemale). Always state the reference in plain text.
+</div>
+
+<div class="callout warn"><p class="callout-label">Watch out</p>
+<strong>5. Forgetting the scale of $x$.</strong> A "small" coefficient on an unscaled predictor (like temperature in Kelvin) might be enormous biologically; a "large" coefficient on a predictor measured in nanometers might be tiny. Always think about a meaningful unit (1 SD? 1 standard increment? 1 degree?) before interpreting magnitude.
+</div>
+</section>
+
+<div style="margin-top:50px; display:flex; gap:12px; flex-wrap:wrap;">
+<button id="reveal-all" style="background:var(--accent); color:white; border:none; padding:10px 20px; border-radius:4px; cursor:pointer;">Reveal all answers</button>
+<a href="lab.html" style="background:var(--osu-orange); color:white; padding:10px 20px; border-radius:4px; text-decoration:none;">← Back to main lab</a>
+</div>
+
+</main>
+</div>
+
+<footer>FW 536 · Statistical Modeling for Ecology and Conservation · Oregon State University</footer>
+</body>
+</html>

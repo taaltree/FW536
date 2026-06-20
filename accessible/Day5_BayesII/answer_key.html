@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en" data-a11y="done">
+<head>
+<meta charset="UTF-8" />
+<title>Day 5 · Answer key | FW 536</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../_Shared/css/accessible.css" />
+<script defer src="../_Shared/js/accessible.js"></script>
+<script>
+MathJax = {
+  tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
+  options: {
+    menuOptions: { settings: { assistiveMml: true, explorer: true } }
+  },
+  loader: { load: ['a11y/assistive-mml', 'a11y/explorer'] }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script"></script>
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<div class="a11y-bar" role="region" aria-label="Accessibility">Accessible version &middot; <a href="../accessibility.html">How to use this site with a screen reader</a> &middot; <a href="../index.html">Course home</a></div>
+
+<div class="shell">
+
+<aside class="sidebar">
+ <p class="brand"><a href="../index.html" title="Back to course home">FW 536 · Day 5</a></p>
+ <div class="subtitle">Answer key (instructor)</div>
+ <nav aria-label="On this page and related documents">
+ <ul>
+ <li><a href="#a1">Exercise 1 — vague prior</a></li>
+ <li><a href="#a2">Exercise 2 — ant fits</a></li>
+ <li><a href="#a3">Exercise 3 — lizards diagnostics</a></li>
+ <li><a href="#a4">Exercise 4 — all 5 N2O models</a></li>
+ <li><a href="#a5">Exercise 5 — shrinkage by hand</a></li>
+ <li><a href="#a6">Exercise 6 — Beverton-Holt fit</a></li>
+ <li><a href="#a7">Exercise 7 — dynamic occupancy</a></li>
+ <li><a href="#a8">Exercise 8 — N-mixture build-up</a></li>
+ <li><a href="#a9">Exercise 9 — Poisson-lognormal N-mix</a></li>
+ <li><a href="#a10">Exercise 10 — pick the tool</a></li>
+ </ul>
+ <div class="section">Day 5 docs</div>
+ <ul>
+ <li><a href="lab.html">Main lab</a></li>
+ <li><a class="featured" href="plain_language_summary.html">Plain-language summary</a></li>
+ <li><a href="problem_set_v2.html">Problem set v2</a></li>
+ <li><a href="problem_set_v3.html">Problem set v3</a></li>
+ </ul>
+ </nav>
+</aside>
+
+<main class="content" id="main-content" tabindex="-1">
+<header class="lab-header">
+ <div class="eyebrow">Day 5 · Answer Key (instructor)</div>
+ <h1>Worked solutions — Hierarchical &amp; latent-state Bayes</h1>
+ <p class="lede">Full worked code, expected output, and biological interpretation for every Day 5 exercise. Instructor notes flag the most common student mistakes.</p>
+</header>
+
+<section id="a1">
+<h2>Exercise 1 — "Vague" priors on a log link</h2>
+<p>The point: a $\mathcal{N}(0, \sigma=100)$ prior on a regression coefficient is wildly informative once you exponentiate it.</p>
+<pre><code>set.seed(<span class="nu">1</span>)
+beta &lt;- <span class="fn">rnorm</span>(<span class="nu">1e5</span>, <span class="nu">0</span>, <span class="nu">100</span>)
+eff_raw &lt;- <span class="fn">exp</span>(beta * <span class="nu">3</span>) <span class="cm"># 3-degree latitudinal change</span>
+<span class="fn">mean</span>(<span class="fn">abs</span>(<span class="fn">log10</span>(eff_raw)) &gt; <span class="nu">6</span>) <span class="cm"># ~ 0.98</span>
+eff_sc &lt;- <span class="fn">exp</span>(beta * <span class="nu">1</span>) <span class="cm"># 1 SD on scaled x</span>
+<span class="fn">mean</span>(<span class="fn">abs</span>(<span class="fn">log10</span>(eff_sc)) &gt; <span class="nu">6</span>) <span class="cm"># ~ 0.94</span></code></pre>
+<p><strong>Interpretation.</strong> ~98% of the prior on the raw-scale model puts the implied effect outside a million-fold range &mdash; far beyond anything physically possible. Scaling reduces this slightly but not enough; you also need a tighter prior on $\beta$ itself. The fix that works in practice is <em>both</em>: scale predictors AND use $\mathcal{N}(0, \sigma \approx 2)$ priors.</p>
+<p><em>Common mistake:</em> Students who use a tighter prior but keep raw predictors often still see chains stall, because $\beta \cdot x$ can still get large when $|x|$ is large. The point is the <em>product</em>, not either piece alone.</p>
+</section>
+
+<section id="a2">
+<h2>Exercise 2 — Fit the ant model two ways</h2>
+<pre><code><span class="kw">library</span>(nimble); <span class="kw">library</span>(MCMCvis); <span class="kw">library</span>(coda)
+ants &lt;- <span class="fn">read.csv</span>(<span class="st">"ants.csv"</span>)
+
+antCode &lt;- <span class="fn">nimbleCode</span>({
+ <span class="kw">for</span> (i <span class="kw">in</span> <span class="nu">1</span>:n) {
+ ants[i,<span class="nu">1</span>] ~ <span class="fn">dpois</span>(lam[i])
+ <span class="fn">log</span>(lam[i]) &lt;- b0 + b1*ants[i,<span class="nu">2</span>] + b2*ants[i,<span class="nu">3</span>] + b3*ants[i,<span class="nu">4</span>]
+ }
+ b0 ~ <span class="fn">dnorm</span>(<span class="nu">0</span>, tau); b1 ~ <span class="fn">dnorm</span>(<span class="nu">0</span>, tau)
+ b2 ~ <span class="fn">dnorm</span>(<span class="nu">0</span>, tau); b3 ~ <span class="fn">dnorm</span>(<span class="nu">0</span>, tau)
+})
+
+<span class="cm">## (a) Raw predictors with very vague prior -- chains crawl</span>
+constsA &lt;- <span class="kw">list</span>(ants=<span class="fn">as.matrix</span>(ants), n=<span class="fn">nrow</span>(ants), tau=<span class="nu">1</span>/<span class="nu">10000</span>)
+out_a &lt;- <span class="fn">nimbleMCMC</span>(antCode, constants=constsA,
+ monitors=<span class="fn">c</span>(<span class="st">"b0"</span>,<span class="st">"b1"</span>,<span class="st">"b2"</span>,<span class="st">"b3"</span>),
+ nchains=<span class="nu">3</span>, niter=<span class="nu">10000</span>, nburnin=<span class="nu">500</span>,
+ samplesAsCodaMCMC=<span class="kw">TRUE</span>)
+<span class="fn">gelman.diag</span>(out_a) <span class="cm"># often R-hat &gt; 1.2</span>
+
+<span class="cm">## (b) Scaled predictors, same prior -- chains converge instantly</span>
+ants$forest &lt;- <span class="fn">as.numeric</span>(<span class="fn">scale</span>(ants$forest))
+ants$latitude &lt;- <span class="fn">as.numeric</span>(<span class="fn">scale</span>(ants$latitude))
+ants$elevation &lt;- <span class="fn">as.numeric</span>(<span class="fn">scale</span>(ants$elevation))
+
+constsB &lt;- <span class="kw">list</span>(ants=<span class="fn">as.matrix</span>(ants), n=<span class="fn">nrow</span>(ants), tau=<span class="nu">1</span>/<span class="nu">10000</span>)
+out_b &lt;- <span class="fn">nimbleMCMC</span>(antCode, constants=constsB,
+ monitors=<span class="fn">c</span>(<span class="st">"b0"</span>,<span class="st">"b1"</span>,<span class="st">"b2"</span>,<span class="st">"b3"</span>),
+ nchains=<span class="nu">3</span>, niter=<span class="nu">10000</span>, nburnin=<span class="nu">500</span>,
+ samplesAsCodaMCMC=<span class="kw">TRUE</span>)
+<span class="fn">MCMCsummary</span>(out_b)
+<span class="fn">glm</span>(richness ~ ., data=ants, family=poisson)$coef <span class="cm"># compare</span>
+
+<span class="cm">## (c) Tighter prior</span>
+constsC &lt;- <span class="kw">list</span>(ants=<span class="fn">as.matrix</span>(ants), n=<span class="fn">nrow</span>(ants), tau=<span class="nu">1</span>/<span class="nu">4</span>)
+out_c &lt;- <span class="fn">nimbleMCMC</span>(antCode, constants=constsC,
+ monitors=<span class="fn">c</span>(<span class="st">"b0"</span>,<span class="st">"b1"</span>,<span class="st">"b2"</span>,<span class="st">"b3"</span>),
+ nchains=<span class="nu">3</span>, niter=<span class="nu">10000</span>, nburnin=<span class="nu">500</span>,
+ samplesAsCodaMCMC=<span class="kw">TRUE</span>)
+<span class="fn">MCMCsummary</span>(out_c) <span class="cm"># nearly identical to (b)</span></code></pre>
+<p><strong>Expected posterior medians</strong> (scaled): $b_1$ (forest) &asymp; 0.6 [0.4, 0.8], $b_2$ (latitude) &asymp; -0.3 [-0.5, -0.1], $b_3$ (elevation) &asymp; -0.4 [-0.6, -0.2]. These match <code>glm()</code> output to 2 decimals.</p>
+<p><em>Instructor note.</em> The "vague prior on raw scale" case often produces NaN log densities and a stalled chain. Show this live; it makes the point unforgettable.</p>
+</section>
+
+<section id="a3">
+<h2>Exercise 3 — Lizards: convergence, prediction, and prior sensitivity</h2>
+<pre><code><span class="kw">library</span>(nimble); <span class="kw">library</span>(MCMCvis); <span class="kw">library</span>(coda)
+liz &lt;- <span class="fn">read.csv</span>(<span class="st">"IslandsLizards.csv"</span>)
+x.scaled &lt;- <span class="fn">as.numeric</span>(<span class="fn">scale</span>(liz$perimeterAreaRatio))
+
+lizCode &lt;- <span class="fn">nimbleCode</span>({
+ a ~ <span class="fn">dnorm</span>(<span class="nu">0</span>, <span class="nu">1</span>/<span class="nu">2.71</span>); b ~ <span class="fn">dnorm</span>(<span class="nu">0</span>, <span class="nu">1</span>/<span class="nu">2.71</span>)
+ <span class="kw">for</span> (i <span class="kw">in</span> <span class="nu">1</span>:n) {
+ <span class="fn">logit</span>(p[i]) &lt;- a + b*x[i]
+ y[i] ~ <span class="fn">dbern</span>(p[i])
+ }
+ x10 &lt;- (<span class="nu">10</span> - mx)/sx; x20 &lt;- (<span class="nu">20</span> - mx)/sx
+ y10 &lt;- <span class="fn">ilogit</span>(a + b*x10)
+ y20 &lt;- <span class="fn">ilogit</span>(a + b*x20)
+ diff &lt;- y20 - y10
+})
+consts &lt;- <span class="kw">list</span>(n=<span class="fn">nrow</span>(liz), x=x.scaled,
+ mx=<span class="fn">mean</span>(liz$perimeterAreaRatio),
+ sx=<span class="fn">sd</span>(liz$perimeterAreaRatio))
+samples &lt;- <span class="fn">nimbleMCMC</span>(lizCode, constants=consts,
+ data=<span class="kw">list</span>(y=<span class="fn">as.integer</span>(liz$presence)),
+ monitors=<span class="fn">c</span>(<span class="st">"a"</span>,<span class="st">"b"</span>,<span class="st">"y10"</span>,<span class="st">"y20"</span>,<span class="st">"diff"</span>),
+ nchains=<span class="nu">3</span>, niter=<span class="nu">6000</span>, nburnin=<span class="nu">1000</span>,
+ samplesAsCodaMCMC=<span class="kw">TRUE</span>)
+<span class="fn">gelman.diag</span>(samples[, <span class="fn">c</span>(<span class="st">"a"</span>,<span class="st">"b"</span>)])
+<span class="fn">heidel.diag</span>(samples[, <span class="fn">c</span>(<span class="st">"a"</span>,<span class="st">"b"</span>)])
+b.post &lt;- <span class="fn">as.matrix</span>(samples)[, <span class="st">"b"</span>]
+<span class="fn">mean</span>(b.post &lt; <span class="nu">0</span>) <span class="cm"># ~ 0.99+</span>
+<span class="fn">MCMCsummary</span>(samples, params=<span class="fn">c</span>(<span class="st">"y10"</span>,<span class="st">"y20"</span>,<span class="st">"diff"</span>))</code></pre>
+<p><strong>Expected.</strong> R-hat &asymp; 1.00 on all parameters. $P(b &lt; 0) &gt; 0.99$, confirming higher PA reduces occupancy. <code>diff</code> posterior median &lt; 0 with 95% CI also negative.</p>
+<p><strong>Biology.</strong> Higher perimeter:area ratio means more edge habitat per unit interior, which on small or irregular islands corresponds to more predation pressure and less stable microhabitat &mdash; consistent with the lizards' lower occurrence probability there.</p>
+</section>
+
+<section id="a4">
+<h2>Exercise 4 — All five N2O models</h2>
+<p>Use <code>Multilevel_Nimble.R</code> top to bottom. Key reports:</p>
+<table>
+<tr><th scope="col">Model</th><th scope="col">Posterior of $\beta$ (median, 95% CI)</th><th scope="col">What changed</th></tr>
+<tr><td>1: complete pool</td><td>~ 0.55 [0.45, 0.65]</td><td>Baseline; site variation pooled into residual</td></tr>
+<tr><td>2: no pool</td><td>~ 0.50 [0.40, 0.60]</td><td>$\beta$ slightly tighter; per-site $\alpha_j$ wildly variable</td></tr>
+<tr><td>3: partial pool</td><td>~ 0.50 [0.40, 0.60]</td><td>Per-site $\alpha_j$ pulled toward $\mu_\alpha$ (shrinkage)</td></tr>
+<tr><td>4: + SOC covariate</td><td>~ 0.50 [0.40, 0.60]</td><td>$\eta &gt; 0$ credibly &mdash; SOC matters</td></tr>
+<tr><td>5: + random slope</td><td>$\beta$ now per-fertilizer</td><td>Some fertilizers steeper than others</td></tr>
+</table>
+<p><strong>(b) Shrinkage plot.</strong> Plot <code>a.no</code> (median per-site $\alpha$ from model 2) against <code>a.part</code> (from model 3). The smallest absolute $\alpha_j$ moves stay near the 1:1 line; the extremes are pulled toward the population mean of <code>a.part</code>.</p>
+<p><strong>(c) Group-level effect.</strong> $\eta$ posterior median is positive with 95% CI not crossing 0 in most fits: higher SOC sites tend to have higher baseline emissions, controlling for N input.</p>
+<p><strong>(d) Slopes by fertilizer.</strong> Urea-type fertilizers typically have the steepest emission-vs-input slope; mineral fertilizers (ammonium nitrate etc.) tend to be lower.</p>
+<p><em>Instructor note.</em> If a student reports R-hat &gt; 1.05 for the random-slope model, they may need to lengthen <code>niter</code> to 50,000 and thin; this is a model where the default chain length sometimes isn't enough for the hyperparameters $\sigma_\alpha$ and $\sigma_\beta$ to converge.</p>
+</section>
+
+<section id="a5">
+<h2>Exercise 5 — Shrinkage by hand</h2>
+<p>Using $\hat\alpha_j = (n_j\bar y_j/\sigma^2 + \mu_\alpha/\sigma_\alpha^2)/(n_j/\sigma^2 + 1/\sigma_\alpha^2)$ with $\sigma=2$, $\mu_\alpha=0$, $\sigma_\alpha=3$.</p>
+<p><strong>Site A</strong> ($n=100, \bar y=5$):</p>
+<div class="eq-block">$\hat\alpha_A = \dfrac{100/4 \cdot 5 + 1/9 \cdot 0}{100/4 + 1/9} = \dfrac{125}{25.11} \approx 4.98$</div>
+<p>Pulled almost none.</p>
+<p><strong>Site B</strong> ($n=4, \bar y=5$):</p>
+<div class="eq-block">$\hat\alpha_B = \dfrac{4/4 \cdot 5 + 1/9 \cdot 0}{4/4 + 1/9} = \dfrac{5}{1.111} \approx 4.50$</div>
+<p>Pulled 0.5 units toward 0.</p>
+<p><strong>Punchline.</strong> Same observed mean, very different posterior estimates &mdash; because Site B's $\bar y$ is less precise. This is the entire mechanism of hierarchical models. Memorise this formula; it generalises to almost every random-intercept model you'll ever fit.</p>
+</section>
+
+<section id="a6">
+<h2>Exercise 6 — Beverton-Holt: fit, predict, derive</h2>
+<p>Run <code>SpawnerRecruit_Nimble.R</code> top to bottom.</p>
+<p><strong>(a) Posterior summaries (typical):</strong></p>
+<table>
+<tr><th scope="col">Parameter</th><th scope="col">Median</th><th scope="col">95% CI</th><th scope="col">Truth</th></tr>
+<tr><td>$a$</td><td>~ 4.8</td><td>[3.0, 7.2]</td><td>5</td></tr>
+<tr><td>$b$</td><td>~ 4900</td><td>[3500, 7100]</td><td>5000</td></tr>
+<tr><td>$\sigma$</td><td>~ 0.21</td><td>[0.15, 0.31]</td><td>0.2</td></tr>
+<tr><td>$N_\text{eq}$</td><td>~ 3800</td><td>[2400, 5800]</td><td>4000</td></tr>
+<tr><td>$S_\text{msy}$</td><td>~ 1300</td><td>[700, 2200]</td><td>1316</td></tr>
+<tr><td>$H_\text{msy}$</td><td>~ 0.55</td><td>[0.42, 0.68]</td><td>0.553</td></tr>
+</table>
+<p><strong>(b) Conservative management value.</strong> 5th percentile of $H_\text{msy}$ from your <code>quantile()</code> call &mdash; typically around 0.40 with the default 20-year dataset. That is the "if I want to be 95% confident I'm not over-fishing" harvest rate.</p>
+<p><strong>(c) More data, tighter posteriors.</strong> With $N=100$ years, $H_\text{msy}$ CI half-width shrinks by roughly $\sqrt{5} \approx 2.2$. Bayesian inference obeys the same $\sqrt{N}$ rule as frequentist inference at large $N$; the prior matters only at small $N$.</p>
+<p><em>Instructor note.</em> Some students will get NaN <code>log()</code> values on iteration 1 if the random initial $a$ leads to a negative argument inside <code>log(1 + a/b * S[t])</code>. The prior bounds <code>dunif(1, 10)</code> and <code>dunif(1000, 10000)</code> usually prevent this; if not, supply explicit <code>inits</code>.</p>
+</section>
+
+<section id="a7">
+<h2>Exercise 7 — Dynamic occupancy</h2>
+<p>Run <code>DynamicOccupancy_Nimble.R</code>.</p>
+<p><strong>(a-c)</strong> Posterior medians for $\phi_t, \gamma_t, \psi_t$ plotted vs truth: scattered around the 1:1 line, but with large per-parameter uncertainty due to small sample size (30 sites, 3 reps, 7 transitions).</p>
+<p><strong>(d) Without z-init trick.</strong> Try:</p>
+<pre><code>bad.z &lt;- <span class="fn">matrix</span>(<span class="fn">rbinom</span>(Nsites*Nyears, <span class="nu">1</span>, <span class="nu">0.3</span>), Nsites, Nyears)
+inits.bad &lt;- <span class="fn">list</span>(<span class="fn">list</span>(z=bad.z, phi=<span class="fn">runif</span>(Nyears-<span class="nu">1</span>,.<span class="nu">1</span>,.<span class="nu">9</span>),
+ gamma=<span class="fn">runif</span>(Nyears-<span class="nu">1</span>,.<span class="nu">1</span>,.<span class="nu">9</span>), p=.<span class="nu">5</span>, psi=.<span class="nu">4</span>))
+<span class="fn">nimbleMCMC</span>(DynOccCode, constants=constants, data=data, inits=inits.bad, ...)</code></pre>
+<p>NIMBLE will report:</p>
+<pre><code>Error: Dynamic Index out of bounds, or initial values produce a density of 0</code></pre>
+<p>or similar &mdash; because for any (i,t) where the random $z[i,t] = 0$ but the data has $y[i,j,t] = 1$, the Bernoulli likelihood is 0 and $\log 0 = -\infty$. Always initialise $z$ at 1.</p>
+<p><strong>(e) Why CIs are wide.</strong> Each transition $t \to t+1$ has only 30 sites of evidence. A standard fix is to give $\phi, \gamma$ themselves a hierarchical prior (e.g. logit$(\phi_t) \sim \mathcal{N}(\mu_\phi, \sigma_\phi^2)$), which lets years borrow strength from each other and shrinks year-specific estimates. You can also add covariates like temperature or land-use change to explain year-to-year variation.</p>
+</section>
+
+<section id="a8">
+<h2>Exercise 8 — N-mixture build-up</h2>
+<p><strong>(a) Basic.</strong> Posterior medians: $\lambda \approx 5.9$ [4.5, 7.6], $p \approx 0.78$ [0.62, 0.91]. Truth $\lambda=6, p=0.8$.</p>
+<p><strong>(b) Covariate on abundance.</strong> $\beta_1$ posterior median $\approx 1.0$ with 95% CI well away from 0. The recovered slope matches the simulation truth ($\beta_1 = 1$).</p>
+<p><strong>(c) Covariate on both.</strong> $\beta_1$ posterior is very similar to (b) here (because data are clean), but in general, ignoring detection heterogeneity inflates the apparent abundance heterogeneity. The slope estimates for both abundance and detection are well-recovered.</p>
+<p><strong>(d) Overdispersion + Bayesian p-value.</strong> Bayesian p-value typically &lt; 0.05 or &gt; 0.95 &mdash; clear evidence the Poisson model can't capture the variance. The point is that the discrepancy test catches a model that would otherwise produce confident-sounding (and wrong) posteriors for $\lambda$.</p>
+</section>
+
+<section id="a9">
+<h2>Exercise 9 — Add a Poisson-lognormal random effect to fix overdispersion</h2>
+<pre><code>Nmix5Code &lt;- <span class="fn">nimbleCode</span>({
+ <span class="kw">for</span> (i <span class="kw">in</span> <span class="nu">1</span>:Nsites) {
+ eps[i] ~ <span class="fn">dnorm</span>(<span class="nu">0</span>, tau.eps)
+ <span class="fn">log</span>(lambda[i]) &lt;- b0 + eps[i]
+ N[i] ~ <span class="fn">dpois</span>(lambda[i])
+ <span class="kw">for</span> (j <span class="kw">in</span> <span class="nu">1</span>:Nreps) {
+ y[i,j] ~ <span class="fn">dbinom</span>(prob=p, size=N[i])
+ y.pred[i,j] ~ <span class="fn">dbinom</span>(prob=p, size=N[i])
+ e[i,j] &lt;- p*lambda[i]
+ resid[i,j] &lt;- <span class="fn">pow</span>(<span class="fn">pow</span>(y[i,j], <span class="nu">0.5</span>) - <span class="fn">pow</span>(e[i,j],<span class="nu">0.5</span>), <span class="nu">2</span>)
+ resid.pred[i,j] &lt;- <span class="fn">pow</span>(<span class="fn">pow</span>(y.pred[i,j],<span class="nu">0.5</span>) - <span class="fn">pow</span>(e[i,j],<span class="nu">0.5</span>), <span class="nu">2</span>)
+ }
+ }
+ fit.data &lt;- <span class="fn">sum</span>(resid[<span class="nu">1</span>:Nsites, <span class="nu">1</span>:Nreps])
+ fit.pred &lt;- <span class="fn">sum</span>(resid.pred[<span class="nu">1</span>:Nsites, <span class="nu">1</span>:Nreps])
+
+ b0 ~ <span class="fn">dunif</span>(-<span class="nu">5</span>, <span class="nu">5</span>)
+ p ~ <span class="fn">dbeta</span>(<span class="nu">1</span>, <span class="nu">1</span>)
+ sig.eps ~ <span class="fn">dunif</span>(<span class="nu">0</span>, <span class="nu">5</span>)
+ tau.eps &lt;- <span class="nu">1</span>/sig.eps^<span class="nu">2</span>
+})</code></pre>
+<p><strong>Expected.</strong> Bayesian p-value moves toward 0.5 (usually 0.3-0.7). $\sigma_\epsilon$ posterior median is around 0.5-0.7 with 95% CI well away from 0, capturing the overdispersion the Poisson alone missed.</p>
+<p><em>Conceptual.</em> The Poisson-lognormal is the workhorse fix for overdispersed N-mixture data. Some authors prefer a negative-binomial latent abundance (<code>N[i] ~ dnegbin(...)</code>), which is equivalent in the limit but parameterised differently.</p>
+</section>
+
+<section id="a10">
+<h2>Exercise 10 — Pick the right tool</h2>
+<table>
+<tr><th scope="col">Scenario</th><th scope="col">Model</th><th scope="col">Latent vs. observed</th></tr>
+<tr><td>(a) 30 forest plots × 10 years, marten presence</td><td>Dynamic occupancy with year-specific or hierarchical $\phi, \gamma$</td><td>z = true occupancy; y = detection</td></tr>
+<tr><td>(b) Pellet quadrats, repeat visits, overdispersed</td><td>Poisson-lognormal N-mixture, or NB N-mixture</td><td>N = true count; y = observed count</td></tr>
+<tr><td>(c) Mark-recapture with site-varying survival</td><td>Cormack-Jolly-Seber with random effects on $\phi$</td><td>z = alive/dead state; y = capture history</td></tr>
+<tr><td>(d) Salmon escapement / recruits, harvest rate decision</td><td>Beverton-Holt; report 5th percentile of $H_\text{msy}$</td><td>No latent state; derived management quantity</td></tr>
+<tr><td>(e) 200 streams × replicate eDNA × basin covariate</td><td>Multilevel dynamic occupancy with basin-level random intercept and discharge covariate</td><td>z = true occupancy; y = eDNA detection; nested grouping</td></tr>
+</table>
+<p><em>Instructor note.</em> Good answers will explicitly name the latent state variable and the observation model, not just the distribution family. The structural choice (where to put the random effects, what to treat as latent) matters more than the choice of $p$ vs. $\text{logit}\,p$ vs. $\Phi(p)$.</p>
+</section>
+
+</main>
+</div>
+<footer>FW 536 · Statistical Modeling for Ecology and Conservation · Oregon State University</footer>
+</body>
+</html>

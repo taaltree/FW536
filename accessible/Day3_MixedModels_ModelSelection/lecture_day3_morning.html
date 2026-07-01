@@ -6,11 +6,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="stylesheet" href="../_Shared/css/accessible.css" />
 <script>
-MathJax = {
-  tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
+MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
   options: { menuOptions: { settings: { assistiveMml: true, explorer: true } } },
-  loader: { load: ['a11y/assistive-mml', 'a11y/explorer'] }
-};
+  loader: { load: ['a11y/assistive-mml', 'a11y/explorer'] } };
 </script>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script"></script>
 </head>
@@ -21,8 +19,7 @@ MathJax = {
 <aside class="sidebar">
 <p class="brand"><a href="../index.html">FW 536 · Day 3 Morning</a></p>
 <div class="subtitle">Lecture notes: Mixed effects models</div>
-<nav aria-label="Slides in this lecture">
-<div class="section">Slides</div><ul>
+<nav aria-label="Slides in this lecture"><div class="section">Slides</div><ul>
 <li><a href="#slide-1">1. Slide 1</a></li>
 <li><a href="#slide-2">2. What are Fixed and Random Effects?</a></li>
 <li><a href="#slide-3">3. Mixed Effects Models</a></li>
@@ -91,9 +88,9 @@ MathJax = {
 <header class="lab-header">
 <div class="eyebrow">Day 3 Morning · Accessible lecture notes</div>
 <h1>Mixed effects models</h1>
-<p class="lede">A screen-reader-friendly transcript of the lecture slides: all slide text and speaker notes are included. Figures are flagged where a text description still needs to be added.</p>
+<p class="lede">A screen-reader-friendly transcript of the lecture slides: all slide text, tables, figure descriptions, and speaker notes.</p>
 </header>
-<div class="callout key"><p class="callout-label">About these notes</p>These notes are generated from the lecture slides. Each section below is one slide. Where a slide contained a picture, plot, or equation image, you will see a "Figure needs description" note &mdash; ask your instructor for the description of that figure. For the underlying concepts with worked examples, also read the <a href="plain_language_summary.html">plain-language summary</a> and <a href="lab.html">lab</a> for this session.</p></div>
+<div class="callout key"><p class="callout-label">About these notes</p>Each section is one slide. Figures carry text descriptions where available. For the concepts with worked examples, also read the <a href="plain_language_summary.html">plain-language summary</a> and <a href="lab.html">lab</a> for this session. You can also download the <a href="../../Day3_MixedModels_ModelSelection/FW536_Day3_Morning_mixed%20effects_accessible.pptx">alt-texted PowerPoint deck</a> (the same slides with image descriptions embedded).</div>
 <section aria-labelledby="slide-1-h">
 <h2 id="slide-1-h"><span id="slide-1"></span>Slide 1</h2>
 <p>Mixed Effects Modeling</p>
@@ -103,11 +100,11 @@ MathJax = {
 <h2 id="slide-2-h"><span id="slide-2"></span>Slide 2: What are Fixed and Random Effects?</h2>
 <ul>
 <li>Fixed Effects:</li>
-<li style="margin-left:1em">Parameters associated with the entire population or with certain repeatable levels of experimental units.</li>
-<li style="margin-left:2em">The value for the vessel factor for the SS Titantic.</li>
+<li style="margin-left:1.2em">Parameters associated with the entire population or with certain repeatable levels of experimental units.</li>
+<li style="margin-left:2.4em">The value for the vessel factor for the SS Titantic.</li>
 <li>Random Effects:</li>
-<li style="margin-left:1em">Parameters associated with individual experimental units drawn at random from a population.</li>
-<li style="margin-left:2em">The value of the vessel factor for the 23rd vessel in a database.</li>
+<li style="margin-left:1.2em">Parameters associated with individual experimental units drawn at random from a population.</li>
+<li style="margin-left:2.4em">The value of the vessel factor for the 23rd vessel in a database.</li>
 </ul>
 </section>
 <section aria-labelledby="slide-3-h">
@@ -115,7 +112,7 @@ MathJax = {
 <ul>
 <li>A mixed effects model is a model that has both fixed effects and random effects.</li>
 <li>Often a random effect is assigned to observations sharing a common classification factor.</li>
-<li style="margin-left:1em">Goal is to model both variation within GROUPS and variation among GROUPS</li>
+<li style="margin-left:1.2em">Goal is to model both variation within GROUPS and variation among GROUPS</li>
 </ul>
 </section>
 <section aria-labelledby="slide-4-h">
@@ -123,23 +120,23 @@ MathJax = {
 <ul>
 <li>We select six streams at random and determine the density of fish at each stream three times.</li>
 <li>The questions:</li>
-<li style="margin-left:1em">What is the density in a typical stream?</li>
-<li style="margin-left:1em">What is the variation in density among streams?</li>
-<li style="margin-left:1em">What is the variation in density estimates within a stream?</li>
+<li style="margin-left:1.2em">What is the density in a typical stream?</li>
+<li style="margin-left:1.2em">What is the variation in density among streams?</li>
+<li style="margin-left:1.2em">What is the variation in density estimates within a stream?</li>
 </ul>
 </section>
 <section aria-labelledby="slide-5-h">
 <h2 id="slide-5-h"><span id="slide-5"></span>Slide 5: Three Options for Structured Data</h2>
 <ul>
 <li>Your options are:</li>
-<li style="margin-left:1em">1. Complete pooling: Pool density estimates from all streams for analysis</li>
-<li style="margin-left:1em">2. No pooling: Include a factor for each stream. This will estimate a separate parameter for each stock.</li>
-<li style="margin-left:1em">3. Partial pooling: Model the factor as a random effect with some variance around the mean among streams. This separates variation within streams (j = 3 observations) and variation among streams (i = 6 streams)</li>
+<li style="margin-left:1.2em">1. Complete pooling: Pool density estimates from all streams for analysis</li>
+<li style="margin-left:1.2em">2. No pooling: Include a factor for each stream. This will estimate a separate parameter for each stock.</li>
+<li style="margin-left:1.2em">3. Partial pooling: Model the factor as a random effect with some variance around the mean among streams. This separates variation within streams (j = 3 observations) and variation among streams (i = 6 streams)</li>
 </ul>
 </section>
 <section aria-labelledby="slide-6-h">
 <h2 id="slide-6-h"><span id="slide-6"></span>Slide 6: Complete pooling: Fit of the Standard Linear Model(complete pooling of observations)</h2>
-<p class="callout warn" role="note"><span class="callout-label">Figure 6.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 6.1.</strong> Scatterplot of fish density against stream from the complete-pooling linear model; all points share one fitted mean, so between-stream variation is visible in the scatter but unmodeled.</figcaption></figure>
 <p>This analysis attributed all the error to within-stream variation. However, it is clear that there is between-stream variation in density but we have no way to comment on it.</p>
 </section>
 <section aria-labelledby="slide-7-h">
@@ -174,11 +171,11 @@ MathJax = {
 <h2 id="slide-11-h"><span id="slide-11"></span>Slide 11: Time for some R</h2>
 <ul>
 <li>Fitting the fixed effects models:</li>
-<li style="margin-left:1em">lm1 &lt;- lm(Density~1,data=Streams)</li>
-<li style="margin-left:1em">lm2 &lt;- lm(Density~Stream-1,data=Streams)</li>
+<li style="margin-left:1.2em">lm1 &lt;- lm(Density~1,data=Streams)</li>
+<li style="margin-left:1.2em">lm2 &lt;- lm(Density~Stream-1,data=Streams)</li>
 <li>Fitting the mixed effects model:</li>
-<li style="margin-left:1em">lm3 &lt;- lme(Density ~ 1,data=Streams, random = ~ 1 | Stream)</li>
-<li style="margin-left:1em">lme() is from the nlme package</li>
+<li style="margin-left:1.2em">lm3 &lt;- lme(Density ~ 1,data=Streams, random = ~ 1 | Stream)</li>
+<li style="margin-left:1.2em">lme() is from the nlme package</li>
 <li>The call to LME first gives the fixed effects (the intercept in this case), followed by the data set, and finally the random component of the model.</li>
 </ul>
 <p>Group</p>
@@ -200,7 +197,7 @@ MathJax = {
 <li>data – must be a data frame;</li>
 <li>random – the random effects (random effects can be nested);</li>
 <li>correlation – correlation structure of the residuals (optional);</li>
-<li style="margin-left:1em">For example “correlation=corAR1()” for autoregressive term</li>
+<li style="margin-left:1.2em">For example “correlation=corAR1()” for autoregressive term</li>
 <li>weights – variance structure of the residuals (optional);</li>
 <li>subset – which rows of the data set to include (vector of boolean)</li>
 <li>method – ML or REML</li>
@@ -214,7 +211,7 @@ MathJax = {
 <li>REML is default</li>
 <li>The distinction is due to the fact that the MLE for the variance is biased (it has 1/n rather than 1/n-1)</li>
 <li>REML uses an unbiased estimator for the variance</li>
-<li style="margin-left:1em">This is nitpicky, but can matter with small sample size</li>
+<li style="margin-left:1.2em">This is nitpicky, but can matter with small sample size</li>
 </ul>
 <details class="answer"><summary>Speaker notes for this slide</summary><div class="answer-body"><p>REML (Restricted Maximum Likelihood): Estimates variance components (random effects + residual variance) after removing the influence of fixed effects. This makes variance component estimates less biased, especially in small samples. However, because the likelihood is computed after conditioning out fixed effects, REML likelihood values are not comparable across models with different fixed effects structures. The “scale” of the REML likelihood changes with the fixed effects design matrix.  ML (Maximum Likelihood): Fits both variance components and fixed effects together. ML likelihoods are comparable across models with different fixed effects, so you can use AIC (or likelihood ratio tests) to decide among competing fixed-effects structures.</p></div></details>
 </section>
@@ -274,20 +271,20 @@ MathJax = {
 <h2 id="slide-19-h"><span id="slide-19"></span>Slide 19: Example:Fixed and Random Effects Together(Length-weight regressions)</h2>
 <ul>
 <li>The Problem:</li>
-<li style="margin-left:1em">We select 10 individual fish and measure the relationships between their lengths and weights as they grow. The relationship between length and weight is:</li>
-<li style="margin-left:1em">We have repeated measurements from the same individual “Subject”.</li>
-<li style="margin-left:1em">Should we use a fixed effect for “Subject” or a random effect?</li>
-<li style="margin-left:1em">Modeling decision – do we care about estimate for each individual fish? Not at all. So let’s let intercept be random</li>
-<li style="margin-left:1em">lme(Weight~Length,data=LenW,random = ~1 |Subject,method=&quot;REML&quot;)</li>
+<li style="margin-left:1.2em">We select 10 individual fish and measure the relationships between their lengths and weights as they grow. The relationship between length and weight is:</li>
+<li style="margin-left:1.2em">We have repeated measurements from the same individual “Subject”.</li>
+<li style="margin-left:1.2em">Should we use a fixed effect for “Subject” or a random effect?</li>
+<li style="margin-left:1.2em">Modeling decision – do we care about estimate for each individual fish? Not at all. So let’s let intercept be random</li>
+<li style="margin-left:1.2em">lme(Weight~Length,data=LenW,random = ~1 |Subject,method=&quot;REML&quot;)</li>
 </ul>
 </section>
 <section aria-labelledby="slide-20-h">
 <h2 id="slide-20-h"><span id="slide-20"></span>Slide 20: Where does the variation in weight arise from?</h2>
-<p class="callout warn" role="note"><span class="callout-label">Figure 20.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 20.1.</strong> Two scatterplots of Weight (y, about 2 to 9) versus Length (x, 0.7 to 3.0). Left: open circles; right: same points coded by individual fish. Weight rises steadily with length.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-21-h">
 <h2 id="slide-21-h"><span id="slide-21"></span>Slide 21: Fixed and Random Effects Together(Length-weight regressions)</h2>
-<p class="callout warn" role="note"><span class="callout-label">Figure 21.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 21.1.</strong> Scatterplot of Weight versus Length for 10 fish with the fitted mixed-effects regression line; individual subjects share a common slope but have random intercepts around the mean line.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-22-h">
 <h2 id="slide-22-h"><span id="slide-22"></span>Slide 22: Fixed and Random Effects Together(Length-weight regressions)</h2>
@@ -316,8 +313,8 @@ MathJax = {
 <ul>
 <li>If you use REML estimation, you can only compare models with the same fixed-effects structure.</li>
 <li>The standard output does not provide:</li>
-<li style="margin-left:1em">the “best estimates” of the group-level random effects - use coef(lmout) to find them.</li>
-<li style="margin-left:1em">the confidence intervals for the variance parameters – use intervals(lmout, 0.95)</li>
+<li style="margin-left:1.2em">the “best estimates” of the group-level random effects - use coef(lmout) to find them.</li>
+<li style="margin-left:1.2em">the confidence intervals for the variance parameters – use intervals(lmout, 0.95)</li>
 </ul>
 </section>
 <section aria-labelledby="slide-24-h">
@@ -336,29 +333,29 @@ MathJax = {
 <li>10 individuals per species.</li>
 <li>Question: Does trophic position increase with length?</li>
 </ul>
-<p class="callout warn" role="note"><span class="callout-label">Figure 25.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 25.1.</strong> Diagram of the sampling design: three fish species (drawn as fish) measured for Length and Trophic Position, nested within Lake 1 through Lake 6, ten individuals per species per lake.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-26-h">
 <h2 id="slide-26-h"><span id="slide-26"></span>Slide 26: How we should not analyze this dataset</h2>
 <ul>
 <li>1. No pooling. Separate regressions for every species in every lake</li>
-<li style="margin-left:1em">estimate a slope and intercept parameter for each regression (2 parameters x 3 species X 6 lakes = 36 parameter estimates) and the sample size for each analysis would be 10.</li>
-<li style="margin-left:1em">We’re also not scientifically interested in variation among lakes.</li>
+<li style="margin-left:1.2em">estimate a slope and intercept parameter for each regression (2 parameters x 3 species X 6 lakes = 36 parameter estimates) and the sample size for each analysis would be 10.</li>
+<li style="margin-left:1.2em">We’re also not scientifically interested in variation among lakes.</li>
 <li>2. Complete pooling</li>
-<li style="margin-left:1em">Only need to estimate 2 parameters.</li>
-<li style="margin-left:1em">Pseudoreplication? Measurements within same lake or species correlated.</li>
-<li style="margin-left:1em">Noise – Surely some is due to interlake or species variation</li>
+<li style="margin-left:1.2em">Only need to estimate 2 parameters.</li>
+<li style="margin-left:1.2em">Pseudoreplication? Measurements within same lake or species correlated.</li>
+<li style="margin-left:1.2em">Noise – Surely some is due to interlake or species variation</li>
 </ul>
-<p class="callout warn" role="note"><span class="callout-label">Figure 26.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 26.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 26.1.</strong> Scatterplot titled &#x27;Species 1 in Lake 1&#x27;: Trophic Position (y, 3.4 to 4.0) versus Length in mm (x, 100 to 400). Ten points, weak positive trend, much scatter.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 26.2.</strong> Scatterplot titled &#x27;All Data&#x27;: Trophic Position (y, 3.3 to 5.0) versus Length in mm (x, 100 to 400). Points rise with length but cluster vertically.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-27-h">
 <h2 id="slide-27-h"><span id="slide-27"></span>Slide 27: Data exploration</h2>
-<p class="callout warn" role="note"><span class="callout-label">Figure 27.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 27.1.</strong> Faceted scatterplots &#x27;By Species&#x27; (S1, S2, S3) of Trophic Position versus Length in mm. All three species show positive trends; S1 sits lower overall than S2 and S3.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-28-h">
 <h2 id="slide-28-h"><span id="slide-28"></span>Slide 28: Data exploration</h2>
-<p class="callout warn" role="note"><span class="callout-label">Figure 28.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 28.1.</strong> Faceted scatterplots &#x27;By Lake&#x27; (L1 to L6) of Trophic Position versus Length in mm. Each lake shows a positive length trend with broadly similar intercepts across lakes.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-29-h">
 <h2 id="slide-29-h"><span id="slide-29"></span>Slide 29: Let’s look for structure in residuals</h2>
@@ -366,7 +363,7 @@ MathJax = {
 <li>Complete pooling</li>
 <li>Trophic_Position ~ Length</li>
 </ul>
-<p class="callout warn" role="note"><span class="callout-label">Figure 29.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 29.1.</strong> Two boxplots of standardized residuals from the complete-pooling model. Left, by species: S1 residuals sit well below zero, S2 and S3 above. Right, by lake: residuals roughly centered on zero.</figcaption></figure>
 <p>Lots of structure in residuals grouped by species, but not as bad for lake</p>
 <details class="answer"><summary>Speaker notes for this slide</summary><div class="answer-body"><p>Consequences if you ignore it Biased standard errors and confidence intervals (typically underestimated). Inflated type I error for tests of significance. Wrong effect estimates if slope varies strongly between groups and you force a single slope. Poor predictive performance.</p></div></details>
 </section>
@@ -383,17 +380,17 @@ MathJax = {
 <section aria-labelledby="slide-31-h">
 <h2 id="slide-31-h"><span id="slide-31"></span>Slide 31: Allow intercept to vary by species</h2>
 <p>lmer(Z_TP~Z_Length + (1|Fish_Species))</p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 31.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 31.1.</strong> Schematic: three parallel Trophic-Position-versus-Length lines, species 1 (blue, low), 2 (red), 3 (green, high), around a black species-level line; a normal curve shows intercepts varying about the mean.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-32-h">
 <h2 id="slide-32-h"><span id="slide-32"></span>Slide 32: Allow intercept to vary by species</h2>
 <ul>
 <li>lmer(Z_TP~Z_Length + (1|Fish_Species))</li>
 <li>You might also use</li>
-<li style="margin-left:1em">lm(Z_TP~Z_Length + Fish_Species)</li>
-<li style="margin-left:1em">What’s the difference?</li>
+<li style="margin-left:1.2em">lm(Z_TP~Z_Length + Fish_Species)</li>
+<li style="margin-left:1.2em">What’s the difference?</li>
 </ul>
-<p class="callout warn" role="note"><span class="callout-label">Figure 32.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 32.1.</strong> Random-intercept schematic: three parallel colored lines (species 1 blue lowest, 2 red, 3 green highest) around the black species-level mean line, with a normal curve showing intercept spread.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-33-h">
 <h2 id="slide-33-h"><span id="slide-33"></span>Slide 33: Should we use fixed or random effects for groups?</h2>
@@ -407,15 +404,15 @@ MathJax = {
 <h2 id="slide-34-h"><span id="slide-34"></span>Slide 34: Allow intercept to vary by lake</h2>
 <ul>
 <li>lmer(Z_TP~Z_Length + (1|Lake))</li>
-<li style="margin-left:1em">Can also do both species and length</li>
-<li style="margin-left:1em">lmer(Z_TP~Z_Length + (1|Fish_Species)+(1|Lake))</li>
+<li style="margin-left:1.2em">Can also do both species and length</li>
+<li style="margin-left:1.2em">lmer(Z_TP~Z_Length + (1|Fish_Species)+(1|Lake))</li>
 </ul>
-<p class="callout warn" role="note"><span class="callout-label">Figure 34.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 34.1.</strong> Random-intercept-by-lake schematic: six parallel colored lines (Lake 1 lowest to Lake 6 highest) offset around the black lake-level mean line; a normal curve shows intercept spread.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-35-h">
 <h2 id="slide-35-h"><span id="slide-35"></span>Slide 35: But what if the effect of length on TP varies by species or lake?All our prior models were “random intercept” models. Now also “random slope”</h2>
 <p>lmer(Z_TP~Z_Length + (1+Z_Length|Fish_Species)+(1+Z_Length|Lake))</p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 35.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 35.1.</strong> Random-slope schematic: three lines fanning from a shared intercept (species 3 blue shallow, 2 green, 1 red steepest) around the black mean line; inset normal curve labeled &#x27;Distribution of slopes&#x27;.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-36-h">
 <h2 id="slide-36-h"><span id="slide-36"></span>Slide 36: Borrowing strength</h2>
@@ -425,24 +422,24 @@ MathJax = {
 <li>Here we have balanced design, so not issue</li>
 <li>Inappropriate use of random effects with unbalanced designs + shrinkage can lead to incorrect conclusions.</li>
 </ul>
-<p class="callout warn" role="note"><span class="callout-label">Figure 36.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 36.1.</strong> Schematic of shrinkage: the fitted line for species 1 (blue, three data points) is pulled toward the black species-level mean line rather than fitting its own points, illustrating borrowing strength.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-37-h">
 <h2 id="slide-37-h"><span id="slide-37"></span>Slide 37: Which model to use for prediction?</h2>
-<p class="callout warn" role="note"><span class="callout-label">Figure 37.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 37.1.</strong> R code screenshot listing candidate models M0 to M8 for Z_TP on Z_Length: an lm plus lmer random-intercept and random-slope combinations of Fish_Species and Lake.</figcaption></figure>
 <p>Model 8 (AICc=36.3) and Model 2 (AICc=39.6) much lower than others</p>
 <p>REML to compare random effects</p>
 </section>
 <section aria-labelledby="slide-38-h">
 <h2 id="slide-38-h"><span id="slide-38"></span>Slide 38: Crossed vs Nested random effects</h2>
-<p class="callout warn" role="note"><span class="callout-label">Figure 38.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 38.1.</strong> Diagram of crossed random effects: three School ovals each send arrows to all three Class boxes, so the same classes appear across every school.</figcaption></figure>
 <ul>
 <li>Note that fish species appear in multiple lakes. This is a crossed random effect, but effects can also be nested</li>
 <li>Consider measurements on student within classes within schools</li>
-<li style="margin-left:1em">If the classes are “remedial”, “average”, and “gifted”, then they could be crossed among schools.</li>
-<li style="margin-left:1em">But if they are just different teachers, then this would be a nested design, R uses different syntax for each.</li>
+<li style="margin-left:1.2em">If the classes are “remedial”, “average”, and “gifted”, then they could be crossed among schools.</li>
+<li style="margin-left:1.2em">But if they are just different teachers, then this would be a nested design, R uses different syntax for each.</li>
 </ul>
-<p class="callout warn" role="note"><span class="callout-label">Figure 38.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 38.2.</strong> Diagram of nested random effects: each of School1, School2, School3 has its own separate Class1, Class2, Class3 boxes; classes belong to a single school only.</figcaption></figure>
 <ul>
 <li>Nested</li>
 <li>Use (1|School/Class)</li>
@@ -469,7 +466,7 @@ MathJax = {
 </section>
 <section aria-labelledby="slide-40-h">
 <h2 id="slide-40-h"><span id="slide-40"></span>Slide 40: Glmer ExampleProportions are Rarely Proportions</h2>
-<p class="callout warn" role="note"><span class="callout-label">Figure 40.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 40.1.</strong> Journal article opening: Warton and Hui (2011), Ecology, &#x27;The arcsine is asinine: the analysis of proportions in ecology&#x27;, abstract arguing for logistic regression over the arcsine transform.</figcaption></figure>
 <ul>
 <li>Imagine 4 out of 10 observed animals survive, or contract disease, or give birth</li>
 <li>Does this have the same information content as 40 of 100 animals?</li>
@@ -479,53 +476,53 @@ MathJax = {
 </section>
 <section aria-labelledby="slide-41-h">
 <h2 id="slide-41-h"><span id="slide-41"></span>Slide 41: White Stork Example</h2>
-<p class="callout warn" role="note"><span class="callout-label">Figure 41.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 41.1.</strong> Photo of a white stork with red bill and legs standing on a rock over water, head lowered; overlaid caption reads &#x27;This is not a GLMM&#x27;.</figcaption></figure>
 <p>Oliver Gimenez’s Example</p>
 </section>
 <section aria-labelledby="slide-42-h">
 <h2 id="slide-42-h"><span id="slide-42"></span>Slide 42</h2>
-<p class="callout warn" role="note"><span class="callout-label">Figure 42.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 42.1.</strong> White Stork GLMM example figure (Oliver Gimenez); vector graphic could not be rendered on this system for a precise description.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-43-h">
 <h2 id="slide-43-h"><span id="slide-43"></span>Slide 43</h2>
-<p class="callout warn" role="note"><span class="callout-label">Figure 43.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 43.1.</strong> White Stork GLMM example figure; vector graphic could not be rendered on this system for a precise description.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-44-h">
 <h2 id="slide-44-h"><span id="slide-44"></span>Slide 44: What if we have substantial additional interannual variation not explained by weather?</h2>
-<p class="callout warn" role="note"><span class="callout-label">Figure 44.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 44.1.</strong> Figure for the White Stork example on additional interannual variation not explained by weather; vector graphic could not be rendered on this system for a precise description.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-45-h">
 <h2 id="slide-45-h"><span id="slide-45"></span>Slide 45</h2>
-<p class="callout warn" role="note"><span class="callout-label">Figure 45.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 45.1.</strong> White Stork GLMM example figure; vector graphic could not be rendered on this system for a precise description.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-46-h">
 <h2 id="slide-46-h"><span id="slide-46"></span>Slide 46</h2>
-<p class="callout warn" role="note"><span class="callout-label">Figure 46.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 46.1.</strong> White Stork GLMM example figure; vector graphic could not be rendered on this system for a precise description.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-47-h">
 <h2 id="slide-47-h"><span id="slide-47"></span>Slide 47</h2>
-<p class="callout warn" role="note"><span class="callout-label">Figure 47.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 47.1.</strong> White Stork GLMM example figure; vector graphic could not be rendered on this system for a precise description.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-48-h">
 <h2 id="slide-48-h"><span id="slide-48"></span>Slide 48</h2>
-<p class="callout warn" role="note"><span class="callout-label">Figure 48.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 48.1.</strong> White Stork GLMM example figure; vector graphic could not be rendered on this system for a precise description.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-49-h">
 <h2 id="slide-49-h"><span id="slide-49"></span>Slide 49: Example 2 – Nonlinear mixed model for length and age</h2>
 <ul>
 <li>We shall assume that:</li>
-<li style="margin-left:1em">Growth follows a von Bertalanffy growth equation</li>
+<li style="margin-left:1.2em">Growth follows a von Bertalanffy growth equation</li>
 </ul>
-<p class="callout warn" role="note"><span class="callout-label">Figure 49.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 49.1.</strong> von Bertalanffy growth curve: Total Length in mm (y) versus Age (x, 0 to 12). Points scatter around a curve rising then leveling at asymptote L-infinity (dashed line); t0 marked at length zero.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-50-h">
 <h2 id="slide-50-h"><span id="slide-50"></span>Slide 50: Example – length and age</h2>
 <ul>
 <li>We shall assume that:</li>
-<li style="margin-left:1em">Growth follows a von Bertalanffy growth equation</li>
-<li style="margin-left:1em">t0 and  are the same for all animals in the population while the asymptotic size differs among individuals.</li>
-<li style="margin-left:1em">There is normally distributed measurement error.</li>
-<li style="margin-left:1em">R can be used to fit non-linear mixed effects models (function nlme).</li>
+<li style="margin-left:1.2em">Growth follows a von Bertalanffy growth equation</li>
+<li style="margin-left:1.2em">t0 and  are the same for all animals in the population while the asymptotic size differs among individuals.</li>
+<li style="margin-left:1.2em">There is normally distributed measurement error.</li>
+<li style="margin-left:1.2em">R can be used to fit non-linear mixed effects models (function nlme).</li>
 </ul>
 </section>
 <section aria-labelledby="slide-51-h">
@@ -545,7 +542,7 @@ MathJax = {
 </section>
 <section aria-labelledby="slide-53-h">
 <h2 id="slide-53-h"><span id="slide-53"></span>Slide 53: Fitting Length and Age Data(The basic data)</h2>
-<p class="callout warn" role="note"><span class="callout-label">Figure 53.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 53.1.</strong> Scatterplot of the length-and-age data (Total Length versus Age) for the growth model where asymptotic size L-infinity varies by individual; vector graphic could not be rendered for exact values.</figcaption></figure>
 <p>Let L-inf (saturation) vary by individual</p>
 </section>
 <section aria-labelledby="slide-54-h">
@@ -563,13 +560,13 @@ MathJax = {
 <li>among observations for the</li>
 <li>same animal.</li>
 </ul>
-<p class="callout warn" role="note"><span class="callout-label">Figure 54.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 54.1.</strong> Residual diagnostic plot from the standard nonlinear least-squares von Bertalanffy fit, showing model misspecification from within-animal correlation rather than heteroscedasticity; vector graphic could not be rendered for exact values.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-55-h">
 <h2 id="slide-55-h"><span id="slide-55"></span>Slide 55: Fitting Length and Age Data(Standard non-linear model-II)</h2>
 <p>boxplot(split(residuals(lm1),AgeLen$Subject),ylab=&quot;Residual&quot;,</p>
 <p>xlab=&quot;Subject&quot;,csi=0.2)</p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 55.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 55.1.</strong> Boxplots of residuals by Subject from the standard nonlinear fit. Residual medians shift from about -8 to +8 across subjects, showing within-animal correlation the model missed.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-56-h">
 <h2 id="slide-56-h"><span id="slide-56"></span>Slide 56: The NLME Function-I</h2>
@@ -578,7 +575,7 @@ MathJax = {
 <li>nlme(model, data, fixed, random, groups, start, correlation, weights, subset, method,na.action,naPattern, control,verbose)</li>
 <li>model: “response ~ fn(fixed effects)”</li>
 <li>fixed: “fixed = c(fix1~var1,fix2~var2)”.</li>
-<li style="margin-left:1em">There are several ways to specify the fixed effects structure.</li>
+<li style="margin-left:1.2em">There are several ways to specify the fixed effects structure.</li>
 </ul>
 </section>
 <section aria-labelledby="slide-57-h">
@@ -628,7 +625,7 @@ MathJax = {
 <li>Kappa</li>
 <li>t0</li>
 </ul>
-<p class="callout warn" role="note"><span class="callout-label">Figure 59.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 59.1.</strong> Diagnostic figure for the nonlinear mixed-effects fit (random Linf by subject; fixed Linf, Kappa, Tzero); vector graphic could not be rendered for exact values.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-60-h">
 <h2 id="slide-60-h"><span id="slide-60"></span>Slide 60: Fitting Length and Age Data(Non-linear mixed model-II)</h2>
@@ -637,7 +634,7 @@ MathJax = {
 <li>Try “intervals (lm2)” to see</li>
 <li>the confidence intervals</li>
 </ul>
-<p class="callout warn" role="note"><span class="callout-label">Figure 60.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 60.1.</strong> Plot of residuals by Subject from the nonlinear mixed model (plot(lm2, Subject ~ resid(.))), residuals now centered near zero across subjects; vector graphic could not be rendered for exact values.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-61-h">
 <h2 id="slide-61-h"><span id="slide-61"></span>Slide 61: Fitting Length and Age Data(Non-linear mixed model-III)</h2>
@@ -673,8 +670,8 @@ MathJax = {
 <li>~ fitted(.) | Subject,</li>
 <li>abline = 0,pch=16)</li>
 </ul>
-<p class="callout warn" role="note"><span class="callout-label">Figure 62.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 62.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 62.1.</strong> Plot of subject-specific asymptotic size estimates (population Linf plus each subject&#x27;s random effect) as points; vector graphic could not be rendered for exact values.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 62.2.</strong> Faceted plot of standardized residuals versus fitted values by Subject for the nonlinear mixed model, with a zero reference line; vector graphic could not be rendered for exact values.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-63-h">
 <h2 id="slide-63-h"><span id="slide-63"></span>Slide 63: Fitting Length and Age Data(Non-linear mixed model-V)</h2>
@@ -684,10 +681,9 @@ MathJax = {
 <li>the model</li>
 <li>predictions</li>
 </ul>
-<p class="callout warn" role="note"><span class="callout-label">Figure 63.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 63.1.</strong> Faceted plot from augPred: observed length-at-age data with the fitted nonlinear mixed-model growth curves overlaid per subject; vector graphic could not be rendered for exact values.</figcaption></figure>
 </section>
 </main>
 
 <footer>FW 536 &middot; Statistical Modeling for Ecology and Conservation &middot; Oregon State University &middot; Accessible lecture notes</footer>
-</body>
-</html>
+</body></html>

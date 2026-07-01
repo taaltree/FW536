@@ -1,0 +1,195 @@
+---
+title: "FW 536 — Day 3 morning lab (mixed models) — Your Name"
+author: "Your Name Here"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    self_contained: true
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    code_folding: show
+    theme: cosmo
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+# Day 3 morning lab — Mixed models problem set
+
+This template matches the morning (Part 1) problems in
+[`problem_set.html`](problem_set.html#morning). Read each problem statement there,
+write your work below, **Knit** to HTML, and upload the `.html` to the matching
+Canvas assignment.
+
+For setup help see the [R Markdown tutorial](../rmarkdown_tutorial.html).
+
+---
+
+# Setup
+
+```{r}
+# Load packages you'll need. Add or remove as appropriate.
+library(ggplot2)
+library(dplyr)
+library(lme4)
+library(nlme)
+library(AICcmodavg)
+library(MuMIn)
+```
+
+```{r data}
+# Real-data problems read these files from the data/ folder.
+# Problem 1 — streams (mixed1a.txt); n counts total values (3 fields x 300 rows),
+# so n = 3 * 300 loads all 100 streams
+StreamsRaw <- scan("data/mixed1a.txt",
+                   what = list(Stream = 0, Tst = 0, Density = 0), n = 3 * 300)
+Streams <- data.frame(StreamsRaw); Streams$Stream <- factor(Streams$Stream)
+
+# Problem 2 — length-weight (mixed1b.txt)
+LenWRaw <- scan("data/mixed1b.txt",
+                what = list(Subject = 0, TST1 = 0, TST2 = 0,
+                            Length = 0, Weight = 0, TST3 = 0), n = 6 * 100)
+LenW <- data.frame(LenWRaw); LenW$Subject <- as.factor(LenW$Subject)
+
+# Problem 3 — von Bertalanffy growth (week6b.txt)
+VonBRaw <- scan("data/week6b.txt",
+                what = list(Subject = 0, Age = 0, Length = 0, NULL),
+                skip = 1, n = 4 * 100)
+AgeLen <- groupedData(Length ~ Age | Subject,
+                      data = as.data.frame(cbind(Subject = VonBRaw$Subject,
+                                                 Age = VonBRaw$Age,
+                                                 Length = VonBRaw$Length)))
+
+# Problem 4 — trophic position (qcbs_w6_data.csv)
+dat <- read.csv("data/qcbs_w6_data.csv")
+dat$Fish_Species <- as.factor(dat$Fish_Species)
+dat$Lake         <- as.factor(dat$Lake)
+dat$Z_Length     <- scale(dat$Fish_Length)[, 1]
+dat$Z_TP         <- scale(dat$Trophic_Pos)[, 1]
+```
+
+---
+
+# Problem 1 — Streams: complete / no / partial pooling (mixed1a.txt)
+
+> Fit `lm(Density ~ 1)`, `lm(Density ~ Stream - 1)`, and
+> `lme(Density ~ 1, random = ~ 1 | Stream)`. Compare pooling behaviour, residual
+> structure, shrinkage of the most extreme stream, and the ICC.
+
+**My work:**
+
+```{r}
+# Your R code here (Streams data frame is loaded above)
+```
+
+**Answer / biological interpretation:**
+
+
+---
+
+# Problem 2 — Length–weight random intercepts (mixed1b.txt)
+
+> Fit `lme(Weight ~ Length, random = ~ 1 | Subject)` (and the `lmer` equivalent).
+> Report the fixed slope, the among-subject intercept SD, the residual SD and ICC,
+> then test a random slope with `anova(..., refit = FALSE)`.
+
+**My work:**
+
+```{r}
+# Your R code here (LenW data frame is loaded above)
+```
+
+**Answer / biological interpretation:**
+
+
+---
+
+# Problem 3 — Von Bertalanffy nonlinear mixed model (week6b.txt)
+
+> Fit the fixed-effect `nls` von Bertalanffy curve and the `nlme` version with a
+> random $L_\infty$ per fish. Compare residual structure and residual SE, and
+> interpret the per-fish BLUPs.
+
+**My work:**
+
+```{r}
+# Your R code here (AgeLen groupedData is loaded above)
+```
+
+**Answer / biological interpretation:**
+
+
+---
+
+# Problem 4 — Trophic position: crossed random effects (qcbs_w6_data.csv)
+
+> Fit the candidate `lmer` models (M1, M3, M4, M7, M8), rank with `aictab()`, and
+> read the variance components of the best model. Discuss the few-levels risk.
+
+**My work:**
+
+```{r}
+# Your R code here (dat data frame is loaded above)
+```
+
+**Answer / biological interpretation:**
+
+
+---
+
+# Problem 5 — Detection probability: binomial GLMM (variance partitioning)
+
+> Given the `VarCorr` output in the problem, partition variance (remember the
+> $\pi^2/3$ residual), compute the detection probability at mean conditions, and
+> translate the covariate slope into an odds ratio.
+
+**My work:**
+
+```{r}
+# Your R code here (this problem is conceptual; show your arithmetic in code)
+```
+
+**Answer / biological interpretation:**
+
+
+---
+
+# Problem 6 — Nested random effects + overdispersion
+
+> Diagram the nesting, write the Poisson GLMM, distinguish `(1 | unit/transect)`
+> from `(1 | unit) + (1 | transect)`, and give the Pearson-dispersion check plus
+> two fixes for overdispersion.
+
+**My work:**
+
+```{r}
+# Your R code here (conceptual; include the dispersion-check expression)
+```
+
+**Answer / biological interpretation:**
+
+
+---
+
+# (Optional) Embed a photo of hand-written work
+
+For problems easier to do on paper, photograph and embed:
+
+```{r, echo=FALSE, eval=FALSE, out.width="60%", fig.cap="Hand-derivation for Problem N"}
+knitr::include_graphics("images/problemN_derivation.jpg")
+```
+
+(Change `eval=FALSE` to `eval=TRUE` after saving an image. See the
+[R Markdown tutorial](../rmarkdown_tutorial.html) for details.)
+
+---
+
+# Submission checklist
+
+- [ ] Answered every morning (Part 1) problem from `problem_set.html`.
+- [ ] Loaded the data files (`mixed1a.txt`, `mixed1b.txt`, `week6b.txt`, `qcbs_w6_data.csv`) from `data/`.
+- [ ] Knitted to HTML without errors.
+- [ ] Photos (if any) embedded with `self_contained: true` in the YAML.
+- [ ] Uploaded the `.html` to the matching Canvas assignment.

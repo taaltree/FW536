@@ -6,11 +6,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="stylesheet" href="../_Shared/css/accessible.css" />
 <script>
-MathJax = {
-  tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
+MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
   options: { menuOptions: { settings: { assistiveMml: true, explorer: true } } },
-  loader: { load: ['a11y/assistive-mml', 'a11y/explorer'] }
-};
+  loader: { load: ['a11y/assistive-mml', 'a11y/explorer'] } };
 </script>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script"></script>
 </head>
@@ -21,8 +19,7 @@ MathJax = {
 <aside class="sidebar">
 <p class="brand"><a href="../index.html">FW 536 · Day 5</a></p>
 <div class="subtitle">Lecture notes: Bayesian statistics II</div>
-<nav aria-label="Slides in this lecture">
-<div class="section">Slides</div><ul>
+<nav aria-label="Slides in this lecture"><div class="section">Slides</div><ul>
 <li><a href="#slide-1">1. Slide 1</a></li>
 <li><a href="#slide-2">2. Where to go from here</a></li>
 <li><a href="#slide-3">3. Where to go from here</a></li>
@@ -54,29 +51,29 @@ MathJax = {
 <header class="lab-header">
 <div class="eyebrow">Day 5 · Accessible lecture notes</div>
 <h1>Bayesian statistics II</h1>
-<p class="lede">A screen-reader-friendly transcript of the lecture slides: all slide text and speaker notes are included. Figures are flagged where a text description still needs to be added.</p>
+<p class="lede">A screen-reader-friendly transcript of the lecture slides: all slide text, tables, figure descriptions, and speaker notes.</p>
 </header>
-<div class="callout key"><p class="callout-label">About these notes</p>These notes are generated from the lecture slides. Each section below is one slide. Where a slide contained a picture, plot, or equation image, you will see a "Figure needs description" note &mdash; ask your instructor for the description of that figure. For the underlying concepts with worked examples, also read the <a href="plain_language_summary.html">plain-language summary</a> and <a href="lab.html">lab</a> for this session.</p></div>
+<div class="callout key"><p class="callout-label">About these notes</p>Each section is one slide. Figures carry text descriptions where available. For the concepts with worked examples, also read the <a href="plain_language_summary.html">plain-language summary</a> and <a href="lab.html">lab</a> for this session. You can also download the <a href="../../Day5_BayesII/FW536_Day5_BayesII_accessible.pptx">alt-texted PowerPoint deck</a> (the same slides with image descriptions embedded).</div>
 <section aria-labelledby="slide-1-h">
 <h2 id="slide-1-h"><span id="slide-1"></span>Slide 1</h2>
 <p>Introduction to Bayesian Analysis Part Deux</p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 1.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 1.1.</strong> 3D surface plot of a bivariate normal probability density over axes x1 and x2, showing a bell-shaped peak (~0.15) at the origin, with a semi-transparent horizontal reference plane.</figcaption></figure>
 <p>Many slides adapted from Matt Falcy ODFW, and SESYNC course by Chris Che-Castaldo, Mary B. Collins, N. Thompson Hobbs (with permission)</p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 1.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 1.2.</strong> Portrait of Thomas Bayes with Bayes&#x27; theorem overlaid. Equation: P(A|B) = P(B|A) P(A) / P(B).</figcaption></figure>
 </section>
 <section aria-labelledby="slide-2-h">
 <h2 id="slide-2-h"><span id="slide-2"></span>Slide 2: Where to go from here</h2>
-<p class="callout warn" role="note"><span class="callout-label">Figure 2.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 2.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 2.1.</strong> Book cover: &#x27;Statistical Rethinking: A Bayesian Course with Examples in R and Stan,&#x27; Second Edition, by Richard McElreath.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 2.2.</strong> Screenshot of two YouTube playlists by Richard McElreath: Statistical Rethinking 2023 (20 videos) and 2022 (21 videos), with a woodpecker thumbnail.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-3-h">
 <h2 id="slide-3-h"><span id="slide-3"></span>Slide 3: Where to go from here</h2>
-<p class="callout warn" role="note"><span class="callout-label">Figure 3.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 3.1.</strong> Book cover: &#x27;The Theoretical Biologist&#x27;s Toolbox: Quantitative Methods for Ecology and Evolutionary Biology&#x27; by Marc Mangel.</figcaption></figure>
 <ul>
 <li>If you have strong quantitative skills and want to become a master</li>
 <li>Covers a diverse array of topics</li>
 </ul>
-<p class="callout warn" role="note"><span class="callout-label">Figure 3.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 3.2.</strong> Book cover: &#x27;The Ecological Detective: Confronting Models with Data&#x27; by Ray Hilborn and Marc Mangel, Monographs in Population Biology 28.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-4-h">
 <h2 id="slide-4-h"><span id="slide-4"></span>Slide 4: This course is just a jumping off point</h2>
@@ -85,20 +82,20 @@ MathJax = {
 <li>Consider pursuing side project using methods you want to learn</li>
 <li>Consider attending weekly math/stats seminars</li>
 </ul>
-<p class="callout warn" role="note"><span class="callout-label">Figure 4.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 4.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 4.3 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 4.4 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 4.5 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 4.6 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 4.1.</strong> Book cover: &#x27;The Ecological Detective: Confronting Models with Data&#x27; by Ray Hilborn and Marc Mangel, Monographs in Population Biology 28.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 4.2.</strong> Book cover: &#x27;Ecological Models and Data in R&#x27; by Benjamin M. Bolker, showing a fish on coral.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 4.3.</strong> Book cover: &#x27;The Theoretical Biologist&#x27;s Toolbox: Quantitative Methods for Ecology and Evolutionary Biology&#x27; by Marc Mangel.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 4.4.</strong> Book cover: &#x27;Applied Hierarchical Modeling in Ecology&#x27; Volume 1, by Marc Kery and J. Andrew Royle, with a green dragonfly.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 4.5.</strong> Book cover: &#x27;Applied Hierarchical Modeling in Ecology&#x27; Volume 2, Dynamic and Advanced Models, by Marc Kery and J. Andrew Royle, with a red dragonfly.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 4.6.</strong> Book cover: &#x27;Bayesian Models: A Statistical Primer for Ecologists&#x27; by N. Thompson Hobbs and Mevin B. Hooten.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-5-h">
 <h2 id="slide-5-h"><span id="slide-5"></span>Slide 5</h2>
-<p class="callout warn" role="note"><span class="callout-label">Figure 5.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 5.1.</strong> Equation: [b0,b1,sigma | y] proportional to product over i of normal(y_i | g(b0,b1,x_i), sigma^2) times normal(b0|0,1000) normal(b1|0,1000) uniform(sigma|0,100); g = b0 + b1*x_i. Below, JAGS code for this normal regression.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-6-h">
 <h2 id="slide-6-h"><span id="slide-6"></span>Slide 6</h2>
-<p class="callout warn" role="note"><span class="callout-label">Figure 6.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 6.1.</strong> Slide titled &#x27;Nonlinear regression&#x27;; the embedded figure did not render, only a citation to Bolker 2008, Ecological Models and Data in R.</figcaption></figure>
 <ul>
 <li>Unlike with lm() and glm()</li>
 <li>this easily extends to nonlinear functional forms</li>
@@ -113,15 +110,15 @@ MathJax = {
 </ul>
 <ul>
 <li>Spawner-recruit problem. We want to estimate</li>
-<li style="margin-left:1em">equilibrium number of spawners without harvest, Neq</li>
-<li style="margin-left:1em">Spawners that maximize sustained yield</li>
-<li style="margin-left:1em">The MSY harvest</li>
+<li style="margin-left:1.2em">equilibrium number of spawners without harvest, Neq</li>
+<li style="margin-left:1.2em">Spawners that maximize sustained yield</li>
+<li style="margin-left:1.2em">The MSY harvest</li>
 </ul>
-<p class="callout warn" role="note"><span class="callout-label">Figure 7.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 7.1.</strong> Scatterplot of Recruits versus Spawners with a curved black Beverton-Holt fit that saturates near 4000-4500 recruits, and a blue 1:1 replacement line.</figcaption></figure>
 <p>Neq</p>
 <p>Smsy</p>
 <p>Hmsy</p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 7.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 7.2.</strong> R code for derived quantities: Neq &lt;- b*(a-1)/a; Smsy &lt;- b*sqrt(1/a) - b/a; Hmsy &lt;- 1 - sqrt(1/a).</figcaption></figure>
 <ul>
 <li>Beverton-Holt Model</li>
 <li>R = (a*S)/(1+a/b*S)</li>
@@ -130,12 +127,12 @@ MathJax = {
 </section>
 <section aria-labelledby="slide-8-h">
 <h2 id="slide-8-h"><span id="slide-8"></span>Slide 8</h2>
-<p class="callout warn" role="note"><span class="callout-label">Figure 8.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 8.1.</strong> Table &#x27;You don&#x27;t have to be normal!&#x27; mapping data types to distribution, mean function, and link: continuous/normal (identity), discrete-positive/Poisson (log), 0-or-1/Bernoulli (logit), [0,1]/beta (logit), positive/lognormal and gamma (log).</figcaption></figure>
 <p>Wrong</p>
 </section>
 <section aria-labelledby="slide-9-h">
 <h2 id="slide-9-h"><span id="slide-9"></span>Slide 9</h2>
-<p class="callout warn" role="note"><span class="callout-label">Figure 9.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 9.1.</strong> Equation: [b0,b1|y] proportional to product over i of Poisson(y_i | g(b0,b1,x_i)) times normal(b0|0,1000) normal(b1|0,1000); g = exp(b0 + b1*x_i). Below, JAGS Poisson-regression code using log link.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-10-h">
 <h2 id="slide-10-h"><span id="slide-10"></span>Slide 10</h2>
@@ -147,7 +144,7 @@ MathJax = {
 </section>
 <section aria-labelledby="slide-11-h">
 <h2 id="slide-11-h"><span id="slide-11"></span>Slide 11</h2>
-<p class="callout warn" role="note"><span class="callout-label">Figure 11.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 11.1.</strong> Equation: [b0,b1|y] proportional to product over i of Bernoulli(y_i | g) times normal(b0|0,2.7) normal(b1|0,2.7); g = exp(b0+b1*x_i)/(exp(b0+b1*x_i)+1). Below, JAGS logistic-regression code with logit link.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-12-h">
 <h2 id="slide-12-h"><span id="slide-12"></span>Slide 12</h2>
@@ -165,14 +162,14 @@ MathJax = {
 <section aria-labelledby="slide-13-h">
 <h2 id="slide-13-h"><span id="slide-13"></span>Slide 13</h2>
 <p>Latent Variable Modeling I - Occupancy</p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 13.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 13.1.</strong> Tree diagram of occupancy detection: surveying an area leads to not seeing the species (y=0), which means either absent (z=0) or present but undetected (z=1); or seeing it (y=1), meaning present (z=1).</figcaption></figure>
 <p>“Latent variable” inferred rather than observed</p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 13.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 13.2.</strong> Equation: y_i | z_i ~ Bernoulli(p_i * z_i); z_i ~ Bernoulli(psi_i); logit(p_i) = alpha_0 + alpha_1 * covariate_1; logit(psi_i) = beta_0 + beta_1 * covariate_1.</figcaption></figure>
 <p>What should the priors be?</p>
 </section>
 <section aria-labelledby="slide-14-h">
 <h2 id="slide-14-h"><span id="slide-14"></span>Slide 14</h2>
-<p class="callout warn" role="note"><span class="callout-label">Figure 14.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 14.1.</strong> Slide &#x27;Choosing reasonable flat priors on logit intercept.&#x27; Four panels: a normal(0, var=10000) prior on logit(p) gives a U-shaped bathtub distribution of p (mass at 0 and 1), while normal(0, var=2.7) gives a roughly uniform p.</figcaption></figure>
 <ul>
 <li>An implied Uniform(0,1) prior for ψ is a Logistic distribution prior for intercept centered at 0 with scale parameter 1</li>
 <li>Logistic(μ = 0, σ = 1)</li>
@@ -181,7 +178,7 @@ MathJax = {
 <section aria-labelledby="slide-15-h">
 <h2 id="slide-15-h"><span id="slide-15"></span>Slide 15</h2>
 <p>DYNAMIC OCCUPANCY MODELING LAB</p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 15.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 15.1.</strong> Diagram of dynamic occupancy transitions from year t-1 to year t between states z=0 (absent) and z=1 (present), with rates: colonization gamma, persistence phi, and complements 1-gamma and 1-phi.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-16-h">
 <h2 id="slide-16-h"><span id="slide-16"></span>Slide 16</h2>
@@ -194,11 +191,11 @@ MathJax = {
 </section>
 <section aria-labelledby="slide-17-h">
 <h2 id="slide-17-h"><span id="slide-17"></span>Slide 17</h2>
-<p class="callout warn" role="note"><span class="callout-label">Figure 17.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 17.1.</strong> Slide text: Clark 2003 modeled fecundity of spotted owls and its implications for population growth; data were offspring counts per pair of owls, sample size n=197.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-18-h">
 <h2 id="slide-18-h"><span id="slide-18"></span>Slide 18</h2>
-<p class="callout warn" role="note"><span class="callout-label">Figure 18.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 18.1.</strong> Directed graph with arrows from alpha and beta pointing to lambda_i. Equation: [lambda,alpha,beta|y] proportional to product Poisson(y_i|lambda_i) gamma(lambda_i|alpha,beta) times gamma(alpha|.001,.001) gamma(beta|.001,.001).</figcaption></figure>
 <p>Gamma is the conjugate prior and flexible/non-negative. Good choice here</p>
 <ul>
 <li>These are called hyperpriors.</li>
@@ -212,7 +209,7 @@ MathJax = {
 </section>
 <section aria-labelledby="slide-19-h">
 <h2 id="slide-19-h"><span id="slide-19"></span>Slide 19</h2>
-<p class="callout warn" role="note"><span class="callout-label">Figure 19.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 19.1.</strong> Directed graph with arrows from alpha and beta pointing to lambda_i. Equation: [lambda,alpha,beta|y] proportional to product Poisson(y_i|lambda_i) gamma(lambda_i|alpha,beta) times gamma(alpha|.001,.001) gamma(beta|.001,.001).</figcaption></figure>
 <p>Gamma is the conjugate prior and flexible/non-negative. Good choice here</p>
 <ul>
 <li>These are called hyperpriors.</li>
@@ -229,13 +226,13 @@ MathJax = {
 <h2 id="slide-20-h"><span id="slide-20"></span>Slide 20</h2>
 <p>MULTILEVEL MODELING LAB</p>
 <p>MultiLevelModelingLab.html</p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 20.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 20.1.</strong> Screenshot of lab introduction text on multilevel models of nitrous oxide (N2O) emissions from agricultural soils, using Qian et al. 2010 data with soil carbon as a group-level covariate across 107 sites.</figcaption></figure>
 <p>Sensitivity: changes in parameters of &quot;vague&quot; priors meaningfully changes the posterior when data sets are small or when they have high variance</p>
 </section>
 <section aria-labelledby="slide-21-h">
 <h2 id="slide-21-h"><span id="slide-21"></span>Slide 21</h2>
 <p>Complete pooling</p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 21.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 21.1.</strong> JAGS complete-pooling model code: single alpha and beta priors, sigma, and one likelihood loop regressing log.emission on centered log nitrogen input, plus a loop deriving predicted emissions.</figcaption></figure>
 <p>Iterate likelihood over the data</p>
 <p>Only one alpha and beta</p>
 <p>Only one alpha and beta</p>
@@ -243,7 +240,7 @@ MathJax = {
 <section aria-labelledby="slide-22-h">
 <h2 id="slide-22-h"><span id="slide-22"></span>Slide 22</h2>
 <p>No pooling</p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 22.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 22.1.</strong> JAGS no-pooling model code: a separate alpha[j] prior for each of n.sites, shared beta and sigma; likelihood uses alpha[group[i]], with nested loops for site-level predicted emissions.</figcaption></figure>
 <p>Every site gets its own alpha</p>
 <ul>
 <li>Every site gets its own alpha</li>
@@ -256,8 +253,8 @@ MathJax = {
 <li>Random intercept</li>
 <li>Partial pooling</li>
 </ul>
-<p class="callout warn" role="note"><span class="callout-label">Figure 23.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 23.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 23.1.</strong> Directed acyclic graph for a partial-pooling random-intercept model: y_ij depends on beta, alpha_j, sigma, and covariate x_ij; alpha_j depends on hyperparameters mu_alpha and varsigma_alpha.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 23.2.</strong> JAGS partial-pooling model code: hyperpriors mu.alpha and sigma.alpha, site intercepts alpha[j] drawn from dnorm(mu.alpha, tau.alpha), shared beta/sigma, likelihood, and predicted emissions loops.</figcaption></figure>
 <p>Alpha varies by site but within shared distribution</p>
 </section>
 <section aria-labelledby="slide-24-h">
@@ -266,9 +263,9 @@ MathJax = {
 <li>Random intercept</li>
 <li>Partial pooling, but also attempt to EXPLAIN site-level differences</li>
 </ul>
-<p class="callout warn" role="note"><span class="callout-label">Figure 24.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 24.1.</strong> JAGS model code adding a site-level carbon covariate: mu.alpha[j] &lt;- kappa + eta*w[j] and alpha[j] ~ dnorm(mu.alpha[j], tau.alpha), explaining variation in intercepts among sites, plus predicted emissions.</figcaption></figure>
 <p>Every site gets its own alpha</p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 24.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 24.2.</strong> Directed acyclic graph: y_ij depends on alpha_j, beta, sigma, and covariate x_ij; alpha_j depends on kappa, eta, varsigma_alpha, and site covariate w_j feeds into alpha_j.</figcaption></figure>
 <p>In the previous example, we assumed that the variation in the intercept was attributable to spatial variation among sites. We did not try to explain that variation, we simply acknowledged that it exists. Now we are going to “model a parameter” using soil carbon content data at the site-level to explain variation in the intercepts among sites.</p>
 <p>Alpha varies by site but within shared distribution</p>
 <p>Flexibility! Intercepts can depend on soil carbon</p>
@@ -287,7 +284,7 @@ MathJax = {
 <li>What should the prior distributions be?</li>
 <li>How should we link these variables to environmental covariates?</li>
 </ul>
-<p class="callout warn" role="note"><span class="callout-label">Figure 25.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 25.1.</strong> Equation: N_i ~ Poisson(lambda) is the ecological process for true population size; y_ij | N_i ~ Binomial(N_i, p) is the observation process giving counts with detection probability p.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-26-h">
 <h2 id="slide-26-h"><span id="slide-26"></span>Slide 26</h2>
@@ -296,5 +293,4 @@ MathJax = {
 </main>
 
 <footer>FW 536 &middot; Statistical Modeling for Ecology and Conservation &middot; Oregon State University &middot; Accessible lecture notes</footer>
-</body>
-</html>
+</body></html>

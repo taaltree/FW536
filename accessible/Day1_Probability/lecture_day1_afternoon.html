@@ -6,11 +6,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="stylesheet" href="../_Shared/css/accessible.css" />
 <script>
-MathJax = {
-  tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
+MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
   options: { menuOptions: { settings: { assistiveMml: true, explorer: true } } },
-  loader: { load: ['a11y/assistive-mml', 'a11y/explorer'] }
-};
+  loader: { load: ['a11y/assistive-mml', 'a11y/explorer'] } };
 </script>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script"></script>
 </head>
@@ -21,8 +19,7 @@ MathJax = {
 <aside class="sidebar">
 <p class="brand"><a href="../index.html">FW 536 · Day 1 Afternoon</a></p>
 <div class="subtitle">Lecture notes: Discrete distributions</div>
-<nav aria-label="Slides in this lecture">
-<div class="section">Slides</div><ul>
+<nav aria-label="Slides in this lecture"><div class="section">Slides</div><ul>
 <li><a href="#slide-1">1. Discrete Probability Distributions</a></li>
 <li><a href="#slide-2">2. Binomial Experiments-I</a></li>
 <li><a href="#slide-3">3. Binomial Experiments-II</a></li>
@@ -75,9 +72,9 @@ MathJax = {
 <header class="lab-header">
 <div class="eyebrow">Day 1 Afternoon · Accessible lecture notes</div>
 <h1>Discrete distributions</h1>
-<p class="lede">A screen-reader-friendly transcript of the lecture slides: all slide text and speaker notes are included. Figures are flagged where a text description still needs to be added.</p>
+<p class="lede">A screen-reader-friendly transcript of the lecture slides: all slide text, tables, figure descriptions, and speaker notes.</p>
 </header>
-<div class="callout key"><p class="callout-label">About these notes</p>These notes are generated from the lecture slides. Each section below is one slide. Where a slide contained a picture, plot, or equation image, you will see a "Figure needs description" note &mdash; ask your instructor for the description of that figure. For the underlying concepts with worked examples, also read the <a href="plain_language_summary.html">plain-language summary</a> and <a href="lab.html">lab</a> for this session.</p></div>
+<div class="callout key"><p class="callout-label">About these notes</p>Each section is one slide. Figures carry text descriptions where available. For the concepts with worked examples, also read the <a href="plain_language_summary.html">plain-language summary</a> and <a href="lab.html">lab</a> for this session. You can also download the <a href="../../Day1_Probability/FW536_Day1_Afternoon%20Distributions%20I_accessible.pptx">alt-texted PowerPoint deck</a> (the same slides with image descriptions embedded).</div>
 <section aria-labelledby="slide-1-h">
 <h2 id="slide-1-h"><span id="slide-1"></span>Slide 1: Discrete Probability Distributions</h2>
 <p><em>(No text on this slide.)</em></p>
@@ -96,9 +93,9 @@ MathJax = {
 <h2 id="slide-3-h"><span id="slide-3"></span>Slide 3: Binomial Experiments-II</h2>
 <ul>
 <li>Why is the following a binomial experiment?</li>
-<li style="margin-left:1em">We randomly sample 500 fish from the population.</li>
-<li style="margin-left:1em">We record whether each animal is mature or immature.</li>
-<li style="margin-left:1em">The random variable X is the number of mature animals.</li>
+<li style="margin-left:1.2em">We randomly sample 500 fish from the population.</li>
+<li style="margin-left:1.2em">We record whether each animal is mature or immature.</li>
+<li style="margin-left:1.2em">The random variable X is the number of mature animals.</li>
 </ul>
 </section>
 <section aria-labelledby="slide-4-h">
@@ -128,8 +125,8 @@ MathJax = {
 <ul>
 <li>In a binomial experiment, the probability of exactly x successes in n trials is:</li>
 <li>With n = 1, the Binomial becomes the Bernoulli distribution</li>
-<li style="margin-left:1em">P(x) = px (1 - p)1 – x</li>
-<li style="margin-left:1em">Where x can take the values of 0 or 1</li>
+<li style="margin-left:1.2em">P(x) = px (1 - p)1 – x</li>
+<li style="margin-left:1.2em">Where x can take the values of 0 or 1</li>
 <li>Bernoulli  probability a single coin flip comes up heads</li>
 <li>Binomial  Probability that 10 coin flips yield 3 heads</li>
 <li>So the Binomial is the distribution for the sum of independent Bernoulli trials</li>
@@ -137,26 +134,26 @@ MathJax = {
 </section>
 <section aria-labelledby="slide-7-h">
 <h2 id="slide-7-h"><span id="slide-7"></span>Slide 7</h2>
-<p class="callout warn" role="note"><span class="callout-label">Figure 7.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 7.1.</strong> Concept-question slide. Q1: if X~binom(n,p) and Y~binom(m,p) are independent, X+Y follows (a) binom(n+m,p), (b) binom(nm,p), (c) binom(n+m,2p), (d) other. Q2: X~binom(n,p) and Z~binom(n,q) independent, X+Z follows (a) binom(n,p+q), (b) binom(n,pq), (c) binom(2n,p+q), (d) other.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-8-h">
 <h2 id="slide-8-h"><span id="slide-8"></span>Slide 8</h2>
-<p class="callout warn" role="note"><span class="callout-label">Figure 8.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 8.1.</strong> Same concept question with answers. Q1 answer: (a) binom(n+m,p), since each binomial is a sum of independent Bernoulli(p) variables. Q2 answer: (d) other, because combining Bernoulli(p) with Bernoulli(q) gives no named distribution.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-9-h">
 <h2 id="slide-9-h"><span id="slide-9"></span>Slide 9</h2>
-<p class="callout warn" role="note"><span class="callout-label">Figure 9.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 9.1.</strong> Board questions. 1: Prove Var(X)=p(1-p) if X~Bernoulli(p). 2: Prove Var(X)=np(1-p) if X~bin(n,p). 3: X1..Xn independent with standard deviation sigma=2; find the standard deviation of their average X-bar. Solution on next slide.</figcaption></figure>
 <ul>
 <li>Hints:</li>
 <li>Make a table with X, p(x), and (X - µ )2. Remember µ = E[X]</li>
 <li>Remember that variances of independent random variables add</li>
-<li style="margin-left:1em">Var(X + Y) = Var(X) + Var(Y)</li>
+<li style="margin-left:1.2em">Var(X + Y) = Var(X) + Var(Y)</li>
 </ul>
 <p>Group Work</p>
 </section>
 <section aria-labelledby="slide-10-h">
 <h2 id="slide-10-h"><span id="slide-10"></span>Slide 10</h2>
-<p class="callout warn" role="note"><span class="callout-label">Figure 10.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 10.1.</strong> Worked solution. For Bernoulli(p), a table gives Var(X)=E[(X-mu)^2]=(1-p)p^2+p(1-p)^2=p(1-p). For bin(n,p), X is a sum of n independent Bernoulli(p), so variances add: Var(X)=Var(X1)+...+Var(Xn)=np(1-p).</figcaption></figure>
 </section>
 <section aria-labelledby="slide-11-h">
 <h2 id="slide-11-h"><span id="slide-11"></span>Slide 11: Binomial Probabilities-II</h2>
@@ -179,9 +176,9 @@ MathJax = {
 <h2 id="slide-13-h"><span id="slide-13"></span>Slide 13: Examples of the Binomial Distribution-I</h2>
 <ul>
 <li>We examine 12 animals for the presence of a disease (p = 0.1). What is the probability that:</li>
-<li style="margin-left:1em">We find exactly 2 animals with the disease?</li>
-<li style="margin-left:1em">We find no animals with the disease?</li>
-<li style="margin-left:1em">We find 2 or more animals with the disease?</li>
+<li style="margin-left:1.2em">We find exactly 2 animals with the disease?</li>
+<li style="margin-left:1.2em">We find no animals with the disease?</li>
+<li style="margin-left:1.2em">We find 2 or more animals with the disease?</li>
 </ul>
 <p>Group Work</p>
 </section>
@@ -192,16 +189,16 @@ MathJax = {
 <li>P[X=0]=</li>
 <li>P[X2]=1-P[X=0]-P[X=1]=0.3410</li>
 </ul>
-<p class="callout warn" role="note"><span class="callout-label">Figure 14.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 14.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 14.1.</strong> R console: 1-pbinom(1,12,0.1) returns 0.3409977, the probability of 2 or more diseased animals out of 12 when p=0.1.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 14.2.</strong> R console: dbinom(2,12,0.1)=0.2301278; dbinom(0,12,0.1)=0.2824295; 1-dbinom(1,12,0.1)-dbinom(0,12,0.1)=0.3409977, giving P(exactly 2), P(0), and P(2 or more).</figcaption></figure>
 </section>
 <section aria-labelledby="slide-15-h">
 <h2 id="slide-15-h"><span id="slide-15"></span>Slide 15: Sneak peak: Maximum likelihood is just doing this in reverse!!!</h2>
 <ul>
 <li>Instead of knowing N and p, we often collect data in which p and sometimes also N are unknown.</li>
 <li>To understand how the world works, we want to determine p</li>
-<li style="margin-left:1em">What is the prevalence of a disease?</li>
-<li style="margin-left:1em">What is the probability of giving birth?</li>
+<li style="margin-left:1.2em">What is the prevalence of a disease?</li>
+<li style="margin-left:1.2em">What is the probability of giving birth?</li>
 </ul>
 </section>
 <section aria-labelledby="slide-16-h">
@@ -210,7 +207,7 @@ MathJax = {
 <li>Instead of knowing N and p, we often collect data, k #successes, to determine p and/or N</li>
 <li>Let’s assume that N is known. Say we conduct N trials, observe k successes, and want to make inference about p, given k and N</li>
 </ul>
-<p class="callout warn" role="note"><span class="callout-label">Figure 16.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 16.1.</strong> Equation: L-tilde(p | k, N) = (N choose k) p^k (1-p)^(N-k). The binomial written as a likelihood function of p given observed k and N.</figcaption></figure>
 <p>This is among the easiest possible likelihood problems</p>
 <p>Sneak peak: Maximum likelihood is just doing this in reverse!!!</p>
 </section>
@@ -223,7 +220,7 @@ MathJax = {
 <li>The range of p must be 0 to 1, but there is no requirement that the integral of the likelihood from 0 to 1 = 1 (as would be the case for a probability)</li>
 <li>Why did I say “integral” and not “sum”</li>
 </ul>
-<p class="callout warn" role="note"><span class="callout-label">Figure 17.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 17.1.</strong> Equation: L-tilde(p | k, N) = (N choose k) p^k (1-p)^(N-k). The binomial written as a likelihood function of p given observed k and N.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-18-h">
 <h2 id="slide-18-h"><span id="slide-18"></span>Slide 18: Sneak peak: Maximum likelihood is just doing this in reverse!!!</h2>
@@ -231,8 +228,8 @@ MathJax = {
 <li>This equation is exactly what we’ve been working with but the interpretation is very different</li>
 <li>We usually work with the log-likelihood. Can you find that?  log(a*b) = log(a) + log(b), log(ab)=b*log(a)</li>
 </ul>
-<p class="callout warn" role="note"><span class="callout-label">Figure 18.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 18.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 18.1.</strong> Equation: L-tilde(p | k, N) = (N choose k) p^k (1-p)^(N-k).</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 18.2.</strong> Equation: L(p | k, N) = log(N choose k) + k log(p) + (N-k) log(1-p). The binomial log-likelihood.</figcaption></figure>
 <p>Should I show you the derivation?</p>
 </section>
 <section aria-labelledby="slide-19-h">
@@ -242,12 +239,12 @@ MathJax = {
 <li>Enter Calculus!</li>
 <li>Find the MLE for p</li>
 </ul>
-<p class="callout warn" role="note"><span class="callout-label">Figure 19.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 19.1.</strong> Equation: L(p | k, N) = log(N choose k) + k log(p) + (N-k) log(1-p). The binomial log-likelihood to be maximized for the MLE.</figcaption></figure>
 <p>Sneak peak: Maximum likelihood is just doing this in reverse!!!</p>
 </section>
 <section aria-labelledby="slide-20-h">
 <h2 id="slide-20-h"><span id="slide-20"></span>Slide 20</h2>
-<p class="callout warn" role="note"><span class="callout-label">Figure 20.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 20.1.</strong> Two log-likelihood curves for p (binomial, constant term dropped). Panel a: 4 successes in 10 trials, wide peak near p=0.4. Panel b: 40 in 100, much narrower peak near 0.4. Larger samples give sharper likelihoods.</figcaption></figure>
 <ul>
 <li>Hudson (1971) showed that an approximate 95% CI for a single peaked likelihood function occurs 2 log-likelihood units below the peak.</li>
 <li>Can you see why sample size is so important based on these shapes?</li>
@@ -263,8 +260,8 @@ MathJax = {
 </section>
 <section aria-labelledby="slide-22-h">
 <h2 id="slide-22-h"><span id="slide-22"></span>Slide 22</h2>
-<p class="callout warn" role="note"><span class="callout-label">Figure 22.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 22.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 22.1.</strong> Multinomial distribution text and formula. Equation: Pr{k | N, p} = N! / (product over i of k_i!) times product over i=1 to n of p_i^(k_i). Extends the binomial to n outcome categories.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 22.2.</strong> Equation: n! / (x_1! ... x_k!) times p_1^(x_1) ... p_k^(x_k). Multinomial probability written with x and k notation.</figcaption></figure>
 <p>Alternatively written</p>
 </section>
 <section aria-labelledby="slide-23-h">
@@ -281,12 +278,12 @@ MathJax = {
 <h2 id="slide-24-h"><span id="slide-24"></span>Slide 24: The Poisson Distribution-I</h2>
 <ul>
 <li>In short – Poisson models ”random” count data</li>
-<li style="margin-left:1em">Number of ladybugs or leaves per bush</li>
-<li style="margin-left:1em">Number of prey encountered per unit time</li>
-<li style="margin-left:1em">Number of eggs produced by a fish</li>
+<li style="margin-left:1.2em">Number of ladybugs or leaves per bush</li>
+<li style="margin-left:1.2em">Number of prey encountered per unit time</li>
+<li style="margin-left:1.2em">Number of eggs produced by a fish</li>
 <li>This is different from bounded count data, which is binomial</li>
-<li style="margin-left:1em"># offspring that survive out of N offspring</li>
-<li style="margin-left:1em">#cameras that detect wolves out of N cameras</li>
+<li style="margin-left:1.2em"># offspring that survive out of N offspring</li>
+<li style="margin-left:1.2em">#cameras that detect wolves out of N cameras</li>
 <li>You might think that the Poisson could be a good approximation of the binomial if N is large and p is small. You are right!</li>
 </ul>
 </section>
@@ -296,8 +293,8 @@ MathJax = {
 <li>Various notations:</li>
 <li>Note that x (or k) can be any non-negative integer.</li>
 </ul>
-<p class="callout warn" role="note"><span class="callout-label">Figure 25.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 25.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 25.1.</strong> Equation: p_k(t) = (lambda t)^k / k! times e^(-lambda t). The Poisson pmf with rate lambda over interval t.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 25.2.</strong> Equation: P(k events in interval) = e^(-lambda) lambda^k / k!. The Poisson pmf with mean lambda.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-26-h">
 <h2 id="slide-26-h"><span id="slide-26"></span>Slide 26: Where does the Poisson distribution come from?</h2>
@@ -311,13 +308,13 @@ MathJax = {
 <li>Use the definition of the derivative to show that this leads to</li>
 <li>Solve to find the zero term of the Poisson, Pr(no events)</li>
 </ul>
-<p class="callout warn" role="note"><span class="callout-label">Figure 27.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 27.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 27.1.</strong> Equation: dp_0/dt = -lambda p_0. Differential equation for the probability of no events.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 27.2.</strong> Equation: p_0(t) = exp(-lambda t). Solution giving the probability of no events by time t.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-28-h">
 <h2 id="slide-28-h"><span id="slide-28"></span>Slide 28: Zero term of the Poisson Distribution</h2>
-<p class="callout warn" role="note"><span class="callout-label">Figure 28.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 28.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 28.1.</strong> Equation: Pr{no event in 0 to t} = p_0(t) = e^(-lambda t). The zero term of the Poisson.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 28.2.</strong> Equation: p_0(t) = exp(-lambda t). Probability of no events by time t.</figcaption></figure>
 <p>Probability Mass Function:</p>
 </section>
 <section aria-labelledby="slide-29-h">
@@ -328,7 +325,7 @@ MathJax = {
 <li>Continue like this to derive other terms</li>
 <li>Another derivation starts with the Binomial distribution where the average number of successes, Np, is replaced by.    and N approaches infinity</li>
 </ul>
-<p class="callout warn" role="note"><span class="callout-label">Figure 29.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 29.1.</strong> Equation: p_k(t) = (lambda t)^k / k! times e^(-lambda t). The full Poisson pmf.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-30-h">
 <h2 id="slide-30-h"><span id="slide-30"></span>Slide 30: The Poisson Distribution - pmf</h2>
@@ -336,8 +333,8 @@ MathJax = {
 <li>Various notations:</li>
 <li>Note that x (or k) can be any non-negative integer.</li>
 </ul>
-<p class="callout warn" role="note"><span class="callout-label">Figure 30.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 30.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 30.1.</strong> Equation: p_k(t) = (lambda t)^k / k! times e^(-lambda t). The Poisson pmf with rate lambda over interval t.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 30.2.</strong> Equation: P(k events in interval) = e^(-lambda) lambda^k / k!. The Poisson pmf with mean lambda.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-31-h">
 <h2 id="slide-31-h"><span id="slide-31"></span>Slide 31: The Poisson Distribution Graphically</h2>
@@ -349,9 +346,9 @@ MathJax = {
 <h2 id="slide-32-h"><span id="slide-32"></span>Slide 32: An Example of the Poisson Distribution-I</h2>
 <ul>
 <li>The mean bycatch of dolphins per month in the Eastern Tropical Pacific is 3</li>
-<li style="margin-left:1em">What is the probability that the catch will be 4 in a given month?</li>
-<li style="margin-left:1em">What is the probability that the catch will be 2 or less in a given month?</li>
-<li style="margin-left:1em">What is the probability that at least one dolphin is killed?</li>
+<li style="margin-left:1.2em">What is the probability that the catch will be 4 in a given month?</li>
+<li style="margin-left:1.2em">What is the probability that the catch will be 2 or less in a given month?</li>
+<li style="margin-left:1.2em">What is the probability that at least one dolphin is killed?</li>
 </ul>
 <p>Breakout groups: Try to find analytical solutions AND a solution using built in functions in R</p>
 <p>Group Work</p>
@@ -360,44 +357,44 @@ MathJax = {
 <h2 id="slide-33-h"><span id="slide-33"></span>Slide 33: An Example of the Poisson Distribution-II</h2>
 <ul>
 <li>The mean catch of dolphins per month in the Eastern Tropical Pacific is 3.</li>
-<li style="margin-left:1em">What is the probability that the catch will be 4 in a given month?</li>
+<li style="margin-left:1.2em">What is the probability that the catch will be 4 in a given month?</li>
 </ul>
-<p class="callout warn" role="note"><span class="callout-label">Figure 33.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 33.1.</strong> R console: dpois(4,3) returns 0.1680314, the Poisson probability of exactly 4 events when the mean is 3.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-34-h">
 <h2 id="slide-34-h"><span id="slide-34"></span>Slide 34: An Example of the Poisson Distribution-III</h2>
 <ul>
 <li>The mean catch of dolphins per month in the Eastern Tropical Pacific is 3.</li>
-<li style="margin-left:1em">What is the probability that the catch will be 4 in a given month?</li>
-<li style="margin-left:1em">What is the probability that the catch will be 2 or fewer in a given month?</li>
-<li style="margin-left:1em">P[X2]=P[X=0]+P[X=1]+P[X=2]=</li>
+<li style="margin-left:1.2em">What is the probability that the catch will be 4 in a given month?</li>
+<li style="margin-left:1.2em">What is the probability that the catch will be 2 or fewer in a given month?</li>
+<li style="margin-left:1.2em">P[X2]=P[X=0]+P[X=1]+P[X=2]=</li>
 </ul>
-<p class="callout warn" role="note"><span class="callout-label">Figure 34.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 34.1.</strong> R console: dpois(0,3)+dpois(1,3)+dpois(2,3)=0.4231901 and ppois(2,3)=0.4231901, the Poisson probability of 2 or fewer events when the mean is 3.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-35-h">
 <h2 id="slide-35-h"><span id="slide-35"></span>Slide 35: An Example of the Poisson Distribution-III</h2>
 <ul>
 <li>The mean catch of dolphins per month in the Eastern Tropical Pacific is 3.</li>
-<li style="margin-left:1em">What is the probability that the catch will be 4 in a given month?</li>
-<li style="margin-left:1em">What is the probability that the catch will be 2 or fewer in a given month?</li>
-<li style="margin-left:1em">What is the probability that at least 1 dolphin is killed?</li>
+<li style="margin-left:1.2em">What is the probability that the catch will be 4 in a given month?</li>
+<li style="margin-left:1.2em">What is the probability that the catch will be 2 or fewer in a given month?</li>
+<li style="margin-left:1.2em">What is the probability that at least 1 dolphin is killed?</li>
 </ul>
-<p class="callout warn" role="note"><span class="callout-label">Figure 35.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 35.1.</strong> R console: dpois(0,3)=0.04978707 and 1-dpois(0,3)=0.9502129, the Poisson probability of at least one event when the mean is 3.</figcaption></figure>
 <p>e-3</p>
 <p>1 - e-3</p>
 </section>
 <section aria-labelledby="slide-36-h">
 <h2 id="slide-36-h"><span id="slide-36"></span>Slide 36: Example of using Poisson Probabilistic Arguments in Research</h2>
-<p class="callout warn" role="note"><span class="callout-label">Figure 36.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 36.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 36.1.</strong> Journal excerpt: modeling observed attacks as a Poisson process, the probability of zero attacks being seen before 1990 is 0.006, given a rate constant over the 27-year period.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 36.2.</strong> Journal article header: &#x27;Killer Whale Predation on Sea Otters Linking Oceanic and Nearshore Ecosystems&#x27; by Estes, Tinker, Williams and Doak, with abstract on sea otter decline from killer whale predation.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-37-h">
 <h2 id="slide-37-h"><span id="slide-37"></span>Slide 37: The Poisson Distribution - Caveat</h2>
 <ul>
 <li>The Poisson distribution would seem to be a good distribution to assume for catch data in fisheries. However, fish school. What does this imply regarding the assumptions of the Poisson distribution?</li>
 <li>Variance would be high relative to the mean</li>
-<li style="margin-left:1em">You catch zero or a shit ton!!!</li>
-<li style="margin-left:1em">This is called overdispersion  Onward to negative binomial!</li>
+<li style="margin-left:1.2em">You catch zero or a shit ton!!!</li>
+<li style="margin-left:1.2em">This is called overdispersion  Onward to negative binomial!</li>
 </ul>
 </section>
 <section aria-labelledby="slide-38-h">
@@ -406,9 +403,9 @@ MathJax = {
 <li>Let’s find the MLE of the Poisson distribution</li>
 <li>Let’s do it for a dataset of n Poisson distributed observations. (very common to assume that t =1 since counts per period is typically desired)</li>
 </ul>
-<p class="callout warn" role="note"><span class="callout-label">Figure 38.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 38.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 38.3 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 38.1.</strong> Equation: p_k(t) = (lambda t)^k / k! times e^(-lambda t). The Poisson pmf.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 38.2.</strong> Equation: L(p | {X_i}) = sum from i=1 to n of log(f(X_i | p)). The log-likelihood for n observations.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 38.3.</strong> Equation: L-tilde(p | {X_i}) = product from i=1 to n of f(X_i | p). The likelihood as a product over n observations.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-39-h">
 <h2 id="slide-39-h"><span id="slide-39"></span>Slide 39: The Negative Binomial Distribution(1) # failures/trials before fixed number of successes</h2>
@@ -416,17 +413,17 @@ MathJax = {
 <li>We have an experiment with two outcomes: success (with probability p) and failure (with probability q =1-p).</li>
 <li>Let N  be the number of trials to achieve k successes, each with probability p</li>
 <li>Number of trials, N, is now the random variable!</li>
-<li style="margin-left:1em">Recall, k, was the R.V. in the binomial case</li>
+<li style="margin-left:1.2em">Recall, k, was the R.V. in the binomial case</li>
 </ul>
 </section>
 <section aria-labelledby="slide-40-h">
 <h2 id="slide-40-h"><span id="slide-40"></span>Slide 40</h2>
-<p class="callout warn" role="note"><span class="callout-label">Figure 40.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 40.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 40.3 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 40.1.</strong> Equation: Pr{N = n | k, p} = Probability that the kth success occurs on trial n. Sets up the negative binomial.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 40.2.</strong> Text: for the kth success on trial n, we need k-1 successes in the first n-1 trials (binomial with parameters n-1 and p) and a success on trial n with probability p, independently.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 40.3.</strong> Equation: Pr{N = n | k, p} = (n-1 choose k-1) p^(k-1) (1-p)^(n-k) p = (n-1 choose k-1) p^k (1-p)^(n-k). The negative binomial pmf.</figcaption></figure>
 <p>Try to derive it based on this argument</p>
 <p>How do we turn this into “failures”, X=k, until r successes?</p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 40.4 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 40.4.</strong> Equation: f(k; r, p) = Pr(X = k) = (k+r-1 choose r-1) (1-p)^k p^r. Negative binomial for number of failures k before r successes.</figcaption></figure>
 <p>The Negative Binomial Distribution(1) # failures/trials before fixed number of successes</p>
 <details class="answer"><summary>Speaker notes for this slide</summary><div class="answer-body"><p>Examples? Number of foraging bouts before r successes. Number of surveys before r detections.</p></div></details>
 </section>
@@ -436,9 +433,9 @@ MathJax = {
 <li>Start with Poisson</li>
 <li>But let’s give lambda a continuous probability (continuous distributions come soon!) and then integrate over all possible values of lambda (this is called “marginalizing”)</li>
 </ul>
-<p class="callout warn" role="note"><span class="callout-label">Figure 41.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 41.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 41.3 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 41.1.</strong> Equation: Pr{k events in [0,t] | lambda} = (lambda t)^k / k! times e^(-lambda t). The Poisson before making lambda random.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 41.2.</strong> Equation: Pr{k events in [0,t]} = integral from 0 to infinity of (lambda t)^k / k! times e^(-lambda t) f(lambda) d-lambda. Marginalizing the Poisson over a distribution of lambda.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 41.3.</strong> Equation: p_X(x) = integral over y of p_{X,Y}(x,y) dy = integral over y of p_{X|Y}(x|y) p_Y(y) dy. The marginalization identity.</figcaption></figure>
 <p>Because:</p>
 </section>
 <section aria-labelledby="slide-42-h">
@@ -449,36 +446,35 @@ MathJax = {
 <li>In general</li>
 <li>Defined (for z &gt; 0):</li>
 </ul>
-<p class="callout warn" role="note"><span class="callout-label">Figure 42.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 42.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 42.3 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 42.1.</strong> Equation: Gamma(z) = (z-1)!. The gamma function equals the factorial for integer z.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 42.2.</strong> Equation: Gamma(z+1) = z Gamma(z). The recurrence relation of the gamma function.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 42.3.</strong> Equation: Gamma(z) = integral from 0 to infinity of s^(z-1) e^(-s) ds. Integral definition of the gamma function for z&gt;0.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-43-h">
 <h2 id="slide-43-h"><span id="slide-43"></span>Slide 43: The Negative Binomial Distribution(2) Poisson with a variable rate parameter</h2>
 <p>Common parameterization in ecology with the mean as a parameter:</p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 43.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 43.1.</strong> Equation: Pr{N = n} = p_n(m, k) = Gamma(k+n) / (n! Gamma(k)) times (k/(k+m))^k times (m/(k+m))^n. Negative binomial parameterized by mean m and dispersion k.</figcaption></figure>
 <p>We model N overdispersed counts as function of mean, m, and dispersion, k</p>
 </section>
 <section aria-labelledby="slide-44-h">
 <h2 id="slide-44-h"><span id="slide-44"></span>Slide 44: The Negative Binomial Distribution(2) Poisson with a variable rate parameter</h2>
-<p class="callout warn" role="note"><span class="callout-label">Figure 44.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 44.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 44.1.</strong> Equation: Pr{N = n} = p_n(m, k) = Gamma(k+n) / (n! Gamma(k)) times (k/(k+m))^k times (m/(k+m))^n. Negative binomial in mean-dispersion form.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 44.2.</strong> Equation: p_0(m, k) = (k/(k+m))^k. Negative binomial probability of no events; large when k is small even if m is big.</figcaption></figure>
 <p>What is the probability of no events?</p>
 <p>This probability can be large if k is small even if m is big</p>
 </section>
 <section aria-labelledby="slide-45-h">
 <h2 id="slide-45-h"><span id="slide-45"></span>Slide 45: Poisson vs. Negative Binomial</h2>
-<p class="callout warn" role="note"><span class="callout-label">Figure 45.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 45.1.</strong> Four bar charts of probability versus number of events (0 to 30). Panel a: Poisson, mean 10, bell-shaped peak near 10. Panels b, c, d: negative binomial, same mean, dispersion 5, 1, 0.5, becoming flatter and more skewed as dispersion drops.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-46-h">
 <h2 id="slide-46-h"><span id="slide-46"></span>Slide 46: The Geometric Distribution</h2>
 <p>This is a special case of the negative binomial distribution for which k =1 (i.e. the probability of the number of trials or failures until one success is recorded).</p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 46.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 46.1.</strong> Comparison table of two geometric distribution conventions (k trials vs k failures): Support, PMF (1-p)^(k-1)p vs (1-p)^k p, CDF, and Mean 1/p vs (1-p)/p.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-47-h">
 <h2 id="slide-47-h"><span id="slide-47"></span>Slide 47: Summary of Discrete Distributions</h2>
-<table>
-<thead><tr><th scope="col">Distribution</th><th scope="col">Number of trials</th><th scope="col">Random Variable</th><th scope="col">Parameters</th></tr></thead>
+<table><thead><tr><th scope="col">Distribution</th><th scope="col">Number of trials</th><th scope="col">Random Variable</th><th scope="col">Parameters</th></tr></thead>
 <tbody>
 <tr><td>Binomial</td><td>Pre-specified</td><td>Number of successes</td><td>n, p</td></tr>
 <tr><td>Negative Binomial</td><td>Repeated until a given number of successes</td><td>Number of failures</td><td>r, p</td></tr>
@@ -490,5 +486,4 @@ MathJax = {
 </main>
 
 <footer>FW 536 &middot; Statistical Modeling for Ecology and Conservation &middot; Oregon State University &middot; Accessible lecture notes</footer>
-</body>
-</html>
+</body></html>

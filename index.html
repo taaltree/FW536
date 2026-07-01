@@ -7,16 +7,22 @@
 <link rel="stylesheet" href="_Shared/css/lab.css" />
 <style>
   body { background: linear-gradient(180deg, #FBFAF6 0%, #F1EFE8 100%); }
-  .hero { padding: 60px 60px 30px; max-width: 1200px; margin: 0 auto; }
+  .hero { padding: 60px 60px 20px; max-width: 1200px; margin: 0 auto; }
   .hero h1 { font-size: 44px; line-height: 1.1; margin: 8px 0 12px; }
   .hero .eyebrow { font-family: 'Helvetica Neue', Arial, sans-serif; color: var(--osu-orange); letter-spacing: 2px; text-transform: uppercase; font-size: 14px; font-weight: 700; }
   .hero p { font-size: 20px; color: var(--osu-stone); line-height: 1.5; max-width: 950px; }
-  .quicklinks { padding: 0 60px 20px; max-width: 1200px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 14px; }
+  .quicklinks { padding: 0 60px 10px; max-width: 1200px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 14px; }
   .quicklink { display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 8px; background: white; border: 1px solid var(--border); color: var(--osu-black); text-decoration: none; font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 14px; font-weight: 600; }
   .quicklink:hover { background: var(--osu-orange); color: white; border-color: var(--osu-orange); }
   .quicklink.primary { background: var(--osu-orange); color: white; border-color: var(--osu-orange); }
   .quicklink.primary:hover { background: var(--osu-orange-dark); }
-  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 22px; padding: 30px 60px; max-width: 1200px; margin: 0 auto; }
+  .prep { max-width: 1200px; margin: 14px auto 0; padding: 0 60px; }
+  .prep-box { background: #11304A; color: #fff; border-radius: 12px; padding: 20px 26px; }
+  .prep-box h2 { color:#fff; border:none; margin:0 0 6px; font-size:20px; }
+  .prep-box p { margin:0 0 12px; color:#dbe6ef; font-size:15px; }
+  .prep-box a { display:inline-block; margin:0 10px 8px 0; padding:8px 15px; border-radius:7px; background:#FFE08A; color:#11304A; text-decoration:none; font-family:'Helvetica Neue',Arial,sans-serif; font-weight:700; font-size:14px; }
+  .prep-box a:hover { background:#fff; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 22px; padding: 26px 60px; max-width: 1200px; margin: 0 auto; }
   .card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); border-top: 5px solid var(--osu-orange); }
   .card .day-num-link { font-family: 'Helvetica Neue', Arial, sans-serif; color: var(--osu-orange); font-size: 12px; letter-spacing: 2px; text-transform: uppercase; font-weight: 700; text-decoration: none; display: inline-block; }
   .card .day-num-link:hover { color: var(--osu-orange-dark); }
@@ -25,28 +31,24 @@
   .card h2 a:hover { color: var(--osu-orange); }
   .card .session-block { padding: 12px 0; border-top: 1px solid var(--border); }
   .card .session-block:first-of-type { border-top: none; padding-top: 4px; }
-  .card .session-label { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--osu-stone); font-weight: 700; margin-bottom: 4px; }
+  .card .session-label { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--osu-stone); font-weight: 700; margin-bottom: 6px; }
   .card .session-label a { color: inherit; text-decoration: none; }
   .card .session-label a:hover { color: var(--osu-orange); }
-  .card .session-title { font-weight: 600; color: var(--osu-black); margin-bottom: 8px; }
-  .card .session-title a { color: inherit; text-decoration: none; border-bottom: 1px dotted transparent; }
-  .card .session-title a:hover { color: var(--osu-orange); border-bottom-color: var(--osu-orange); }
-  .card .activity-row { display: grid; grid-template-columns: 70px 1fr; gap: 8px; align-items: baseline; padding: 4px 0; font-size: 13px; }
+  .card .activity-row { display: grid; grid-template-columns: 78px 1fr; gap: 8px; align-items: baseline; padding: 4px 0; font-size: 13px; }
   .card .activity-row .tag { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 3px 6px; border-radius: 10px; text-align: center; }
+  .card .activity-row .tag.lecture  { background: #F4ECD8; color: #6A3F22; }
   .card .activity-row .tag.practice { background: #E8F2D9; color: #3F6B2A; }
   .card .activity-row .tag.assessed { background: #FBE3DD; color: #A22020; }
   .card .activity-row .tag.template { background: #E1ECF7; color: #1C638A; }
-  .card .activity-row .tag.lecture  { background: #F4ECD8; color: #6A3F22; }
+  .card .activity-row .tag.interactive { background: #ECE4F6; color: #5B2C8A; }
   .card .activity-row .tag.exam     { background: #F0E4F5; color: #6C2C8A; }
   .card .activity-row a { color: var(--osu-orange-dark); text-decoration: none; font-weight: 600; }
   .card .activity-row a:hover { color: var(--osu-orange); text-decoration: underline; }
-  .card .activity-row .theme-note { color: var(--muted); font-size: 12px; font-style: italic; margin-left: 4px; }
-  .card .extras { font-size: 12px; color: var(--muted); margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--border); line-height: 1.6; }
+  .card .activity-row .note { color: var(--muted); font-size: 12px; font-style: italic; margin-left: 4px; }
+  .card .extras { font-size: 12px; color: var(--muted); margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--border); line-height: 1.7; }
   .card .extras a { color: var(--osu-orange-dark); text-decoration: none; font-weight: 600; }
   .card .extras a.featured { font-size: 13px; padding: 1px 6px; border-radius: 4px; background: var(--panel-alt); }
   .card .extras a:hover { color: var(--osu-orange); }
-  .card .instr-row { margin-top: 8px; font-size: 12px; color: var(--muted); }
-  .card .instr-row a { color: #6C2C8A; text-decoration: none; padding: 1px 6px; border-radius: 4px; background: #F0E4F5; margin-right: 4px; }
   .features { padding: 30px 60px; max-width: 1200px; margin: 0 auto; }
   .features h2 { font-size: 26px; }
   .feat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
@@ -66,11 +68,21 @@
 
 <div class="quicklinks">
   <a class="quicklink primary" href="syllabus.html">Syllabus</a>
+  <a class="quicklink" href="install_jags_nimble.html">Setup: R, JAGS &amp; Nimble</a>
   <a class="quicklink" href="rmarkdown_tutorial.html">R Markdown tutorial</a>
   <a class="quicklink" href="pre_course_exam.html">Pre-course exam</a>
   <a class="quicklink" href="post_course_exam.html">Post-course exam</a>
-  <a class="quicklink" href="README.md">README</a>
   <a class="quicklink" href="accessible/index.html">Accessible version (screen-reader optimized)</a>
+</div>
+
+<div class="prep">
+  <div class="prep-box">
+    <h2>Before the course — do this first</h2>
+    <p>The Bayesian labs need a working toolchain. Install everything and confirm it runs before Day 1, and learn the R Markdown workflow used for every hand-in.</p>
+    <a href="install_jags_nimble.html">1 · Install R, JAGS &amp; Nimble (Windows &amp; Mac)</a>
+    <a href="rmarkdown_tutorial.html">2 · R Markdown tutorial</a>
+    <a href="pre_course_exam.html">3 · Take the pre-course exam (Day 1 morning)</a>
+  </div>
 </div>
 
 <div class="grid">
@@ -81,29 +93,26 @@
     <h2><a href="Day1_Probability/lab.html">Probability &amp; discrete distributions</a></h2>
 
     <div class="session-block">
-      <div class="session-label"><a href="Day1_Probability/lab.html#morning">Morning · 20 pts · pre-course exam at start</a></div>
-      <div class="session-title"><a href="Day1_Probability/lab.html#morning">Probability problem set</a></div>
-      <div class="activity-row"><span class="tag practice">Practice</span><span><a href="Day1_Probability/lab.html#morning">In-class walkthrough</a> <span class="theme-note">— answers visible</span></span></div>
-      <div class="activity-row"><span class="tag assessed">Assess A</span><span><a href="Day1_Probability/problem_set_v2.html#morning">v2 marine &amp; fisheries</a></span></div>
-      <div class="activity-row"><span class="tag assessed">Assess B</span><span><a href="Day1_Probability/problem_set_v3.html#morning">v3 terrestrial wildlife &amp; disease</a></span></div>
-      <div class="activity-row"><span class="tag template">Hand-in</span><span><a href="Day1_Probability/morning_lab_template_v2.Rmd">morning v2 (marine &amp; fisheries)</a> <span class="theme-note">or</span> <a href="Day1_Probability/morning_lab_template_v3.Rmd">morning v3 (terrestrial wildlife &amp; disease)</a></span></div>
+      <div class="session-label"><a href="Day1_Probability/lab.html#morning">Morning · Probability · 20 pts · pre-course exam at start</a></div>
+      <div class="activity-row"><span class="tag lecture">Lecture</span><span><a href="Day1_Probability/FW536_Day1_Morning_intro%20to%20probability.pptx">Slides: intro to probability (PPT)</a></span></div>
+      <div class="activity-row"><span class="tag practice">Practice</span><span><a href="Day1_Probability/lab.html#morning">In-class walkthrough</a> <span class="note">answers visible</span></span></div>
+      <div class="activity-row"><span class="tag assessed">Graded</span><span><a href="Day1_Probability/problem_set.html#morning">Morning problem set</a></span></div>
+      <div class="activity-row"><span class="tag template">Hand-in</span><span><a href="Day1_Probability/morning_lab_template.Rmd">morning_lab_template.Rmd</a></span></div>
     </div>
 
     <div class="session-block">
-      <div class="session-label"><a href="Day1_Probability/lab.html#afternoon">Afternoon · 20 pts</a></div>
-      <div class="session-title"><a href="Day1_Probability/lab.html#afternoon">Discrete distributions problem set</a></div>
-      <div class="activity-row"><span class="tag practice">Practice</span><span><a href="Day1_Probability/lab.html#afternoon">In-class walkthrough</a> <span class="theme-note">— answers visible</span></span></div>
-      <div class="activity-row"><span class="tag assessed">Assess A</span><span><a href="Day1_Probability/problem_set_v2.html#afternoon">v2 marine &amp; fisheries</a></span></div>
-      <div class="activity-row"><span class="tag assessed">Assess B</span><span><a href="Day1_Probability/problem_set_v3.html#afternoon">v3 terrestrial wildlife &amp; disease</a></span></div>
-      <div class="activity-row"><span class="tag template">Hand-in</span><span><a href="Day1_Probability/afternoon_lab_template_v2.Rmd">afternoon v2 (marine &amp; fisheries)</a> <span class="theme-note">or</span> <a href="Day1_Probability/afternoon_lab_template_v3.Rmd">afternoon v3 (terrestrial wildlife &amp; disease)</a></span></div>
+      <div class="session-label"><a href="Day1_Probability/lab.html#afternoon">Afternoon · Discrete distributions · 20 pts</a></div>
+      <div class="activity-row"><span class="tag lecture">Lecture</span><span><a href="Day1_Probability/FW536_Day1_Afternoon%20Distributions%20I.pptx">Slides: discrete distributions (PPT)</a></span></div>
+      <div class="activity-row"><span class="tag practice">Practice</span><span><a href="Day1_Probability/lab.html#afternoon">In-class walkthrough</a> <span class="note">answers visible</span></span></div>
+      <div class="activity-row"><span class="tag assessed">Graded</span><span><a href="Day1_Probability/problem_set.html#afternoon">Afternoon problem set</a></span></div>
+      <div class="activity-row"><span class="tag template">Hand-in</span><span><a href="Day1_Probability/afternoon_lab_template.Rmd">afternoon_lab_template.Rmd</a></span></div>
+      <div class="activity-row"><span class="tag interactive">Explore</span><span><a href="Day1_Probability/explore_distributions.html">Interactive distribution explorer</a></span></div>
     </div>
 
     <div class="extras">
       <a class="featured" href="Day1_Probability/plain_language_summary.html">Plain-language summary</a> ·
-      <a href="Day1_Probability/answer_key.html">Practice answer key</a><br/>
-      Lectures: <a class="featured" href="Day1_Probability/FW536_Day1_Morning_intro%20to%20probability.pptx">morning PPT</a> ·
-      <a class="featured" href="Day1_Probability/FW536_Day1_Afternoon%20Distributions%20I.pptx">afternoon PPT</a>
-      <div class="instr-row">Instructor keys: <a href="Day1_Probability/problem_set_v2_KEY.html">v2 KEY</a> <a href="Day1_Probability/problem_set_v3_KEY.html">v3 KEY</a></div>
+      <a href="Day1_Probability/answer_key.html">Practice answer key</a> ·
+      <a href="accessible/Day1_Probability/lecture_day1_morning.html">Accessible lecture notes</a>
     </div>
   </div>
 
@@ -113,30 +122,27 @@
     <h2><a href="Day2_GLM/lab.html">Continuous distributions, LMs &amp; GLMs</a></h2>
 
     <div class="session-block">
-      <div class="session-label"><a href="Day2_GLM/lab.html#morning">Morning · 20 pts</a></div>
-      <div class="session-title"><a href="Day2_GLM/lab.html#morning">Continuous distributions problem set</a></div>
-      <div class="activity-row"><span class="tag practice">Practice</span><span><a href="Day2_GLM/lab.html#morning">In-class walkthrough</a> <span class="theme-note">— answers visible</span></span></div>
-      <div class="activity-row"><span class="tag assessed">Assess A</span><span><a href="Day2_GLM/problem_set_v2.html#morning">v2 forest &amp; songbird</a></span></div>
-      <div class="activity-row"><span class="tag assessed">Assess B</span><span><a href="Day2_GLM/problem_set_v3.html#morning">v3 aquatic &amp; fisheries</a></span></div>
-      <div class="activity-row"><span class="tag template">Hand-in</span><span><a href="Day2_GLM/morning_lab_template_v2.Rmd">morning v2 (forest &amp; songbird)</a> <span class="theme-note">or</span> <a href="Day2_GLM/morning_lab_template_v3.Rmd">morning v3 (aquatic &amp; fisheries)</a></span></div>
+      <div class="session-label"><a href="Day2_GLM/lab.html#morning">Morning · Continuous distributions · 20 pts</a></div>
+      <div class="activity-row"><span class="tag lecture">Lecture</span><span><a href="Day2_GLM/FW536_Day2_Morning_ContinuousDistributions.pptx">Slides: continuous distributions (PPT)</a></span></div>
+      <div class="activity-row"><span class="tag practice">Practice</span><span><a href="Day2_GLM/lab.html#morning">In-class walkthrough</a> <span class="note">answers visible</span></span></div>
+      <div class="activity-row"><span class="tag assessed">Graded</span><span><a href="Day2_GLM/problem_set.html#morning">Morning problem set</a></span></div>
+      <div class="activity-row"><span class="tag template">Hand-in</span><span><a href="Day2_GLM/morning_lab_template.Rmd">morning_lab_template.Rmd</a></span></div>
     </div>
 
     <div class="session-block">
-      <div class="session-label"><a href="Day2_GLM/lab.html#afternoon">Afternoon · 20 pts</a></div>
-      <div class="session-title"><a href="Day2_GLM/lab.html#afternoon">Linear models problem set</a></div>
-      <div class="activity-row"><span class="tag practice">Practice</span><span><a href="Day2_GLM/lab.html#afternoon">In-class walkthrough</a> <span class="theme-note">— answers visible</span></span></div>
-      <div class="activity-row"><span class="tag assessed">Assess A</span><span><a href="Day2_GLM/problem_set_v2.html#afternoon">v2 forest &amp; songbird</a></span></div>
-      <div class="activity-row"><span class="tag assessed">Assess B</span><span><a href="Day2_GLM/problem_set_v3.html#afternoon">v3 aquatic &amp; fisheries</a></span></div>
-      <div class="activity-row"><span class="tag template">Hand-in</span><span><a href="Day2_GLM/afternoon_lab_template_v2.Rmd">afternoon v2 (forest &amp; songbird)</a> <span class="theme-note">or</span> <a href="Day2_GLM/afternoon_lab_template_v3.Rmd">afternoon v3 (aquatic &amp; fisheries)</a></span></div>
+      <div class="session-label"><a href="Day2_GLM/lab.html#afternoon">Afternoon · Linear models &amp; GLMs · 20 pts</a></div>
+      <div class="activity-row"><span class="tag lecture">Lecture</span><span><a href="Day2_GLM/FW536_Day2_Afternoon_GeneralizedLinear%20Models.pptx">Slides: generalized linear models (PPT)</a></span></div>
+      <div class="activity-row"><span class="tag practice">Practice</span><span><a href="Day2_GLM/lab.html#afternoon">In-class walkthrough</a> <span class="note">answers visible</span></span></div>
+      <div class="activity-row"><span class="tag assessed">Graded</span><span><a href="Day2_GLM/problem_set.html#afternoon">Afternoon problem set</a></span></div>
+      <div class="activity-row"><span class="tag template">Hand-in</span><span><a href="Day2_GLM/afternoon_lab_template.Rmd">afternoon_lab_template.Rmd</a></span></div>
+      <div class="activity-row"><span class="tag interactive">Explore</span><span><a href="Day2_GLM/explore_links.html">Interactive link-function &amp; logit visualizer</a></span></div>
     </div>
 
     <div class="extras">
       <a class="featured" href="Day2_GLM/log_logit_intuition.html"><strong>★ Log &amp; logit intuition guide</strong></a> ·
       <a class="featured" href="Day2_GLM/plain_language_summary.html">Plain-language summary</a> ·
-      <a href="Day2_GLM/answer_key.html">Practice answer key</a><br/>
-      Lectures: <a class="featured" href="Day2_GLM/FW536_Day2_Morning_ContinuousDistributions.pptx">morning PPT</a> ·
-      <a class="featured" href="Day2_GLM/FW536_Day2_Afternoon_GeneralizedLinear%20Models.pptx">afternoon PPT</a>
-      <div class="instr-row">Instructor keys: <a href="Day2_GLM/problem_set_v2_KEY.html">v2 KEY</a> <a href="Day2_GLM/problem_set_v3_KEY.html">v3 KEY</a></div>
+      <a href="Day2_GLM/answer_key.html">Practice answer key</a> ·
+      <a href="accessible/Day2_GLM/lecture_day2_morning.html">Accessible lecture notes</a>
     </div>
   </div>
 
@@ -146,29 +152,26 @@
     <h2><a href="Day3_MixedModels_ModelSelection/lab.html">Mixed models &amp; model selection</a></h2>
 
     <div class="session-block">
-      <div class="session-label"><a href="Day3_MixedModels_ModelSelection/lab.html#morning">Morning · 20 pts</a></div>
-      <div class="session-title"><a href="Day3_MixedModels_ModelSelection/lab.html#morning">Hierarchical modeling problem set</a></div>
-      <div class="activity-row"><span class="tag practice">Practice</span><span><a href="Day3_MixedModels_ModelSelection/lab.html#morning">In-class walkthrough</a> <span class="theme-note">— answers visible</span></span></div>
-      <div class="activity-row"><span class="tag assessed">Assess A</span><span><a href="Day3_MixedModels_ModelSelection/problem_set_v2.html#morning">v2 terrestrial wildlife</a></span></div>
-      <div class="activity-row"><span class="tag assessed">Assess B</span><span><a href="Day3_MixedModels_ModelSelection/problem_set_v3.html#morning">v3 aquatic &amp; fisheries</a></span></div>
-      <div class="activity-row"><span class="tag template">Hand-in</span><span><a href="Day3_MixedModels_ModelSelection/morning_lab_template_v2.Rmd">morning v2 (terrestrial wildlife)</a> <span class="theme-note">or</span> <a href="Day3_MixedModels_ModelSelection/morning_lab_template_v3.Rmd">morning v3 (aquatic &amp; fisheries)</a></span></div>
+      <div class="session-label"><a href="Day3_MixedModels_ModelSelection/lab.html#morning">Morning · Mixed models · 20 pts</a></div>
+      <div class="activity-row"><span class="tag lecture">Lecture</span><span><a href="Day3_MixedModels_ModelSelection/FW536_Day3_Morning_mixed%20effects.pptx">Slides: mixed effects (PPT)</a></span></div>
+      <div class="activity-row"><span class="tag practice">Practice</span><span><a href="Day3_MixedModels_ModelSelection/lab.html#morning">In-class walkthrough</a> <span class="note">answers visible</span></span></div>
+      <div class="activity-row"><span class="tag assessed">Graded</span><span><a href="Day3_MixedModels_ModelSelection/problem_set.html#morning">Morning problem set</a></span></div>
+      <div class="activity-row"><span class="tag template">Hand-in</span><span><a href="Day3_MixedModels_ModelSelection/morning_lab_template.Rmd">morning_lab_template.Rmd</a></span></div>
+      <div class="activity-row"><span class="tag interactive">Explore</span><span><a href="Day3_MixedModels_ModelSelection/explore_shrinkage.html">Interactive shrinkage / partial-pooling demo</a></span></div>
     </div>
 
     <div class="session-block">
-      <div class="session-label"><a href="Day3_MixedModels_ModelSelection/lab.html#afternoon">Afternoon · 20 pts</a></div>
-      <div class="session-title"><a href="Day3_MixedModels_ModelSelection/lab.html#afternoon">Model selection problem set</a></div>
-      <div class="activity-row"><span class="tag practice">Practice</span><span><a href="Day3_MixedModels_ModelSelection/lab.html#afternoon">In-class walkthrough</a> <span class="theme-note">— answers visible</span></span></div>
-      <div class="activity-row"><span class="tag assessed">Assess A</span><span><a href="Day3_MixedModels_ModelSelection/problem_set_v2.html#afternoon">v2 terrestrial wildlife</a></span></div>
-      <div class="activity-row"><span class="tag assessed">Assess B</span><span><a href="Day3_MixedModels_ModelSelection/problem_set_v3.html#afternoon">v3 aquatic &amp; fisheries</a></span></div>
-      <div class="activity-row"><span class="tag template">Hand-in</span><span><a href="Day3_MixedModels_ModelSelection/afternoon_lab_template_v2.Rmd">afternoon v2 (terrestrial wildlife)</a> <span class="theme-note">or</span> <a href="Day3_MixedModels_ModelSelection/afternoon_lab_template_v3.Rmd">afternoon v3 (aquatic &amp; fisheries)</a></span></div>
+      <div class="session-label"><a href="Day3_MixedModels_ModelSelection/lab.html#afternoon">Afternoon · Model selection · 20 pts</a></div>
+      <div class="activity-row"><span class="tag lecture">Lecture</span><span><a href="Day3_MixedModels_ModelSelection/FW536_Day3_Afternoon_hypothesis%20test%20and%20model%20selection.pptx">Slides: hypothesis tests &amp; model selection (PPT)</a></span></div>
+      <div class="activity-row"><span class="tag practice">Practice</span><span><a href="Day3_MixedModels_ModelSelection/lab.html#afternoon">In-class walkthrough</a> <span class="note">answers visible</span></span></div>
+      <div class="activity-row"><span class="tag assessed">Graded</span><span><a href="Day3_MixedModels_ModelSelection/problem_set.html#afternoon">Afternoon problem set</a></span></div>
+      <div class="activity-row"><span class="tag template">Hand-in</span><span><a href="Day3_MixedModels_ModelSelection/afternoon_lab_template.Rmd">afternoon_lab_template.Rmd</a></span></div>
     </div>
 
     <div class="extras">
       <a class="featured" href="Day3_MixedModels_ModelSelection/plain_language_summary.html">Plain-language summary</a> ·
-      <a href="Day3_MixedModels_ModelSelection/answer_key.html">Practice answer key</a><br/>
-      Lectures: <a class="featured" href="Day3_MixedModels_ModelSelection/FW536_Day3_Morning_mixed%20effects.pptx">morning PPT</a> ·
-      <a class="featured" href="Day3_MixedModels_ModelSelection/FW536_Day3_Afternoon_hypothesis%20test%20and%20model%20selection.pptx">afternoon PPT</a>
-      <div class="instr-row">Instructor keys: <a href="Day3_MixedModels_ModelSelection/problem_set_v2_KEY.html">v2 KEY</a> <a href="Day3_MixedModels_ModelSelection/problem_set_v3_KEY.html">v3 KEY</a></div>
+      <a href="Day3_MixedModels_ModelSelection/answer_key.html">Practice answer key</a> ·
+      <a href="accessible/Day3_MixedModels_ModelSelection/lecture_day3_morning.html">Accessible lecture notes</a>
     </div>
   </div>
 
@@ -178,30 +181,27 @@
     <h2><a href="Day4_Likelihood_BayesI/lab.html">Maximum likelihood &amp; Bayes I</a></h2>
 
     <div class="session-block">
-      <div class="session-label"><a href="Day4_Likelihood_BayesI/lab.html#morning">Morning · 20 pts</a></div>
-      <div class="session-title"><a href="Day4_Likelihood_BayesI/lab.html#morning">Maximum likelihood problem set</a></div>
-      <div class="activity-row"><span class="tag practice">Practice</span><span><a href="Day4_Likelihood_BayesI/lab.html#morning">In-class walkthrough</a> <span class="theme-note">— answers visible</span></span></div>
-      <div class="activity-row"><span class="tag assessed">Assess A</span><span><a href="Day4_Likelihood_BayesI/problem_set_v2.html#morning">v2 avian / songbird</a></span></div>
-      <div class="activity-row"><span class="tag assessed">Assess B</span><span><a href="Day4_Likelihood_BayesI/problem_set_v3.html#morning">v3 marine &amp; stock assessment</a></span></div>
-      <div class="activity-row"><span class="tag template">Hand-in</span><span><a href="Day4_Likelihood_BayesI/morning_lab_template_v2.Rmd">morning v2 (avian / songbird)</a> <span class="theme-note">or</span> <a href="Day4_Likelihood_BayesI/morning_lab_template_v3.Rmd">morning v3 (marine &amp; stock assessment)</a></span></div>
+      <div class="session-label"><a href="Day4_Likelihood_BayesI/lab.html#morning">Morning · Maximum likelihood · 20 pts</a></div>
+      <div class="activity-row"><span class="tag lecture">Lecture</span><span><a href="Day4_Likelihood_BayesI/FW536_Day4_Morning_maximum%20likelihod.pptx">Slides: maximum likelihood (PPT)</a></span></div>
+      <div class="activity-row"><span class="tag practice">Practice</span><span><a href="Day4_Likelihood_BayesI/lab.html#morning">In-class walkthrough</a> <span class="note">answers visible</span></span></div>
+      <div class="activity-row"><span class="tag assessed">Graded</span><span><a href="Day4_Likelihood_BayesI/problem_set.html#morning">Morning problem set</a> <span class="note">MLE only</span></span></div>
+      <div class="activity-row"><span class="tag template">Hand-in</span><span><a href="Day4_Likelihood_BayesI/morning_lab_template.Rmd">morning_lab_template.Rmd</a></span></div>
+      <div class="activity-row"><span class="tag interactive">Explore</span><span><a href="Day4_Likelihood_BayesI/explore_likelihood_mcmc.html">Interactive likelihood &amp; MCMC</a></span></div>
     </div>
 
     <div class="session-block">
-      <div class="session-label"><a href="Day4_Likelihood_BayesI/lab.html#afternoon">Afternoon · 20 pts</a></div>
-      <div class="session-title"><a href="Day4_Likelihood_BayesI/lab.html#afternoon">Bayesian modeling problem set 1</a></div>
-      <div class="activity-row"><span class="tag practice">Practice</span><span><a href="Day4_Likelihood_BayesI/lab.html#afternoon">In-class walkthrough</a> <span class="theme-note">— answers visible</span></span></div>
-      <div class="activity-row"><span class="tag assessed">Assess A</span><span><a href="Day4_Likelihood_BayesI/problem_set_v2.html#afternoon">v2 avian / songbird</a></span></div>
-      <div class="activity-row"><span class="tag assessed">Assess B</span><span><a href="Day4_Likelihood_BayesI/problem_set_v3.html#afternoon">v3 marine &amp; stock assessment</a></span></div>
-      <div class="activity-row"><span class="tag template">Hand-in</span><span><a href="Day4_Likelihood_BayesI/afternoon_lab_template_v2.Rmd">afternoon v2 (avian / songbird)</a> <span class="theme-note">or</span> <a href="Day4_Likelihood_BayesI/afternoon_lab_template_v3.Rmd">afternoon v3 (marine &amp; stock assessment)</a></span></div>
+      <div class="session-label"><a href="Day4_Likelihood_BayesI/lab.html#afternoon">Afternoon · Bayes I · 20 pts</a></div>
+      <div class="activity-row"><span class="tag lecture">Lecture</span><span><a href="Day4_Likelihood_BayesI/FW536_Day4_Afternoon_BayesI.pptx">Slides: Bayes I (PPT)</a></span></div>
+      <div class="activity-row"><span class="tag practice">Practice</span><span><a href="Day4_Likelihood_BayesI/lab.html#afternoon">In-class walkthrough</a> <span class="note">answers visible</span></span></div>
+      <div class="activity-row"><span class="tag assessed">Graded</span><span><a href="Day4_Likelihood_BayesI/problem_set.html#afternoon">Afternoon problem set</a> <span class="note">Bayesian / Nimble</span></span></div>
+      <div class="activity-row"><span class="tag template">Hand-in</span><span><a href="Day4_Likelihood_BayesI/afternoon_lab_template.Rmd">afternoon_lab_template.Rmd</a></span></div>
     </div>
 
     <div class="extras">
       <a class="featured" href="Day4_Likelihood_BayesI/plain_language_summary.html">Plain-language summary</a> ·
       <a href="Day4_Likelihood_BayesI/answer_key.html">Practice answer key</a> ·
-      <a href="Day4_Likelihood_BayesI/Logistic_BayesianGrowth_Nimble.R">Nimble R: logistic growth</a><br/>
-      Lectures: <a class="featured" href="Day4_Likelihood_BayesI/FW536_Day4_Morning_maximum%20likelihod.pptx">morning PPT</a> ·
-      <a class="featured" href="Day4_Likelihood_BayesI/FW536_Day4_Afternoon_BayesI.pptx">afternoon PPT</a>
-      <div class="instr-row">Instructor keys: <a href="Day4_Likelihood_BayesI/problem_set_v2_KEY.html">v2 KEY</a> <a href="Day4_Likelihood_BayesI/problem_set_v3_KEY.html">v3 KEY</a></div>
+      <a href="Day4_Likelihood_BayesI/Logistic_BayesianGrowth_Nimble.R">Nimble R: logistic growth</a> ·
+      <a href="accessible/Day4_Likelihood_BayesI/lecture_day4_morning.html">Accessible lecture notes</a>
     </div>
   </div>
 
@@ -211,31 +211,29 @@
     <h2><a href="Day5_BayesII/lab.html">Bayesian hierarchical modeling</a></h2>
 
     <div class="session-block">
-      <div class="session-label"><a href="Day5_BayesII/lab.html#morning">Morning · 20 pts</a></div>
-      <div class="session-title"><a href="Day5_BayesII/lab.html#morning">Bayesian modeling problem set 2</a></div>
-      <div class="activity-row"><span class="tag practice">Practice</span><span><a href="Day5_BayesII/lab.html#morning">In-class walkthrough</a> <span class="theme-note">— answers visible</span></span></div>
-      <div class="activity-row"><span class="tag assessed">Assess A</span><span><a href="Day5_BayesII/problem_set_v2.html#morning">v2 forest carnivore</a></span></div>
-      <div class="activity-row"><span class="tag assessed">Assess B</span><span><a href="Day5_BayesII/problem_set_v3.html#morning">v3 anadromous fish &amp; freshwater</a></span></div>
-      <div class="activity-row"><span class="tag template">Hand-in</span><span><a href="Day5_BayesII/morning_lab_template_v2.Rmd">morning v2 (forest carnivore)</a> <span class="theme-note">or</span> <a href="Day5_BayesII/morning_lab_template_v3.Rmd">morning v3 (anadromous fish &amp; freshwater)</a></span></div>
+      <div class="session-label"><a href="Day5_BayesII/lab.html#morning">Morning · Bayes II · 20 pts</a></div>
+      <div class="activity-row"><span class="tag lecture">Lecture</span><span><a href="Day5_BayesII/FW536_Day5_BayesII.pptx">Slides: Bayes II (PPT)</a></span></div>
+      <div class="activity-row"><span class="tag practice">Practice</span><span><a href="Day5_BayesII/lab.html#morning">In-class walkthrough</a> <span class="note">answers visible</span></span></div>
+      <div class="activity-row"><span class="tag assessed">Graded</span><span><a href="Day5_BayesII/problem_set.html#morning">Morning problem set</a></span></div>
+      <div class="activity-row"><span class="tag template">Hand-in</span><span><a href="Day5_BayesII/morning_lab_template.Rmd">morning_lab_template.Rmd</a></span></div>
+      <div class="activity-row"><span class="tag interactive">Explore</span><span><a href="Day4_Likelihood_BayesI/explore_likelihood_mcmc.html">Interactive MCMC sampler</a></span></div>
     </div>
 
     <div class="session-block">
-      <div class="session-label">Afternoon · no problem set</div>
-      <div class="session-title">Bayes II continued + post-course exam</div>
+      <div class="session-label">Afternoon · Post-course exam</div>
       <div class="activity-row"><span class="tag exam">Exam</span><span><a href="post_course_exam.html">Post-course exam</a></span></div>
       <div class="activity-row"><span class="tag template">Hand-in</span><span><a href="post_course_exam.Rmd">post_course_exam.Rmd</a></span></div>
     </div>
 
     <div class="extras">
       <a class="featured" href="Day5_BayesII/plain_language_summary.html">Plain-language summary</a> ·
-      <a href="Day5_BayesII/answer_key.html">Practice answer key</a> ·
+      <a href="Day5_BayesII/answer_key.html">Practice answer key</a><br/>
       Nimble R: <a href="Day5_BayesII/Lizards_Nimble.R">Lizards</a>,
       <a href="Day5_BayesII/SpawnerRecruit_Nimble.R">Spawner-recruit</a>,
       <a href="Day5_BayesII/DynamicOccupancy_Nimble.R">Dynamic occupancy</a>,
       <a href="Day5_BayesII/NMixture_Nimble.R">N-mixture</a>,
       <a href="Day5_BayesII/Multilevel_Nimble.R">Multilevel</a><br/>
-      Lecture: <a class="featured" href="Day5_BayesII/FW536_Day5_BayesII.pptx">Day 5 PPT</a>
-      <div class="instr-row">Instructor keys: <a href="Day5_BayesII/problem_set_v2_KEY.html">v2 KEY</a> <a href="Day5_BayesII/problem_set_v3_KEY.html">v3 KEY</a> · <a href="post_course_exam_KEY.html">post-exam KEY</a></div>
+      <a href="accessible/Day5_BayesII/lecture_day5.html">Accessible lecture notes</a>
     </div>
   </div>
 
@@ -245,32 +243,36 @@
 <h2>What's in this site</h2>
 <div class="feat-grid">
   <div class="feat">
-    <h3>Pick your theme</h3>
-    <p>Each session offers two assessed problem sets — same statistical content, different ecological themes (e.g., forest vs. aquatic). Choose whichever fits your interests; the practice problems on the lab page show you what to expect.</p>
+    <h3>One focused lab per session</h3>
+    <p>Each morning and afternoon has a single graded problem set — the best problems distilled into one coherent assignment, worth 20 points and submitted on Canvas.</p>
   </div>
   <div class="feat">
-    <h3>Three problem-set variants per session</h3>
-    <p>A practice problem set (answers visible) for in-class work, plus two assessed problem sets (answers in separate instructor-only KEY files) for graded submission.</p>
+    <h3>Analyze real datasets</h3>
+    <p>Problems load real ecological data (salmon eDNA, Titanic survival, fish trophic position, ant richness, lizard occupancy, growth and recruitment data) so you practice the full workflow, not just formulas.</p>
+  </div>
+  <div class="feat">
+    <h3>Interactive visualizations</h3>
+    <p>Explore distributions, link functions, shrinkage, and a live MCMC sampler — drag sliders and watch the concepts move, right in the browser.</p>
+  </div>
+  <div class="feat">
+    <h3>Practice, then perform</h3>
+    <p>In-class practice labs have visible, reveal-able answers. The graded problem sets are separate and their keys are released only after grading.</p>
   </div>
   <div class="feat">
     <h3>Plain-language summaries</h3>
-    <p>Each day has a non-mathematical companion document explaining the WHY before the HOW. Students can read these before lab to set up the conceptual scaffolding.</p>
+    <p>Each day has a non-mathematical companion explaining the WHY before the HOW — read it before lab to set up the concepts.</p>
   </div>
   <div class="feat">
     <h3>R Markdown submission workflow</h3>
-    <p>All problem sets and exams are submitted as R Markdown HTML outputs uploaded to Canvas. A Day-1 R Markdown tutorial walks students through install, knit, and photo-embedding.</p>
+    <p>All problem sets and exams are submitted as knitted R Markdown HTML. A tutorial covers install, knit, and embedding photos of written work.</p>
   </div>
   <div class="feat">
     <h3>Pre- and post-course exams</h3>
-    <p>Parallel 50-point exams measure the workshop's effect on student understanding from Day 1 morning to Day 5 afternoon.</p>
+    <p>Parallel exams measure how much you learned across the week, from Day 1 morning to Day 5 afternoon.</p>
   </div>
   <div class="feat">
-    <h3>Log/logit deep dive</h3>
-    <p>A dedicated guide on Day 2 with 16 worked biological examples for log and logit links — built around the most common GLM-interpretation difficulty.</p>
-  </div>
-  <div class="feat">
-    <h3>JAGS &amp; Nimble side by side</h3>
-    <p>Days 4 and 5 include Nimble R scripts for the hierarchical, latent-state, and management-quantity models students will fit in the workshop.</p>
+    <h3>Accessible edition</h3>
+    <p>A full screen-reader-optimized version of the site, with accessible lecture notes and navigable math, for students who use assistive technology.</p>
   </div>
 </div>
 </div>

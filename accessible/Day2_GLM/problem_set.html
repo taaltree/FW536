@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en" data-a11y="done">
+<head>
+<meta charset="UTF-8" />
+<title>Day 2 · Assessed Problem Set | FW 536 · Student copy (no answers)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../_Shared/css/accessible.css" />
+<script defer src="../_Shared/js/accessible.js"></script>
+<script>
+MathJax = {
+  tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
+  options: { menuOptions: { settings: { assistiveMml: true, explorer: true } } },
+  loader: { load: ['a11y/assistive-mml', 'a11y/explorer'] }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script"></script>
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<div class="a11y-bar" role="region" aria-label="Accessibility">Accessible version &middot; <a href="../accessibility.html">How to use this site with a screen reader</a> &middot; <a href="../index.html">Course home</a></div>
+
+<div class="shell">
+
+<aside class="sidebar">
+ <p class="brand"><a href="../index.html" title="Back to course home">FW 536 · Day 2</a></p>
+ <div class="subtitle">Assessed Problem Set</div>
+ <nav aria-label="On this page and related documents">
+ <div class="section">Morning · continuous distributions</div>
+ <ul>
+ <li><a href="#p1">1. Which distribution? (lognormal)</a></li>
+ <li><a href="#p2">2. Allometry as a power law</a></li>
+ <li><a href="#p3">3. Exponential detection function</a></li>
+ <li><a href="#p4">4. Overdispersed counts (data)</a></li>
+ </ul>
+ <div class="section">Afternoon · linear models & GLMs</div>
+ <ul>
+ <li><a href="#p5">5. Sockeye eDNA GLM (data)</a></li>
+ <li><a href="#p6">6. Titanic: long vs aggregated (data)</a></li>
+ <li><a href="#p7">7. Titanic: class × sex (data)</a></li>
+ <li><a href="#p8">8. Poisson log-link interpretation</a></li>
+ <li><a href="#p9">9. Interaction &amp; crossover</a></li>
+ <li><a href="#p10">10. Offsets &amp; effort</a></li>
+ <li><a href="#p11">11. Logit threshold &amp; marginal effects</a></li>
+ <li><a href="#p12">12. Back-transforming a CI</a></li>
+ </ul>
+ <div class="section">Day 2 docs</div>
+ <ul>
+ <li><a href="lab.html">Main lab</a></li>
+ <li><a class="featured" href="plain_language_summary.html">Plain-language summary</a></li>
+ <li><a href="log_logit_intuition.html">Log/logit intuition guide</a></li>
+ <li><a href="../index.html">All days</a></li>
+ </ul>
+ </nav>
+</aside>
+
+<main class="content" id="main-content" tabindex="-1">
+<header class="lab-header">
+ <div class="eyebrow">Day 2 · Assessed Problem Set · 40 pts (20 morning + 20 afternoon)</div>
+ <h1>Continuous distributions, linear models, and GLMs</h1>
+ <p class="lede">Twelve problems covering continuous-distribution choice, Normal vs lognormal regression, Poisson and negative-binomial count models with the log link, and logistic regression with the logit link. Several problems load real datasets and ask you to <em>fit</em> models and <em>read the coefficients as biology</em> — the sentence you would put in a manuscript, not the raw <code>Estimate (SE)</code>.</p>
+</header>
+
+<section class="callout warn" style="margin-top:24px;"><p class="callout-label">Watch out</p><p><strong>This is the graded problem set.</strong> Answers are <em>not</em> shown here. Write your work in the two hand-in templates: <a href="morning_lab_template.Rmd"><code>morning_lab_template.Rmd</code></a> for the morning problems (1&ndash;4) and <a href="afternoon_lab_template.Rmd"><code>afternoon_lab_template.Rmd</code></a> for the afternoon problems (5&ndash;12). Knit each to HTML and upload the <code>.html</code> to the matching Canvas assignment.</p><p>For worked-example study with <em>visible</em> answers, see <a href="lab.html">the practice problem set on the main lab page</a> and the <a href="log_logit_intuition.html">log/logit intuition guide</a>.</p></section>
+
+<section class="data-card" id="data-files">
+<h2>Data you will load</h2>
+<p>The analysis problems read these files from this Day's <code>data/</code> folder. All paths below are relative to the folder your <code>.Rmd</code> lives in.</p>
+<div class="data-section">
+  <h3 class="data-h">Datasets</h3>
+  <div class="data-row"><a href="data/sockeye_adult.csv"><code>sockeye_adult.csv</code></a><span class="data-desc">Daily sockeye salmon counts and flow-corrected qPCR eDNA concentrations, 2015&ndash;2016 (Levi et al. 2019). Long format; filter to <code>Sockeyetype == "Sockeye_Adults"</code>. Used in Problems 4 and 5.</span></div>
+  <div class="data-row"><a href="data/titanic_long.csv"><code>titanic_long.csv</code></a><span class="data-desc">One row per Titanic passenger: <code>class</code>, <code>age</code>, <code>sex</code>, binary <code>survived</code>. Used in Problems 6 and 7.</span></div>
+  <div class="data-row"><a href="data/titanic_prop.csv"><code>titanic_prop.csv</code></a><span class="data-desc">Titanic survival aggregated to (<code>Yes</code>, <code>No</code>) counts per Class/Sex/Age for binomial-form GLM. Used in Problem 6.</span></div>
+</div>
+</section>
+
+<section><p>Work each problem before you write the interpretation. The numeric output is necessary but not sufficient: the biological-interpretation sentence is the assessment. When a coefficient is on the log or logit scale, you are expected to translate it (multiplicative effect, odds ratio, or probability change) before you claim to have "interpreted" it.</p></section>
+
+<!-- ============================================================ -->
+<!-- ============================ MORNING ======================= -->
+<!-- ============================================================ -->
+<a id="morning"></a>
+<div class="practice-banner"><div class="label">Morning · 20 pts</div><h3>Continuous distributions</h3><p>Problems 1&ndash;4. Write your work in <a class="hand-in" href="morning_lab_template.Rmd"><code>morning_lab_template.Rmd</code> &darr;</a></p></div>
+
+<!-- =========================== PROBLEM 1 =========================== -->
+<div class="exercise" id="p1">
+<span class="ex-tag">Problem 1</span><span class="difficulty easy"> · continuous distribution choice</span>
+<h3>Which distribution for a right-skewed body-size sample?</h3>
+<p>You record body weight (g) for every fish kept in a 30-day creel survey on a coastal river. Most fish are sub-legal-size cutthroat (small), with a long right tail of large hatchery steelhead retained in the same fishery. The empirical distribution is strictly positive and strongly right-skewed. (The same reasoning applies to tree DBH, seed mass, or any size variable built up by multiplicative growth.)</p>
+<ol type="a">
+<li>Which of {Normal, Lognormal, Gamma, Exponential, Beta} would you choose, and what is the <em>data-generating story</em> that justifies it in one sentence?</li>
+<li>If $\log(\text{weight}) \sim \mathcal{N}(5.0,\,0.8^2)$, what is the expected weight on the raw scale? (Recall the lognormal mean is $e^{\mu + \sigma^2/2}$.)</li>
+<li>What is the median weight? Why does it differ from the mean, and which is larger?</li>
+<li>If you mistakenly fit a Normal to these weights and reported a 95% prediction interval centered at the mean, why would the lower endpoint be biological nonsense?</li>
+</ol>
+<div class="callout try"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Report the distribution you chose with its one-sentence justification, the mean and median, and the "say it as biology" sentence contrasting them.</div>
+</div>
+
+<!-- =========================== PROBLEM 2 =========================== -->
+<div class="exercise" id="p2">
+<span class="ex-tag">Problem 2</span><span class="difficulty medium"> · Normal vs lognormal regression, allometry</span>
+<h3>Length&ndash;weight allometry and the power law</h3>
+<p>For 200 Chinook salmon you have fork length (cm) and weight (g). Lengths range 30&ndash;110 cm; weights range 250 g to 18 kg. Two analysts fit:</p>
+<ul>
+<li>Analyst A: <code>lm(weight ~ length)</code></li>
+<li>Analyst B: <code>lm(log(weight) ~ log(length))</code></li>
+</ul>
+<ol type="a">
+<li>Describe what Analyst A's residuals-vs-fitted plot would look like, and name the assumption it violates.</li>
+<li>Analyst B finds $\hat\beta_1 = 3.05$. Connect this slope to the standard allometric equation $W = a L^b$ and interpret $b$ biologically. Why is $b = 3$ (the "cube law") the natural null?</li>
+<li>What multiplicative effect on weight corresponds to a 25% increase in length? To a doubling of length?</li>
+<li>Analyst B back-transforms $\hat\beta_0 + \hat\beta_1 \log(L)$ by exponentiating to predict weight at a given length. What does that back-transformed value give you &mdash; the mean or the median weight &mdash; and what correction turns it into the other one?</li>
+</ol>
+<div class="callout try"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Give the allometric interpretation of $b = 3.05$, both multiplicative effects, and one sentence on the mean-vs-median back-transform correction.</div>
+</div>
+
+<!-- =========================== PROBLEM 3 =========================== -->
+<div class="exercise" id="p3">
+<span class="ex-tag">Problem 3</span><span class="difficulty medium"> · Exponential, survival function</span>
+<h3>Line-transect detection as an exponential process</h3>
+<p>On a line transect the probability of detecting an animal declines with perpendicular distance $x$. Model the detection process as Exponential with rate $\lambda = 0.02$ per meter, so that the chance of <em>not yet</em> having detected an animal at distance $x$ follows the survival function of the Exponential.</p>
+<ol type="a">
+<li>Write the survival function $S(x) = P(X \ge x)$ for an Exponential$(\lambda)$ and state its mean.</li>
+<li>Compute the probability of missing an animal that is 50 m off the transect line.</li>
+<li>At what perpendicular distance does the detection process reach its "half-life" (the distance at which $S(x) = 0.5$)? Show that this equals $\ln 2 / \lambda$.</li>
+<li>The Exponential is <em>memoryless</em>. State what that means for two animals, one first eligible for detection at 0 m and one at 20 m, and why that property is biologically convenient (or suspicious) here.</li>
+</ol>
+<div class="callout try"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Show $S(x)$, the value at 50 m, the half-distance, and one sentence on what memorylessness implies for detection.</div>
+</div>
+
+<!-- =========================== PROBLEM 4 =========================== -->
+<div class="exercise" id="p4">
+<span class="ex-tag">Problem 4</span><span class="difficulty hard"> · overdispersion, Poisson vs NB · loads real data</span>
+<h3>Are the sockeye counts Poisson? Diagnose overdispersion</h3>
+<p>Load the adult sockeye counts and look at them <em>before</em> fitting any predictors. This problem is about the marginal count distribution.</p>
+<pre><code>d &lt;- read.csv("data/sockeye_adult.csv", stringsAsFactors = FALSE)
+d &lt;- subset(d, Sockeyetype == "Sockeye_Adults")
+d &lt;- d[!is.na(d$Count), ]
+mean(d$Count); var(d$Count)</code></pre>
+<ol type="a">
+<li>Compute the mean and variance of <code>Count</code>. What is the dispersion ratio (variance / mean)? Does a Poisson &mdash; which forces variance = mean &mdash; look plausible?</li>
+<li>Solve for the negative-binomial size parameter $k$ that reproduces the empirical variance under $\text{Var} = \mu + \mu^2/k$. (Use the empirical mean for $\mu$.)</li>
+<li>Simulate 5000 draws from both <code>rpois(mu)</code> and <code>rnbinom(mu, size = k)</code> with your $\mu$ and $k$. Compare $P(\text{count} = 0)$ and the probability of a large "bumper run" (e.g. count &gt; 400) between the two.</li>
+<li>Name a biological mechanism that would generate this overdispersion in daily salmon counts, and say in one sentence what would go wrong if you reported Poisson-based confidence intervals for the mean daily count.</li>
+</ol>
+<div class="callout try"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Report the dispersion ratio, your $k$, the two simulated tail probabilities, and the one-sentence biological + inferential consequence.</div>
+</div>
+
+<!-- ============================================================ -->
+<!-- ========================== AFTERNOON ======================= -->
+<!-- ============================================================ -->
+<a id="afternoon"></a>
+<div class="practice-banner"><div class="label">Afternoon · 20 pts</div><h3>Linear models &amp; GLMs</h3><p>Problems 5&ndash;12. Write your work in <a class="hand-in" href="afternoon_lab_template.Rmd"><code>afternoon_lab_template.Rmd</code> &darr;</a></p></div>
+
+<!-- =========================== PROBLEM 5 =========================== -->
+<div class="exercise" id="p5">
+<span class="ex-tag">Problem 5</span><span class="difficulty hard"> · Normal vs Poisson vs NB, log-link interpretation · loads real data</span>
+<h3>Sockeye eDNA &rarr; daily count: pick the right model and read the slope</h3>
+<p>Do adult sockeye numbers track the flow-corrected eDNA signal? Use the same subset as Problem 4, keep only rows where both the count and the eDNA are observed, and build a <code>Year</code> factor from the date.</p>
+<pre><code>d &lt;- read.csv("data/sockeye_adult.csv", stringsAsFactors = FALSE)
+d &lt;- subset(d, Sockeyetype == "Sockeye_Adults")
+d$Year &lt;- factor(sub(".*/", "", d$Date))              # "15" or "16"
+d &lt;- d[!is.na(d$Count) &amp; !is.na(d$Qcorr_qPCR), ]
+min_pos &lt;- min(d$Qcorr_qPCR[d$Qcorr_qPCR &gt; 0])          # small constant so log() is finite
+d$logED &lt;- log(d$Qcorr_qPCR + min_pos)</code></pre>
+<p>Fit, in sequence, and compare:</p>
+<ol>
+<li><code>lm(log(Count + 1) ~ logED + Year, data = d)</code> &mdash; the old-school log-transform approach.</li>
+<li><code>glm(Count ~ logED + Year, family = poisson, data = d)</code>.</li>
+<li><code>glm(Count ~ logED + Year, family = quasipoisson, data = d)</code>.</li>
+<li><code>MASS::glm.nb(Count ~ logED + Year, data = d)</code>.</li>
+</ol>
+<ol type="a">
+<li>For the Poisson fit, report residual deviance / residual df. Is overdispersion present? What does the quasipoisson dispersion estimate tell you, and how does the NB residual-deviance ratio compare?</li>
+<li>Compare the standard error on the <code>logED</code> coefficient across the four fits. Which models give realistically wide confidence intervals and which give unrealistically narrow ones? Why?</li>
+<li>Take the log-link slope on <code>logED</code> from your preferred model. Because the predictor is $\log(\text{eDNA})$, a <em>doubling</em> of eDNA multiplies the linear predictor by $\hat\beta \cdot \ln 2$, so it multiplies the expected count by $2^{\hat\beta}$. Compute that multiplier and finish the sentence: "a doubling of eDNA concentration is associated with a &times;___ change in the expected daily adult count."</li>
+</ol>
+<div class="callout bio"><p class="callout-label">Biological intuition</p>
+<strong>Where the biology lives.</strong> If your log-link slope is around 0.9, then $2^{0.9} \approx 1.87$ &mdash; a doubling of eDNA is associated with roughly an 87% increase in the expected daily count. <em>That</em> sentence is what goes in the paper, not "the slope was 0.90 (SE 0.08)."
+</div>
+<div class="callout try"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Report the overdispersion diagnostics, the SE comparison, your chosen model, and the doubling-of-eDNA multiplier as a biology sentence.</div>
+</div>
+
+<!-- =========================== PROBLEM 6 =========================== -->
+<div class="exercise" id="p6">
+<span class="ex-tag">Problem 6</span><span class="difficulty medium"> · logistic regression, long vs aggregated · loads real data</span>
+<h3>Titanic survival: individual-level vs aggregated binomial</h3>
+<p>The same logistic regression can be fit from one-row-per-passenger data or from aggregated (successes, failures) counts. Show that they agree.</p>
+<pre><code>long &lt;- read.csv("data/titanic_long.csv", stringsAsFactors = TRUE)
+prop &lt;- read.csv("data/titanic_prop.csv", stringsAsFactors = TRUE)
+f1 &lt;- glm(survived ~ class, family = binomial, data = long)
+f2 &lt;- glm(cbind(Yes, No) ~ Class, family = binomial, data = prop)</code></pre>
+<ol type="a">
+<li>Fit both models. The fitted survival <em>probability for each class</em> should match between the two fits and should equal the raw survival proportion in that class. Verify this with <code>predict(f1, type = "response")</code> and <code>tapply(long$survived, long$class, mean)</code>. Why must the individual-level (Bernoulli) and aggregated (Binomial) likelihoods give the same fitted probabilities?</li>
+<li>The raw coefficient <em>tables</em> from <code>f1</code> and <code>f2</code> do not look identical. Explain why &mdash; think about which class each fit uses as its reference level. (Hint: <code>levels(long$class)</code> vs <code>levels(prop$Class)</code>.)</li>
+<li>Take the intercept and the first-class coefficient from <code>f1</code> and convert them, by hand, from log-odds to odds to probability. Confirm your first-class probability against the fitted value and against the raw first-class survival proportion.</li>
+<li>Express the first-class-vs-reference coefficient as an odds ratio and state, in plain English, how many times greater the odds of survival were for that class relative to the reference.</li>
+</ol>
+<div class="callout try"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Show the matching probabilities, explain the reference-level difference, and give the odds-ratio sentence.</div>
+</div>
+
+<!-- =========================== PROBLEM 7 =========================== -->
+<div class="exercise" id="p7">
+<span class="ex-tag">Problem 7</span><span class="difficulty hard"> · logistic interaction, emmeans · loads real data</span>
+<h3>Titanic: does the class effect depend on sex?</h3>
+<p>Fit an interaction model and interpret it on the odds and probability scales.</p>
+<pre><code>library(effects); library(emmeans)
+long &lt;- read.csv("data/titanic_long.csv", stringsAsFactors = TRUE)
+fit &lt;- glm(survived ~ class * sex + age, family = binomial, data = long)
+plot(allEffects(fit))                                  # fitted probabilities
+emmeans(fit, pairwise ~ class | sex, type = "response")  # class contrasts within each sex</code></pre>
+<ol type="a">
+<li>From the <code>emmeans</code> pairwise output (on the odds-ratio scale), which class contrast within a sex is the <em>largest</em>? Report the odds ratio and say what it means in words.</li>
+<li>Add <code>age</code> to the model as a main effect. Express the <code>agechild</code> coefficient as an odds ratio and interpret it.</li>
+<li>Using <code>emmeans(fit, ~ class | sex, type = "response")</code>, read off the fitted survival probability for first-class females and third-class females, and report the probability <em>difference</em> between them. Contrast this with what you would conclude from the odds ratio alone.</li>
+<li>Why is a <code>TukeyHSD</code> on an <code>aov</code> object the wrong tool for these class contrasts, whereas <code>emmeans</code> on the fitted GLM is correct?</li>
+</ol>
+<div class="callout try"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Report the largest contrast, the child odds ratio, the female first-vs-third probability difference, and one sentence on why <code>emmeans</code> (not <code>TukeyHSD</code>) is appropriate.</div>
+</div>
+
+<!-- =========================== PROBLEM 8 =========================== -->
+<div class="exercise" id="p8">
+<span class="ex-tag">Problem 8</span><span class="difficulty medium"> · Poisson regression, log-link interpretation</span>
+<h3>Reading a Poisson coefficient table as biology</h3>
+<p>From 120 ten-minute point counts in oak woodland you fit</p>
+<pre><code>glm(warblers ~ canopy_oak + elev_km, family = poisson, data = pc)</code></pre>
+<p>and obtain intercept $\hat\beta_0 = +0.10$, $\hat\beta_{\text{oak}} = +0.020$ per percent canopy oak, and $\hat\beta_{\text{elev}} = -0.55$ per km elevation.</p>
+<ol type="a">
+<li>What is the predicted mean count at oak = 0% and elev = 0 km?</li>
+<li>What is the multiplicative effect on expected count of going from 10% to 60% oak canopy?</li>
+<li>What is the elevation "half-decay" &mdash; the increase in elevation at which the expected count is halved? (Solve $e^{\hat\beta_{\text{elev}} \cdot \Delta} = 0.5$.)</li>
+<li>Write the one-sentence biology summary you would put in a manuscript, with both effects on the multiplicative scale.</li>
+</ol>
+<div class="callout try"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Report the intercept back-transform, the oak-canopy multiplier, the elevation half-decay, and the manuscript sentence.</div>
+</div>
+
+<!-- =========================== PROBLEM 9 =========================== -->
+<div class="exercise" id="p9">
+<span class="ex-tag">Problem 9</span><span class="difficulty hard"> · interaction, crossover on the log scale</span>
+<h3>When the sign of an effect flips between groups</h3>
+<p>Macroinvertebrate counts per Surber sample from 90 collections are modeled as Poisson with predictors discharge (m&sup3;/s, continuous) and season (factor: <em>spring</em> reference, <em>fall</em>):</p>
+<pre><code>glm(macros ~ discharge * season, family = poisson, data = samps)</code></pre>
+<p>Coefficients: intercept = 3.50, discharge = $-0.30$, seasonFall = $+0.40$, discharge:seasonFall = $+0.50$.</p>
+<ol type="a">
+<li>What is the discharge slope in spring, on both the log scale and as a multiplicative (per-m&sup3;/s) effect?</li>
+<li>What is the discharge slope in fall? Note that the two seasons respond in <em>opposite</em> directions &mdash; a finding you cannot get from a single pooled slope.</li>
+<li>What is the expected count at discharge = 0 in the fall?</li>
+<li>Solve for the discharge at which the spring and fall fitted counts are equal. Is that crossover inside the plausible range of discharges, and what does that imply about which season has higher counts across the observed gradient?</li>
+</ol>
+<div class="callout try"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Report both seasonal slopes as multiplicative effects, the fall intercept back-transform, the crossover discharge, and one sentence on why the interaction matters biologically.</div>
+</div>
+
+<!-- =========================== PROBLEM 10 =========================== -->
+<div class="exercise" id="p10">
+<span class="ex-tag">Problem 10</span><span class="difficulty hard"> · offsets and effort</span>
+<h3>Turning counts into rates with an offset</h3>
+<p>Across 200 longline sets, the number of hooks varies from 500 to 5000. You record bycatch counts of yelloweye rockfish per set. Two analysts:</p>
+<ul>
+<li>Analyst A: <code>glm(bycatch ~ depth_m, family = poisson)</code></li>
+<li>Analyst B: <code>glm(bycatch ~ depth_m + offset(log(hooks)), family = poisson)</code></li>
+</ul>
+<ol type="a">
+<li>What does Analyst B's intercept represent that Analyst A's does not?</li>
+<li>Why must the effort term enter as <code>offset(log(hooks))</code> on the log scale, rather than by dividing the response by <code>hooks</code>?</li>
+<li>If Analyst B's depth slope is $+0.012$ per m, write a one-sentence biological summary of the per-hook bycatch rate, and give the compounded multiplier over a 100 m depth change.</li>
+<li>If shallow sets tended to use fewer hooks, in which direction would Analyst A's depth slope be biased, and why?</li>
+</ol>
+<div class="callout try"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Explain the offset intercept, justify the log scale, give the per-hook rate sentence, and state the direction of Analyst A's bias.</div>
+</div>
+
+<!-- =========================== PROBLEM 11 =========================== -->
+<div class="exercise" id="p11">
+<span class="ex-tag">Problem 11</span><span class="difficulty hard"> · logit threshold + marginal effects</span>
+<h3>Occupancy thresholds and choosing a management lever</h3>
+<p>Presence/absence of hermit thrush at 300 sites is modeled as <code>glm(present ~ basal_area + shrub_cover, family = binomial)</code>, giving intercept $-3.0$, basal-area slope $+0.08$ per m&sup2;/ha, and shrub slope $+0.04$ per percent shrub.</p>
+<ol type="a">
+<li>For a site with shrub cover = 25%, at what basal area does predicted occupancy probability equal 0.5? (Solve the linear predictor = 0.)</li>
+<li>For a site with shrub cover = 50%, what is the new "threshold" basal area? Interpret the shift.</li>
+<li>Compute the marginal effect of basal area on probability at the $p = 0.5$ inflection, using $\beta\,p(1-p)$. Confirm it against the divide-by-4 rule.</li>
+<li>At a low-suitability site currently at $p = 0.3$, a manager can either raise basal area by 5 m&sup2;/ha or raise shrub cover by 10 percentage points. Using the marginal-effect approximation (or an exact <code>plogis</code> computation), which intervention yields the larger predicted gain in occupancy probability?</li>
+</ol>
+<div class="callout try"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Report both threshold basal areas, the marginal effect at $p = 0.5$, the two intervention gains, and one management-relevant sentence.</div>
+</div>
+
+<!-- =========================== PROBLEM 12 =========================== -->
+<div class="exercise" id="p12">
+<span class="ex-tag">Problem 12</span><span class="difficulty medium"> · back-transforming a coefficient and its CI</span>
+<h3>From a log-scale contrast to a percent change with uncertainty</h3>
+<p>A Gamma GLM with a log link returns, for the contrast "fine sediment vs medium sediment" on eelgrass biomass, a coefficient $\hat\beta = -0.65$ with a 95% Wald CI of $(-0.95,\,-0.35)$ on the log scale.</p>
+<ol type="a">
+<li>Back-transform the point estimate. What multiplicative effect on biomass does it represent?</li>
+<li>Back-transform the confidence interval. Is the resulting interval symmetric around the point estimate on the multiplicative scale?</li>
+<li>Translate the point estimate and CI into a "percent decrease" statement.</li>
+<li>Why is it correct to exponentiate each endpoint of the CI, but wrong in general to exponentiate the <em>midpoint</em>? Under what special condition does exponentiating the midpoint happen to land on the point estimate?</li>
+</ol>
+<div class="callout try"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Give the multiplicative point estimate and CI, the percent-decrease statement, and one sentence on why endpoint-wise back-transformation is the rule.</div>
+</div>
+
+</main>
+</div>
+<footer>FW 536 · Statistical Modeling for Ecology and Conservation · Oregon State University</footer>
+</body>
+</html>

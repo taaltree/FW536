@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Day 1 · Problem Set | FW 536 · Student copy (no answers)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../_Shared/css/lab.css" />
+<script defer src="../_Shared/js/lab.js"></script>
+<script>MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] } };</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+</head>
+<body>
+<div class="shell">
+
+<aside class="sidebar">
+ <h1><a href="../index.html" title="Back to course home">FW 536 · Day 1</a></h1>
+ <div class="subtitle">Assessed problem set — Probability &amp; discrete distributions</div>
+ <nav>
+ <div class="section">Morning · probability</div>
+ <ul>
+ <li><a href="#p1">1. Acoustic detection</a></li>
+ <li><a href="#p2">2. eDNA Bayes (data)</a></li>
+ <li><a href="#p3">3. Camera-grid heterogeneity</a></li>
+ <li><a href="#p4">4. Isolated callers</a></li>
+ <li><a href="#p5">5. Hair-snare DNA</a></li>
+ <li><a href="#p6">6. Voting fishers</a></li>
+ </ul>
+ <div class="section">Afternoon · distributions</div>
+ <ul>
+ <li><a href="#p7">7. Nest success (Binomial)</a></li>
+ <li><a href="#p8">8. Den visits (Poisson)</a></li>
+ <li><a href="#p9">9. Scat counts (Poisson vs NB, data)</a></li>
+ <li><a href="#p10">10. Pellet contents (Multinomial)</a></li>
+ <li><a href="#p11">11. Pooled counts (overdispersion)</a></li>
+ <li><a href="#p12">12. Surveillance design</a></li>
+ </ul>
+ <div class="section">Day 1 docs</div>
+ <ul>
+ <li><a href="lab.html">Practice lab (answers visible)</a></li>
+ <li><a class="featured" href="plain_language_summary.html">Plain-language summary</a></li>
+ <li><a href="../index.html">All days</a></li>
+ </ul>
+ </nav>
+</aside>
+
+<main class="content">
+<header class="lab-header">
+ <div class="eyebrow">Day 1 · Assessed problem set</div>
+ <h1>Probability and discrete distributions in ecology</h1>
+ <p class="lede">Your graded 40-point Day 1 assignment: six morning probability problems and six afternoon distribution problems, drawn from marine, terrestrial, and wildlife-disease systems. Two problems use small real datasets you load into R.</p>
+</header>
+
+<section class="callout warn" style="margin-top:24px;"><p><strong>This is the assessed problem set — answers are not shown here.</strong> Write your work in the two R Markdown hand-in templates: <a href="morning_lab_template.Rmd"><code>morning_lab_template.Rmd</code></a> for the morning problems (1&ndash;6) and <a href="afternoon_lab_template.Rmd"><code>afternoon_lab_template.Rmd</code></a> for the afternoon problems (7&ndash;12). Knit each to HTML and upload to the matching Canvas assignment.</p>
+<p>For worked-example study with visible answers, use the <a href="lab.html">in-class practice lab</a>. Need R Markdown help? See the <a href="../rmarkdown_tutorial.html">R Markdown tutorial</a>.</p></section>
+
+<section><p>Problems 2 and 9 supply a small dataset in the <code>data/</code> folder next to this page. Keep the <code>data/</code> folder alongside your <code>.Rmd</code> file so the <code>read.csv()</code> calls resolve. Work each problem in the matching template, knit to HTML, and submit on Canvas.</p></section>
+
+
+<!-- ============================= MORNING ============================= -->
+<a id="morning"></a>
+<div class="practice-banner"><div class="label">Morning · 20 pts</div><h3>Probability problems</h3><p>Sample-space reasoning, conditional probability, Bayes' rule, heterogeneity, and expected value. Work each on paper first, then confirm numerically in R inside <code>morning_lab_template.Rmd</code>.</p></div>
+
+<div class="exercise" id="p1">
+<span class="ex-tag">Problem 1</span><span class="difficulty easy"> · conditional probability</span>
+<h3>Acoustic detection of tagged steelhead</h3>
+<p>A tagged steelhead passes through a river reach monitored by two independent acoustic receivers. Given the fish is present, each receiver detects the tag with probability $0.85$. If the fish is absent, false detections are negligible.</p>
+<ol type="a">
+<li>Given the fish is present, what is the probability that <em>at least one</em> receiver detects it?</li>
+<li>Given that <em>at least one</em> receiver detected the fish, what is the probability that <em>both</em> receivers detected it?</li>
+<li>Why is your answer to (b) different from $0.85$? Answer in one or two sentences.</li>
+</ol>
+<div class="callout try"><strong>Your answer goes in the R Markdown hand-in.</strong> Put your reasoning and any R checks in <code>morning_lab_template.Rmd</code> under Problem 1.</div>
+</div>
+
+<div class="exercise" id="p2">
+<span class="ex-tag">Problem 2</span><span class="difficulty medium"> · Bayes' rule · uses data</span>
+<h3>eDNA detection of invasive carp</h3>
+<p>An agency screens candidate lakes for bighead carp using an environmental-DNA (eDNA) qPCR assay. Based on the surrounding watershed, the <em>prior</em> probability that carp are present in any given lake is $0.20$. The assay has <strong>sensitivity</strong> $P(+\mid\text{present}) = 0.92$ and <strong>specificity</strong> $P(-\mid\text{absent}) = 0.97$ (so the false-positive rate is $0.03$).</p>
+<ol type="a">
+<li>A single sample from a lake comes back <em>positive</em>. What is the posterior probability that carp are present?</li>
+<li>If <em>two</em> independent samples from the same lake both come back positive, what is the posterior? (Update sequentially: the posterior after the first sample becomes the prior for the second.)</li>
+<li>How much does the answer to (a) change if the prior is $0.02$ instead of $0.20$? What does this say about screening rare invaders?</li>
+<li>The file <code>data/edna_carp_results.csv</code> holds the qPCR replicate results for 12 candidate lakes (columns <code>lake</code>, <code>replicate</code>, <code>positive</code>, where <code>positive</code> is 1/0). Load it, and for each lake compute the posterior probability of carp presence by starting from the $0.20$ prior and updating once per replicate (a positive replicate updates with sensitivity/false-positive-rate; a negative replicate updates with the miss rate $1-0.92$ and specificity $0.97$). Which lakes end up with posterior probability above $0.95$? Which fall below $0.05$?</li>
+</ol>
+<div class="callout bio">Swap "carp present" for any rare cryptic species and "eDNA assay" for an AI-classified camera-trap detector: when the base rate is low, even an accurate test produces mostly false alarms. Replicate sampling is how field programs claw the posterior back toward certainty.</div>
+<div class="code-label">Load the data</div>
+<pre><code>edna &lt;- <span class="fn">read.csv</span>(<span class="st">"data/edna_carp_results.csv"</span>)
+<span class="fn">head</span>(edna)
+<span class="cm"># one row per qPCR replicate; positive = 1 (detection) or 0 (no detection)</span></code></pre>
+<div class="callout try"><strong>Your answer goes in the R Markdown hand-in.</strong> Do parts (a)&ndash;(c) with pencil-and-paper reasoning plus an R check, and write the per-lake update in (d) as a small loop or function in <code>morning_lab_template.Rmd</code>.</div>
+</div>
+
+<div class="exercise" id="p3">
+<span class="ex-tag">Problem 3</span><span class="difficulty medium"> · heterogeneity (beta-binomial preview)</span>
+<h3>Bobcat camera-grid heterogeneity</h3>
+<p>A grid of eight remote cameras is run for one week at a survey site. Across many site-weeks the <em>average</em> per-camera detection probability is $\bar p = 0.20$, but a whole site-week is either good (fresh sign, animals moving) or poor. Model the shared week-level detectability $p$ as a single draw from $\text{Beta}(1.6,\,6.4)$ (mean $0.20$, but highly variable); in a given week <em>all eight cameras share that week's $p$</em>.</p>
+<ol type="a">
+<li>Under a plain $\text{Binomial}(8, 0.20)$ (i.e., $p$ fixed at exactly $0.20$ every week), what is $P(\text{0 of 8 cameras detect})$? What are the mean and variance of the number detecting?</li>
+<li>Now simulate the heterogeneous model: for each of 10,000 site-weeks, draw one $p \sim \text{Beta}(1.6, 6.4)$, then draw the 8 camera outcomes as $\text{Bernoulli}(p)$. Estimate $P(\text{0 detect})$ and the variance of the number detecting.</li>
+<li>Compare (a) and (b). Why does shared week-to-week heterogeneity <em>inflate</em> both the probability of an all-zero week and the variance, even though the average detection probability is unchanged?</li>
+</ol>
+<div class="callout bio">This is the seed of over-dispersion. Unmodeled variation in detectability, habitat quality, or effort makes real detection/count data more variable — and more prone to all-zero outcomes — than any fixed-$p$ model predicts. You will meet its remedies (beta-binomial, negative binomial, random effects) all week.</div>
+<div class="callout try"><strong>Your answer goes in the R Markdown hand-in.</strong> Set a seed and report your simulated numbers in <code>morning_lab_template.Rmd</code> under Problem 3.</div>
+</div>
+
+<div class="exercise" id="p4">
+<span class="ex-tag">Problem 4</span><span class="difficulty hard"> · expected value via indicators</span>
+<h3>Isolated callers along a ridgeline</h3>
+<p>$n = 30$ cougar territories are arranged linearly along a ridgeline. Each cougar independently has probability $p = 0.3$ of calling on a given night. Define an <strong>isolated caller</strong> as a cougar that calls while <em>neither</em> immediate neighbor calls. Consider only the 28 interior cougars (positions $2$ through $29$), which have two neighbors each.</p>
+<ol type="a">
+<li>Using indicator variables and linearity of expectation, compute the expected number of isolated callers. (Write $X = \sum_i X_i$ where $X_i = 1$ if cougar $i$ is an isolated caller.)</li>
+<li>Verify your answer by simulation with 20,000 replicate nights.</li>
+<li>Would the expected value in (a) change if calling events were positively correlated between neighbors (as they often are)? Which of your two arguments &mdash; the expectation or a variance calculation &mdash; would be affected? One or two sentences.</li>
+</ol>
+<div class="callout bio">The indicator trick &mdash; break a complicated count into a sum of simple 0/1 pieces, then add their expectations &mdash; is one of the most reusable moves in ecology: expected number of local-maximum nest sites, of solitary singers, of runs in a track survey, and more.</div>
+<div class="callout try"><strong>Your answer goes in the R Markdown hand-in.</strong> Show the indicator argument and the simulation check in <code>morning_lab_template.Rmd</code>.</div>
+</div>
+
+<div class="exercise" id="p5">
+<span class="ex-tag">Problem 5</span><span class="difficulty medium"> · total probability + Bayes</span>
+<h3>Grizzly bear DNA from hair snares</h3>
+<p>A hair-snare grid has 40 stations. At a station where a bear is actually present, the probability of collecting at least one usable hair sample in one visit is $p = 0.18$; where no bear is present, no usable sample is collected. Bears are present at $60\%$ of stations.</p>
+<ol type="a">
+<li>For a randomly chosen station, what is the probability of collecting at least one usable sample in one visit? (Condition on presence — this is the law of total probability.)</li>
+<li>Given that a station <em>did</em> yield at least one sample, what is the probability a bear was present there? Explain why the answer takes the value it does.</li>
+<li>If you visit every station three times (visits independent given presence), what is the per-station probability of at least one sample across the three visits &mdash; both conditional on presence, and marginally over presence?</li>
+</ol>
+<div class="callout bio">Detection is conditional on presence, and presence is uncertain. Nearly every occupancy and capture&ndash;recapture model in the course is built on exactly this two-layer structure: a process that decides presence, and a detection process laid on top of it.</div>
+<div class="callout try"><strong>Your answer goes in the R Markdown hand-in.</strong> Lay out the conditioning and the arithmetic in <code>morning_lab_template.Rmd</code> under Problem 5.</div>
+</div>
+
+<div class="exercise" id="p6">
+<span class="ex-tag">Problem 6</span><span class="difficulty medium"> · expected value + binomial tail</span>
+<h3>Fishers vote on a regulation</h3>
+<p>Twenty commercial fishers vote on a proposed regulation. Each votes "yes" independently with probability $0.4$. The motion passes if <em>more than half</em> (i.e., at least 11 of 20) vote yes.</p>
+<ol type="a">
+<li>What are the expected number of yes votes and its variance?</li>
+<li>What is the probability the motion passes?</li>
+<li>Keeping $p = 0.4$, what is the smallest group size $n$ (with "passes" = more than half of $n$ vote yes) for which the probability of passage drops below $1\%$? Solve numerically in R.</li>
+</ol>
+<div class="callout bio">"How many independent yes/no events, at what per-unit probability, before a threshold is crossed?" is the binomial skeleton behind quorum rules, minimum detectable effects, and required sample sizes throughout applied ecology.</div>
+<div class="callout try"><strong>Your answer goes in the R Markdown hand-in.</strong> Report the mean, variance, tail probability, and your search for $n$ in <code>morning_lab_template.Rmd</code>.</div>
+</div>
+
+
+<!-- ============================ AFTERNOON ============================ -->
+<a id="afternoon"></a>
+<div class="practice-banner"><div class="label">Afternoon · 20 pts</div><h3>Discrete-distribution problems</h3><p>Bernoulli/Binomial, Poisson, Negative Binomial, and Multinomial &mdash; each one a <em>story</em> about how counts are generated. Work these in <code>afternoon_lab_template.Rmd</code>.</p></div>
+
+<div class="exercise" id="p7">
+<span class="ex-tag">Problem 7</span><span class="difficulty easy"> · Binomial</span>
+<h3>Sea turtle nest success</h3>
+<p>A monitored loggerhead beach has $n = 18$ nests, each hatching successfully with probability $p = 0.62$, independently.</p>
+<ol type="a">
+<li>Write the data-generating model, then give the expected number of successful nests and the variance.</li>
+<li>What is the probability of exactly 12 successful nests?</li>
+<li>What is the probability of at least 15 successful nests?</li>
+<li>If a beach manager wanted at least an $80\%$ chance of seeing $\ge 15$ successes, what would the per-nest success probability $p$ need to be? Find it numerically.</li>
+</ol>
+<div class="callout try"><strong>Your answer goes in the R Markdown hand-in.</strong> Use <code>dbinom</code>/<code>pbinom</code> and report values in <code>afternoon_lab_template.Rmd</code> under Problem 7.</div>
+</div>
+
+<div class="exercise" id="p8">
+<span class="ex-tag">Problem 8</span><span class="difficulty easy"> · Poisson</span>
+<h3>Wolf approaches at an active den</h3>
+<p>An observer records wolf approaches to a den at an average rate of $\lambda = 1.8$ per 12-hour observation period.</p>
+<ol type="a">
+<li>Write the model. What does it assume about the independence of successive approaches, and where might that assumption fail in the field?</li>
+<li>What is the probability of no approaches in a 12-hour period?</li>
+<li>What is the probability of more than 3 approaches in a 12-hour period?</li>
+<li>What is the probability of exactly 5 approaches in a 36-hour period? (Scale $\lambda$ with the observation window.)</li>
+</ol>
+<div class="callout bio">The Poisson is the natural distribution for independent, rare-ish events occurring at a steady rate in a fixed window of time or space. Its single-parameter rigidity (mean = variance) is exactly what real, clustered data violate &mdash; which motivates the next problem.</div>
+<div class="callout try"><strong>Your answer goes in the R Markdown hand-in.</strong> Use <code>dpois</code>/<code>ppois</code> and note the rate-scaling in part (d).</div>
+</div>
+
+<div class="exercise" id="p9">
+<span class="ex-tag">Problem 9</span><span class="difficulty medium"> · Poisson vs Negative Binomial · uses data</span>
+<h3>Coyote scat counts: is Poisson enough?</h3>
+<p>The file <code>data/coyote_scat_counts.csv</code> holds coyote scat counts from a recent survey of 120 grid cells (columns <code>grid_id</code>, <code>transect</code>, <code>scats</code>). You will decide whether a Poisson or a Negative Binomial model fits these counts.</p>
+<ol type="a">
+<li>Load the data. Compute the sample mean and variance of <code>scats</code>. What do you notice, and what does it suggest about the Poisson assumption that mean = variance?</li>
+<li>Using the method of moments, find the Negative Binomial dispersion parameter $k$ (R's <code>size</code>) that matches the sample moments. Recall $\mathrm{Var}(Y) = \mu + \mu^2/k$, so $k = \mu^2 / (\mathrm{Var}(Y) - \mu)$.</li>
+<li>Compare the <em>observed</em> $P(Y = 0)$ and $P(Y &gt; 15)$ in the data against the values predicted by (i) a Poisson with the sample mean, and (ii) a Negative Binomial with the sample mean and your fitted $k$. Which distribution reproduces the data?</li>
+<li>Plot a histogram of the counts and overlay the Poisson and NB pmfs. In one or two sentences, name an ecological mechanism that could produce this over-dispersion.</li>
+</ol>
+<div class="callout bio">Animals cluster &mdash; territories, latrines, family groups, patchy resources. That clustering pushes variance above the mean, and the Negative Binomial is the "Poisson with a built-in clumping mechanism." Diagnosing over-dispersion from data is one of the most common moves you will make all week.</div>
+<div class="code-label">Load the data</div>
+<pre><code>coyote &lt;- <span class="fn">read.csv</span>(<span class="st">"data/coyote_scat_counts.csv"</span>)
+<span class="fn">str</span>(coyote)
+mu  &lt;- <span class="fn">mean</span>(coyote$scats)
+v   &lt;- <span class="fn">var</span>(coyote$scats)
+<span class="fn">c</span>(mean = mu, variance = v)</code></pre>
+<div class="callout try"><strong>Your answer goes in the R Markdown hand-in.</strong> Report the moments, fitted $k$, the three-way comparison, and the plot in <code>afternoon_lab_template.Rmd</code> under Problem 9.</div>
+</div>
+
+<div class="exercise" id="p10">
+<span class="ex-tag">Problem 10</span><span class="difficulty easy"> · Multinomial</span>
+<h3>Owl pellet contents</h3>
+<p>Barn owl pellets from a regional diet study are composed of voles $0.65$, shrews $0.20$, mice $0.10$, and birds $0.05$. A pellet contains 15 identifiable prey items.</p>
+<ol type="a">
+<li>What is the probability of the exact composition $(10, 3, 1, 1)$ &mdash; 10 voles, 3 shrews, 1 mouse, 1 bird?</li>
+<li>What is the marginal distribution of the number of shrews in a single pellet? Give its name, mean, and variance.</li>
+<li>Across 50 pellets, what is the expected total number of mice consumed?</li>
+<li>Simulate 5,000 pellets and confirm that the marginal count of one category (your choice) matches the binomial you named in (b).</li>
+</ol>
+<div class="callout bio">The Multinomial is the distribution for "$n$ items sorted into $k$ mutually exclusive categories." A key fact you will reuse: any single category of a Multinomial is, on its own, Binomial &mdash; which is why diet, habitat-use, and survey-response data can be analyzed one category at a time when convenient.</div>
+<div class="callout try"><strong>Your answer goes in the R Markdown hand-in.</strong> Use <code>dmultinom</code> and <code>rmultinom</code> in <code>afternoon_lab_template.Rmd</code> under Problem 10.</div>
+</div>
+
+<div class="exercise" id="p11">
+<span class="ex-tag">Problem 11</span><span class="difficulty hard"> · mixed Poisson / over-dispersion</span>
+<h3>Pooling counts across sites creates over-dispersion</h3>
+<p>Counts of microplastic particles per mussel follow a Poisson distribution, but the rate differs by site: at site A, $\lambda_A = 2$; at site B, $\lambda_B = 8$. You collect 50 mussels from each site and then <em>pool</em> them into a single sample of 100.</p>
+<ol type="a">
+<li>If you (incorrectly) treat the pooled sample as one Poisson sample, what mean and variance would you estimate? Will the pooled distribution actually be Poisson? Explain why or why not.</li>
+<li>Show by simulation that the pooled distribution is over-dispersed (variance noticeably greater than mean).</li>
+<li>Using the law of total variance, derive the exact mean and variance of the pooled mixture, and compare to your simulation. (Hint: $E[Y] = E[\lambda]$ and $\mathrm{Var}(Y) = E[\lambda] + \mathrm{Var}(\lambda)$ when $Y\mid\lambda \sim \text{Poisson}(\lambda)$.)</li>
+<li>In one or two sentences: what does this exercise tell you about why <em>real</em> count data are over-dispersed even when the process is Poisson within each homogeneous unit?</li>
+</ol>
+<div class="callout bio">This is the mechanism behind the Negative Binomial itself: a Poisson whose rate varies (here across two sites; in the NB, continuously via a gamma distribution). Unmodeled heterogeneity in the rate is the single most common source of over-dispersion in ecological counts.</div>
+<div class="callout try"><strong>Your answer goes in the R Markdown hand-in.</strong> Give the simulation and the total-variance derivation in <code>afternoon_lab_template.Rmd</code> under Problem 11.</div>
+</div>
+
+<div class="exercise" id="p12">
+<span class="ex-tag">Problem 12</span><span class="difficulty medium"> · Binomial · surveillance design</span>
+<h3>Disease surveillance sample size</h3>
+<p>A herd has a hypothetical brucellosis prevalence of $0.15$. You will sample $n$ animals independently and test each. You want at least a $95\%$ probability of detecting <em>at least one</em> positive animal.</p>
+<ol type="a">
+<li>Write the binomial probability of detecting at least one positive in a sample of $n$, and set up the inequality that guarantees $95\%$ detection power.</li>
+<li>Solve for the smallest $n$ that delivers $95\%$ detection probability &mdash; algebraically using logs, and confirm in R.</li>
+<li>Repeat for a prevalence of $0.02$. Comment on how required sample size scales as the disease becomes rarer.</li>
+</ol>
+<div class="callout bio">"Freedom from disease" and rare-species-detection sample-size calculations are exactly this computation. The same $1 - (1-p)^n \ge 0.95$ logic sizes the effort needed to be confident you would have caught something if it were there.</div>
+<div class="callout try"><strong>Your answer goes in the R Markdown hand-in.</strong> Show the inequality, the closed-form $n$, and the R confirmation in <code>afternoon_lab_template.Rmd</code> under Problem 12.</div>
+</div>
+
+</main>
+</div>
+<footer>FW 536 · Statistical Modeling for Ecology and Conservation · Oregon State University</footer>
+</body>
+</html>

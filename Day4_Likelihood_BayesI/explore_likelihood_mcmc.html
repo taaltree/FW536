@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Interactive: likelihood &amp; MCMC | FW 536 Day 4</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../_Shared/css/lab.css" />
+<script defer src="../_Shared/js/lab.js"></script>
+<style>
+  .widget { background:#fff; border:1px solid var(--border); border-radius:10px; padding:20px 24px; margin:24px 0; box-shadow:0 2px 10px rgba(0,0,0,.05); }
+  .controls { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:14px 24px; margin-bottom:14px; }
+  .ctl label { font-family:'Helvetica Neue',Arial,sans-serif; font-size:13px; font-weight:600; color:var(--osu-stone); display:flex; justify-content:space-between; }
+  .ctl input[type=range]{ width:100%; accent-color:var(--osu-orange); }
+  .ctl .val { color:var(--osu-orange-dark); font-variant-numeric:tabular-nums; }
+  svg text { font-family:'Helvetica Neue',Arial,sans-serif; }
+  .btns { display:flex; gap:8px; flex-wrap:wrap; margin:8px 0; }
+  .btns button { font-family:'Helvetica Neue',Arial,sans-serif; font-size:14px; font-weight:600; border:2px solid var(--osu-orange); background:var(--osu-orange); color:#fff; border-radius:6px; padding:7px 16px; cursor:pointer; }
+  .btns button.sec { background:#fff; color:var(--osu-orange-dark); }
+  .readout { font-family:'Helvetica Neue',Arial,sans-serif; font-size:14px; margin-top:6px; }
+  .readout b { color:var(--osu-orange-dark); font-variant-numeric:tabular-nums; }
+</style>
+</head>
+<body>
+<div class="shell">
+<aside class="sidebar">
+  <h1><a href="../index.html" title="Back to course home">FW 536 · Day 4</a></h1>
+  <div class="subtitle">Likelihood &amp; MCMC</div>
+  <nav>
+    <div class="section">This page</div>
+    <ul><li><a href="#like">1. Likelihood &amp; the MLE</a></li><li><a href="#mcmc">2. Metropolis MCMC</a></li><li><a href="#try">Things to try</a></li></ul>
+    <div class="section">Day 4</div>
+    <ul>
+      <li><a href="lab.html">Practice lab</a></li>
+      <li><a href="plain_language_summary.html">Plain-language summary</a></li>
+      <li><a href="../index.html">Course home</a></li>
+    </ul>
+  </nav>
+</aside>
+
+<main class="content">
+<header class="lab-header">
+  <div class="eyebrow">Day 4 · Interactive</div>
+  <h1>From likelihood to posterior to MCMC</h1>
+  <p class="lede">One running example — you observed <em>k</em> successes in <em>n</em> trials — shown three ways: the likelihood curve and its peak (the MLE), and a live Metropolis sampler whose histogram builds up the Bayesian posterior.</p>
+</header>
+
+<div class="widget">
+  <div class="controls">
+    <div class="ctl"><label for="k">k (successes observed)<span class="val" id="v_k"></span></label><input id="k" type="range" min="0" max="50" step="1" value="30"></div>
+    <div class="ctl"><label for="n">n (trials)<span class="val" id="v_n"></span></label><input id="n" type="range" min="1" max="50" step="1" value="50"></div>
+  </div>
+  <p class="readout">Data: <b id="dataline"></b> &nbsp; MLE p̂ = k/n = <b id="mle"></b></p>
+</div>
+
+<section id="like">
+<h2>1. The likelihood and the MLE</h2>
+<div class="widget">
+  <div class="controls">
+    <div class="ctl"><label for="p">Try a value of p<span class="val" id="v_p"></span></label><input id="p" type="range" min="0.01" max="0.99" step="0.01" value="0.5"></div>
+  </div>
+  <svg id="likechart" viewBox="0 0 720 300" width="100%" role="img" aria-label="Likelihood curve as a function of p"></svg>
+  <div class="readout" id="likeout"></div>
+</div>
+</section>
+
+<section id="mcmc">
+<h2>2. A Metropolis sampler builds the posterior</h2>
+<div class="widget">
+  <div class="controls">
+    <div class="ctl"><label for="step">Proposal step size<span class="val" id="v_step"></span></label><input id="step" type="range" min="0.01" max="0.5" step="0.01" value="0.1"></div>
+  </div>
+  <div class="btns">
+    <button id="run">▶ Run</button>
+    <button id="stepb" class="sec">Step ×20</button>
+    <button id="reset" class="sec">Reset</button>
+  </div>
+  <svg id="tracechart" viewBox="0 0 720 200" width="100%" role="img" aria-label="MCMC trace plot"></svg>
+  <svg id="histchart" viewBox="0 0 720 260" width="100%" role="img" aria-label="Histogram of MCMC samples with the analytic posterior overlaid"></svg>
+  <div class="readout" id="mcmcout"></div>
+</div>
+</section>
+
+<section id="try">
+<h2>Things to try</h2>
+<div class="callout key">
+<ol>
+<li><strong>The peak is the MLE.</strong> Drag p in panel 1 to the top of the likelihood curve — it lands on k/n.</li>
+<li><strong>MCMC recovers the posterior.</strong> Hit Run and watch the orange histogram in panel 2 fill in the dashed black posterior curve. The MCMC never computes that curve — it just wanders and the samples pile up in the right shape.</li>
+<li><strong>Step size matters.</strong> Set the step very small: the chain crawls and the acceptance rate is high but mixing is slow. Set it very large: most proposals are rejected (low acceptance) and the chain gets stuck. A middling step (acceptance ≈ 20–45%) works best.</li>
+<li><strong>More data → tighter posterior.</strong> Raise n (keeping k/n fixed) and both the likelihood and the posterior get narrower.</li>
+</ol>
+</div>
+<p><a href="lab.html">← Back to the Day 4 lab</a></p>
+</section>
+</main>
+</div>
+<footer>FW 536 · Statistical Modeling for Ecology and Conservation · Oregon State University</footer>
+
+<script>
+function lgamma(z){const g=7,c=[0.99999999999980993,676.5203681218851,-1259.1392167224028,
+ 771.32342877765313,-176.61502916214059,12.507343278686905,-0.13857109526572012,
+ 9.9843695780195716e-6,1.5056327351493116e-7];
+ if(z<0.5)return Math.log(Math.PI/Math.sin(Math.PI*z))-lgamma(1-z);
+ z-=1;let x=c[0];for(let i=1;i<g+2;i++)x+=c[i]/(z+i);const t=z+g+0.5;
+ return 0.5*Math.log(2*Math.PI)+(z+0.5)*Math.log(t)-t+Math.log(x);}
+
+let K=30,N=50,P=0.5,STEP=0.1;
+const logL=p=>(p<=0||p>=1)?-Infinity:K*Math.log(p)+(N-K)*Math.log(1-p);
+// analytic posterior (flat prior): Beta(K+1, N-K+1)
+const logBeta=(a,b)=>lgamma(a)+lgamma(b)-lgamma(a+b);
+const postDens=p=>{if(p<=0||p>=1)return 0;const a=K+1,b=N-K+1;
+  return Math.exp((a-1)*Math.log(p)+(b-1)*Math.log(1-p)-logBeta(a,b));};
+
+// ---- MCMC state ----
+let chain=[], cur=0.5, accepts=0, iters=0, timer=null;
+function resetChain(){chain=[];cur=K/N||0.5;accepts=0;iters=0;draw();}
+function mcmcStep(m){
+  m=m||1;
+  for(let s=0;s<m;s++){
+    // Gaussian-ish proposal via sum of three uniforms
+    let g=0; for(let j=0;j<3;j++) g+=Math.random()*2-1; g=g/1.732; // ~N(0,1)
+    const cand=cur+g*STEP;
+    const la=logL(cand)-logL(cur);
+    if(Math.log(Math.random())<la){cur=cand;accepts++;}
+    chain.push(cur); iters++;
+  }
+}
+
+// ---- drawing ----
+function axes(s,W,H,ml,mr,mt,mb,xlab,ylab,xlo,xhi,ylo,yhi,fmtY){
+  const pw=W-ml-mr,ph=H-mt-mb;
+  s.v=`<rect width="${W}" height="${H}" fill="white"/>`;
+  s.px=x=>ml+((x-xlo)/(xhi-xlo))*pw; s.py=y=>mt+ph-((y-ylo)/(yhi-ylo))*ph;
+  s.v+=`<line x1="${ml}" y1="${mt+ph}" x2="${ml+pw}" y2="${mt+ph}" stroke="#999"/>`;
+  s.v+=`<line x1="${ml}" y1="${mt}" x2="${ml}" y2="${mt+ph}" stroke="#999"/>`;
+  for(let t=0;t<=4;t++){const yy=mt+ph-(t/4)*ph, v=ylo+(yhi-ylo)*t/4;
+    s.v+=`<text x="${ml-6}" y="${yy+4}" font-size="10" fill="#666" text-anchor="end">${fmtY(v)}</text>`;}
+  s.v+=`<text x="${ml+pw/2}" y="${H-4}" font-size="12" fill="#444" text-anchor="middle">${xlab}</text>`;
+  return s;
+}
+
+function drawLike(){
+  const s=axes({},720,300,50,14,14,40,'p (success probability)','',0,1,0,0,()=>'');
+  // likelihood on natural scale, normalized to max=1
+  let xs=[],ys=[],maxLL=-Infinity;
+  for(let p=0.005;p<1;p+=0.005){const ll=logL(p); if(ll>maxLL)maxLL=ll;}
+  for(let p=0.005;p<1;p+=0.005){xs.push(p);ys.push(Math.exp(logL(p)-maxLL));}
+  const pw=720-50-14,ph=300-14-40,ml=50,mt=14; const py=v=>mt+ph-v*ph;
+  let pts=xs.map((p,i)=>`${s.px(p)},${py(ys[i])}`).join(' ');
+  s.v+=`<polyline points="${pts}" fill="none" stroke="#D73F09" stroke-width="3"/>`;
+  const mle=K/N;
+  s.v+=`<line x1="${s.px(mle)}" y1="${mt}" x2="${s.px(mle)}" y2="${mt+ph}" stroke="#111" stroke-dasharray="3 3"/>`;
+  s.v+=`<text x="${s.px(mle)+4}" y="${mt+12}" font-size="11" fill="#111">MLE = ${mle.toFixed(3)}</text>`;
+  s.v+=`<line x1="${s.px(P)}" y1="${mt}" x2="${s.px(P)}" y2="${mt+ph}" stroke="#1F5B50" stroke-width="1.5"/>`;
+  s.v+=`<circle cx="${s.px(P)}" cy="${py(Math.exp(logL(P)-maxLL))}" r="5" fill="#1F5B50"/>`;
+  document.getElementById('likechart').innerHTML=s.v;
+  document.getElementById('likeout').innerHTML=
+    `At p = <b>${P.toFixed(2)}</b>: log-likelihood = <b>${logL(P).toFixed(2)}</b>, `+
+    `relative likelihood = <b>${Math.exp(logL(P)-maxLL).toFixed(3)}</b> of the peak. `+
+    (Math.abs(P-K/N)<0.02?'You are essentially at the MLE.':'Drag toward the peak to reach the MLE.');
+}
+
+function drawTrace(){
+  const H=200,W=720,ml=50,mr=14,mt=12,mb=34,pw=W-ml-mr,ph=H-mt-mb;
+  const show=chain.slice(-300); const start=Math.max(0,chain.length-300);
+  let v=`<rect width="${W}" height="${H}" fill="white"/>`;
+  v+=`<line x1="${ml}" y1="${mt}" x2="${ml}" y2="${mt+ph}" stroke="#999"/>`;
+  v+=`<line x1="${ml}" y1="${mt+ph}" x2="${ml+pw}" y2="${mt+ph}" stroke="#999"/>`;
+  for(let t=0;t<=4;t++){const yy=mt+ph-(t/4)*ph, val=t/4;
+    v+=`<text x="${ml-6}" y="${yy+4}" font-size="10" fill="#666" text-anchor="end">${val.toFixed(2)}</text>`;}
+  v+=`<text x="${ml+pw/2}" y="${H-3}" font-size="12" fill="#444" text-anchor="middle">iteration (last 300) — trace of p</text>`;
+  if(show.length>1){
+    const px=i=>ml+(i/(show.length-1))*pw, py=val=>mt+ph-val*ph;
+    v+=`<polyline points="${show.map((val,i)=>`${px(i)},${py(val)}`).join(' ')}" fill="none" stroke="#1F5B50" stroke-width="1.3"/>`;
+  }
+  document.getElementById('tracechart').innerHTML=v;
+}
+
+function drawHist(){
+  const H=260,W=720,ml=50,mr=14,mt=14,mb=40,pw=W-ml-mr,ph=H-mt-mb;
+  const nb=40, burn=Math.floor(chain.length*0.2);
+  const samp=chain.slice(burn);
+  const bins=new Array(nb).fill(0);
+  samp.forEach(x=>{let b=Math.min(nb-1,Math.max(0,Math.floor(x*nb))); bins[b]++;});
+  const binw=1/nb; const dens=bins.map(c=> samp.length? c/samp.length/binw : 0);
+  // analytic posterior curve
+  let post=[],pmax=0; for(let p=0.005;p<1;p+=0.005){const d=postDens(p); post.push([p,d]); if(d>pmax)pmax=d;}
+  const ymax=Math.max(pmax, ...dens, 0.1)*1.1;
+  const px=x=>ml+x*pw, py=d=>mt+ph-(d/ymax)*ph;
+  let v=`<rect width="${W}" height="${H}" fill="white"/>`;
+  v+=`<line x1="${ml}" y1="${mt+ph}" x2="${ml+pw}" y2="${mt+ph}" stroke="#999"/>`;
+  v+=`<line x1="${ml}" y1="${mt}" x2="${ml}" y2="${mt+ph}" stroke="#999"/>`;
+  v+=`<text x="${ml+pw/2}" y="${H-4}" font-size="12" fill="#444" text-anchor="middle">p — histogram of samples vs. analytic posterior (dashed)</text>`;
+  for(let b=0;b<nb;b++){const x0=px(b*binw), bw=pw/nb;
+    v+=`<rect x="${x0+bw*0.08}" y="${py(dens[b])}" width="${bw*0.84}" height="${mt+ph-py(dens[b])}" fill="#D73F09" opacity="0.75"/>`;}
+  v+=`<polyline points="${post.map(([p,d])=>`${px(p)},${py(d)}`).join(' ')}" fill="none" stroke="#111" stroke-width="2.5" stroke-dasharray="5 4"/>`;
+  document.getElementById('histchart').innerHTML=v;
+}
+
+function draw(){
+  drawLike(); drawTrace(); drawHist();
+  const accRate=iters?accepts/iters:0;
+  const burn=Math.floor(chain.length*0.2), samp=chain.slice(burn);
+  const mean=samp.length?samp.reduce((a,b)=>a+b,0)/samp.length:0;
+  document.getElementById('mcmcout').innerHTML=
+    `Iterations: <b>${iters}</b> &nbsp; Acceptance rate: <b>${(accRate*100).toFixed(0)}%</b> &nbsp; `+
+    `Posterior mean (post-burn-in): <b>${samp.length?mean.toFixed(3):'—'}</b> &nbsp; `+
+    `Analytic posterior mean = (k+1)/(n+2) = <b>${((K+1)/(N+2)).toFixed(3)}</b>`;
+}
+
+function refreshData(){
+  document.getElementById('v_k').textContent=K;
+  document.getElementById('v_n').textContent=N;
+  document.getElementById('dataline').textContent=`${K} successes in ${N} trials`;
+  document.getElementById('mle').textContent=(K/N).toFixed(3);
+}
+
+// events
+document.getElementById('k').addEventListener('input',e=>{K=+e.target.value; if(K>N){N=K;document.getElementById('n').value=N;} refreshData(); resetChain();});
+document.getElementById('n').addEventListener('input',e=>{N=+e.target.value; if(K>N){K=N;document.getElementById('k').value=K;} refreshData(); resetChain();});
+document.getElementById('p').addEventListener('input',e=>{P=+e.target.value; document.getElementById('v_p').textContent=P.toFixed(2); drawLike();});
+document.getElementById('step').addEventListener('input',e=>{STEP=+e.target.value; document.getElementById('v_step').textContent=STEP.toFixed(2);});
+document.getElementById('run').addEventListener('click',function(){
+  if(timer){clearInterval(timer);timer=null;this.textContent='▶ Run';}
+  else{this.textContent='⏸ Pause'; timer=setInterval(()=>{mcmcStep(8);draw();},60);}
+});
+document.getElementById('stepb').addEventListener('click',()=>{mcmcStep(20);draw();});
+document.getElementById('reset').addEventListener('click',()=>{resetChain();});
+
+document.getElementById('v_p').textContent=P.toFixed(2);
+document.getElementById('v_step').textContent=STEP.toFixed(2);
+refreshData(); resetChain();
+</script>
+</body>
+</html>

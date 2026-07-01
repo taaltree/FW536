@@ -1,0 +1,175 @@
+---
+title: "FW 536 — Day 1 afternoon lab (Discrete distributions) — Your Name"
+author: "Your Name Here"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    self_contained: true
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    code_folding: show
+    theme: cosmo
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+# Day 1 afternoon lab — Discrete distributions problem set
+
+This template matches the afternoon problems (7–12) in [`problem_set.html`](problem_set.html).
+Read each problem statement there, write your work below, **Knit** to HTML, and
+upload the `.html` to the matching Canvas assignment.
+
+**Data:** Problem 9 uses `data/coyote_scat_counts.csv`. Keep the `data/` folder
+alongside this `.Rmd` file so the `read.csv()` call resolves.
+
+For setup help see the [R Markdown tutorial](../rmarkdown_tutorial.html).
+
+---
+
+# Setup
+
+```{r}
+# Load packages you'll need. Add or remove as appropriate.
+library(ggplot2)
+library(dplyr)
+```
+
+---
+
+# Problem 7 — Sea turtle nest success
+
+> n = 18 nests, each hatching successfully with p = 0.62, independently.
+> (a) Model + mean and variance. (b) P(exactly 12). (c) P(at least 15).
+> (d) What p gives at least an 80% chance of >= 15 successes? Find it numerically.
+
+**My work:**
+
+```{r}
+# Your R code here
+```
+
+**Answer / interpretation:**
+
+
+---
+
+# Problem 8 — Wolf approaches at an active den
+
+> Wolf approaches occur at rate lambda = 1.8 per 12-h period.
+> (a) Model + independence assumption. (b) P(0 in 12 h). (c) P(more than 3 in 12 h).
+> (d) P(exactly 5 in 36 h) — scale lambda with the window.
+
+**My work:**
+
+```{r}
+# Your R code here
+```
+
+**Answer / interpretation:**
+
+
+---
+
+# Problem 9 — Coyote scat counts: is Poisson enough?
+
+> Load `data/coyote_scat_counts.csv` (120 grid cells, column `scats`).
+> (a) Sample mean and variance — what do you notice about mean vs variance?
+> (b) Method-of-moments NB dispersion k = mu^2 / (var - mu).
+> (c) Compare observed P(Y=0) and P(Y>15) against Poisson(mu) and NB(mu, k).
+> (d) Histogram with Poisson and NB pmfs overlaid; name a mechanism for the over-dispersion.
+
+**My work:**
+
+```{r}
+coyote <- read.csv("data/coyote_scat_counts.csv")
+str(coyote)
+mu <- mean(coyote$scats)
+v  <- var(coyote$scats)
+c(mean = mu, variance = v)
+# Your fitted k, model comparison, and overlay plot here
+```
+
+**Answer / interpretation:**
+
+
+---
+
+# Problem 10 — Owl pellet contents
+
+> Prey composition voles 0.65, shrews 0.20, mice 0.10, birds 0.05; 15 items per pellet.
+> (a) P(exact composition (10, 3, 1, 1)). (b) Marginal distribution of shrews (name, mean,
+> variance). (c) Expected total mice across 50 pellets. (d) Simulate 5,000 pellets and
+> confirm a category's marginal matches the binomial from (b).
+
+**My work:**
+
+```{r}
+set.seed(1)
+# Your R code here
+```
+
+**Answer / interpretation:**
+
+
+---
+
+# Problem 11 — Pooling counts across sites creates over-dispersion
+
+> Poisson counts with lambda_A = 2, lambda_B = 8; 50 mussels from each site, pooled.
+> (a) Naive pooled mean/variance — still Poisson? (b) Simulate and show over-dispersion.
+> (c) Derive the exact mean and variance via the law of total variance and compare.
+> (d) Why are real count data over-dispersed even when Poisson within each unit?
+
+**My work:**
+
+```{r}
+set.seed(1)
+# Your R code here
+```
+
+**Answer / interpretation:**
+
+
+---
+
+# Problem 12 — Disease surveillance sample size
+
+> Prevalence p = 0.15; want at least 95% probability of detecting >= 1 positive.
+> (a) Write P(at least one positive) and the 95% inequality. (b) Smallest n (log form +
+> R check). (c) Repeat for prevalence 0.02 and comment on how effort scales.
+
+**My work:**
+
+```{r}
+# Your R code here
+```
+
+**Answer / interpretation:**
+
+
+---
+
+# (Optional) Embed a photo of hand-written work
+
+For problems easier to do on paper, photograph and embed:
+
+```{r, echo=FALSE, eval=FALSE, out.width="60%", fig.cap="Hand-derivation for Problem N"}
+knitr::include_graphics("images/problemN_derivation.jpg")
+```
+
+(Change `eval=FALSE` to `eval=TRUE` after saving an image in an `images/` folder next
+to this `.Rmd`. See the [R Markdown tutorial](../rmarkdown_tutorial.html) for details.)
+
+---
+
+# Submission checklist
+
+- [ ] Answered every afternoon problem (7–12) from `problem_set.html`.
+- [ ] Loaded `data/coyote_scat_counts.csv` for Problem 9 (kept the `data/` folder next to this file).
+- [ ] Set a seed before each simulation (Problems 10 and 11).
+- [ ] Knitted to HTML without errors.
+- [ ] Photos (if any) embedded with `self_contained: true` in the YAML.
+- [ ] Uploaded the `.html` to the matching Canvas assignment.

@@ -17,3 +17,7 @@ Icon?
 # Editor cruft
 *.swp
 *~
+
+# Instructor answer keys — never publish. Kept locally; release via Canvas
+# after grading. (Practice-lab answer_key.html stays public by design.)
+*_KEY.html

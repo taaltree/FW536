@@ -9,9 +9,7 @@
 <script>
 MathJax = {
   tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
-  options: {
-    menuOptions: { settings: { assistiveMml: true, explorer: true } }
-  },
+  options: { menuOptions: { settings: { assistiveMml: true, explorer: true } } },
   loader: { load: ['a11y/assistive-mml', 'a11y/explorer'] }
 };
 </script>
@@ -41,8 +39,7 @@ MathJax = {
  <ul>
  <li><a class="featured" href="plain_language_summary.html">Plain-language summary</a></li>
  <li><a href="answer_key.html">Answer key</a></li>
- <li><a href="problem_set_v2.html">Problem set · v2</a></li>
- <li><a href="problem_set_v3.html">Problem set · v3</a></li>
+ <li><a href="problem_set.html">Graded problem set</a></li>
  </ul>
  <div class="section">Course</div>
  <ul>
@@ -61,7 +58,7 @@ MathJax = {
 
 <div class="lab-toc" id="lab-toc">
   <h2>What's in this lab and what to hand in</h2>
-  <p class="toc-intro">This page is your <strong>in-class practice</strong> problem set — worked examples with visible answers. Your <strong>graded 20-point assignment</strong> is a separate problem set (v2 or v3); write up your answers in the matching R Markdown template and submit on Canvas.</p>
+  <p class="toc-intro">This page is your <strong>in-class practice</strong> problem set — worked examples with visible answers. Your <strong>graded 20-point assignment</strong> is a separate problem set; write up your answers in the R Markdown template and submit on Canvas.</p>
   
 <div class="session">
   <div class="session-label">Morning · 20 pts</div>
@@ -70,9 +67,9 @@ MathJax = {
     <div class="row"><span class="tag practice">Practice</span>
       <span><a href="#morning">Walk through the morning problems on this page</a> <span class="note">— answers visible, in-class</span></span></div>
     <div class="row"><span class="tag assessed">Assessed</span>
-      <span><a href="problem_set_v2.html#morning">Assessed v2 &middot; marine &amp; fisheries</a> &nbsp;or&nbsp; <a href="problem_set_v3.html#morning">Assessed v3 &middot; terrestrial wildlife &amp; disease</a>
-            <span class="note">— answers NOT shown; choose whichever theme fits your interests</span></span></div>
-    <div class="row"><span class="tag template">Hand-in</span><span>Choose template matching your theme: <a href="morning_lab_template_v2.Rmd">morning v2 (marine &amp; fisheries).Rmd</a> <span class="note">or</span> <a href="morning_lab_template_v3.Rmd">morning v3 (terrestrial wildlife &amp; disease).Rmd</a> <span class="note">— knit to HTML and upload to Canvas</span></span></div>
+      <span><a href="problem_set.html#morning">Graded problem set</a>
+            <span class="note">— answers NOT shown; graded — submit on Canvas</span></span></div>
+    <div class="row"><span class="tag template">Hand-in</span><span><a href="morning_lab_template.Rmd">morning_lab_template.Rmd</a> <span class="note">— knit to HTML and upload to Canvas</span></span></div>
     <div class="row"><span class="tag lecture">Lecture</span>
       <span><a href="lecture_day1_morning.html">Morning lecture · intro to probability</a></span></div>
   </div>
@@ -85,9 +82,9 @@ MathJax = {
     <div class="row"><span class="tag practice">Practice</span>
       <span><a href="#afternoon">Walk through the afternoon problems on this page</a> <span class="note">— answers visible, in-class</span></span></div>
     <div class="row"><span class="tag assessed">Assessed</span>
-      <span><a href="problem_set_v2.html#afternoon">Assessed v2 &middot; marine &amp; fisheries</a> &nbsp;or&nbsp; <a href="problem_set_v3.html#afternoon">Assessed v3 &middot; terrestrial wildlife &amp; disease</a>
-            <span class="note">— answers NOT shown; choose whichever theme fits your interests</span></span></div>
-    <div class="row"><span class="tag template">Hand-in</span><span>Choose template matching your theme: <a href="afternoon_lab_template_v2.Rmd">afternoon v2 (marine &amp; fisheries).Rmd</a> <span class="note">or</span> <a href="afternoon_lab_template_v3.Rmd">afternoon v3 (terrestrial wildlife &amp; disease).Rmd</a> <span class="note">— knit to HTML and upload to Canvas</span></span></div>
+      <span><a href="problem_set.html#afternoon">Graded problem set</a>
+            <span class="note">— answers NOT shown; graded — submit on Canvas</span></span></div>
+    <div class="row"><span class="tag template">Hand-in</span><span><a href="afternoon_lab_template.Rmd">afternoon_lab_template.Rmd</a> <span class="note">— knit to HTML and upload to Canvas</span></span></div>
     <div class="row"><span class="tag lecture">Lecture</span>
       <span><a href="lecture_day1_afternoon.html">Afternoon lecture · discrete distributions</a></span></div>
   </div>
@@ -169,7 +166,7 @@ MathJax = {
 </section>
 
 <!-- ================================================================== -->
-<div class="practice-banner"><div class="label">Practice — answers visible</div><h3>Morning practice problems</h3><p>The exercises below are walk-through practice. Your graded morning assignment (Probability problem set) uses a separate, novel problem set &mdash; <strong>choose either theme below</strong> and write your answers in the matching theme template (<code>morning_lab_template_v2.Rmd</code> or <code>morning_lab_template_v3.Rmd</code>).</p><p style="margin: 8px 0 0 0;"><a class="hand-in" href="problem_set_v2.html#morning">v2 &middot; marine &amp; fisheries &rarr;</a> &nbsp;or&nbsp; <a class="hand-in" href="problem_set_v3.html#morning">v3 &middot; terrestrial wildlife &amp; disease &rarr;</a> &nbsp;&nbsp; <a class="hand-in" href="morning_lab_template_v2.Rmd" style="background:#1C638A; color:white; border-color:#1C638A;">v2 template &darr;</a> <a class="hand-in" href="morning_lab_template_v3.Rmd" style="background:#1C638A; color:white; border-color:#1C638A;">v3 template &darr;</a></p></div>
+<div class="practice-banner"><div class="label">Practice — answers visible</div><h3>Morning practice problems</h3><p>The exercises below are walk-through practice. Your graded morning assignment (Probability problem set) uses a separate, novel problem set &mdash; <strong>choose either theme below</strong> and write your answers in <code>morning_lab_template.Rmd</code>.</p><p style="margin: 8px 0 0 0;"><a class="hand-in" href="problem_set.html#morning">Open the graded morning problem set &rarr;</a> &nbsp;&nbsp; <a class="hand-in" href="morning_lab_template.Rmd" style="background:#1C638A; color:white; border-color:#1C638A;">morning_lab_template.Rmd &darr;</a></p></div>
 <section id="morning">
 <h2>Morning lab · Probability puzzles</h2>
 <p>Work each problem with pencil and paper first. Then check your numerical answer in R. Each problem comes with a hint, a short worked solution you can reveal, and a <em>"why this matters"</em> note linking the puzzle back to ecology.</p>
@@ -270,7 +267,7 @@ dbinom(0, size=4, prob=1/4) <span class="cm"># same thing</span></code></pre>
 </section>
 
 <!-- ================================================================== -->
-<div class="practice-banner"><div class="label">Practice — answers visible</div><h3>Afternoon practice problems</h3><p>The exercises below are walk-through practice. Your graded afternoon assignment (Discrete distributions problem set) uses a separate, novel problem set &mdash; <strong>choose either theme below</strong> and write your answers in the matching theme template (<code>afternoon_lab_template_v2.Rmd</code> or <code>afternoon_lab_template_v3.Rmd</code>).</p><p style="margin: 8px 0 0 0;"><a class="hand-in" href="problem_set_v2.html#afternoon">v2 &middot; marine &amp; fisheries &rarr;</a> &nbsp;or&nbsp; <a class="hand-in" href="problem_set_v3.html#afternoon">v3 &middot; terrestrial wildlife &amp; disease &rarr;</a> &nbsp;&nbsp; <a class="hand-in" href="afternoon_lab_template_v2.Rmd" style="background:#1C638A; color:white; border-color:#1C638A;">v2 template &darr;</a> <a class="hand-in" href="afternoon_lab_template_v3.Rmd" style="background:#1C638A; color:white; border-color:#1C638A;">v3 template &darr;</a></p></div>
+<div class="practice-banner"><div class="label">Practice — answers visible</div><h3>Afternoon practice problems</h3><p>The exercises below are walk-through practice. Your graded afternoon assignment (Discrete distributions problem set) uses a separate, novel problem set &mdash; <strong>choose either theme below</strong> and write your answers in <code>afternoon_lab_template.Rmd</code>.</p><p style="margin: 8px 0 0 0;"><a class="hand-in" href="problem_set.html#afternoon">Open the graded afternoon problem set &rarr;</a> &nbsp;&nbsp; <a class="hand-in" href="afternoon_lab_template.Rmd" style="background:#1C638A; color:white; border-color:#1C638A;">afternoon_lab_template.Rmd &darr;</a></p></div>
 <section id="afternoon">
 <h2>Afternoon lab · Discrete distributions in R</h2>
 

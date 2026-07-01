@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Pre-course setup: R, JAGS &amp; Nimble | FW 536</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="_Shared/css/lab.css" />
+<script defer src="_Shared/js/lab.js"></script>
+</head>
+<body>
+<div class="shell">
+
+<aside class="sidebar">
+  <h1><a href="index.html" title="Back to course home">FW 536 · Setup</a></h1>
+  <div class="subtitle">Install R, JAGS &amp; Nimble</div>
+  <nav>
+    <div class="section">Before you arrive</div>
+    <ul>
+      <li><a href="#overview">What you need</a></li>
+      <li><a href="#step1">1. R &amp; RStudio</a></li>
+      <li><a href="#step2">2. Compiler toolchain</a></li>
+      <li><a href="#step3">3. Install JAGS</a></li>
+      <li><a href="#step4">4. R packages</a></li>
+      <li><a href="#verify">5. Verify it works</a></li>
+      <li><a href="#trouble">6. Troubleshooting</a></li>
+      <li><a href="#checklist">Final checklist</a></li>
+    </ul>
+    <div class="section">Also</div>
+    <ul>
+      <li><a href="rmarkdown_tutorial.html">R Markdown tutorial</a></li>
+      <li><a href="syllabus.html">Syllabus</a></li>
+      <li><a href="index.html">Course home</a></li>
+    </ul>
+  </nav>
+</aside>
+
+<main class="content">
+<header class="lab-header">
+  <div class="eyebrow">Pre-course preparation</div>
+  <h1>Setting up R, JAGS, and Nimble on Windows and Mac</h1>
+  <p class="lede">Do this before Day 1. Bayesian labs (Days 4&ndash;5) use JAGS and Nimble, and Nimble compiles C++, so a working compiler toolchain must be in place. Budget 30&ndash;60 minutes and finish the verification step.</p>
+</header>
+
+<section id="overview">
+<h2>What you need</h2>
+<p>By the end of this page you should have all of the following working:</p>
+<table>
+<tr><th>Component</th><th>Why</th><th>Windows</th><th>Mac</th></tr>
+<tr><td>R (≥ 4.3)</td><td>the language</td><td>CRAN installer</td><td>CRAN installer (pick Intel or Apple-Silicon build)</td></tr>
+<tr><td>RStudio</td><td>the IDE we use in class</td><td>Posit installer</td><td>Posit installer</td></tr>
+<tr><td>Compiler toolchain</td><td>Nimble compiles models to C++</td><td>Rtools</td><td>Xcode Command Line Tools</td></tr>
+<tr><td>JAGS</td><td>a Bayesian sampler used alongside Nimble</td><td>JAGS installer (.exe)</td><td>JAGS installer (.dmg) or Homebrew</td></tr>
+<tr><td>R packages</td><td><code>nimble</code>, <code>rjags</code>, <code>R2jags</code>, <code>coda</code>, <code>MCMCvis</code>, <code>HDInterval</code></td><td colspan="2"><code>install.packages(...)</code> (same on both)</td></tr>
+</table>
+
+<div class="callout key">
+<p>Order matters. Install <strong>R first</strong>, then the <strong>compiler toolchain</strong>, then <strong>JAGS</strong>, then the <strong>R packages</strong>. Installing <code>rjags</code> before JAGS, or <code>nimble</code> before the compiler, is the most common cause of "it won't install" problems.</p>
+</div>
+</section>
+
+<section id="step1">
+<h2>1. Install R and RStudio</h2>
+
+<div class="tabs">
+<div class="tab-buttons">
+  <button class="active">Windows</button>
+  <button>Mac</button>
+</div>
+
+<div class="tab-panel active">
+<h3>Windows</h3>
+<ol>
+<li>Go to <a href="https://cran.r-project.org/bin/windows/base/" target="_blank" rel="noopener">cran.r-project.org/bin/windows/base</a> and run the installer for the latest R. Accept the defaults.</li>
+<li>Go to <a href="https://posit.co/download/rstudio-desktop/" target="_blank" rel="noopener">posit.co/download/rstudio-desktop</a> and install RStudio Desktop (free).</li>
+<li>Open RStudio. In the Console, run <code>R.version.string</code> to confirm the version.</li>
+</ol>
+</div>
+
+<div class="tab-panel">
+<h3>Mac</h3>
+<ol>
+<li>Go to <a href="https://cran.r-project.org/bin/macosx/" target="_blank" rel="noopener">cran.r-project.org/bin/macosx</a>. Download the <code>.pkg</code> that matches your chip: the <strong>arm64</strong> build for Apple Silicon (M1/M2/M3/M4), or the <strong>x86_64</strong> build for older Intel Macs. If unsure, click the Apple menu → <em>About This Mac</em> and read the "Chip"/"Processor" line.</li>
+<li>Run the installer, accepting defaults.</li>
+<li>Install RStudio Desktop from <a href="https://posit.co/download/rstudio-desktop/" target="_blank" rel="noopener">posit.co/download/rstudio-desktop</a>.</li>
+<li>Open RStudio and run <code>R.version.string</code> to confirm.</li>
+</ol>
+</div>
+</div>
+</section>
+
+<section id="step2">
+<h2>2. Install the compiler toolchain (needed by Nimble)</h2>
+<p>Nimble writes C++ and compiles it, so it needs a compiler. This is the step people forget.</p>
+
+<div class="tabs">
+<div class="tab-buttons">
+  <button class="active">Windows (Rtools)</button>
+  <button>Mac (Xcode CLT)</button>
+</div>
+
+<div class="tab-panel active">
+<h3>Windows — Rtools</h3>
+<ol>
+<li>Go to <a href="https://cran.r-project.org/bin/windows/Rtools/" target="_blank" rel="noopener">cran.r-project.org/bin/windows/Rtools</a>.</li>
+<li>Download the Rtools version that <strong>matches your R version</strong> (e.g., Rtools44 for R 4.4.x, Rtools43 for R 4.3.x). Run the installer with defaults.</li>
+<li>Restart RStudio, then confirm the toolchain is visible:
+<div class="code-label">R console</div>
+<pre><code>Sys.which(<span class="st">"make"</span>)      <span class="cm"># should return a non-empty path ending in make.exe</span>
+pkgbuild::has_build_tools(debug = <span class="kw">TRUE</span>)   <span class="cm"># TRUE if Rtools is found</span></code></pre>
+If <code>pkgbuild</code> is missing, run <code>install.packages("pkgbuild")</code> first.</li>
+</ol>
+</div>
+
+<div class="tab-panel">
+<h3>Mac — Xcode Command Line Tools</h3>
+<ol>
+<li>Open <strong>Terminal</strong> (Applications → Utilities → Terminal) and run:
+<div class="code-label">Terminal</div>
+<pre><code>xcode-select --install</code></pre>
+Click "Install" in the dialog that appears and wait for it to finish. (You do <em>not</em> need the full Xcode app, just the Command Line Tools.)</li>
+<li>Verify:
+<div class="code-label">Terminal</div>
+<pre><code>xcode-select -p        <span class="cm"># prints a path like /Library/Developer/CommandLineTools</span>
+clang --version        <span class="cm"># prints the compiler version</span></code></pre></li>
+<li><strong>Fortran (needed by some packages):</strong> install the gfortran package recommended on the <a href="https://cran.r-project.org/bin/macosx/tools/" target="_blank" rel="noopener">CRAN macOS tools page</a>. Nimble itself does not require Fortran, but installing it now avoids surprises with other spatial/mixed-model packages.</li>
+</ol>
+</div>
+</div>
+
+<div class="callout warn">
+<p>On Apple Silicon, make sure your R build, Xcode tools, and packages are all the arm64 versions. Mixing an Intel R with arm64 tools (or vice versa) is a common source of Nimble compile errors.</p>
+</div>
+</section>
+
+<section id="step3">
+<h2>3. Install JAGS</h2>
+
+<div class="tabs">
+<div class="tab-buttons">
+  <button class="active">Windows</button>
+  <button>Mac</button>
+</div>
+
+<div class="tab-panel active">
+<h3>Windows</h3>
+<ol>
+<li>Download the JAGS installer from <a href="https://sourceforge.net/projects/mcmc-jags/files/JAGS/4.x/Windows/" target="_blank" rel="noopener">SourceForge (JAGS 4.x, Windows)</a>. Choose the latest <code>JAGS-4.x.x.exe</code>.</li>
+<li>Run it with default options. It installs to <code>C:\Program Files\JAGS\JAGS-4.x.x</code> by default.</li>
+<li>No PATH editing is normally required &mdash; <code>rjags</code> finds JAGS through the registry. (If it doesn't, see Troubleshooting.)</li>
+</ol>
+</div>
+
+<div class="tab-panel">
+<h3>Mac</h3>
+<p><strong>Option A — installer (simplest):</strong></p>
+<ol>
+<li>Download the JAGS <code>.dmg</code> from <a href="https://sourceforge.net/projects/mcmc-jags/files/JAGS/4.x/Mac%20OS%20X/" target="_blank" rel="noopener">SourceForge (JAGS 4.x, Mac OS X)</a>.</li>
+<li>Open the <code>.dmg</code> and run the <code>.pkg</code> installer.</li>
+</ol>
+<p><strong>Option B — Homebrew</strong> (if you use it):</p>
+<div class="code-label">Terminal</div>
+<pre><code>brew install jags</code></pre>
+</div>
+</div>
+</section>
+
+<section id="step4">
+<h2>4. Install the R packages</h2>
+<p>In the RStudio Console (same on Windows and Mac):</p>
+<div class="code-label">R console</div>
+<pre><code><span class="fn">install.packages</span>(<span class="kw">c</span>(
+  <span class="st">"coda"</span>, <span class="st">"rjags"</span>, <span class="st">"R2jags"</span>,
+  <span class="st">"nimble"</span>, <span class="st">"MCMCvis"</span>, <span class="st">"HDInterval"</span>,
+  <span class="st">"ggplot2"</span>, <span class="st">"dplyr"</span>
+))</code></pre>
+<p>Notes:</p>
+<ul>
+<li><code>rjags</code> must be installed <em>after</em> JAGS, or it will fail to load.</li>
+<li><code>nimble</code> is large and may take several minutes; it does not fully compile until you build your first model (that's the verification below).</li>
+</ul>
+</section>
+
+<section id="verify">
+<h2>5. Verify everything works</h2>
+<p>Run each block. If all three succeed, you are ready for the Bayesian labs.</p>
+
+<h3>a. JAGS + rjags</h3>
+<div class="code-label">R console</div>
+<pre><code><span class="kw">library</span>(rjags)
+<span class="fn">cat</span>(<span class="st">"model { p ~ dbeta(1,1); y ~ dbin(p, 10) }"</span>, file = <span class="st">"m.bug"</span>)
+m &lt;- <span class="fn">jags.model</span>(<span class="st">"m.bug"</span>, data = <span class="kw">list</span>(y = <span class="nu">7</span>), quiet = <span class="kw">TRUE</span>)
+s &lt;- <span class="fn">coda.samples</span>(m, <span class="st">"p"</span>, n.iter = <span class="nu">2000</span>)
+<span class="fn">summary</span>(s)$statistics       <span class="cm"># posterior mean of p should be near 0.67</span></code></pre>
+
+<h3>b. Nimble (this is the real compiler test)</h3>
+<div class="code-label">R console</div>
+<pre><code><span class="kw">library</span>(nimble)
+code &lt;- <span class="fn">nimbleCode</span>({
+  p ~ <span class="fn">dbeta</span>(<span class="nu">1</span>, <span class="nu">1</span>)
+  y ~ <span class="fn">dbinom</span>(p, size = <span class="nu">10</span>)
+})
+fit &lt;- <span class="fn">nimbleMCMC</span>(code = code, data = <span class="kw">list</span>(y = <span class="nu">7</span>),
+                  inits = <span class="kw">list</span>(p = <span class="nu">0.5</span>),
+                  monitors = <span class="st">"p"</span>, niter = <span class="nu">2000</span>, nburnin = <span class="nu">500</span>)
+<span class="fn">mean</span>(fit[, <span class="st">"p"</span>])          <span class="cm"># near 0.67; if this compiles, your toolchain works</span></code></pre>
+
+<h3>c. MCMCvis (we use it to summarize posteriors)</h3>
+<div class="code-label">R console</div>
+<pre><code><span class="kw">library</span>(MCMCvis)
+<span class="fn">MCMCsummary</span>(s)             <span class="cm"># tidy table with mean, sd, 95% CI, Rhat, n.eff</span></code></pre>
+
+<div class="callout key">
+<p>If block (b) prints a posterior mean without errors, your C++ toolchain is correctly installed &mdash; that is the step most likely to fail, so this is the one that matters most.</p>
+</div>
+</section>
+
+<section id="trouble">
+<h2>6. Troubleshooting</h2>
+
+<h3>"Error: .onLoad failed ... cannot find JAGS" (rjags)</h3>
+<ul>
+<li>You installed <code>rjags</code> before JAGS. Reinstall JAGS, then run <code>install.packages("rjags", type = "source")</code>.</li>
+<li><strong>Windows:</strong> if it still can't find JAGS, set the path once per session with
+<code>Sys.setenv(JAGS_HOME = "C:/Program Files/JAGS/JAGS-4.3.1")</code> (adjust the version), then reload <code>library(rjags)</code>.</li>
+<li><strong>Mac (Homebrew on Apple Silicon):</strong> JAGS lands under <code>/opt/homebrew</code>. If rjags can't find it, install rjags from source: <code>install.packages("rjags", type = "source")</code>.</li>
+</ul>
+
+<h3>Nimble compile errors ("make: command not found", "clang: error", "cannot compile")</h3>
+<ul>
+<li><strong>Windows:</strong> Rtools is missing or the wrong version. Reinstall the Rtools that matches your R version and restart RStudio. Confirm with <code>pkgbuild::has_build_tools(debug = TRUE)</code>.</li>
+<li><strong>Mac:</strong> run <code>xcode-select --install</code> again; if it says "already installed" but compiling still fails, reset it with <code>sudo xcode-select --reset</code>.</li>
+<li>Restart R after installing any toolchain (Session → Restart R).</li>
+</ul>
+
+<h3>Package won't install / binary vs source</h3>
+<ul>
+<li>If a binary install fails, try <code>install.packages("nimble", type = "source")</code>.</li>
+<li>Keep R and RStudio up to date; very old R versions may not have current package binaries.</li>
+</ul>
+
+<h3>Still stuck?</h3>
+<p>Email the instructor <em>before</em> Day 1 with: your operating system and chip, your <code>R.version.string</code>, and the exact error text. Setup problems are much faster to fix ahead of time than during a lab.</p>
+</section>
+
+<section id="checklist">
+<h2>Final checklist</h2>
+<div class="callout try">
+<ul>
+<li>R and RStudio open and report a version.</li>
+<li>Compiler toolchain present (Rtools on Windows / Xcode CLT on Mac).</li>
+<li>JAGS installed.</li>
+<li><code>library(rjags)</code>, <code>library(nimble)</code>, <code>library(MCMCvis)</code> all load without error.</li>
+<li>The Nimble verification block (5b) compiled and printed a posterior mean.</li>
+<li>You have also worked through the <a href="rmarkdown_tutorial.html">R Markdown tutorial</a>, since all assignments are submitted as knitted HTML.</li>
+</ul>
+</div>
+</section>
+
+</main>
+</div>
+
+<footer>FW 536 · Statistical Modeling for Ecology and Conservation · Oregon State University</footer>
+</body>
+</html>

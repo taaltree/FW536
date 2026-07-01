@@ -6,11 +6,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="stylesheet" href="../_Shared/css/accessible.css" />
 <script>
-MathJax = {
-  tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
+MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
   options: { menuOptions: { settings: { assistiveMml: true, explorer: true } } },
-  loader: { load: ['a11y/assistive-mml', 'a11y/explorer'] }
-};
+  loader: { load: ['a11y/assistive-mml', 'a11y/explorer'] } };
 </script>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script"></script>
 </head>
@@ -21,8 +19,7 @@ MathJax = {
 <aside class="sidebar">
 <p class="brand"><a href="../index.html">FW 536 · Day 3 Afternoon</a></p>
 <div class="subtitle">Lecture notes: Hypothesis tests and model selection</div>
-<nav aria-label="Slides in this lecture">
-<div class="section">Slides</div><ul>
+<nav aria-label="Slides in this lecture"><div class="section">Slides</div><ul>
 <li><a href="#slide-1">1. Slide 1</a></li>
 <li><a href="#slide-2">2. Hypothesis Tests to Compare Models (not parameters)</a></li>
 <li><a href="#slide-3">3. Nested Models</a></li>
@@ -87,9 +84,9 @@ MathJax = {
 <header class="lab-header">
 <div class="eyebrow">Day 3 Afternoon · Accessible lecture notes</div>
 <h1>Hypothesis tests and model selection</h1>
-<p class="lede">A screen-reader-friendly transcript of the lecture slides: all slide text and speaker notes are included. Figures are flagged where a text description still needs to be added.</p>
+<p class="lede">A screen-reader-friendly transcript of the lecture slides: all slide text, tables, figure descriptions, and speaker notes.</p>
 </header>
-<div class="callout key"><p class="callout-label">About these notes</p>These notes are generated from the lecture slides. Each section below is one slide. Where a slide contained a picture, plot, or equation image, you will see a "Figure needs description" note &mdash; ask your instructor for the description of that figure. For the underlying concepts with worked examples, also read the <a href="plain_language_summary.html">plain-language summary</a> and <a href="lab.html">lab</a> for this session.</p></div>
+<div class="callout key"><p class="callout-label">About these notes</p>Each section is one slide. Figures carry text descriptions where available. For the concepts with worked examples, also read the <a href="plain_language_summary.html">plain-language summary</a> and <a href="lab.html">lab</a> for this session. You can also download the <a href="../../Day3_MixedModels_ModelSelection/FW536_Day3_Afternoon_hypothesis%20test%20and%20model%20selection_accessible.pptx">alt-texted PowerPoint deck</a> (the same slides with image descriptions embedded).</div>
 <section aria-labelledby="slide-1-h">
 <h2 id="slide-1-h"><span id="slide-1"></span>Slide 1</h2>
 <p>1</p>
@@ -105,9 +102,9 @@ MathJax = {
 <p>2</p>
 <ul>
 <li>One can use the likelihood ratio test to compare two models when</li>
-<li style="margin-left:1em">both are based on the same data</li>
-<li style="margin-left:1em">one of the models is “nested” within the other</li>
-<li style="margin-left:2em">That is, one model is a special case with a parameter equal to a specific value (usually zero) from the more general model.</li>
+<li style="margin-left:1.2em">both are based on the same data</li>
+<li style="margin-left:1.2em">one of the models is “nested” within the other</li>
+<li style="margin-left:2.4em">That is, one model is a special case with a parameter equal to a specific value (usually zero) from the more general model.</li>
 </ul>
 </section>
 <section aria-labelledby="slide-3-h">
@@ -133,8 +130,8 @@ MathJax = {
 <li>HA: Model A does not fit the data as well as Model B</li>
 <li>(you need those extra parameters)</li>
 <li>Fit models A and B and record:</li>
-<li style="margin-left:1em">the negative log-likelihood at the best fit</li>
-<li style="margin-left:1em">the number of parameters in models A and B, pA and pB.</li>
+<li style="margin-left:1.2em">the negative log-likelihood at the best fit</li>
+<li style="margin-left:1.2em">the number of parameters in models A and B, pA and pB.</li>
 </ul>
 <p>4</p>
 </section>
@@ -184,12 +181,12 @@ MathJax = {
 <li>this significant given the difference in parameters is 1?</li>
 <li>2*8.6=17.2, compare to chisq distribution with one d.f</li>
 </ul>
-<p class="callout warn" role="note"><span class="callout-label">Figure 9.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 9.1.</strong> Chi-square distribution table: rows are degrees of freedom, columns are upper-tail probabilities from 0.99 to 0.01, giving critical chi-square values. Used to find p-values for likelihood ratio tests.</figcaption></figure>
 <ul>
 <li>REJECT THE NULL</li>
 <li>That the one parameter model fits that data. Much better to use two parameters, indicating that the probability of running the red light has changed!</li>
 </ul>
-<p class="callout warn" role="note"><span class="callout-label">Figure 9.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 9.2.</strong> R console: 1-pchisq(8.630462*2, 1) returns 3.258189e-05, the p-value for the likelihood ratio test with 1 degree of freedom.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-10-h">
 <h2 id="slide-10-h"><span id="slide-10"></span>Slide 10</h2>
@@ -202,37 +199,37 @@ MathJax = {
 <section aria-labelledby="slide-11-h">
 <h2 id="slide-11-h"><span id="slide-11"></span>Slide 11: Information Theoretic Criteria for Model Selection (i.e. AIC, BIC, etc.)</h2>
 <p>The likelihood ratio statistic is twice the log of the likelihood ratio</p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 11.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 11.1.</strong> Equation: LRT = -2 log_e ( L_s(theta-hat) / L_g(theta-hat) ), the likelihood ratio of the specific model over the general model.</figcaption></figure>
 <p>Can also be written as difference in log-likelihoods or deviances</p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 11.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 11.2.</strong> Equation: LRT = -2 ( log_e(L_s) - log_e(L_g) ) = -2 log_e(L_s) + 2 log_e(L_g) = deviance_s - deviance_g.</figcaption></figure>
 <p>Compare to chi.sq distribution with degrees of freedom = # parameters</p>
 </section>
 <section aria-labelledby="slide-12-h">
 <h2 id="slide-12-h"><span id="slide-12"></span>Slide 12: Information Theoretic Criteria for Model Selection</h2>
 <p>Look familiar?</p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 12.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 12.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 12.1.</strong> Equation: LRT = -2 log_e ( L_s(theta-hat) / L_g(theta-hat) ), the likelihood ratio of the specific model over the general model.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 12.2.</strong> Equation: AIC_i = -2 log L_i + 2 p_i, and BIC_i = -2 log L_i + p_i log n. Both penalize the fit by the number of parameters.</figcaption></figure>
 <p>Compare to chi.sq distribution with degrees of freedom = # parameters</p>
 <p>AIC and BIC are meaningless on their own, but models with lower values are more parsimonious (i.e. supported). They balance better fit with more parameters. This is exactly what the likelihood ratio test does.</p>
 </section>
 <section aria-labelledby="slide-13-h">
 <h2 id="slide-13-h"><span id="slide-13"></span>Slide 13</h2>
-<p class="callout warn" role="note"><span class="callout-label">Figure 13.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 13.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 13.1.</strong> Equation: LRT = -2 log_e ( L_s(theta-hat) / L_g(theta-hat) ), the likelihood ratio of the specific model over the general model.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 13.2.</strong> Equation: AIC_i = -2 log L_i + 2 p_i, and BIC_i = -2 log L_i + p_i log n. Both penalize the fit by the number of parameters.</figcaption></figure>
 <p>Compare to chi.sq distribution with degrees of freedom = # parameters</p>
 <p>Say you compare two models with k parameters and with k+1</p>
 <p>Information Theoretic Criteria for Model Selection</p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 13.3 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 13.3.</strong> Figure (vector image, not machine-readable here) illustrating the difference in information criteria between models with k versus k+1 parameters. Ask instructor for details.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-14-h">
 <h2 id="slide-14-h"><span id="slide-14"></span>Slide 14</h2>
-<p class="callout warn" role="note"><span class="callout-label">Figure 14.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 14.1.</strong> Chi-square distribution table: rows are degrees of freedom, columns are upper-tail probabilities from 0.99 to 0.01, giving critical chi-square values. Used to find p-values for likelihood ratio tests.</figcaption></figure>
 <p>Convention within&gt;2 AIC units are “considered competitive”, and this is approximately the same as frequentist model selection using LRT</p>
 <p>If 1 parameter separate the model. AIC likes bigger models</p>
 </section>
 <section aria-labelledby="slide-15-h">
 <h2 id="slide-15-h"><span id="slide-15"></span>Slide 15</h2>
-<p class="callout warn" role="note"><span class="callout-label">Figure 15.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 15.1.</strong> Chi-square distribution table: rows are degrees of freedom, columns are upper-tail probabilities from 0.99 to 0.01, giving critical chi-square values. Used to find p-values for likelihood ratio tests.</figcaption></figure>
 <p>What if 3 parameters separate the model? AIC likes bigger models</p>
 <p>(reject the null that the parameters equal 0)</p>
 <p>2 deltaAIC still equivalent to p = 0.05</p>
@@ -242,10 +239,10 @@ MathJax = {
 <ul>
 <li>Interpretation of relative AIC is not symmetric</li>
 <li>If a more complex model has higher AIC but less than 2 units, it is NOT competitive</li>
-<li style="margin-left:1em">Penalty for adding parameter is 2 units and fit improves with complexity, so models with random data as predictor will be within 2 AIC.</li>
+<li style="margin-left:1.2em">Penalty for adding parameter is 2 units and fit improves with complexity, so models with random data as predictor will be within 2 AIC.</li>
 <li>The 2 AIC convention is about whether a more complex model with lower AIC is better enough relative to simpler model (in the sense that the parameters are informative)</li>
 </ul>
-<p class="callout warn" role="note"><span class="callout-label">Figure 16.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 16.1.</strong> Equation: AIC_i = -2 log L_i + 2 p_i, and BIC_i = -2 log L_i + p_i log n. Both penalize the fit by the number of parameters.</figcaption></figure>
 <p>Taal, show why with a simulation and math</p>
 </section>
 <section aria-labelledby="slide-17-h">
@@ -254,7 +251,7 @@ MathJax = {
 <li>3700 Citations!</li>
 <li>72% of all papers incorrectly interpret uninformative parameters!</li>
 </ul>
-<p class="callout warn" role="note"><span class="callout-label">Figure 17.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 17.1.</strong> Journal of Wildlife Management article header: Arnold, &quot;Uninformative Parameters and Model Selection Using Akaike&#x27;s Information Criterion.&quot; Free Access.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-18-h">
 <h2 id="slide-18-h"><span id="slide-18"></span>Slide 18</h2>
@@ -278,7 +275,7 @@ MathJax = {
 </section>
 <section aria-labelledby="slide-23-h">
 <h2 id="slide-23-h"><span id="slide-23"></span>Slide 23</h2>
-<p class="callout warn" role="note"><span class="callout-label">Figure 23.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 23.1.</strong> Figure (vector image, not machine-readable here). Slide had no accompanying text. Ask instructor for a description.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-24-h">
 <h2 id="slide-24-h"><span id="slide-24"></span>Slide 24</h2>
@@ -300,13 +297,13 @@ MathJax = {
 <h2 id="slide-28-h"><span id="slide-28"></span>Slide 28</h2>
 <ul>
 <li>P &lt; 0.05 is an arbitrary threshold</li>
-<li style="margin-left:1em">But ⍙AIC &lt; 2 is as well</li>
+<li style="margin-left:1.2em">But ⍙AIC &lt; 2 is as well</li>
 <li>AIC doesn’t suffer from Type I error or problems with autocorrelation</li>
-<li style="margin-left:1em">This is just wrong, as we will see by simulation. Making inference by AIC has MUCH MORE Type I error</li>
+<li style="margin-left:1.2em">This is just wrong, as we will see by simulation. Making inference by AIC has MUCH MORE Type I error</li>
 <li>P-values don’t tell us how important an effect is – i.e. whether the effect is biologically significant. Use effect sizes and confidence intervals instead</li>
-<li style="margin-left:1em">AIC doesn’t tell you that either. And I notice big tables full of models with no effect sizes or R2, sometimes without even an intercept only model. What if all the models are terrible?</li>
-<li style="margin-left:1em">We always need effect sizes for inference. These are the most important part of the science!</li>
-<li style="margin-left:1em">But let’s remember how confidence intervals and p-values are related</li>
+<li style="margin-left:1.2em">AIC doesn’t tell you that either. And I notice big tables full of models with no effect sizes or R2, sometimes without even an intercept only model. What if all the models are terrible?</li>
+<li style="margin-left:1.2em">We always need effect sizes for inference. These are the most important part of the science!</li>
+<li style="margin-left:1.2em">But let’s remember how confidence intervals and p-values are related</li>
 </ul>
 <p>Why does the cult of AIC hate p-values?</p>
 </section>
@@ -319,7 +316,7 @@ MathJax = {
 </section>
 <section aria-labelledby="slide-30-h">
 <h2 id="slide-30-h"><span id="slide-30"></span>Slide 30: P-values should be interpreted on a continuum. Not a step function at 0.05. AIC should be interpreted in the same way!</h2>
-<p class="callout warn" role="note"><span class="callout-label">Figure 30.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 30.1.</strong> Diagram: a horizontal p-value scale from 0 to 1, shaded from black (Convincing) at low values through Moderate and Suggestive-but-inconclusive to white (No evidence). Ramsey and Schafer 2002; p-value as a continuum.</figcaption></figure>
 <p>deltaAIC=2</p>
 <p>deltaAIC=7</p>
 </section>
@@ -330,7 +327,7 @@ MathJax = {
 <li>It is good for selecting models for prediction</li>
 <li>Useful when you have lots of potentially correlated predictors</li>
 <li>But it is widely used for inference, resulting in more Type I error</li>
-<li style="margin-left:1em">Often used incorrectly, resulting in more error (more on this later)</li>
+<li style="margin-left:1.2em">Often used incorrectly, resulting in more error (more on this later)</li>
 </ul>
 </section>
 <section aria-labelledby="slide-32-h">
@@ -349,7 +346,7 @@ MathJax = {
 </section>
 <section aria-labelledby="slide-34-h">
 <h2 id="slide-34-h"><span id="slide-34"></span>Slide 34</h2>
-<p class="callout warn" role="note"><span class="callout-label">Figure 34.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 34.1.</strong> Figure (vector image, not machine-readable here) supporting the question of which model is the top model and which are competitive. Ask instructor for the AIC values shown.</figcaption></figure>
 <p>Which is the top model? Which models are competitive?</p>
 </section>
 <section aria-labelledby="slide-35-h">
@@ -357,13 +354,13 @@ MathJax = {
 <ul>
 <li>For small sample sizes, AIC is biased and so people use AICc. AICc is treated as “corrected AIC” and converges to AIC for large n.</li>
 <li>Model weights. Each model i of R is weighted based on its deltaAIC.</li>
-<li style="margin-left:1em">Variables included with lots of model weight considered important.</li>
-<li style="margin-left:1em">Model weight used for averaging across models for prediction</li>
-<li style="margin-left:1em">Both deltaAIC and weights depend on model set. Notice, no intercept model here, estimates, or R2. All the models could be garbage.</li>
+<li style="margin-left:1.2em">Variables included with lots of model weight considered important.</li>
+<li style="margin-left:1.2em">Model weight used for averaging across models for prediction</li>
+<li style="margin-left:1.2em">Both deltaAIC and weights depend on model set. Notice, no intercept model here, estimates, or R2. All the models could be garbage.</li>
 </ul>
-<p class="callout warn" role="note"><span class="callout-label">Figure 35.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 35.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 35.3 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 35.1.</strong> Model-selection table: models (e.g. Age+Method, Age) with columns Log-likelihood, K, deltaAICc, and weight w. Top model Age+Method has deltaAICc 0.00, w 0.14; several models within about 2 units.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 35.2.</strong> Equation: AICc = AIC + (2k^2 + 2k) / (n - k - 1), the small-sample correction to AIC.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 35.3.</strong> Equation: w_i = exp(-0.5 delta_i) / sum over r=1 to R of exp(-0.5 delta_r), the Akaike model weight for model i.</figcaption></figure>
 <p>Why would I HATE this table as presentation of results?</p>
 </section>
 <section aria-labelledby="slide-36-h">
@@ -371,10 +368,10 @@ MathJax = {
 <ul>
 <li>Interpretation of relative AIC is not symmetric</li>
 <li>If a more complex model has higher AIC but less than 2 units, it is NOT competitive</li>
-<li style="margin-left:1em">Penalty for adding parameter is 2 units and fit improves with complexity, so models with random data as predictor will be within 2 AIC.</li>
+<li style="margin-left:1.2em">Penalty for adding parameter is 2 units and fit improves with complexity, so models with random data as predictor will be within 2 AIC.</li>
 <li>The 2 AIC convention is about whether a more complex model with lower AIC is better enough relative to simpler model</li>
 </ul>
-<p class="callout warn" role="note"><span class="callout-label">Figure 36.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 36.1.</strong> Equation: AIC_i = -2 log L_i + 2 p_i, and BIC_i = -2 log L_i + p_i log n. Both penalize the fit by the number of parameters.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-37-h">
 <h2 id="slide-37-h"><span id="slide-37"></span>Slide 37</h2>
@@ -382,7 +379,7 @@ MathJax = {
 <li>3700 Citations!</li>
 <li>72% of all papers incorrectly interpret uninformative parameters!</li>
 </ul>
-<p class="callout warn" role="note"><span class="callout-label">Figure 37.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 37.1.</strong> Journal of Wildlife Management article header: Arnold, &quot;Uninformative Parameters and Model Selection Using Akaike&#x27;s Information Criterion.&quot; Free Access.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-38-h">
 <h2 id="slide-38-h"><span id="slide-38"></span>Slide 38: Best recent paper as a resource to stop doing dumb stuff with AIC</h2>
@@ -397,9 +394,9 @@ MathJax = {
 <ul>
 <li>If you look at many models, you will have many Type I errors leading to “overfitting”.</li>
 <li>But did ecologists listen to B&amp;A and construct sensible model sets?</li>
-<li style="margin-left:1em">Hell no</li>
+<li style="margin-left:1.2em">Hell no</li>
 <li>Do ecologists even think about whether the purpose of modeling is inference or prediction?</li>
-<li style="margin-left:1em">Also no</li>
+<li style="margin-left:1.2em">Also no</li>
 </ul>
 <p>“An investigator with, say, 10 explanatory variables cannot expect to learn much from his data and a multiple linear regression analysis unless there is some substantial supporting science that can be used to help narrow the number of models to consider. In this example, there would be 1,024 models (many more if transformations or interaction terms were allowed), and over-ﬁtting would surely be a serious risk. The analysis, by whatever method, should probably be considered exploratory and the results used to design further data gathering leading to a more conﬁrmatory analysis, based on some a priori considerations” (Burnham and Anderson 2002:85)</p>
 </section>
@@ -415,7 +412,7 @@ MathJax = {
 <li>AIC chooses the model that gives the best prediction. It is efficient for prediction.</li>
 <li>BIC chooses the “correct” model if it is in the set.</li>
 </ul>
-<p class="callout warn" role="note"><span class="callout-label">Figure 42.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 42.1.</strong> Equation: AIC_i = -2 log L_i + 2 p_i, and BIC_i = -2 log L_i + p_i log n. Both penalize the fit by the number of parameters.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-43-h">
 <h2 id="slide-43-h"><span id="slide-43"></span>Slide 43: AIC vs BIC</h2>
@@ -449,8 +446,8 @@ MathJax = {
 </section>
 <section aria-labelledby="slide-46-h">
 <h2 id="slide-46-h"><span id="slide-46"></span>Slide 46</h2>
-<p class="callout warn" role="note"><span class="callout-label">Figure 46.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 46.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 46.1.</strong> Journal article header: Murtaugh 2007, &quot;Simplicity and Complexity in Ecological Data Analysis,&quot; Ecology, with abstract arguing analyses are often needlessly complicated.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 46.2.</strong> Quote in italics: a professor says they could test hypotheses with simple t tests but want something more elegant to fit a better journal. Attributed to an Oregon State University professor requesting statistical help.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-47-h">
 <h2 id="slide-47-h"><span id="slide-47"></span>Slide 47: Don’t take my word for it…</h2>
@@ -459,7 +456,7 @@ MathJax = {
 <section aria-labelledby="slide-48-h">
 <h2 id="slide-48-h"><span id="slide-48"></span>Slide 48</h2>
 <p>“If researchers want to accurately estimate the strength of multiple competing ecological processes along with reliable confidence intervals, their best hope is to use full (maximal) statistical models after making principled, a priori decisions about which predictors to include. “</p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 48.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 48.1.</strong> Multi-panel plot of relative probability of selection versus canopy cover, distance to road, distance to water, and ruggedness, one row per species, with fitted curves and shaded confidence bands.</figcaption></figure>
 <p>Don’t take my word for it…</p>
 <p>Left as a preprint for years until Bolker finally submitted it to a journal after we chatted about this problem</p>
 </section>
@@ -470,11 +467,11 @@ MathJax = {
 </section>
 <section aria-labelledby="slide-50-h">
 <h2 id="slide-50-h"><span id="slide-50"></span>Slide 50</h2>
-<p class="callout warn" role="note"><span class="callout-label">Figure 50.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 50.1.</strong> Figure (vector image, not machine-readable here). Slide had no accompanying text. Ask instructor for a description.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-51-h">
 <h2 id="slide-51-h"><span id="slide-51"></span>Slide 51</h2>
-<p class="callout warn" role="note"><span class="callout-label">Figure 51.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 51.1.</strong> Text screenshot listing Trafimow and Marks&#x27; (2015) three reasons for banning p-values: hypothesis testing does not give the probability a hypothesis is true, confidence intervals do not give the probability a parameter lies in an interval, and Bayesian priors depend on Laplacian assumptions.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-52-h">
 <h2 id="slide-52-h"><span id="slide-52"></span>Slide 52: Are any statistical procedures required?</h2>
@@ -487,24 +484,24 @@ MathJax = {
 </section>
 <section aria-labelledby="slide-54-h">
 <h2 id="slide-54-h"><span id="slide-54"></span>Slide 54</h2>
-<p class="callout warn" role="note"><span class="callout-label">Figure 54.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 54.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 54.1.</strong> Journal article title: &quot;Assessing the Statistical Analyses Used in Basic and Applied Social Psychology After Their p-Value Ban,&quot; by Fricker, Burke, Han and Woodall.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 54.2.</strong> Article abstract: assessing 31 articles in Basic and Applied Social Psychology in 2016 after the p-value ban; found authors overstating conclusions beyond what data support.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-55-h">
 <h2 id="slide-55-h"><span id="slide-55"></span>Slide 55: Further buffoonery</h2>
 <ul>
 <li>Journal: you should use Cohen’s d to compare two samples</li>
-<li style="margin-left:1em">0.2≤d&lt;0.5 indicates there is a “small” practical effect</li>
-<li style="margin-left:1em">0.5≤d&lt;0.8 indicates a “medium” practical effect</li>
-<li style="margin-left:1em">d≥0.8 indicates a “large” practical effect</li>
+<li style="margin-left:1.2em">0.2≤d&lt;0.5 indicates there is a “small” practical effect</li>
+<li style="margin-left:1.2em">0.5≤d&lt;0.8 indicates a “medium” practical effect</li>
+<li style="margin-left:1.2em">d≥0.8 indicates a “large” practical effect</li>
 <li>Does Cohen’s d look familiar?</li>
 </ul>
-<p class="callout warn" role="note"><span class="callout-label">Figure 55.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 55.2 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 55.1.</strong> Equation: Cohen&#x27;s d = (x-bar_2 minus x-bar_1) divided by pooled standard deviation s_p.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 55.2.</strong> Equation: t = (X-bar_1 minus X-bar_2) divided by s_p times the square root of (1/n_1 + 1/n_2); the two-sample t statistic, structurally like Cohen&#x27;s d.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-56-h">
 <h2 id="slide-56-h"><span id="slide-56"></span>Slide 56: Further buffoonery</h2>
-<p class="callout warn" role="note"><span class="callout-label">Figure 56.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 56.1.</strong> Scatter plot of absolute effect size |d| (y-axis) versus approximate p-value (x-axis) with marginal histograms. Points colored by p-value bin; dashed lines mark small, medium, large effect thresholds. Small effects span a wide p-value range.</figcaption></figure>
 <ul>
 <li>d values larger than Cohen’s minimum medium effect size were statistically significant and all below Cohen’s small effect size limit were not</li>
 <li>For d values that correspond to small effect sizes (45.3% of the d values), there is no way to decide whether a particular d value is consistent with random fluctuations in the data under the assumption of equal population means without some measure of statistical significance</li>
@@ -514,13 +511,12 @@ MathJax = {
 <section aria-labelledby="slide-57-h">
 <h2 id="slide-57-h"><span id="slide-57"></span>Slide 57: The chief benefit of AIC/BIC</h2>
 <p>Stresses the importance of evaluating multiple competing hypotheses when applied properly to actual competing hypothesis</p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 57.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 57.1.</strong> Journal review-article header: Betini, Avgar and Fryxell 2017, &quot;Why are we not evaluating multiple competing hypotheses in ecology and evolution?&quot;, Royal Society Open Science.</figcaption></figure>
 <p>“While often used as a tool for statistical inference, a set of regression models containing partially overlapping sets of explanatory variables does not necessarily represent a valid evaluation of multiple hypotheses unless each statistical model represents a unique research hypothesis [31]. In other words, model competition, based on AIC and BIC, is not a stepwise regression procedure.”</p>
 </section>
 <section aria-labelledby="slide-58-h">
 <h2 id="slide-58-h"><span id="slide-58"></span>Slide 58</h2>
-<table>
-<thead><tr><th scope="col">Species</th><th scope="col">ΔAIC</th><th scope="col"></th></tr></thead>
+<table><thead><tr><th scope="col">Species</th><th scope="col">ΔAIC</th><th scope="col"></th></tr></thead>
 <tbody>
 <tr><td></td><td>Habitat Only</td><td>Habitat + Cougar</td></tr>
 <tr><td>Bobcat</td><td>0</td><td>2.69</td></tr>
@@ -529,11 +525,11 @@ MathJax = {
 </tbody>
 </table>
 <p>Compare habitat only models for resource selection vs. models that include interactions with cougars.</p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 58.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 58.1.</strong> Table of parameter estimates (beta, SE, P) for landscape and cougar variables in step-selection functions for coyotes, bears, and bobcats. Cougar-interaction terms are significant for coyotes but mostly not for bobcats.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-59-h">
 <h2 id="slide-59-h"><span id="slide-59"></span>Slide 59</h2>
-<p class="callout warn" role="note"><span class="callout-label">Figure 59.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 59.1.</strong> Multi-panel plot: relative probability of selection versus canopy cover, distance to road, distance to water, and ruggedness for coyote, bear, and bobcat (rows), with fitted curves and shaded confidence bands showing species-specific responses.</figcaption></figure>
 <p>How SHOULD we be making inference</p>
 <ul>
 <li>Interpret point estimates algebraically and geometrically with uncertainty</li>
@@ -544,5 +540,4 @@ MathJax = {
 </main>
 
 <footer>FW 536 &middot; Statistical Modeling for Ecology and Conservation &middot; Oregon State University &middot; Accessible lecture notes</footer>
-</body>
-</html>
+</body></html>

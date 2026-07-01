@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en" data-a11y="done">
+<head>
+<meta charset="UTF-8" />
+<title>Day 3 · Assessed Problem Set | FW 536 · Student copy (no answers)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../_Shared/css/accessible.css" />
+<script defer src="../_Shared/js/accessible.js"></script>
+<script>
+MathJax = {
+  tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
+  options: { menuOptions: { settings: { assistiveMml: true, explorer: true } } },
+  loader: { load: ['a11y/assistive-mml', 'a11y/explorer'] }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script"></script>
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<div class="a11y-bar" role="region" aria-label="Accessibility">Accessible version &middot; <a href="../accessibility.html">How to use this site with a screen reader</a> &middot; <a href="../index.html">Course home</a></div>
+
+<div class="shell">
+
+<aside class="sidebar">
+ <p class="brand"><a href="../index.html" title="Back to course home">FW 536 · Day 3</a></p>
+ <div class="subtitle">Assessed Problem Set</div>
+ <nav aria-label="On this page and related documents">
+ <div class="section">Morning · mixed models</div>
+ <ul>
+ <li><a href="#p1">1. Streams: pooling</a></li>
+ <li><a href="#p2">2. Length–weight intercepts</a></li>
+ <li><a href="#p3">3. Von Bertalanffy (nonlinear)</a></li>
+ <li><a href="#p4">4. Trophic position: crossed REs</a></li>
+ <li><a href="#p5">5. Binomial GLMM (detection)</a></li>
+ <li><a href="#p6">6. Nested REs + overdispersion</a></li>
+ </ul>
+ <div class="section">Afternoon · model selection</div>
+ <ul>
+ <li><a href="#p7">7. The ΔAIC &lt; 2 myth</a></li>
+ <li><a href="#p8">8. AIC/AICc/BIC on noise</a></li>
+ <li><a href="#p9">9. BIC vs AIC: weak effects</a></li>
+ <li><a href="#p10">10. AIC vs cross-validation (real data)</a></li>
+ <li><a href="#p11">11. Multimodel inference</a></li>
+ </ul>
+ <div class="section">Day 3 docs</div>
+ <ul>
+ <li><a href="lab.html">Main lab</a></li>
+ <li><a class="featured" href="plain_language_summary.html">Plain-language summary</a></li>
+ <li><a href="../index.html">All days</a></li>
+ </ul>
+ </nav>
+</aside>
+
+<main class="content" id="main-content" tabindex="-1">
+<header class="lab-header">
+ <div class="eyebrow">Day 3 · Assessed Problem Set</div>
+ <h1>Mixed models &amp; model selection — the graded hand-in</h1>
+ <p class="lede">Eleven problems: six on hierarchical (mixed) models in the <a href="#morning">morning</a>, five on hypothesis tests and model selection in the <a href="#afternoon">afternoon</a>. Several problems are worked on real datasets that live in this folder; others ask you to simulate, exactly as in the lab. Write every answer in the R Markdown hand-in template, knit to HTML, and submit on Canvas.</p>
+</header>
+
+<section class="callout warn" style="margin-top:24px;"><p class="callout-label">Watch out</p><p><strong>This is the assessed problem set.</strong> Answers are <em>not</em> shown here. Write your work in the hand-in templates: <a href="morning_lab_template.Rmd"><code>morning_lab_template.Rmd</code></a> for the morning (mixed-model) problems and <a href="afternoon_lab_template.Rmd"><code>afternoon_lab_template.Rmd</code></a> for the afternoon (model-selection) problems. Knit each to HTML, then upload to the matching Canvas assignment.</p><p>For worked-example study with visible answers, see <a href="lab.html">the practice problem set</a> and the <a href="plain_language_summary.html">plain-language summary</a>.</p></section>
+
+<section class="data-card" id="data-files">
+<h2>Data files used in this problem set</h2>
+<p>Every real-data problem below reads one of these files from the <code>data/</code> folder. The <code>scan()</code> / <code>read.csv()</code> calls are copied from the main lab so you can paste them directly.</p>
+<div class="data-section">
+  <h3 class="data-h">Datasets</h3>
+  <div class="data-row"><a href="data/mixed1a.txt"><code>mixed1a.txt</code></a><span class="data-desc">Fish density in 100 streams, three observations per stream. Used in Problem 1.</span></div>
+  <div class="data-row"><a href="data/mixed1b.txt"><code>mixed1b.txt</code></a><span class="data-desc">Length–weight measurements per individual, grouped by subject. Used in Problem 2.</span></div>
+  <div class="data-row"><a href="data/week6b.txt"><code>week6b.txt</code></a><span class="data-desc">Age and length per individual fish (von Bertalanffy growth). Used in Problem 3.</span></div>
+  <div class="data-row"><a href="data/qcbs_w6_data.csv"><code>qcbs_w6_data.csv</code></a><span class="data-desc">QCBS fish trophic position: three species across six lakes. Used in Problems 4 and 10.</span></div>
+</div>
+</section>
+
+<section><p>This problem set is designed to take roughly the same time as the main lab. Work each problem in the matching R Markdown template, knit to HTML, and submit on Canvas. Where simulations are requested, exact numbers depend on the seed; "approximately" is in the spirit of the exercise.</p></section>
+
+<!-- ========================= MIXED MODELS ========================= -->
+<a id="morning"></a>
+<h2 style="margin-top:36px;">Part 1 · Mixed models <span class="note">(morning · 20 pts)</span></h2>
+
+<div class="exercise" id="p1">
+<span class="ex-tag">Problem 1</span><span class="difficulty easy"> · real data · pooling decision</span>
+<h3>Streams: complete pooling vs no pooling vs partial pooling</h3>
+<p>The file <code>mixed1a.txt</code> holds fish-density measurements from 100 streams, three replicate observations per stream. Read it with the lab's <code>scan()</code> pattern; <code>n</code> counts total values (3 fields × 300 rows), so use <code>n=3*300</code> to load every stream:</p>
+<div class="code-label">Setup</div>
+<pre><code><span class="kw">library</span>(nlme); <span class="kw">library</span>(lme4)
+
+TheData &lt;- <span class="fn">scan</span>(<span class="st">"data/mixed1a.txt"</span>, what=<span class="kw">list</span>(Stream=<span class="nu">0</span>, Tst=<span class="nu">0</span>, Density=<span class="nu">0</span>), n=<span class="nu">3</span>*<span class="nu">300</span>)
+Streams &lt;- <span class="fn">data.frame</span>(TheData)
+Streams$Stream &lt;- <span class="fn">factor</span>(Streams$Stream)
+
+lm1 &lt;- <span class="fn">lm</span>(Density ~ <span class="nu">1</span>, data=Streams)                 <span class="cm"># complete pooling</span>
+lm2 &lt;- <span class="fn">lm</span>(Density ~ Stream - <span class="nu">1</span>, data=Streams)        <span class="cm"># no pooling</span>
+lm3 &lt;- <span class="fn">lme</span>(fixed = Density ~ <span class="nu">1</span>, random = ~ <span class="nu">1</span> | Stream, data=Streams) <span class="cm"># partial pooling</span></code></pre>
+<ol type="a">
+<li>Write out the equation each of the three models fits, and state how many parameters each estimates. Which model would you use if you wanted to make inferences about fish density in <em>other</em> Oregon streams not in this dataset, and why?</li>
+<li>Plot residuals from <code>lm1</code> by stream with <code>boxplot(split(resid(lm1), Streams$Stream))</code>. What do you see, and what does it tell you about the validity of <code>lm1</code>?</li>
+<li>Compare <code>coef(lm2)</code> (the 18 no-pooling stream means) with <code>coef(lm3)</code> (the 18 partially-pooled estimates). Pick the most extreme stream and describe how far it shrank toward the overall mean, and why.</li>
+<li>From <code>summary(lm3)</code> and <code>intervals(lm3)</code>, report the among-stream SD (with its 95% CI), the within-stream residual SD, and compute the ICC. Interpret the ICC in one sentence.</li>
+</ol>
+<div class="callout try" style="margin-top: 12px;"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
+</div>
+
+<div class="exercise" id="p2">
+<span class="ex-tag">Problem 2</span><span class="difficulty medium"> · real data · random intercepts + covariate</span>
+<h3>Length–weight: random intercepts with a fixed-effect covariate</h3>
+<p><code>mixed1b.txt</code> has length and weight for individuals grouped by subject. The biological question: is there a length–weight relationship, and does the intercept vary by subject?</p>
+<div class="code-label">Setup</div>
+<pre><code>TheData &lt;- <span class="fn">scan</span>(<span class="st">"data/mixed1b.txt"</span>,
+ what=<span class="kw">list</span>(Subject=<span class="nu">0</span>,TST1=<span class="nu">0</span>,TST2=<span class="nu">0</span>,Length=<span class="nu">0</span>,Weight=<span class="nu">0</span>,TST3=<span class="nu">0</span>), n=<span class="nu">6</span>*<span class="nu">100</span>)
+LenW &lt;- <span class="fn">data.frame</span>(TheData); LenW$Subject &lt;- <span class="fn">as.factor</span>(LenW$Subject)
+
+m1  &lt;- <span class="fn">lme</span>(Weight ~ Length, data=LenW, random = ~ <span class="nu">1</span> | Subject, method=<span class="st">"REML"</span>)
+m1b &lt;- <span class="fn">lmer</span>(Weight ~ Length + (<span class="nu">1</span> | Subject), data=LenW)   <span class="cm"># same model, lme4 syntax</span></code></pre>
+<ol type="a">
+<li>Write out the equation the model fits and say what each parameter means biologically. Report the fixed-effect intercept and slope: what is the group-mean length–weight relationship?</li>
+<li>From <code>summary(m1)</code> / <code>VarCorr(m1b)</code>, report the among-subject SD of the intercept. Translate it into "subjects of the same length differ by ± X units in expected weight" (the columns are on an index scale, so keep the answer in the data's own units).</li>
+<li>Report the within-subject residual SD and compute the ICC. Contrast it with the ICC from Problem 1 and explain the difference.</li>
+<li>Fit a random-slope model <code>lmer(Weight ~ Length + (1 + Length | Subject))</code> and compare it to <code>m1b</code> with <code>anova(m1b, m_slope, refit = FALSE)</code>. Is the random slope supported? Explain why <code>refit = FALSE</code> is correct here.</li>
+</ol>
+<div class="callout try" style="margin-top: 12px;"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
+</div>
+
+<div class="exercise" id="p3">
+<span class="ex-tag">Problem 3</span><span class="difficulty hard"> · real data · nonlinear mixed</span>
+<h3>Von Bertalanffy growth — a nonlinear mixed model</h3>
+<p><code>week6b.txt</code> contains age and length measurements for multiple individual fish (<code>Subject</code>). Each fish is expected to follow the von Bertalanffy growth curve</p>
+<div class="eq-block">$L(a) = L_\infty\left(1 - e^{-\kappa (a - t_0)}\right),$</div>
+<p>where $L_\infty$ is asymptotic length, $\kappa$ the growth rate, and $t_0$ the theoretical age at length zero.</p>
+<div class="code-label">Fixed-effect fit, then the mixed fit (random $L_\infty$)</div>
+<pre><code>TheData &lt;- <span class="fn">scan</span>(<span class="st">"data/week6b.txt"</span>, what=<span class="kw">list</span>(Subject=<span class="nu">0</span>,Age=<span class="nu">0</span>,Length=<span class="nu">0</span>,<span class="kw">NULL</span>), skip=<span class="nu">1</span>, n=<span class="nu">4</span>*<span class="nu">100</span>)
+xx &lt;- <span class="fn">as.data.frame</span>(<span class="kw">cbind</span>(Subject=TheData$Subject, Age=TheData$Age, Length=TheData$Length))
+AgeLen &lt;- <span class="fn">groupedData</span>(Length ~ Age | Subject, data=xx)
+
+m_fixed &lt;- <span class="fn">nls</span>(Length ~ Linf*(<span class="nu">1</span>-<span class="fn">exp</span>(-Kappa*(Age - Tzero))),
+ data=AgeLen, start=<span class="kw">c</span>(Linf=<span class="nu">100</span>, Kappa=<span class="nu">0.2</span>, Tzero=<span class="nu">0</span>))
+
+m_nlme &lt;- <span class="fn">nlme</span>(Length ~ Linf*(<span class="nu">1</span>-<span class="fn">exp</span>(-Kappa*(Age - Tzero))),
+ fixed = Linf + Kappa + Tzero ~ <span class="nu">1</span>,
+ random = Linf ~ <span class="nu">1</span> | Subject,
+ data = AgeLen,
+ start = <span class="kw">c</span>(Linf=<span class="nu">100</span>, Kappa=<span class="nu">0.2</span>, Tzero=<span class="nu">0</span>))</code></pre>
+<ol type="a">
+<li>Why should we expect $L_\infty$ to vary by individual fish in a biological sense?</li>
+<li>Plot <code>boxplot(split(residuals(m_fixed), AgeLen$Subject))</code>. What evidence do you see that the fixed-effects residuals are <em>not</em> independent within subject?</li>
+<li>Compare the residual SE of <code>m_fixed</code> (from <code>summary(m_fixed)$sigma</code>) with the within-subject residual SE of <code>m_nlme</code>. Which is smaller, and why does that <em>have</em> to be the case?</li>
+<li>Explain what <code>m_nlme$coefficients$fixed[1] + m_nlme$coefficients$random$Subject</code> returns and why it is a better per-fish estimate of $L_\infty$ than fitting a separate <code>nls</code> to each fish.</li>
+</ol>
+<div class="callout try" style="margin-top: 12px;"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
+</div>
+
+<div class="exercise" id="p4">
+<span class="ex-tag">Problem 4</span><span class="difficulty hard"> · real data · crossed random effects</span>
+<h3>Fish trophic position — crossed random effects, slopes &amp; intercepts</h3>
+<p>The QCBS dataset <code>qcbs_w6_data.csv</code> gives trophic position vs body length for three fish species (<code>S1</code>, <code>S2</code>, <code>S3</code>) sampled across six lakes (<code>L1</code>–<code>L6</code>). The biological question: does trophic position increase with body length, and does that relationship differ by species and by lake?</p>
+<div class="code-label">Setup &amp; z-scoring</div>
+<pre><code>dat &lt;- <span class="fn">read.csv</span>(<span class="st">"data/qcbs_w6_data.csv"</span>)
+dat$Fish_Species &lt;- <span class="fn">as.factor</span>(dat$Fish_Species)
+dat$Lake         &lt;- <span class="fn">as.factor</span>(dat$Lake)
+dat$Z_Length     &lt;- <span class="fn">scale</span>(dat$Fish_Length)[,<span class="nu">1</span>]   <span class="cm"># z-score for numerical stability</span>
+dat$Z_TP         &lt;- <span class="fn">scale</span>(dat$Trophic_Pos)[,<span class="nu">1</span>]
+
+M1 &lt;- <span class="fn">lmer</span>(Z_TP ~ Z_Length + (<span class="nu">1</span>|Fish_Species) + (<span class="nu">1</span>|Lake), data=dat, REML=<span class="kw">TRUE</span>)
+M3 &lt;- <span class="fn">lmer</span>(Z_TP ~ Z_Length + (<span class="nu">1</span>|Fish_Species), data=dat, REML=<span class="kw">TRUE</span>)
+M4 &lt;- <span class="fn">lmer</span>(Z_TP ~ Z_Length + (<span class="nu">1</span>|Lake), data=dat, REML=<span class="kw">TRUE</span>)
+M7 &lt;- <span class="fn">lmer</span>(Z_TP ~ Z_Length + (<span class="nu">1</span>|Fish_Species) + (<span class="nu">1</span>+Z_Length|Lake), data=dat, REML=<span class="kw">TRUE</span>)
+M8 &lt;- <span class="fn">lmer</span>(Z_TP ~ Z_Length + (<span class="nu">1</span>+Z_Length|Fish_Species) + (<span class="nu">1</span>|Lake), data=dat, REML=<span class="kw">TRUE</span>)
+
+<span class="kw">library</span>(AICcmodavg)
+<span class="fn">aictab</span>(<span class="kw">list</span>(M1=M1,M3=M3,M4=M4,M7=M7,M8=M8))</code></pre>
+<ol type="a">
+<li>Why are <em>both</em> Lake and Fish_Species candidates for random effects rather than fixed? Give the argument that would push you the other way.</li>
+<li>What does the term <code>(1 + Z_Length | Fish_Species)</code> assume about the population of slopes across species? Write out the implied bivariate Normal for the (intercept, slope) pair.</li>
+<li>Report the AICc table. Which model has the lowest AICc? For that model, read off the variance components with <code>summary()</code> / <code>VarCorr()</code> and say whether most slope variation lives across species, across lakes, or within.</li>
+<li>Only 3 species and 6 lakes is on the edge of what we should treat as random. What is the practical risk (name the warning you are likely to see), and when would you switch species to a fixed effect?</li>
+</ol>
+<div class="callout try" style="margin-top: 12px;"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
+</div>
+
+<div class="exercise" id="p5">
+<span class="ex-tag">Problem 5</span><span class="difficulty medium"> · variance partitioning · binomial GLMM</span>
+<h3>Detection probability across regions — a binomial GLMM</h3>
+<p>You fit a logistic mixed model to detection/non-detection data (a camera-trap or PIT-array design; the algebra is identical). Cameras are nested within regions:</p>
+<pre><code>m &lt;- glmer(Detect ~ scale(Covariate) + (1 | Region/Camera), data=d, family=binomial)
+VarCorr(m)
+# Groups        Name        Variance Std.Dev.
+# Camera:Region (Intercept) 1.05     1.02
+# Region        (Intercept) 0.46     0.68
+# Fixed effects:
+#                   Estimate Std.Error z
+# (Intercept)       -1.4      0.30     -4.6
+# scale(Covariate)   0.62     0.13      4.8</code></pre>
+<ol type="a">
+<li>On the latent logit scale the implicit residual variance of a Bernoulli draw is $\pi^2/3 \approx 3.29$. What fraction of total non-fixed variation lives between regions, between cameras within regions, and in the residual? Why do we add the $\pi^2/3$ term in the ICC denominator for a binomial GLMM?</li>
+<li>For a camera at mean covariate value with average region and camera intercepts, what is the expected detection probability? (Use <code>plogis()</code>.)</li>
+<li>Translate the covariate slope into an odds ratio per 1 SD, with an approximate 95% CI.</li>
+<li>Why include the camera-level (rather than only the region-level) random intercept at all? What does dropping it do to your standard errors?</li>
+</ol>
+<div class="callout try" style="margin-top: 12px;"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
+</div>
+
+<div class="exercise" id="p6">
+<span class="ex-tag">Problem 6</span><span class="difficulty hard"> · nested random effects · overdispersion</span>
+<h3>Nested counts and the overdispersion check</h3>
+<p>An agency flies aerial surveys that produce counts nested three deep: 3 flights × 6 transects per flight × 4 management units = 72 transect-flights, each a single count. Counts vary among units, among transects within units, and among flights within transects.</p>
+<ol type="a">
+<li>Diagram the nesting, then write the equation for a Poisson GLMM with random intercepts at each level. With one count per flight, what happens to the flight-level term, and what is the standard trick for using it anyway?</li>
+<li>In lme4 syntax, what is the difference between <code>(1 | unit/transect)</code> and <code>(1 | unit) + (1 | transect)</code>? If transect IDs are reused across units (transect "1" exists in every unit but they are different transects), which do you use?</li>
+<li>For the Poisson GLMM, how do you check for overdispersion? Write the Pearson-dispersion calculation and state the threshold that should worry you.</li>
+<li>If the data are overdispersed, name two concrete fixes and say what each does.</li>
+</ol>
+<div class="callout try" style="margin-top: 12px;"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
+</div>
+
+<!-- ========================= MODEL SELECTION ========================= -->
+<a id="afternoon"></a>
+<h2 style="margin-top:60px;">Part 2 · Model selection <span class="note">(afternoon · 20 pts)</span></h2>
+
+<div class="exercise" id="p7">
+<span class="ex-tag">Problem 7</span><span class="difficulty easy"> · simulation · the "competitive model" myth</span>
+<h3>What does $\Delta\text{AIC} = 1.5$ actually mean?</h3>
+<p>A common rule of thumb calls any model within 2 AIC units of the best "competitive." Test what that rule really buys you when the extra variable is pure noise.</p>
+<div class="code-label">Code</div>
+<pre><code>reps &lt;- <span class="nu">1000</span>
+within2 &lt;- <span class="fn">replicate</span>(reps, {
+ n &lt;- <span class="nu">1000</span>; x &lt;- <span class="fn">runif</span>(n); x2 &lt;- <span class="fn">rnorm</span>(n)   <span class="cm"># x2 is pure noise</span>
+ y &lt;- <span class="nu">2</span> + <span class="nu">3</span>*x + <span class="fn">rnorm</span>(n, <span class="nu">0</span>, <span class="nu">0.2</span>)              <span class="cm"># only x matters</span>
+ d &lt;- <span class="fn">AIC</span>(<span class="fn">lm</span>(y ~ x + x2)) - <span class="fn">AIC</span>(<span class="fn">lm</span>(y ~ x))
+ d &lt; <span class="nu">2</span>
+})
+<span class="fn">mean</span>(within2)</code></pre>
+<ol type="a">
+<li>Before running: predict roughly what fraction of reps will have the junk model within 2 AIC units of the correct one. Explain your prediction from the size of AIC's per-parameter penalty.</li>
+<li>Run it. Report <code>mean(within2)</code>. Was your prediction right?</li>
+<li>Explain, in terms of the penalty $2k$, why the $\Delta\text{AIC} \le 2$ rule is structurally biased toward keeping noise variables. What should you report about the extra variable's <em>coefficient</em> before claiming it matters?</li>
+</ol>
+<div class="callout try" style="margin-top: 12px;"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
+</div>
+
+<div class="exercise" id="p8">
+<span class="ex-tag">Problem 8</span><span class="difficulty medium"> · simulation · Type I error of AIC/AICc/BIC</span>
+<h3>How often does each criterion pick noise as "best"?</h3>
+<p>Generate a response that is completely unrelated to its predictors, fit every subset with <code>dredge()</code>, and record how often the top model retains at least one noise variable under each criterion.</p>
+<div class="code-label">Code</div>
+<pre><code><span class="kw">library</span>(MuMIn)
+<span class="fn">options</span>(na.action = <span class="st">"na.fail"</span>)
+<span class="fn">set.seed</span>(<span class="nu">126</span>)
+n &lt;- <span class="nu">50</span>; a &lt;- <span class="nu">5</span>; sdy &lt;- <span class="nu">3</span>
+nummodels &lt;- <span class="nu">500</span>
+pstor &lt;- AICstor &lt;- AICcstor &lt;- BICstor &lt;- <span class="fn">rep</span>(<span class="kw">NA</span>, nummodels)
+
+<span class="kw">for</span>(i <span class="kw">in</span> <span class="nu">1</span>:nummodels) {
+ y &lt;- <span class="fn">rnorm</span>(n, mean=a, sd=sdy)
+ x1 &lt;- <span class="fn">runif</span>(n); x2 &lt;- <span class="fn">runif</span>(n); x3 &lt;- <span class="fn">runif</span>(n)
+ d &lt;- <span class="fn">data.frame</span>(y, x1, x2, x3)
+ reg &lt;- <span class="fn">lm</span>(y ~ ., data=d)
+ pstor[i]    &lt;- <span class="fn">sum</span>(<span class="fn">summary</span>(reg)$coefficients[<span class="nu">2</span>:<span class="nu">4</span>,<span class="nu">4</span>] &lt; <span class="nu">0.05</span>)
+ AICstor[i]  &lt;- <span class="fn">sum</span>(!<span class="fn">is.na</span>(<span class="fn">dredge</span>(reg, rank=<span class="st">"AIC"</span>)[<span class="nu">1</span>, <span class="nu">2</span>:<span class="nu">4</span>]))
+ AICcstor[i] &lt;- <span class="fn">sum</span>(!<span class="fn">is.na</span>(<span class="fn">dredge</span>(reg, rank=<span class="st">"AICc"</span>)[<span class="nu">1</span>, <span class="nu">2</span>:<span class="nu">4</span>]))
+ BICstor[i]  &lt;- <span class="fn">sum</span>(!<span class="fn">is.na</span>(<span class="fn">dredge</span>(reg, rank=<span class="st">"BIC"</span>)[<span class="nu">1</span>, <span class="nu">2</span>:<span class="nu">4</span>]))
+}
+<span class="fn">data.frame</span>(p = <span class="fn">mean</span>(pstor &gt; <span class="nu">0</span>), AIC = <span class="fn">mean</span>(AICstor &gt; <span class="nu">0</span>),
+           AICc = <span class="fn">mean</span>(AICcstor &gt; <span class="nu">0</span>), BIC = <span class="fn">mean</span>(BICstor &gt; <span class="nu">0</span>))</code></pre>
+<ol type="a">
+<li>Predict before you run: which criterion will pick "at least one noise variable" most often, and which least often?</li>
+<li>Run the simulation. Report the four proportions and compare to your prediction.</li>
+<li>Why does BIC avoid noise variables so much better than AIC in this $n = 50$ setting? Describe a setting in which BIC's parsimony would <em>backfire</em>.</li>
+</ol>
+<div class="callout try" style="margin-top: 12px;"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
+</div>
+
+<div class="exercise" id="p9">
+<span class="ex-tag">Problem 9</span><span class="difficulty medium"> · simulation · BIC vs AIC on weak effects</span>
+<h3>When BIC misses a weak-but-real effect</h3>
+<p>Three predictors have known effect sizes: one strong, one modest, one weak. Ask which criterion keeps the weak one.</p>
+<div class="code-label">Code</div>
+<pre><code><span class="kw">library</span>(MuMIn); <span class="fn">options</span>(na.action=<span class="st">"na.fail"</span>)
+<span class="fn">set.seed</span>(<span class="nu">7</span>); n &lt;- <span class="nu">60</span>
+strong &lt;- <span class="fn">runif</span>(n); modest &lt;- <span class="fn">runif</span>(n); weak &lt;- <span class="fn">runif</span>(n)
+y &lt;- <span class="nu">0.8</span>*strong - <span class="nu">0.4</span>*modest + <span class="nu">0.1</span>*weak + <span class="fn">rnorm</span>(n, <span class="nu">0</span>, <span class="nu">0.5</span>)
+d &lt;- <span class="fn">data.frame</span>(y, strong, modest, weak)
+m &lt;- <span class="fn">lm</span>(y ~ strong + modest + weak, data=d)
+<span class="fn">dredge</span>(m, rank=<span class="st">"AIC"</span>); <span class="fn">dredge</span>(m, rank=<span class="st">"AICc"</span>); <span class="fn">dredge</span>(m, rank=<span class="st">"BIC"</span>)</code></pre>
+<ol type="a">
+<li>Run the single simulation. Which predictors does each criterion retain in its top model?</li>
+<li>Wrap it in a 500-rep loop (resampling <code>y</code> and the predictors each time) and report the proportion of reps in which each criterion retains <code>weak</code>. Do the same for <code>modest</code> and <code>strong</code>.</li>
+<li>Which criterion would you use if the science question is "is the weak predictor worth studying further?", and which if it is "does the weak signal generalize out of sample?" Justify each choice.</li>
+</ol>
+<div class="callout try" style="margin-top: 12px;"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
+</div>
+
+<div class="exercise" id="p10">
+<span class="ex-tag">Problem 10</span><span class="difficulty hard"> · real data · AIC vs cross-validation</span>
+<h3>AIC vs LOOCV on the trophic-position data</h3>
+<p>Return to <code>qcbs_w6_data.csv</code> from Problem 4, but now treat species and lake as ordinary fixed factors so we can rank candidate <em>fixed-effect</em> models by both an information criterion and cross-validation. The question is predictive: which set of predictors best forecasts a fish's trophic position?</p>
+<div class="code-label">Setup &amp; candidate models</div>
+<pre><code><span class="kw">library</span>(boot); <span class="kw">library</span>(AICcmodavg)
+dat &lt;- <span class="fn">read.csv</span>(<span class="st">"data/qcbs_w6_data.csv"</span>)
+dat$Fish_Species &lt;- <span class="fn">as.factor</span>(dat$Fish_Species)
+dat$Lake         &lt;- <span class="fn">as.factor</span>(dat$Lake)
+dat$Z_Length     &lt;- <span class="fn">scale</span>(dat$Fish_Length)[,<span class="nu">1</span>]
+
+forms &lt;- <span class="fn">list</span>(
+ null    = Trophic_Pos ~ <span class="nu">1</span>,
+ length  = Trophic_Pos ~ Z_Length,
+ len_sp  = Trophic_Pos ~ Z_Length + Fish_Species,
+ len_lk  = Trophic_Pos ~ Z_Length + Lake,
+ full    = Trophic_Pos ~ Z_Length + Fish_Species + Lake,
+ interact= Trophic_Pos ~ Z_Length * Fish_Species + Lake)
+
+<span class="cm"># LOOCV MSE (delta[1]) and AICc for each candidate</span>
+cv   &lt;- <span class="fn">sapply</span>(forms, <span class="kw">function</span>(f) <span class="fn">cv.glm</span>(dat, <span class="fn">glm</span>(f, data=dat))$delta[<span class="nu">1</span>])
+aicc &lt;- <span class="fn">sapply</span>(forms, <span class="kw">function</span>(f) <span class="fn">AICc</span>(<span class="fn">glm</span>(f, data=dat)))
+<span class="fn">data.frame</span>(cv_MSE = <span class="fn">round</span>(cv, <span class="nu">4</span>), AICc = <span class="fn">round</span>(aicc, <span class="nu">1</span>))</code></pre>
+<ol type="a">
+<li>Report the table. Which model minimizes AICc, and which minimizes the LOOCV MSE? Do they agree?</li>
+<li>Compute $\Delta$AICc for every model and the Akaike weights. Is there a single clearly-best model, or a cluster within $\Delta\text{AICc} &lt; 2$?</li>
+<li>Compare the best model's LOOCV MSE to <code>var(dat$Trophic_Pos)</code>. Roughly what fraction of the response variance does the model's prediction error remove? Is the "best" model actually good in absolute terms, or just best of a weak field?</li>
+<li>If AICc and LOOCV disagreed, which would you trust for a pure prediction task, and why? State one reason AICc could mislead on a dataset this size.</li>
+</ol>
+<div class="callout try" style="margin-top: 12px;"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
+</div>
+
+<div class="exercise" id="p11">
+<span class="ex-tag">Problem 11</span><span class="difficulty hard"> · multimodel inference · the "right question" trap</span>
+<h3>Model averaging, evidence ratios, and asking the right question</h3>
+<p>A size-at-age analysis is fit with four competing candidate models. M1 has a fixed temperature effect, M2 a fixed regional effect, M3 both, and M0 is intercept-only. The AICc table:</p>
+<pre><code>Model   K   AICc     deltaAICc   weight
+M3      5   1240.0   0.0         0.45
+M1      4   1240.6   0.6         0.33
+M2      4   1241.9   1.9         0.18
+M0      3   1244.7   4.7         0.04</code></pre>
+<ol type="a">
+<li>Write the Akaike-weight formula. Confirm the weights in the table from the $\Delta$AICc column, and list which models are "competitive" by the $\Delta\text{AICc} &lt; 2$ rule.</li>
+<li>Why can model-averaging <em>coefficients</em> mislead when the candidate models contain different, correlated predictors? Why is model-averaging <em>predictions</em> usually safer?</li>
+<li>The biologist's actual question is "does temperature affect size-at-age?" Re-frame the table to answer <em>that</em> question directly: compute the summed weight of models containing temperature vs those without, and interpret it as an evidence ratio rather than "which model wins."</li>
+<li>If the temperature coefficient in M3 is $\hat\beta_T = 0.03$ with SE 0.02, what does that say about the practical importance of temperature, regardless of which model "wins"? What single number would you also report so a reader can judge how much of the inference rides on one model?</li>
+</ol>
+<div class="callout try" style="margin-top: 12px;"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
+</div>
+
+<div style="margin-top:60px;">
+<a href="lab.html" style="background:var(--osu-orange); color:white; padding:10px 20px; border-radius:4px; text-decoration:none;">← Back to lab</a>
+<a href="plain_language_summary.html" style="background:var(--accent); color:white; padding:10px 20px; border-radius:4px; text-decoration:none; margin-left:8px;">Plain-language summary →</a>
+</div>
+
+</main>
+</div>
+
+<footer>FW 536 · Statistical Modeling for Ecology and Conservation · Oregon State University</footer>
+</body>
+</html>

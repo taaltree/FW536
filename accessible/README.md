@@ -33,17 +33,17 @@ which explains page layout, screen-reader navigation, and how to read the math.
 
 ## Lecture notes and figure descriptions
 
-The lecture-notes pages include all slide **text**, **tables**, and **speaker
-notes**. They cannot auto-describe images (plots, diagrams, R-output
-screenshots, equation graphics), so each image is flagged with a
-"Figure N.k — needs description" note.
+The lecture-notes pages include all slide **text**, **tables**, **speaker
+notes**, and **figure descriptions**. Alt text was authored for ~390 slide
+images (plots, diagrams, R output, equations); equation images are transcribed
+and plots are described by axes and takeaway. A handful of purely decorative
+images are marked as such. Two images that could not be extracted from one deck
+remain the only gaps.
 
-[`FIGURE_DESCRIPTIONS_TODO.md`](FIGURE_DESCRIPTIONS_TODO.md) lists every flagged
-figure (400 total across the 9 lectures) with a per-lecture count and a
-fill-in checklist. To complete a description, open the lecture-notes file, find
-the figure note, and replace it with a sentence or two describing the figure
-(or, for an equation image, write the equation in `$...$` so it renders as
-navigable math).
+The alt text is also embedded in a separate accessible copy of each deck
+(`Day*/FW536_*_accessible.pptx` in the standard tree), linked from the top of
+each lecture-notes page. To regenerate everything after editing slides, run
+`_tools/build_accessible_pptx.py` then `_tools/build_lecture_notes.py`.
 
 ## Accommodations baked into the materials
 

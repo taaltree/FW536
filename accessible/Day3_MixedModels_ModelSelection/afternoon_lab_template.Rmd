@@ -1,0 +1,153 @@
+---
+title: "FW 536 — Day 3 afternoon lab (model selection) — Your Name"
+author: "Your Name Here"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    self_contained: true
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    code_folding: show
+    theme: cosmo
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+# Day 3 afternoon lab — Model selection problem set
+
+This template matches the afternoon (Part 2) problems in
+[`problem_set.html`](problem_set.html#afternoon). Read each problem statement there,
+write your work below, **Knit** to HTML, and upload the `.html` to the matching
+Canvas assignment.
+
+For setup help see the [R Markdown tutorial](../rmarkdown_tutorial.html).
+
+---
+
+# Setup
+
+```{r}
+# Load packages you'll need. Add or remove as appropriate.
+library(ggplot2)
+library(dplyr)
+library(lme4)
+library(nlme)
+library(AICcmodavg)
+library(MuMIn)
+library(boot)          # cross-validation (cv.glm)
+options(na.action = "na.fail")   # required by MuMIn::dredge()
+```
+
+```{r data}
+# Problem 10 uses the real trophic-position data (fixed factors this time).
+dat <- read.csv("data/qcbs_w6_data.csv")
+dat$Fish_Species <- as.factor(dat$Fish_Species)
+dat$Lake         <- as.factor(dat$Lake)
+dat$Z_Length     <- scale(dat$Fish_Length)[, 1]
+```
+
+---
+
+# Problem 7 — What does $\Delta\text{AIC} = 1.5$ actually mean?
+
+> Simulate a strong real effect plus a pure-noise predictor and record how often
+> the junk model lands within 2 AIC units of the correct one.
+
+**My work:**
+
+```{r}
+# Your R code here
+```
+
+**Answer / biological interpretation:**
+
+
+---
+
+# Problem 8 — Type I error of AIC / AICc / BIC on pure noise
+
+> Response unrelated to three predictors; `dredge()` every subset; record how often
+> the top model retains a noise variable under each criterion.
+
+**My work:**
+
+```{r}
+# Your R code here (options(na.action = "na.fail") is set above)
+```
+
+**Answer / biological interpretation:**
+
+
+---
+
+# Problem 9 — BIC vs AIC on a weak-but-real effect
+
+> Three predictors (strong / modest / weak). Report the proportion of 500 reps in
+> which each criterion retains each predictor.
+
+**My work:**
+
+```{r}
+# Your R code here
+```
+
+**Answer / biological interpretation:**
+
+
+---
+
+# Problem 10 — AIC vs LOOCV on the trophic-position data (qcbs_w6_data.csv)
+
+> Rank candidate fixed-effect models by AICc and by LOOCV MSE (`cv.glm`), compute
+> Akaike weights, and compare the best model's CV MSE to `var(Trophic_Pos)`.
+
+**My work:**
+
+```{r}
+# Your R code here (dat data frame is loaded above)
+```
+
+**Answer / biological interpretation:**
+
+
+---
+
+# Problem 11 — Multimodel inference and the "right question" trap
+
+> From the AICc table, confirm the Akaike weights, discuss averaging coefficients
+> vs predictions, and re-frame the temperature question as an evidence ratio.
+
+**My work:**
+
+```{r}
+# Your R code here
+```
+
+**Answer / biological interpretation:**
+
+
+---
+
+# (Optional) Embed a photo of hand-written work
+
+For problems easier to do on paper, photograph and embed:
+
+```{r, echo=FALSE, eval=FALSE, out.width="60%", fig.cap="Hand-derivation for Problem N"}
+knitr::include_graphics("images/problemN_derivation.jpg")
+```
+
+(Change `eval=FALSE` to `eval=TRUE` after saving an image. See the
+[R Markdown tutorial](../rmarkdown_tutorial.html) for details.)
+
+---
+
+# Submission checklist
+
+- [ ] Answered every afternoon (Part 2) problem from `problem_set.html`.
+- [ ] Loaded `qcbs_w6_data.csv` from `data/` for the AIC-vs-CV problem.
+- [ ] Knitted to HTML without errors.
+- [ ] Photos (if any) embedded with `self_contained: true` in the YAML.
+- [ ] Uploaded the `.html` to the matching Canvas assignment.

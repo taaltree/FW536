@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en" data-a11y="done">
+<head>
+<meta charset="UTF-8" />
+<title>Day 5 · Problem Set — Hierarchical &amp; Latent-State Bayesian Models | FW 536 · Student copy (no answers)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../_Shared/css/accessible.css" />
+<script defer src="../_Shared/js/accessible.js"></script>
+<script>
+MathJax = {
+  tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
+  options: { menuOptions: { settings: { assistiveMml: true, explorer: true } } },
+  loader: { load: ['a11y/assistive-mml', 'a11y/explorer'] }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script"></script>
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<div class="a11y-bar" role="region" aria-label="Accessibility">Accessible version &middot; <a href="../accessibility.html">How to use this site with a screen reader</a> &middot; <a href="../index.html">Course home</a></div>
+
+<div class="shell">
+
+<aside class="sidebar">
+ <p class="brand"><a href="../index.html" title="Back to course home">FW 536 · Day 5</a></p>
+ <div class="subtitle">Assessed Problem Set — Hierarchical &amp; Latent-State Models</div>
+ <nav aria-label="On this page and related documents">
+ <div class="section">Problems</div>
+ <ul>
+ <li><a href="#p1">1. Hierarchical Poisson (ants)</a></li>
+ <li><a href="#p2">2. Link-scale prior sensitivity (ants)</a></li>
+ <li><a href="#p3">3. Pooling spectrum (N2O)</a></li>
+ <li><a href="#p4">4. Group-level covariate (N2O)</a></li>
+ <li><a href="#p5">5. Bayesian logistic (lizards)</a></li>
+ <li><a href="#p6">6. Derived probability difference (lizards)</a></li>
+ <li><a href="#p7">7. Spawner-recruit &amp; $H_\text{msy}$</a></li>
+ <li><a href="#p8">8. Precautionary harvest (derived)</a></li>
+ <li><a href="#p9">9. N-mixture &amp; Bayesian p-value</a></li>
+ <li><a href="#p10">10. Dynamic occupancy (latent state)</a></li>
+ </ul>
+ <div class="section">Day 5 docs</div>
+ <ul>
+ <li><a href="lab.html">Main lab</a></li>
+ <li><a class="featured" href="plain_language_summary.html">Plain-language summary</a></li>
+ <li><a href="../index.html">All days</a></li>
+ </ul>
+ </nav>
+</aside>
+
+<main class="content" id="main-content" tabindex="-1">
+<header class="lab-header">
+ <div class="eyebrow">Day 5 · Assessed Problem Set · Morning · 20 pts</div>
+ <h1>Hierarchical &amp; latent-state Bayesian inference on real data</h1>
+ <p class="lede">Ten graded problems in <span class="pill nimble">NIMBLE</span> spanning hierarchical Poisson, multilevel pooling, Bayesian logistic regression, spawner-recruit derived management quantities, and latent-state models &mdash; fit on the datasets in <code>data/</code> wherever possible.</p>
+</header>
+
+<section class="callout warn" style="margin-top:24px;"><p class="callout-label">Watch out</p><p><strong>Assessed problem set &middot; hand-in required.</strong> Answers are <em>not</em> shown here. Write your reasoning, R code, numeric answers, and biological interpretation in <a href="morning_lab_template.Rmd"><code>morning_lab_template.Rmd</code></a>, knit to HTML, and upload the <code>.html</code> to the Canvas assignment.</p><p>All models are fit in <span class="pill nimble">NIMBLE</span>. For worked-example study with visible answers, see <a href="lab.html">the main lab (in-class practice)</a>.</p></section>
+
+<section>
+<div class="callout plain"><p class="callout-label">Plain-language summary</p>
+<p>Six of the ten problems use the real datasets shipped in this Day's <code>data/</code> folder &mdash; <code>ants.csv</code>, <code>N2OEmission.csv</code>, and <code>IslandsLizards.csv</code>. Each of those problems shows the <code>read.csv()</code> call you should start from; run it, then build the requested model. The remaining four problems (spawner-recruit and latent-state) simulate their data in the same code block, following the patterns in the accompanying Nimble scripts.</p>
+<p>Set <code>samplesAsCodaMCMC = TRUE</code> in every <code>nimbleMCMC()</code> call so <code>coda</code> diagnostics (<code>gelman.diag</code>, <code>effectiveSize</code>) work directly. Report R-hat and effective sample size for the parameters you interpret.</p>
+</div>
+</section>
+
+<!-- ================================================================== -->
+<!-- Problem 1 -->
+<a id="morning"></a>
+<div class="exercise" id="p1">
+<span class="ex-tag">Problem 1</span><span class="difficulty medium"> · 25 min · hierarchical Poisson · <code>ants.csv</code></span>
+<h3>Overdispersed ant richness with a bog-level random effect</h3>
+<p>Load the ant-richness data and fit a Poisson regression of <em>richness</em> on the three scaled covariates, but add a <strong>bog-level (observation-level) random effect</strong> $\epsilon_i$ on the log mean to absorb overdispersion:</p>
+<div class="eq-block">$y_i \sim \text{Poisson}(\lambda_i), \quad \log \lambda_i = \beta_0 + \beta_1 \text{forest}_i + \beta_2 \text{lat}_i + \beta_3 \text{elev}_i + \epsilon_i, \quad \epsilon_i \sim \mathcal{N}(0, \sigma_\epsilon^2)$</div>
+<div class="code-label">R · start from the real data</div>
+<pre><code>ants &lt;- <span class="fn">read.csv</span>(<span class="st">"data/ants.csv"</span>)
+ants$forest    &lt;- <span class="fn">as.numeric</span>(<span class="fn">scale</span>(ants$forest))
+ants$latitude  &lt;- <span class="fn">as.numeric</span>(<span class="fn">scale</span>(ants$latitude))
+ants$elevation &lt;- <span class="fn">as.numeric</span>(<span class="fn">scale</span>(ants$elevation))</code></pre>
+<ol type="a">
+ <li>Fit the model in <span class="pill nimble">NIMBLE</span> with weakly informative priors ($\beta \sim \mathcal{N}(0, \sigma^2{=}4)$, $\sigma_\epsilon \sim \text{Uniform}(0,5)$). Report posterior medians and 95% CIs for $\beta_1,\beta_2,\beta_3$ and for $\sigma_\epsilon$.</li>
+ <li>Is $\sigma_\epsilon$ credibly bounded away from 0? What does that tell you about overdispersion relative to a plain Poisson GLM?</li>
+ <li>Compare your $\beta$ posterior medians to the frequentist <code>glm(richness ~ forest + latitude + elevation, family = poisson)</code> fit. Where do they agree or differ, and why?</li>
+</ol>
+<div class="callout try" style="margin-top: 12px;"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
+</div>
+
+<!-- Problem 2 -->
+<div class="exercise" id="p2">
+<span class="ex-tag">Problem 2</span><span class="difficulty easy"> · 20 min · link-scale prior sensitivity · <code>ants.csv</code></span>
+<h3>What does a "vague" log-scale prior actually do?</h3>
+<p>Using the same <code>ants.csv</code> Poisson regression (you may drop the random effect and use the plain log-link GLM form here), investigate how the prior on the coefficients interacts with predictor scaling.</p>
+<ol type="a">
+ <li>Fit the model with RAW (unscaled) predictors and a $\mathcal{N}(0, \sigma^2{=}10000)$ prior on each $\beta$. Report what happens to chain mixing and R-hat. (You may hit <code>Inf</code> log-densities or a stuck chain &mdash; describe what you see.)</li>
+ <li>Fit again with SCALED predictors and the same vague prior. Report R-hat and effective sample size, and compare the posterior medians of $(\beta_1,\beta_2,\beta_3)$ to the frequentist <code>glm()</code>.</li>
+ <li>Keep the scaled predictors but tighten the prior to $\mathcal{N}(0, \sigma^2{=}4)$ (i.e. <code>dnorm(0, 1/4)</code>). Does the posterior move meaningfully? Explain in one sentence why (or why not).</li>
+ <li>Draw $10^5$ values of a slope from $\mathcal{N}(0,10000)$ and report the fraction for which the implied multiplicative effect $e^{\beta}$ exceeds a million-fold. Use this to justify a weakly informative default.</li>
+</ol>
+<div class="callout try" style="margin-top: 12px;"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
+</div>
+
+<!-- Problem 3 -->
+<div class="exercise" id="p3">
+<span class="ex-tag">Problem 3</span><span class="difficulty medium"> · 30 min · multilevel pooling · <code>N2OEmission.csv</code></span>
+<h3>The pooling spectrum for soil N<sub>2</sub>O emissions</h3>
+<p>Load the N<sub>2</sub>O data and model $\log(\text{emission})$ as a function of centred $\log(\text{n.input})$, with sites indexed by <code>group.index</code>.</p>
+<div class="code-label">R · start from the real data</div>
+<pre><code>N2O   &lt;- <span class="fn">read.csv</span>(<span class="st">"data/N2OEmission.csv"</span>)
+y     &lt;- <span class="fn">log</span>(N2O$emission)
+x     &lt;- <span class="fn">log</span>(N2O$n.input) - <span class="fn">mean</span>(<span class="fn">log</span>(N2O$n.input))  <span class="cm"># centred predictor</span>
+group &lt;- N2O$group.index
+nsites &lt;- <span class="fn">length</span>(<span class="fn">unique</span>(group))</code></pre>
+<ol type="a">
+ <li>Fit the <strong>complete-pooling</strong> model $\mu_i = \alpha + \beta x_i$ and the <strong>partial-pooling</strong> random-intercept model $\alpha_j \sim \mathcal{N}(\mu_\alpha, \sigma_\alpha^2)$, $\mu_i = \alpha_{j[i]} + \beta x_i$. Report the posterior of $\beta$ from each.</li>
+ <li>Also fit the <strong>no-pooling</strong> model (independent $\alpha_j$). Plot the per-site $\alpha_j$ posterior medians from no-pooling (x-axis) vs. partial-pooling (y-axis) with the 1:1 line. Which sites shrink the most toward $\mu_\alpha$, and why?</li>
+ <li>Report the posterior of $\sigma_\alpha$. In plain language, what does its magnitude say about how different the sites are once N input is accounted for?</li>
+</ol>
+<div class="callout try" style="margin-top: 12px;"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
+</div>
+
+<!-- Problem 4 -->
+<div class="exercise" id="p4">
+<span class="ex-tag">Problem 4</span><span class="difficulty hard"> · 35 min · group-level regression · <code>N2OEmission.csv</code></span>
+<h3>Modeling the random intercept with a site-level covariate</h3>
+<p>Extend the partial-pooling model from Problem 3 so the per-site mean intercept is itself regressed on a <strong>site-level covariate</strong> $w_j$ (a per-site summary derived from the data), and let the N-input slope vary by fertilizer type (<code>fert.index</code>):</p>
+<div class="eq-block">$\alpha_j \sim \mathcal{N}(\kappa + \eta\, w_j,\ \sigma_\alpha^2), \qquad \beta_{k} \sim \mathcal{N}(\mu_\beta, \sigma_\beta^2)$</div>
+<p>Build $w_j$ as a per-site summary (e.g. from <code>carbon</code> or the site-mean of <code>n.input</code>); state which you used and how you scaled it.</p>
+<ol type="a">
+ <li>Fit the group-level-regression model in <span class="pill nimble">NIMBLE</span>. Is the posterior of $\eta$ (the effect of the site covariate on baseline emissions) credibly different from 0?</li>
+ <li>Add the fertilizer-varying slope $\beta_k$. Which fertilizer type has the largest absolute N-input effect? Report the posterior of $\sigma_\beta$.</li>
+ <li>In one or two sentences, explain why "group-level regression" lets you keep hierarchical shrinkage while still explaining <em>why</em> sites differ.</li>
+</ol>
+<div class="callout try" style="margin-top: 12px;"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
+</div>
+
+<!-- Problem 5 -->
+<div class="exercise" id="p5">
+<span class="ex-tag">Problem 5</span><span class="difficulty medium"> · 25 min · Bayesian logistic · <code>IslandsLizards.csv</code></span>
+<h3>Island lizard occupancy vs. perimeter:area ratio</h3>
+<p>Load the island-lizard data and fit logistic regression of <em>presence</em> on the scaled perimeter:area ratio:</p>
+<div class="eq-block">$y_i \sim \text{Bernoulli}(p_i), \quad \text{logit}\,p_i = a + b\, x_i$</div>
+<div class="code-label">R · start from the real data</div>
+<pre><code>liz      &lt;- <span class="fn">read.csv</span>(<span class="st">"data/IslandsLizards.csv"</span>)
+x.scaled &lt;- <span class="fn">as.numeric</span>(<span class="fn">scale</span>(liz$perimeterAreaRatio))
+y        &lt;- <span class="fn">as.integer</span>(liz$presence)</code></pre>
+<ol type="a">
+ <li>Fit in <span class="pill nimble">NIMBLE</span> with the Gelman-default weakly informative prior $a, b \sim \mathcal{N}(0, \sigma^2{=}2.71)$ (i.e. <code>dnorm(0, 1/2.71)</code>). Report R-hat and <code>heidel.diag</code> for $a$ and $b$. Use starting values near 0 (why is that necessary here?).</li>
+ <li>What is the posterior probability that the slope $b$ is negative (i.e., more edge per unit area $\Rightarrow$ lower occupancy)?</li>
+ <li>Re-fit with a genuinely vague prior $a,b \sim \mathcal{N}(0, 10^6)$. With only 19 islands, does the prior visibly change the posterior of $b$? Overlay the two posterior densities.</li>
+</ol>
+<div class="callout try" style="margin-top: 12px;"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
+</div>
+
+<!-- Problem 6 -->
+<div class="exercise" id="p6">
+<span class="ex-tag">Problem 6</span><span class="difficulty medium"> · 20 min · derived quantity · <code>IslandsLizards.csv</code></span>
+<h3>A management-relevant probability difference</h3>
+<p>Building on your Problem 5 fit, compute derived quantities <em>inside</em> the model so their full posterior is delivered by MCMC. Add the deterministic nodes</p>
+<div class="eq-block">$y_{10} = \text{ilogit}(a + b\, x_{10}), \quad y_{20} = \text{ilogit}(a + b\, x_{20}), \quad \text{diff} = y_{20} - y_{10}$</div>
+<p>where $x_{10}$ and $x_{20}$ are the scaled versions of raw perimeter:area ratios 10 and 20 (scale them with the same mean/SD you used for the data).</p>
+<ol type="a">
+ <li>Report the posterior median and 95% CI of $\text{diff}$. Does the interval exclude 0?</li>
+ <li>State in one sentence why computing $\text{diff}$ as a node inside <code>nimbleCode</code> gives correct uncertainty, whereas plugging point estimates of $a,b$ into the formula would not.</li>
+</ol>
+<div class="callout try" style="margin-top: 12px;"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
+</div>
+
+<!-- Problem 7 -->
+<div class="exercise" id="p7">
+<span class="ex-tag">Problem 7</span><span class="difficulty medium"> · 30 min · spawner-recruit + derived $S_\text{msy}$</span>
+<h3>Beverton-Holt fit with management quantities</h3>
+<p>Simulate a spawner-recruit time series from a known truth, then fit the Beverton-Holt model in <span class="pill nimble">NIMBLE</span> and define the management quantities as deterministic nodes so their posteriors come for free.</p>
+<div class="eq-block">$\log R_t \sim \mathcal{N}\!\big(\log a + \log S_t - \log(1 + \tfrac{a}{b} S_t),\ \sigma^2\big)$</div>
+<div class="eq-block">$N_\text{eq} = \dfrac{b(a-1)}{a}, \quad S_\text{msy} = b\sqrt{\tfrac1a} - \tfrac{b}{a}, \quad H_\text{msy} = 1 - \sqrt{\tfrac1a}$</div>
+<div class="code-label">R · simulate 25 years of data</div>
+<pre><code>set.seed(<span class="nu">7</span>)
+Nyears &lt;- <span class="nu">25</span>; a.t &lt;- <span class="nu">5</span>; b.t &lt;- <span class="nu">5000</span>; sig.t &lt;- <span class="nu">0.3</span>
+S &lt;- <span class="fn">rlnorm</span>(Nyears, <span class="nu">7.5</span>, <span class="nu">0.8</span>)
+R &lt;- <span class="fn">numeric</span>(Nyears)
+<span class="kw">for</span> (t <span class="kw">in</span> <span class="nu">1</span>:Nyears)
+  R[t] &lt;- (a.t*S[t])/(<span class="nu">1</span> + a.t/b.t*S[t]) * <span class="fn">exp</span>(<span class="fn">rnorm</span>(<span class="nu">1</span>, <span class="nu">0</span>, sig.t))</code></pre>
+<ol type="a">
+ <li>Fit the model (monitor $a,b,\sigma,N_\text{eq},S_\text{msy},H_\text{msy}$). Report posterior medians and 95% CIs. Do the CIs cover the simulated truth?</li>
+ <li>Plot the posterior of $H_\text{msy}$ as a histogram and mark its median.</li>
+ <li>Compare $S_\text{msy}$ from Bayes to what you'd get by plugging the posterior-median $a,b$ into the formula. Are they the same? Explain any difference.</li>
+</ol>
+<div class="callout try" style="margin-top: 12px;"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
+</div>
+
+<!-- Problem 8 -->
+<div class="exercise" id="p8">
+<span class="ex-tag">Problem 8</span><span class="difficulty medium"> · 20 min · precautionary derived quantity</span>
+<h3>The 5th-percentile ("precautionary") harvest rate</h3>
+<p>Using the posterior draws of $H_\text{msy}$ from Problem 7, quantify risk-based management targets.</p>
+<ol type="a">
+ <li>Report the 5th percentile of the $H_\text{msy}$ posterior. Interpret it in management language: the harvest rate you'd allow if you wanted only a 5% chance of exceeding the true MSY harvest rate.</li>
+ <li>Refit Problem 7 with <code>Nyears = 100</code> (regenerate the data). By roughly how much does the 95% CI width of $H_\text{msy}$ shrink relative to the 25-year fit? Is the gain consistent with a $\sqrt{N}$ rule?</li>
+ <li>In one sentence, contrast how a frequentist MLE fit would produce this precautionary number (bootstrap / delta method) with how Bayes produces it directly.</li>
+</ol>
+<div class="callout try" style="margin-top: 12px;"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
+</div>
+
+<!-- Problem 9 -->
+<div class="exercise" id="p9">
+<span class="ex-tag">Problem 9</span><span class="difficulty hard"> · 35 min · N-mixture + Bayesian p-value</span>
+<h3>Repeat-count abundance and a goodness-of-fit check</h3>
+<p>Simulate repeated counts at surveyed sites and fit the Royle (2004) N-mixture model in <span class="pill nimble">NIMBLE</span>, then test the Poisson assumption with a posterior-predictive Bayesian p-value.</p>
+<div class="eq-block">$N_i \sim \text{Poisson}(\lambda), \quad y_{ij} \sim \text{Binomial}(N_i, p)$</div>
+<div class="code-label">R · simulate overdispersed abundance on purpose</div>
+<pre><code><span class="kw">library</span>(MASS)
+set.seed(<span class="nu">9</span>)
+sites &lt;- <span class="nu">150</span>; reps &lt;- <span class="nu">3</span>; lambda &lt;- <span class="nu">6</span>; p.true &lt;- <span class="nu">0.5</span>
+N &lt;- <span class="fn">rnegbin</span>(sites, mu = lambda, theta = <span class="nu">2</span>)   <span class="cm"># NB, not Poisson</span>
+y &lt;- <span class="fn">matrix</span>(<span class="kw">NA</span>, sites, reps)
+<span class="kw">for</span> (i <span class="kw">in</span> <span class="nu">1</span>:sites) y[i, ] &lt;- <span class="fn">rbinom</span>(reps, N[i], p.true)</code></pre>
+<ol type="a">
+ <li>Fit the basic (constant $\lambda$, constant $p$) N-mixture. Remember: <code>dbinom(prob, size)</code> in NIMBLE and initialise <code>N = apply(y, 1, max)</code>. Report the posteriors of $\lambda$ and $p$.</li>
+ <li>Add posterior-predictive replicates $y^\text{rep}$ and a discrepancy statistic (e.g. a Freeman-Tukey or variance/mean statistic). Compute the Bayesian p-value $p_B$. What does a value far from 0.5 indicate here?</li>
+ <li>Propose (in words, or as a modified <code>nimbleCode</code> block) a fix &mdash; e.g. a Poisson-lognormal random effect on $\log\lambda_i$ &mdash; and explain how it would move $p_B$ toward 0.5.</li>
+</ol>
+<div class="callout try" style="margin-top: 12px;"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
+</div>
+
+<!-- Problem 10 -->
+<div class="exercise" id="p10">
+<span class="ex-tag">Problem 10</span><span class="difficulty hard"> · 40 min · latent state · dynamic occupancy</span>
+<h3>Multi-season occupancy: recover persistence and colonization</h3>
+<p>Simulate a dynamic (multi-season) occupancy dataset and recover the year-specific persistence $\phi_t$ and colonization $\gamma_t$ from replicated detection/non-detection data with imperfect detection.</p>
+<div class="eq-block">$z_{i,t} \sim \text{Bernoulli}\big(z_{i,t-1}\phi_{t-1} + (1-z_{i,t-1})\gamma_{t-1}\big), \quad y_{i,j,t} \sim \text{Bernoulli}(z_{i,t}\, p)$</div>
+<div class="code-label">R · simulate a rising-colonization scenario</div>
+<pre><code>set.seed(<span class="nu">10</span>)
+nS &lt;- <span class="nu">50</span>; nY &lt;- <span class="nu">6</span>; nR &lt;- <span class="nu">3</span>; p.t &lt;- <span class="nu">0.5</span>
+phi.t &lt;- <span class="fn">c</span>(<span class="nu">0.70</span>, <span class="nu">0.70</span>, <span class="nu">0.80</span>, <span class="nu">0.85</span>, <span class="nu">0.85</span>)
+gam.t &lt;- <span class="fn">c</span>(<span class="nu">0.05</span>, <span class="nu">0.15</span>, <span class="nu">0.25</span>, <span class="nu">0.30</span>, <span class="nu">0.30</span>)  <span class="cm"># rising colonization</span>
+z &lt;- <span class="fn">matrix</span>(<span class="kw">NA</span>, nS, nY); z[, <span class="nu">1</span>] &lt;- <span class="fn">rbinom</span>(nS, <span class="nu">1</span>, <span class="nu">0.2</span>)
+<span class="kw">for</span> (i <span class="kw">in</span> <span class="nu">1</span>:nS) <span class="kw">for</span> (t <span class="kw">in</span> <span class="nu">2</span>:nY)
+  z[i,t] &lt;- <span class="fn">rbinom</span>(<span class="nu">1</span>, <span class="nu">1</span>, z[i,t-<span class="nu">1</span>]*phi.t[t-<span class="nu">1</span>] + (<span class="nu">1</span>-z[i,t-<span class="nu">1</span>])*gam.t[t-<span class="nu">1</span>])
+y &lt;- <span class="fn">array</span>(<span class="kw">NA</span>, <span class="fn">c</span>(nS, nR, nY))
+<span class="kw">for</span> (t <span class="kw">in</span> <span class="nu">1</span>:nY) <span class="kw">for</span> (i <span class="kw">in</span> <span class="nu">1</span>:nS) <span class="kw">for</span> (j <span class="kw">in</span> <span class="nu">1</span>:nR)
+  y[i,j,t] &lt;- <span class="fn">rbinom</span>(<span class="nu">1</span>, <span class="nu">1</span>, p.t) * z[i,t]</code></pre>
+<ol type="a">
+ <li>Fit the model in <span class="pill nimble">NIMBLE</span>. Use the z-init trick (<code>zst &lt;- matrix(1L, nS, nY)</code>) &mdash; explain in one sentence why initialising $z$ at all-1 is required.</li>
+ <li>Plot the posterior medians of $\gamma_t$ against year. Does the rising-colonization signal come through?</li>
+ <li>The individual $\phi_t$ posteriors are wide. Why? Name one change to the model that would tighten them in a real analysis.</li>
+</ol>
+<div class="callout try" style="margin-top: 12px;"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
+</div>
+
+</main>
+</div>
+<footer>FW 536 · Statistical Modeling for Ecology and Conservation · Oregon State University</footer>
+</body>
+</html>

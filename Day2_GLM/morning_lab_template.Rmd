@@ -1,0 +1,148 @@
+---
+title: "FW 536 — Day 2 morning lab (Continuous distributions) — Your Name"
+author: "Your Name Here"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    self_contained: true
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    code_folding: show
+    theme: cosmo
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+# Day 2 morning lab — Continuous distributions problem set
+
+This template matches the **morning** section (Problems 1–4) of
+[`problem_set.html`](problem_set.html). Read each problem statement there,
+write your work below, **Knit** to HTML, and upload the `.html` to the
+matching Canvas assignment.
+
+Problem 4 loads a real dataset from this Day's `data/` folder:
+
+- `data/sockeye_adult.csv` — daily sockeye counts and flow-corrected qPCR eDNA
+  (Levi et al. 2019). Filter to `Sockeyetype == "Sockeye_Adults"`.
+
+Keep the `.Rmd` in this folder so the `read.csv("data/...")` paths resolve.
+For setup help see the [R Markdown tutorial](../rmarkdown_tutorial.html).
+
+---
+
+# Setup
+
+```{r}
+# Load the packages you'll need. Add or remove as appropriate.
+library(ggplot2)
+library(dplyr)
+library(MASS)        # for glm.nb and negative-binomial helpers
+library(effects)
+library(emmeans)
+```
+
+---
+
+# Problem 1 — Which distribution for a right-skewed body-size sample?
+
+> Body weight (g) from a creel survey: strictly positive, strongly
+> right-skewed. Choose a distribution and justify; compute the lognormal
+> mean and median for $\log(\text{weight}) \sim \mathcal{N}(5.0, 0.8^2)$;
+> explain why a Normal prediction interval would dip below zero.
+
+**My work:**
+
+```{r}
+# Your R code here
+```
+
+**Answer / biological interpretation:**
+
+
+---
+
+# Problem 2 — Length–weight allometry and the power law
+
+> Chinook length (cm) vs weight (g). Contrast `lm(weight ~ length)` with
+> `lm(log(weight) ~ log(length))`; interpret the log–log slope
+> $\hat\beta_1 = 3.05$ as the allometric exponent $b$ in $W = a L^b$;
+> give the multiplicative weight effects of a 25% and a doubling length
+> change; explain the mean-vs-median back-transform.
+
+**My work:**
+
+```{r}
+# Your R code here
+```
+
+**Answer / biological interpretation:**
+
+
+---
+
+# Problem 3 — Line-transect detection as an exponential process
+
+> Exponential detection with rate $\lambda = 0.02$/m. Write the survival
+> function $S(x) = e^{-\lambda x}$ and its mean; compute the probability of
+> missing an animal at 50 m; find the half-distance $\ln 2/\lambda$; explain
+> what memorylessness implies.
+
+**My work:**
+
+```{r}
+# Your R code here
+```
+
+**Answer / biological interpretation:**
+
+
+---
+
+# Problem 4 — Are the sockeye counts Poisson? Diagnose overdispersion
+
+> Load `data/sockeye_adult.csv`, subset to `Sockeye_Adults`. Compute the
+> mean, variance, and dispersion ratio of `Count`; solve for the NB size $k$
+> under $\mathrm{Var} = \mu + \mu^2/k$; simulate Poisson vs NB and compare
+> $P(\text{count}=0)$ and $P(\text{count}>400)$; name a mechanism and the
+> inferential consequence of using Poisson CIs.
+
+**My work:**
+
+```{r}
+# Load and subset the sockeye data
+sock <- read.csv("data/sockeye_adult.csv", stringsAsFactors = FALSE)
+sock <- subset(sock, Sockeyetype == "Sockeye_Adults")
+sock <- sock[!is.na(sock$Count), ]
+
+# mean, variance, dispersion ratio, and NB size k go here
+```
+
+**Answer / biological interpretation:**
+
+
+---
+
+# (Optional) Embed a photo of hand-written work
+
+For problems easier to do on paper, photograph and embed:
+
+```{r, echo=FALSE, eval=FALSE, out.width="60%", fig.cap="Hand-derivation for Problem N"}
+knitr::include_graphics("images/problemN_derivation.jpg")
+```
+
+(Change `eval=FALSE` to `eval=TRUE` after saving an image. See the
+[R Markdown tutorial](../rmarkdown_tutorial.html) for details.)
+
+---
+
+# Submission checklist
+
+- [ ] Answered every morning problem (1–4) from `problem_set.html`.
+- [ ] Loaded `data/sockeye_adult.csv` for Problem 4 (`.Rmd` kept in this folder so the path resolves).
+- [ ] Translated every log-scale quantity into a multiplicative / biological statement, not just an estimate.
+- [ ] Knitted to HTML without errors.
+- [ ] Photos (if any) embedded with `self_contained: true` in the YAML.
+- [ ] Uploaded the `.html` to the matching Canvas assignment.

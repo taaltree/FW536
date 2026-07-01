@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Interactive: link functions &amp; coefficient meaning | FW 536 Day 2</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../_Shared/css/lab.css" />
+<script defer src="../_Shared/js/lab.js"></script>
+<style>
+  .widget { background:#fff; border:1px solid var(--border); border-radius:10px; padding:20px 24px; margin:24px 0; box-shadow:0 2px 10px rgba(0,0,0,.05); }
+  .distpick { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
+  .distpick button { font-family:'Helvetica Neue',Arial,sans-serif; font-size:14px; font-weight:600; border:2px solid var(--border); background:var(--panel-alt); color:var(--osu-stone); border-radius:6px; padding:6px 14px; cursor:pointer; }
+  .distpick button.active { background:var(--osu-orange); color:#fff; border-color:var(--osu-orange); }
+  .controls { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:14px 24px; margin-bottom:16px; }
+  .ctl label { font-family:'Helvetica Neue',Arial,sans-serif; font-size:13px; font-weight:600; color:var(--osu-stone); display:flex; justify-content:space-between; }
+  .ctl input[type=range]{ width:100%; accent-color:var(--osu-orange); }
+  .ctl .val { color:var(--osu-orange-dark); font-variant-numeric:tabular-nums; }
+  svg text { font-family:'Helvetica Neue',Arial,sans-serif; }
+  .interp { background:#F4FAF1; border-left:5px solid #4A8C3A; border-radius:0 8px 8px 0; padding:12px 16px; margin-top:12px; font-size:15px; }
+  .interp b { color:var(--osu-orange-dark); font-variant-numeric:tabular-nums; }
+</style>
+</head>
+<body>
+<div class="shell">
+<aside class="sidebar">
+  <h1><a href="../index.html" title="Back to course home">FW 536 · Day 2</a></h1>
+  <div class="subtitle">Link functions &amp; coefficients</div>
+  <nav>
+    <div class="section">This page</div>
+    <ul><li><a href="#explorer">The explorer</a></li><li><a href="#try">Things to try</a></li></ul>
+    <div class="section">Day 2</div>
+    <ul>
+      <li><a href="lab.html">Practice lab</a></li>
+      <li><a href="log_logit_intuition.html">Log/logit intuition guide</a></li>
+      <li><a href="../index.html">Course home</a></li>
+    </ul>
+  </nav>
+</aside>
+
+<main class="content">
+<header class="lab-header">
+  <div class="eyebrow">Day 2 · Interactive</div>
+  <h1>Link functions: what a coefficient really means</h1>
+  <p class="lede">A GLM runs a straight line <em>on the link scale</em>, then bends it back to the response scale. Drag the coefficients and watch how the same slope means an <em>additive</em>, <em>multiplicative</em>, or <em>odds</em> effect depending on the link.</p>
+</header>
+
+<section id="explorer">
+<div class="widget">
+  <div class="distpick" id="linkpick" role="group" aria-label="Choose a link function">
+    <button data-l="identity" class="active">Identity (Normal)</button>
+    <button data-l="log">Log (Poisson / count)</button>
+    <button data-l="logit">Logit (logistic / 0–1)</button>
+  </div>
+
+  <div class="controls">
+    <div class="ctl"><label for="b0">β₀ (intercept)<span class="val" id="v_b0"></span></label><input id="b0" type="range" min="-4" max="4" step="0.1" value="-1"></div>
+    <div class="ctl"><label for="b1">β₁ (slope, per 1 unit of x)<span class="val" id="v_b1"></span></label><input id="b1" type="range" min="-1.5" max="1.5" step="0.05" value="0.5"></div>
+    <div class="ctl"><label for="xq">Highlight x =<span class="val" id="v_xq"></span></label><input id="xq" type="range" min="0" max="10" step="0.5" value="4"></div>
+  </div>
+
+  <svg id="chart" viewBox="0 0 720 340" width="100%" role="img" aria-label="Response versus predictor curve for the chosen link"></svg>
+
+  <div class="interp" id="interp"></div>
+</div>
+</section>
+
+<section id="try">
+<h2>Things to try</h2>
+<div class="callout key">
+<ol>
+<li><strong>Identity is a straight line.</strong> With the identity link the response <em>is</em> the linear predictor: a 1-unit change in x always adds β₁, everywhere.</li>
+<li><strong>Log link is multiplicative.</strong> Switch to Log. Now a 1-unit change in x <em>multiplies</em> the mean by e^β₁. Notice the curve bends and can never go negative — perfect for counts.</li>
+<li><strong>Logit link is S-shaped.</strong> Switch to Logit. The response is a probability trapped between 0 and 1. The same β₁ moves the probability a lot in the middle and barely at all near 0 or 1 — that is why we talk about <em>odds ratios</em>, not probability differences.</li>
+<li><strong>The "divide by 4" rule.</strong> On the logit, drag x to where the curve is steepest (p ≈ 0.5) and compare the local probability change to β₁/4.</li>
+</ol>
+</div>
+<p>For 16 worked biological examples, see the <a href="log_logit_intuition.html">log/logit intuition guide</a>. <a href="lab.html">← Back to the Day 2 lab</a></p>
+</section>
+</main>
+</div>
+<footer>FW 536 · Statistical Modeling for Ecology and Conservation · Oregon State University</footer>
+
+<script>
+let link='identity';
+const S={b0:-1,b1:0.5,xq:4};
+const ginv=(eta)=> link==='identity'?eta : link==='log'?Math.exp(eta) : 1/(1+Math.exp(-eta));
+const xmax=10;
+
+function yRange(){
+  // sample to find plotting range
+  let vals=[]; for(let x=0;x<=xmax;x+=0.1) vals.push(ginv(S.b0+S.b1*x));
+  let lo=Math.min(...vals), hi=Math.max(...vals);
+  if(link==='logit'){lo=0;hi=1;}
+  if(link==='identity'){const pad=(hi-lo)*0.1||1; lo-=pad;hi+=pad;}
+  if(link==='log'){lo=0; hi=hi*1.08;}
+  return [lo,hi];
+}
+
+function render(){
+  document.getElementById('v_b0').textContent=(+S.b0).toFixed(1);
+  document.getElementById('v_b1').textContent=(+S.b1).toFixed(2);
+  document.getElementById('v_xq').textContent=(+S.xq).toFixed(1);
+  const W=720,H=340,ml=54,mr=16,mt=16,mb=40,pw=W-ml-mr,ph=H-mt-mb;
+  const [lo,hi]=yRange();
+  const px=x=>ml+(x/xmax)*pw, py=v=>mt+ph-((v-lo)/(hi-lo))*ph;
+  let s=`<rect width="${W}" height="${H}" fill="white"/>`;
+  // axes
+  s+=`<line x1="${ml}" y1="${mt+ph}" x2="${ml+pw}" y2="${mt+ph}" stroke="#999"/>`;
+  s+=`<line x1="${ml}" y1="${mt}" x2="${ml}" y2="${mt+ph}" stroke="#999"/>`;
+  for(let t=0;t<=4;t++){const v=lo+(hi-lo)*t/4;const yy=py(v);
+    s+=`<line x1="${ml-4}" y1="${yy}" x2="${ml}" y2="${yy}" stroke="#999"/>`;
+    s+=`<text x="${ml-8}" y="${yy+4}" font-size="11" fill="#666" text-anchor="end">${v.toFixed(link==='logit'?2:1)}</text>`;}
+  for(let t=0;t<=10;t+=2){const xx=px(t);
+    s+=`<text x="${xx}" y="${mt+ph+16}" font-size="11" fill="#666" text-anchor="middle">${t}</text>`;}
+  s+=`<text x="${ml+pw/2}" y="${H-4}" font-size="12" fill="#444" text-anchor="middle">predictor x</text>`;
+  const ylab=link==='logit'?'probability':(link==='log'?'expected count (mean)':'mean response');
+  s+=`<text transform="translate(14,${mt+ph/2}) rotate(-90)" font-size="12" fill="#444" text-anchor="middle">${ylab}</text>`;
+  // curve
+  let pts=[]; for(let x=0;x<=xmax;x+=0.05){pts.push(`${px(x)},${py(ginv(S.b0+S.b1*x))}`);}
+  s+=`<polyline points="${pts.join(' ')}" fill="none" stroke="#D73F09" stroke-width="3"/>`;
+  // highlighted point
+  const xq=S.xq, mu=ginv(S.b0+S.b1*xq), mu1=ginv(S.b0+S.b1*(xq+1));
+  s+=`<line x1="${px(xq)}" y1="${mt}" x2="${px(xq)}" y2="${mt+ph}" stroke="#111" stroke-dasharray="2 3"/>`;
+  s+=`<circle cx="${px(xq)}" cy="${py(mu)}" r="5" fill="#111"/>`;
+  s+=`<circle cx="${px(xq+1<=xmax?xq+1:xq)}" cy="${py(mu1)}" r="4" fill="#1F5B50"/>`;
+  document.getElementById('chart').innerHTML=s;
+
+  // interpretation
+  const eb=Math.exp(S.b1);
+  let html='';
+  if(link==='identity'){
+    html=`Linear predictor: η = ${S.b0.toFixed(1)} + ${S.b1.toFixed(2)}·x, and μ = η. `+
+      `A 1-unit increase in x <b>adds ${S.b1.toFixed(2)}</b> to the mean, everywhere. `+
+      `At x=${xq.toFixed(1)}, mean = <b>${mu.toFixed(2)}</b>; at x=${(xq+1).toFixed(1)}, mean = <b>${mu1.toFixed(2)}</b> (difference ${(mu1-mu).toFixed(2)}).`;
+  } else if(link==='log'){
+    html=`log(μ) = ${S.b0.toFixed(1)} + ${S.b1.toFixed(2)}·x, so μ = e^(η). `+
+      `A 1-unit increase in x <b>multiplies</b> the mean by e^β₁ = <b>${eb.toFixed(3)}</b> `+
+      `(${eb>=1?'+':''}${((eb-1)*100).toFixed(1)}% per unit). `+
+      `At x=${xq.toFixed(1)}, mean = <b>${mu.toFixed(2)}</b>; at x=${(xq+1).toFixed(1)}, mean = <b>${mu1.toFixed(2)}</b> = ${(mu1/mu).toFixed(3)}× as large.`;
+  } else {
+    const odds=mu/(1-mu), odds1=mu1/(1-mu1);
+    html=`logit(p) = ${S.b0.toFixed(1)} + ${S.b1.toFixed(2)}·x. `+
+      `A 1-unit increase in x <b>multiplies the odds</b> by e^β₁ = <b>${eb.toFixed(3)}</b> (odds ratio). `+
+      `At x=${xq.toFixed(1)}: p = <b>${mu.toFixed(3)}</b>, odds = ${odds.toFixed(3)}. `+
+      `At x=${(xq+1).toFixed(1)}: p = <b>${mu1.toFixed(3)}</b>, odds = ${odds1.toFixed(3)} (ratio ${(odds1/odds).toFixed(3)}). `+
+      `Probability change here ≈ <b>${(mu1-mu>=0?'+':'')}${(mu1-mu).toFixed(3)}</b>; the "β₁/4" rule gives ${(S.b1/4).toFixed(3)} at the steepest point.`;
+  }
+  document.getElementById('interp').innerHTML=html;
+}
+
+document.querySelectorAll('#linkpick button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('#linkpick button').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active'); link=b.dataset.l; render();
+}));
+['b0','b1','xq'].forEach(id=>document.getElementById(id).addEventListener('input',e=>{S[id]=+e.target.value; render();}));
+render();
+</script>
+</body>
+</html>

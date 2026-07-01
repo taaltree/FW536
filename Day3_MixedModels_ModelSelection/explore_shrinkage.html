@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Interactive: shrinkage &amp; partial pooling | FW 536 Day 3</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../_Shared/css/lab.css" />
+<script defer src="../_Shared/js/lab.js"></script>
+<style>
+  .widget { background:#fff; border:1px solid var(--border); border-radius:10px; padding:20px 24px; margin:24px 0; box-shadow:0 2px 10px rgba(0,0,0,.05); }
+  .controls { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:14px 24px; margin-bottom:14px; }
+  .ctl label { font-family:'Helvetica Neue',Arial,sans-serif; font-size:13px; font-weight:600; color:var(--osu-stone); display:flex; justify-content:space-between; }
+  .ctl input[type=range]{ width:100%; accent-color:var(--osu-orange); }
+  .ctl .val { color:var(--osu-orange-dark); font-variant-numeric:tabular-nums; }
+  svg text { font-family:'Helvetica Neue',Arial,sans-serif; }
+  .legend { font-family:'Helvetica Neue',Arial,sans-serif; font-size:13px; display:flex; gap:20px; flex-wrap:wrap; margin-top:6px; }
+  .interp { background:#F7F1E2; border-left:5px solid var(--osu-orange); border-radius:0 8px 8px 0; padding:12px 16px; margin-top:12px; font-size:15px; }
+  .interp b { color:var(--osu-orange-dark); font-variant-numeric:tabular-nums; }
+</style>
+</head>
+<body>
+<div class="shell">
+<aside class="sidebar">
+  <h1><a href="../index.html" title="Back to course home">FW 536 · Day 3</a></h1>
+  <div class="subtitle">Shrinkage &amp; partial pooling</div>
+  <nav>
+    <div class="section">This page</div>
+    <ul><li><a href="#explorer">The explorer</a></li><li><a href="#try">Things to try</a></li></ul>
+    <div class="section">Day 3</div>
+    <ul>
+      <li><a href="lab.html">Practice lab</a></li>
+      <li><a href="plain_language_summary.html">Plain-language summary</a></li>
+      <li><a href="../index.html">Course home</a></li>
+    </ul>
+  </nav>
+</aside>
+
+<main class="content">
+<header class="lab-header">
+  <div class="eyebrow">Day 3 · Interactive</div>
+  <h1>Shrinkage: how a random effect borrows strength</h1>
+  <p class="lede">Eight sites, each with its own noisy estimate. A mixed model pulls each site's estimate toward the overall mean — a lot when a site has little data or sites are alike, a little when a site has lots of data or sites truly differ.</p>
+</header>
+
+<section id="explorer">
+<div class="widget">
+  <div class="controls">
+    <div class="ctl"><label for="tau">Between-site SD τ (how different sites really are)<span class="val" id="v_tau"></span></label><input id="tau" type="range" min="0.05" max="3" step="0.05" value="1"></div>
+    <div class="ctl"><label for="n">Observations per site n<span class="val" id="v_n"></span></label><input id="n" type="range" min="1" max="60" step="1" value="5"></div>
+  </div>
+
+  <svg id="chart" viewBox="0 0 720 360" width="100%" role="img" aria-label="Site estimates before and after partial pooling"></svg>
+  <div class="legend">
+    <span style="color:#D73F09">● no-pooling estimate (site mean)</span>
+    <span style="color:#1F5B50">● partial-pooling estimate (mixed model)</span>
+    <span style="color:#111">— overall (grand) mean</span>
+  </div>
+  <div class="interp" id="interp"></div>
+</div>
+</section>
+
+<section id="try">
+<h2>Things to try</h2>
+<div class="callout key">
+<ol>
+<li><strong>Small τ → strong shrinkage.</strong> Slide τ toward 0. The model decides sites are basically alike, so every site estimate collapses onto the grand mean.</li>
+<li><strong>Large τ → almost no shrinkage.</strong> Slide τ up. The model trusts each site's own data, and the teal estimates sit almost on top of the orange ones.</li>
+<li><strong>More data → less shrinkage.</strong> Raise n. Each site's own mean becomes more reliable, so it is pulled less toward the center.</li>
+<li><strong>The shrinkage weight</strong> shown below is τ² / (τ² + σ²/n): the fraction of the way each estimate stays at its own site mean rather than the grand mean.</li>
+</ol>
+</div>
+<p><a href="lab.html">← Back to the Day 3 lab</a></p>
+</section>
+</main>
+</div>
+<footer>FW 536 · Statistical Modeling for Ecology and Conservation · Oregon State University</footer>
+
+<script>
+// Fixed "observed" site means (as if from data) — stable so the picture doesn't jump.
+const sites = [
+  {name:'A', ybar: 7.9}, {name:'B', ybar: 4.2}, {name:'C', ybar: 6.1},
+  {name:'D', ybar: 9.3}, {name:'E', ybar: 2.8}, {name:'F', ybar: 5.5},
+  {name:'G', ybar: 8.6}, {name:'H', ybar: 3.6}
+];
+const sigma = 2.0;                       // within-site residual SD (fixed)
+const grand = sites.reduce((a,s)=>a+s.ybar,0)/sites.length;
+const S={tau:1, n:5};
+
+function render(){
+  document.getElementById('v_tau').textContent=(+S.tau).toFixed(2);
+  document.getElementById('v_n').textContent=Math.round(S.n);
+  const tau2=S.tau*S.tau, se2=sigma*sigma/S.n;
+  const B = tau2/(tau2+se2);             // weight kept on the site's own data
+  const W=720,H=360,ml=44,mr=16,mt=18,mb=42,pw=W-ml-mr,ph=H-mt-mb;
+  const lo=0, hi=12;
+  const px=i=>ml+((i+0.5)/sites.length)*pw, py=v=>mt+ph-((v-lo)/(hi-lo))*ph;
+  let s=`<rect width="${W}" height="${H}" fill="white"/>`;
+  for(let t=0;t<=6;t+=2){const yy=py(t);
+    s+=`<line x1="${ml}" y1="${yy}" x2="${ml+pw}" y2="${yy}" stroke="#eee"/>`;
+    s+=`<text x="${ml-8}" y="${yy+4}" font-size="11" fill="#666" text-anchor="end">${t}</text>`;}
+  s+=`<line x1="${ml}" y1="${py(8)}" x2="${ml+pw}" y2="${py(8)}" stroke="#eee"/><text x="${ml-8}" y="${py(8)+4}" font-size="11" fill="#666" text-anchor="end">8</text>`;
+  s+=`<line x1="${ml}" y1="${py(10)}" x2="${ml+pw}" y2="${py(10)}" stroke="#eee"/><text x="${ml-8}" y="${py(10)+4}" font-size="11" fill="#666" text-anchor="end">10</text>`;
+  // grand mean line
+  s+=`<line x1="${ml}" y1="${py(grand)}" x2="${ml+pw}" y2="${py(grand)}" stroke="#111" stroke-width="1.5"/>`;
+  s+=`<text x="${ml+pw-2}" y="${py(grand)-6}" font-size="11" fill="#111" text-anchor="end">grand mean = ${grand.toFixed(2)}</text>`;
+  sites.forEach((st,i)=>{
+    const pp = grand + B*(st.ybar-grand);
+    const x=px(i);
+    // arrow from no-pool to partial-pool
+    s+=`<line x1="${x}" y1="${py(st.ybar)}" x2="${x}" y2="${py(pp)}" stroke="#bbb" stroke-width="2"/>`;
+    s+=`<circle cx="${x}" cy="${py(st.ybar)}" r="5.5" fill="#D73F09"/>`;
+    s+=`<circle cx="${x}" cy="${py(pp)}" r="5.5" fill="#1F5B50"/>`;
+    s+=`<text x="${x}" y="${mt+ph+16}" font-size="11" fill="#666" text-anchor="middle">${st.name}</text>`;
+  });
+  document.getElementById('chart').innerHTML=s;
+  document.getElementById('interp').innerHTML=
+    `Shrinkage weight B = τ²/(τ² + σ²/n) = <b>${B.toFixed(2)}</b>. `+
+    `Each site estimate keeps <b>${(B*100).toFixed(0)}%</b> of its own site mean and takes <b>${((1-B)*100).toFixed(0)}%</b> from the grand mean. `+
+    (B<0.25 ? `Strong shrinkage — the model treats the sites as nearly interchangeable.` :
+     B>0.8  ? `Weak shrinkage — the model trusts each site's own data.` :
+              `Moderate shrinkage — a balance of site data and the shared population.`);
+}
+['tau','n'].forEach(id=>document.getElementById(id).addEventListener('input',e=>{S[id]=+e.target.value; render();}));
+render();
+</script>
+</body>
+</html>

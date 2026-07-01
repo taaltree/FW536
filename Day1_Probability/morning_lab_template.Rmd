@@ -1,0 +1,171 @@
+---
+title: "FW 536 — Day 1 morning lab (Probability) — Your Name"
+author: "Your Name Here"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    self_contained: true
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    code_folding: show
+    theme: cosmo
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+# Day 1 morning lab — Probability problem set
+
+This template matches the morning problems (1–6) in [`problem_set.html`](problem_set.html).
+Read each problem statement there, write your work below, **Knit** to HTML, and
+upload the `.html` to the matching Canvas assignment.
+
+**Data:** Problem 2 uses `data/edna_carp_results.csv`. Keep the `data/` folder
+alongside this `.Rmd` file so the `read.csv()` call resolves.
+
+For setup help see the [R Markdown tutorial](../rmarkdown_tutorial.html).
+
+---
+
+# Setup
+
+```{r}
+# Load packages you'll need. Add or remove as appropriate.
+library(ggplot2)
+library(dplyr)
+```
+
+---
+
+# Problem 1 — Acoustic detection of tagged steelhead
+
+> A tagged steelhead passes through a river reach with two independent acoustic
+> receivers. Given the fish is present, each detects the tag with probability 0.85.
+> (a) P(at least one detects)? (b) P(both | at least one)? (c) Why is (b) not 0.85?
+
+**My work:**
+
+```{r}
+# Your R code here
+```
+
+**Answer / interpretation:**
+
+
+---
+
+# Problem 2 — eDNA detection of invasive carp
+
+> Prior P(carp present) = 0.20; assay sensitivity 0.92, specificity 0.97.
+> (a) Posterior after one positive. (b) After two positives. (c) Effect of a 0.02 prior.
+> (d) Load `data/edna_carp_results.csv` and compute each lake's posterior by updating
+> once per replicate; which lakes end above 0.95 and which below 0.05?
+
+**My work:**
+
+```{r}
+edna <- read.csv("data/edna_carp_results.csv")
+head(edna)
+# Your Bayes updates here (a Bayesian update function + a per-lake loop for part d)
+```
+
+**Answer / interpretation:**
+
+
+---
+
+# Problem 3 — Bobcat camera-grid heterogeneity
+
+> Eight cameras run one week; a shared week-level detectability p ~ Beta(1.6, 6.4)
+> (mean 0.20). (a) Under fixed p = 0.20, P(0 detect), mean, variance.
+> (b) Simulate the shared-p model: draw one p per week, then 8 Bernoulli outcomes;
+> estimate P(0 detect) and the variance. (c) Why does heterogeneity inflate both?
+
+**My work:**
+
+```{r}
+set.seed(1)
+# Your simulation here
+```
+
+**Answer / interpretation:**
+
+
+---
+
+# Problem 4 — Isolated callers along a ridgeline
+
+> n = 30 cougars in a line; each calls independently with p = 0.3. An "isolated caller"
+> calls while neither neighbor calls. Using the 28 interior cougars:
+> (a) E[X] via indicator variables. (b) Verify by simulation (20,000 reps).
+> (c) Would positive correlation between neighbors change the mean, the variance, or both?
+
+**My work:**
+
+```{r}
+set.seed(1)
+# Your indicator argument + simulation check here
+```
+
+**Answer / interpretation:**
+
+
+---
+
+# Problem 5 — Grizzly bear DNA from hair snares
+
+> Detection given a bear is present p = 0.18; bears present at 60% of stations; no
+> false positives. (a) P(at least one sample) at a random station. (b) P(present | at
+> least one). (c) P(at least one across 3 visits), conditional on presence and marginally.
+
+**My work:**
+
+```{r}
+# Your R code here
+```
+
+**Answer / interpretation:**
+
+
+---
+
+# Problem 6 — Fishers vote on a regulation
+
+> 20 fishers each vote "yes" with probability 0.4; the motion passes with a majority.
+> (a) Expected yes votes and variance. (b) P(motion passes). (c) Smallest group size n
+> for which P(passage) drops below 1% (search numerically).
+
+**My work:**
+
+```{r}
+# Your R code here
+```
+
+**Answer / interpretation:**
+
+
+---
+
+# (Optional) Embed a photo of hand-written work
+
+For problems easier to do on paper, photograph and embed:
+
+```{r, echo=FALSE, eval=FALSE, out.width="60%", fig.cap="Hand-derivation for Problem N"}
+knitr::include_graphics("images/problemN_derivation.jpg")
+```
+
+(Change `eval=FALSE` to `eval=TRUE` after saving an image in an `images/` folder next
+to this `.Rmd`. See the [R Markdown tutorial](../rmarkdown_tutorial.html) for details.)
+
+---
+
+# Submission checklist
+
+- [ ] Answered every morning problem (1–6) from `problem_set.html`.
+- [ ] Loaded `data/edna_carp_results.csv` for Problem 2 (kept the `data/` folder next to this file).
+- [ ] Set a seed before each simulation (Problems 3 and 4).
+- [ ] Knitted to HTML without errors.
+- [ ] Photos (if any) embedded with `self_contained: true` in the YAML.
+- [ ] Uploaded the `.html` to the matching Canvas assignment.

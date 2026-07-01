@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Interactive: discrete distribution explorer | FW 536 Day 1</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../_Shared/css/lab.css" />
+<script defer src="../_Shared/js/lab.js"></script>
+<style>
+  .widget { background:#fff; border:1px solid var(--border); border-radius:10px; padding:20px 24px; margin:24px 0; box-shadow:0 2px 10px rgba(0,0,0,.05); }
+  .controls { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:14px 24px; margin:12px 0 18px; }
+  .ctl label { font-family:'Helvetica Neue',Arial,sans-serif; font-size:13px; font-weight:600; color:var(--osu-stone); display:flex; justify-content:space-between; }
+  .ctl input[type=range]{ width:100%; accent-color:var(--osu-orange); }
+  .ctl .val { color:var(--osu-orange-dark); font-variant-numeric:tabular-nums; }
+  .distpick { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:6px; }
+  .distpick button { font-family:'Helvetica Neue',Arial,sans-serif; font-size:14px; font-weight:600; border:2px solid var(--border); background:var(--panel-alt); color:var(--osu-stone); border-radius:6px; padding:6px 14px; cursor:pointer; }
+  .distpick button.active { background:var(--osu-orange); color:#fff; border-color:var(--osu-orange); }
+  .readout { display:flex; flex-wrap:wrap; gap:22px; font-family:'Helvetica Neue',Arial,sans-serif; font-size:14px; margin-top:8px; }
+  .readout b { color:var(--osu-orange-dark); font-variant-numeric:tabular-nums; }
+  svg text { font-family:'Helvetica Neue',Arial,sans-serif; }
+  .cmp-toggle { font-family:'Helvetica Neue',Arial,sans-serif; font-size:13px; }
+</style>
+</head>
+<body>
+<div class="shell">
+<aside class="sidebar">
+  <h1><a href="../index.html" title="Back to course home">FW 536 · Day 1</a></h1>
+  <div class="subtitle">Interactive distribution explorer</div>
+  <nav>
+    <div class="section">This page</div>
+    <ul>
+      <li><a href="#explorer">The explorer</a></li>
+      <li><a href="#try">Things to try</a></li>
+    </ul>
+    <div class="section">Day 1</div>
+    <ul>
+      <li><a href="lab.html">Practice lab</a></li>
+      <li><a href="plain_language_summary.html">Plain-language summary</a></li>
+      <li><a href="../index.html">Course home</a></li>
+    </ul>
+  </nav>
+</aside>
+
+<main class="content">
+<header class="lab-header">
+  <div class="eyebrow">Day 1 · Interactive</div>
+  <h1>Discrete distribution explorer</h1>
+  <p class="lede">Drag the sliders and watch the probability mass function change. The goal is to feel how each distribution's <em>story</em> (its parameters) controls its shape, mean, and variance.</p>
+</header>
+
+<section id="explorer">
+<div class="widget">
+  <div class="distpick" id="distpick" role="group" aria-label="Choose a distribution">
+    <button data-d="binom" class="active">Binomial</button>
+    <button data-d="pois">Poisson</button>
+    <button data-d="nbinom">Negative Binomial</button>
+  </div>
+
+  <div class="controls" id="controls"></div>
+
+  <label class="cmp-toggle"><input type="checkbox" id="cmp" /> Overlay a Poisson with the same mean (compare spread)</label>
+
+  <svg id="chart" viewBox="0 0 720 340" width="100%" role="img" aria-label="Probability mass function bar chart"></svg>
+
+  <div class="readout" id="readout"></div>
+  <p id="story" style="margin-top:10px; color:var(--osu-stone); font-style:italic;"></p>
+</div>
+</section>
+
+<section id="try">
+<h2>Things to try</h2>
+<div class="callout key">
+<ol>
+<li><strong>Binomial → symmetric vs skewed.</strong> Set <em>p</em> = 0.5 and watch the PMF become symmetric; push <em>p</em> toward 0 or 1 and it skews.</li>
+<li><strong>Poisson mean = variance.</strong> Change λ and note the mean and variance readouts stay equal. This is the Poisson's defining constraint — and why it so often fails on real ecological counts.</li>
+<li><strong>Overdispersion.</strong> Switch to Negative Binomial, tick "overlay a Poisson with the same mean," and drag the dispersion <em>k</em> down. The NegBin spreads far wider than the Poisson at the same mean — that extra spread is what clumped ecological data need.</li>
+<li><strong>NegBin → Poisson limit.</strong> Drag <em>k</em> up to its maximum; the Negative Binomial collapses onto the Poisson.</li>
+</ol>
+</div>
+<p><a href="lab.html">← Back to the Day 1 practice lab</a></p>
+</section>
+</main>
+</div>
+<footer>FW 536 · Statistical Modeling for Ecology and Conservation · Oregon State University</footer>
+
+<script>
+// ---- numerics ----
+function lgamma(z){ // Lanczos approximation
+  const g=7, c=[0.99999999999980993,676.5203681218851,-1259.1392167224028,
+    771.32342877765313,-176.61502916214059,12.507343278686905,
+    -0.13857109526572012,9.9843695780195716e-6,1.5056327351493116e-7];
+  if(z<0.5) return Math.log(Math.PI/Math.sin(Math.PI*z))-lgamma(1-z);
+  z-=1; let x=c[0]; for(let i=1;i<g+2;i++) x+=c[i]/(z+i);
+  const t=z+g+0.5;
+  return 0.5*Math.log(2*Math.PI)+(z+0.5)*Math.log(t)-t+Math.log(x);
+}
+const lfact = n => lgamma(n+1);
+function dbinom(k,n,p){ if(k<0||k>n) return 0;
+  return Math.exp(lfact(n)-lfact(k)-lfact(n-k)+k*Math.log(p)+(n-k)*Math.log(1-p)); }
+function dpois(k,l){ if(k<0) return 0; return Math.exp(-l+k*Math.log(l)-lfact(k)); }
+function dnbinom(k,mu,size){ if(k<0) return 0; const r=size,p=r/(r+mu);
+  return Math.exp(lgamma(k+r)-lfact(k)-lgamma(r)+r*Math.log(p)+k*Math.log(1-p)); }
+
+// ---- state ----
+const defs = {
+  binom:  {params:[{id:'n',label:'n (trials)',min:1,max:50,step:1,val:20},
+                   {id:'p',label:'p (success prob)',min:0,max:1,step:0.01,val:0.3}]},
+  pois:   {params:[{id:'lam',label:'λ (rate / mean)',min:0.2,max:30,step:0.1,val:8}]},
+  nbinom: {params:[{id:'mu',label:'μ (mean)',min:0.5,max:30,step:0.1,val:8},
+                   {id:'k',label:'k (dispersion; small = clumpier)',min:0.1,max:30,step:0.1,val:2}]}
+};
+let cur='binom';
+const P={};
+
+function buildControls(){
+  const box=document.getElementById('controls'); box.innerHTML='';
+  defs[cur].params.forEach(pr=>{
+    if(P[pr.id]===undefined) P[pr.id]=pr.val;
+    const d=document.createElement('div'); d.className='ctl';
+    d.innerHTML=`<label for="s_${pr.id}">${pr.label}<span class="val" id="v_${pr.id}"></span></label>
+      <input type="range" id="s_${pr.id}" min="${pr.min}" max="${pr.max}" step="${pr.step}" value="${P[pr.id]}" aria-label="${pr.label}">`;
+    box.appendChild(d);
+    d.querySelector('input').addEventListener('input',e=>{P[pr.id]=+e.target.value; render();});
+  });
+}
+
+function pmfAndStats(){
+  let xs=[],ys=[],mean=0,varc=0,name='',story='';
+  if(cur==='binom'){ const n=Math.round(P.n),p=P.p; for(let k=0;k<=n;k++){xs.push(k);ys.push(dbinom(k,n,p));}
+    mean=n*p; varc=n*p*(1-p); name=`Binomial(n=${n}, p=${p.toFixed(2)})`;
+    story=`Story: ${n} independent yes/no trials, each with success probability ${p.toFixed(2)}. Count the successes.`;
+  } else if(cur==='pois'){ const l=P.lam; const kmax=Math.max(10,Math.ceil(l+4*Math.sqrt(l)));
+    for(let k=0;k<=kmax;k++){xs.push(k);ys.push(dpois(k,l));} mean=l; varc=l;
+    name=`Poisson(λ=${l.toFixed(1)})`; story=`Story: rare independent events at average rate ${l.toFixed(1)} per unit. Mean and variance are forced equal.`;
+  } else { const mu=P.mu,k=P.k; const v=mu+mu*mu/k; const kmax=Math.max(12,Math.ceil(mu+4*Math.sqrt(v)));
+    for(let x=0;x<=kmax;x++){xs.push(x);ys.push(dnbinom(x,mu,k));} mean=mu; varc=v;
+    name=`NegBin(μ=${mu.toFixed(1)}, k=${k.toFixed(1)})`; story=`Story: a Poisson whose rate varies across units. Variance = μ + μ²/k = ${v.toFixed(1)} > mean, so counts clump.`;
+  }
+  return {xs,ys,mean,varc,name,story};
+}
+
+function render(){
+  defs[cur].params.forEach(pr=>{const el=document.getElementById('v_'+pr.id); if(el) el.textContent=(pr.step<1?(+P[pr.id]).toFixed(2):Math.round(P[pr.id]));});
+  const {xs,ys,mean,varc,name,story}=pmfAndStats();
+  // optional Poisson overlay at same mean
+  let oy=null;
+  if(document.getElementById('cmp').checked){ oy=xs.map(k=>dpois(k,mean)); }
+  const W=720,H=340,ml=44,mr=14,mt=18,mb=40,pw=W-ml-mr,ph=H-mt-mb;
+  const ymax=Math.max(...ys, ...(oy||[0]))*1.1||1;
+  const n=xs.length, bw=pw/n;
+  const x=i=>ml+i*bw, y=v=>mt+ph-(v/ymax)*ph;
+  let s=`<rect x="0" y="0" width="${W}" height="${H}" fill="white"/>`;
+  // axes
+  s+=`<line x1="${ml}" y1="${mt+ph}" x2="${ml+pw}" y2="${mt+ph}" stroke="#999"/>`;
+  s+=`<line x1="${ml}" y1="${mt}" x2="${ml}" y2="${mt+ph}" stroke="#999"/>`;
+  // y ticks
+  for(let t=0;t<=4;t++){const v=ymax*t/4; const yy=y(v);
+    s+=`<line x1="${ml-4}" y1="${yy}" x2="${ml}" y2="${yy}" stroke="#999"/>`;
+    s+=`<text x="${ml-7}" y="${yy+4}" font-size="11" fill="#666" text-anchor="end">${v.toFixed(2)}</text>`;}
+  // bars
+  for(let i=0;i<n;i++){ const bh=(ys[i]/ymax)*ph;
+    s+=`<rect x="${x(i)+bw*0.12}" y="${y(ys[i])}" width="${bw*0.76}" height="${bh}" fill="#D73F09" opacity="0.85"><title>P(X=${xs[i]}) = ${ys[i].toFixed(4)}</title></rect>`;
+  }
+  // overlay poisson as dots+line
+  if(oy){ let pts=oy.map((v,i)=>`${x(i)+bw/2},${y(v)}`).join(' ');
+    s+=`<polyline points="${pts}" fill="none" stroke="#1F5B50" stroke-width="2" stroke-dasharray="4 3"/>`;
+    for(let i=0;i<n;i++) s+=`<circle cx="${x(i)+bw/2}" cy="${y(oy[i])}" r="2.6" fill="#1F5B50"/>`;
+  }
+  // x labels (thinned)
+  const step=Math.ceil(n/16);
+  for(let i=0;i<n;i+=step) s+=`<text x="${x(i)+bw/2}" y="${mt+ph+16}" font-size="11" fill="#666" text-anchor="middle">${xs[i]}</text>`;
+  s+=`<text x="${ml+pw/2}" y="${H-6}" font-size="12" fill="#444" text-anchor="middle">value of X</text>`;
+  // mean line
+  const mi=mean; const mx=ml+(mi)*bw+bw/2;
+  if(mx>=ml&&mx<=ml+pw){ s+=`<line x1="${mx}" y1="${mt}" x2="${mx}" y2="${mt+ph}" stroke="#111" stroke-width="1.5" stroke-dasharray="2 3"/>`;
+    s+=`<text x="${mx+4}" y="${mt+12}" font-size="11" fill="#111">mean</text>`; }
+  document.getElementById('chart').innerHTML=s;
+  document.getElementById('readout').innerHTML=
+    `<span>Distribution: <b>${name}</b></span><span>Mean: <b>${mean.toFixed(2)}</b></span><span>Variance: <b>${varc.toFixed(2)}</b></span>`+
+    (oy?`<span style="color:#1F5B50">dashed line = Poisson(${mean.toFixed(1)})</span>`:'');
+  document.getElementById('story').textContent=story;
+}
+
+document.querySelectorAll('#distpick button').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('#distpick button').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active'); cur=b.dataset.d; buildControls(); render();
+  });
+});
+document.getElementById('cmp').addEventListener('change',render);
+buildControls(); render();
+</script>
+</body>
+</html>

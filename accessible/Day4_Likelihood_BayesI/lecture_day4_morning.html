@@ -6,11 +6,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="stylesheet" href="../_Shared/css/accessible.css" />
 <script>
-MathJax = {
-  tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
+MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
   options: { menuOptions: { settings: { assistiveMml: true, explorer: true } } },
-  loader: { load: ['a11y/assistive-mml', 'a11y/explorer'] }
-};
+  loader: { load: ['a11y/assistive-mml', 'a11y/explorer'] } };
 </script>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script"></script>
 </head>
@@ -21,8 +19,7 @@ MathJax = {
 <aside class="sidebar">
 <p class="brand"><a href="../index.html">FW 536 · Day 4 Morning</a></p>
 <div class="subtitle">Lecture notes: Maximum likelihood</div>
-<nav aria-label="Slides in this lecture">
-<div class="section">Slides</div><ul>
+<nav aria-label="Slides in this lecture"><div class="section">Slides</div><ul>
 <li><a href="#slide-1">1. Slide 1</a></li>
 <li><a href="#slide-2">2. Slide 2</a></li>
 <li><a href="#slide-3">3. What is Maximum Likelihood-II?</a></li>
@@ -66,9 +63,9 @@ MathJax = {
 <header class="lab-header">
 <div class="eyebrow">Day 4 Morning · Accessible lecture notes</div>
 <h1>Maximum likelihood</h1>
-<p class="lede">A screen-reader-friendly transcript of the lecture slides: all slide text and speaker notes are included. Figures are flagged where a text description still needs to be added.</p>
+<p class="lede">A screen-reader-friendly transcript of the lecture slides: all slide text, tables, figure descriptions, and speaker notes.</p>
 </header>
-<div class="callout key"><p class="callout-label">About these notes</p>These notes are generated from the lecture slides. Each section below is one slide. Where a slide contained a picture, plot, or equation image, you will see a "Figure needs description" note &mdash; ask your instructor for the description of that figure. For the underlying concepts with worked examples, also read the <a href="plain_language_summary.html">plain-language summary</a> and <a href="lab.html">lab</a> for this session.</p></div>
+<div class="callout key"><p class="callout-label">About these notes</p>Each section is one slide. Figures carry text descriptions where available. For the concepts with worked examples, also read the <a href="plain_language_summary.html">plain-language summary</a> and <a href="lab.html">lab</a> for this session. You can also download the <a href="../../Day4_Likelihood_BayesI/FW536_Day4_Morning_maximum%20likelihod_accessible.pptx">alt-texted PowerPoint deck</a> (the same slides with image descriptions embedded).</div>
 <section aria-labelledby="slide-1-h">
 <h2 id="slide-1-h"><span id="slide-1"></span>Slide 1</h2>
 <ul>
@@ -107,7 +104,7 @@ MathJax = {
 </section>
 <section aria-labelledby="slide-5-h">
 <h2 id="slide-5-h"><span id="slide-5"></span>Slide 5: What is Maximum Likelihood-III?</h2>
-<p class="callout warn" role="note"><span class="callout-label">Figure 5.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 5.1.</strong> Four panels, each Age in years (x, 5 to 25) versus Length in cm (y, 0 to 120), showing candidate von Bertalanffy growth curves that rise then plateau.</figcaption></figure>
 <ul>
 <li>Which of these curves</li>
 <li>are ”most likely” to have</li>
@@ -122,7 +119,7 @@ MathJax = {
 <section aria-labelledby="slide-6-h">
 <h2 id="slide-6-h"><span id="slide-6"></span>Slide 6: Basics of Likelihood</h2>
 <p>The likelihood of the data is the product of the likelihoods of each data point</p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 6.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 6.1.</strong> Equation: L-tilde(p | {X_i}) = product from i=1 to n of f(X_i | p). The likelihood is the product of the per-data-point densities.</figcaption></figure>
 <p>Notation often inconsistent, but IMO better  to put parameters conditional on data</p>
 <p>The set of data Xi</p>
 <p>Product of the PDF/Likelihood across all data points</p>
@@ -140,7 +137,7 @@ MathJax = {
 <li>(Q: why here?)</li>
 </ul>
 <p>Data</p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 7.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 7.1.</strong> Equation: f(x) = 1 / (sigma times square root of 2 pi) times e to the negative one-half times ((x minus mu) over sigma) squared. Normal density.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-8-h">
 <h2 id="slide-8-h"><span id="slide-8"></span>Slide 8: Further Likelihood Considerations-II</h2>
@@ -171,7 +168,7 @@ MathJax = {
 <li>Best (so far)</li>
 <li>How do we know?</li>
 </ul>
-<p class="callout warn" role="note"><span class="callout-label">Figure 9.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 9.1.</strong> Four panels, Age in years (x, 5 to 25) versus Length in cm (y, 0 to 120), each a von Bertalanffy growth curve for a different candidate parameter set.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-10-h">
 <h2 id="slide-10-h"><span id="slide-10"></span>Slide 10: Overview</h2>
@@ -182,7 +179,7 @@ MathJax = {
 <li>Write the likelihood for one data point.</li>
 <li>Multiply the likelihoods across all data points.</li>
 <li>Find the values for the parameters that maximize the likelihood.</li>
-<li style="margin-left:1em">Do this by minimizing negative log likelihood</li>
+<li style="margin-left:1.2em">Do this by minimizing negative log likelihood</li>
 </ul>
 </section>
 <section aria-labelledby="slide-11-h">
@@ -216,7 +213,7 @@ MathJax = {
 </section>
 <section aria-labelledby="slide-13-h">
 <h2 id="slide-13-h"><span id="slide-13"></span>Slide 13</h2>
-<p class="callout warn" role="note"><span class="callout-label">Figure 13.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 13.1.</strong> Line plot, probability p (x, 0.2 to 0.8) versus Likelihood (y, 0 to about 2e-15). The binomial likelihood peaks near p = 0.6, the maximum likelihood estimate.</figcaption></figure>
 <ul>
 <li>In R:</li>
 <li>Prob &lt;- seq(from=0.01,to=0.99,by=0.01)</li>
@@ -233,14 +230,14 @@ MathJax = {
 <section aria-labelledby="slide-14-h">
 <h2 id="slide-14-h"><span id="slide-14"></span>Slide 14: Negative log-likelihoods</h2>
 <p>Rather than working with likelihoods we often work with negative log-likelihoods. Therefore, rather than maximizing the likelihood, we minimize the negative log-likelihood – this leads to same point estimates.</p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 14.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 14.1.</strong> Line plot, probability p (x, 0.2 to 0.8) versus Negative log-Likelihood (y, 0 to 120). A U-shaped valley with minimum near p = 0.6, the estimate.</figcaption></figure>
 <p>The estimate of p,    , is again 0.6.</p>
 <p>Logs help with the tiny number problem, and negative works for numerical optimizers</p>
 </section>
 <section aria-labelledby="slide-15-h">
 <h2 id="slide-15-h"><span id="slide-15"></span>Slide 15: A Poisson mixture problem</h2>
 <p>The blow rate for a given whale species is Poisson-distributed and it is “known” that the average number of blows in an interval for males and females is different. We monitor a population and find the following distribution of blow times.</p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 15.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 15.1.</strong> Histogram of whale blow counts, Blows (x, 0 to 50) versus density (y, 0.00 to 0.04). Bimodal, consistent with a mixture of two Poisson components.</figcaption></figure>
 <p>15</p>
 <ul>
 <li>Questions</li>
@@ -258,7 +255,7 @@ MathJax = {
 </ul>
 <p>The Poisson distribution is:</p>
 <p>16</p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 16.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 16.1.</strong> Histogram of whale blow counts, Blows (x, 0 to 50) versus density (y, 0.00 to 0.04), bimodal, suggesting two overlapping Poisson blow-rate distributions.</figcaption></figure>
 <p>How would you do this with linear models?</p>
 </section>
 <section aria-labelledby="slide-17-h">
@@ -318,7 +315,7 @@ MathJax = {
 </section>
 <section aria-labelledby="slide-21-h">
 <h2 id="slide-21-h"><span id="slide-21"></span>Slide 21</h2>
-<p class="callout warn" role="note"><span class="callout-label">Figure 21.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 21.1.</strong> Three-dimensional perspective mesh of the negative log-likelihood surface over the two mean blow rates, axes Blow1 and Blow2 with height Likes; a single minimum.</figcaption></figure>
 <p>This is a plot of the negative log-likelihood surface</p>
 <ul>
 <li>The minimum negative</li>
@@ -329,7 +326,7 @@ MathJax = {
 <section aria-labelledby="slide-22-h">
 <h2 id="slide-22-h"><span id="slide-22"></span>Slide 22</h2>
 <p>22</p>
-<p class="callout warn" role="note"><span class="callout-label">Figure 22.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 22.1.</strong> Three-dimensional perspective wireframe of the negative log-likelihood, axes Blow1 (0 to 40) and Blow2 (0 to 60), vertical Likes axis, showing a curved valley.</figcaption></figure>
 <p>Notice anything interesting about this likelihood surface?</p>
 </section>
 <section aria-labelledby="slide-23-h">
@@ -379,7 +376,7 @@ MathJax = {
 <li>What is the probability of “light running” before the camera</li>
 <li>was installed?</li>
 <li>Has the probability of “light running” changed significantly?</li>
-<li style="margin-left:2em">We’ll get to this question later</li>
+<li style="margin-left:2.4em">We’ll get to this question later</li>
 </ul>
 </section>
 <section aria-labelledby="slide-26-h">
@@ -503,9 +500,9 @@ MathJax = {
 <li>Consider different parameterizations (e.g. log(x) rather than x).</li>
 <li>Methods may work better if the variables are all scaled to approximately 1.</li>
 <li>Never trust a non-linear minimizer!</li>
-<li style="margin-left:1em">Try different starting values.</li>
-<li style="margin-left:1em">Combine different methods</li>
-<li style="margin-left:1em">Test your code with data for which you know the correct answer (simulate!).</li>
+<li style="margin-left:1.2em">Try different starting values.</li>
+<li style="margin-left:1.2em">Combine different methods</li>
+<li style="margin-left:1.2em">Test your code with data for which you know the correct answer (simulate!).</li>
 </ul>
 <p>33</p>
 </section>
@@ -527,7 +524,7 @@ MathJax = {
 <li>The length of a fish is related to its age according to the von Bertalanffy growth curve:</li>
 <li>Below find some data for random fish</li>
 </ul>
-<p class="callout warn" role="note"><span class="callout-label">Figure 35.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 35.1.</strong> Two scatter plots, Females and Males, each Age in years (x, 5 to 25) versus Length in cm (y, 0 to 100). Points rise with age then plateau.</figcaption></figure>
 <p>35</p>
 </section>
 <section aria-labelledby="slide-36-h">
@@ -536,13 +533,13 @@ MathJax = {
 <li>Estimate the values for    , , and  from the age and</li>
 <li>growth data.</li>
 <li>Create vectors with the age, sex, and length data.</li>
-<li style="margin-left:1em">Create a function that takes values for the</li>
-<li style="margin-left:1em">parameters as well as the data, and computes the</li>
-<li style="margin-left:1em">negative log-likelihood.</li>
-<li style="margin-left:1em">LL4 &lt;- function(Linf1,Kappa1,Linf2,Kappa2,Sigma,Age,Length,Sex)</li>
-<li style="margin-left:1em">use mle to find the maximum likelihood estimates</li>
-<li style="margin-left:1em">Bound the region of parameter space to reasonable values</li>
-<li style="margin-left:2em">E.g. Can the parameters be negative?</li>
+<li style="margin-left:1.2em">Create a function that takes values for the</li>
+<li style="margin-left:1.2em">parameters as well as the data, and computes the</li>
+<li style="margin-left:1.2em">negative log-likelihood.</li>
+<li style="margin-left:1.2em">LL4 &lt;- function(Linf1,Kappa1,Linf2,Kappa2,Sigma,Age,Length,Sex)</li>
+<li style="margin-left:1.2em">use mle to find the maximum likelihood estimates</li>
+<li style="margin-left:1.2em">Bound the region of parameter space to reasonable values</li>
+<li style="margin-left:2.4em">E.g. Can the parameters be negative?</li>
 </ul>
 <p>36</p>
 </section>
@@ -575,7 +572,7 @@ MathJax = {
 </section>
 <section aria-labelledby="slide-38-h">
 <h2 id="slide-38-h"><span id="slide-38"></span>Slide 38: Confidence Interval</h2>
-<p class="callout warn" role="note"><span class="callout-label">Figure 38.1 — needs description</span> This slide contains an image (a plot, diagram, R output, or equation graphic) that is not yet described in text. <em>Instructor: replace this sentence with a description of the figure.</em></p>
+<figure role="group"><figcaption><strong>Figure 38.1.</strong> Line plot, asymptotic length Linf (x, 75 to 90) versus Negative Log-likelihood (y, 0 to 8). U-shaped profile; a line 1.92 above the minimum marks the 95% confidence interval.</figcaption></figure>
 <ul>
 <li>95% confidence</li>
 <li>interval</li>
@@ -587,5 +584,4 @@ MathJax = {
 </main>
 
 <footer>FW 536 &middot; Statistical Modeling for Ecology and Conservation &middot; Oregon State University &middot; Accessible lecture notes</footer>
-</body>
-</html>
+</body></html>

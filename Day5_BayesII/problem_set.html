@@ -194,7 +194,7 @@ R &lt;- <span class="fn">numeric</span>(Nyears)
 <div class="exercise" id="p9">
 <span class="ex-tag">Problem 9</span><span class="difficulty hard"> · 35 min · N-mixture + Bayesian p-value</span>
 <h3>Repeat-count abundance and a goodness-of-fit check</h3>
-<p>Simulate repeated counts at surveyed sites and fit the Royle (2004) N-mixture model in <span class="pill nimble">NIMBLE</span>, then test the Poisson assumption with a posterior-predictive Bayesian p-value.</p>
+<p>An <strong>N-mixture model</strong> estimates the abundance of unmarked animals when you cannot count every individual: repeated visits to the same closed site let it separate true abundance ($\lambda$) from detection probability ($p$), which a raw count confounds. (It is the abundance analog of the occupancy model; see the practice lab for a fuller explanation.) Here you will simulate repeated counts, fit the Royle (2004) N-mixture model in <span class="pill nimble">NIMBLE</span>, and then test the Poisson-abundance assumption with a posterior-predictive Bayesian p-value.</p>
 <div class="eq-block">$N_i \sim \text{Poisson}(\lambda), \quad y_{ij} \sim \text{Binomial}(N_i, p)$</div>
 <div class="code-label">R · simulate overdispersed abundance on purpose</div>
 <pre><code><span class="kw">library</span>(MASS)

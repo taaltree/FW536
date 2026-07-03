@@ -177,7 +177,7 @@ For any modeling project whose goal is "predict X for new units", cross-validati
 </div>
 
 <div class="callout warn"><p class="callout-label">Watch out</p>
-<strong>"$\Delta\text{AIC} = 1.7$ means model A and model B are equally good."</strong> Not really — the lab simulations show that a model containing a pure noise predictor will sit within 2 AIC units of the truth more than 80% of the time. Treat $\Delta\text{AIC} &lt; 2$ as "the data don't strongly distinguish them," not as evidence that the extra predictor matters.
+<strong>"$\Delta\text{AIC} = 1.7$ means model A and model B are equally good."</strong> Not really — the lab simulations show that a model containing a pure noise predictor sits within 2 AIC units of the truth essentially always — adding one parameter can raise AIC by at most 2, so a junk variable is never ruled out by the "within 2" rule. Treat $\Delta\text{AIC} &lt; 2$ as "the data don't strongly distinguish them," not as evidence that the extra predictor matters.
 </div>
 
 <div class="callout warn"><p class="callout-label">Watch out</p>

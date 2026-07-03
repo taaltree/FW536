@@ -70,7 +70,26 @@ MathJax = {
   
 <div class="session">
   <div class="session-label">Morning · 20 pts</div>
-  
+<div>
+    <div class="session-title">Bayesian modeling problem set 2</div>
+    <div class="row"><span class="tag practice">Practice</span>
+      <span><a href="#morning">Walk through the morning problems on this page</a> <span class="note">— answers visible, in-class</span></span></div>
+    <div class="row"><span class="tag assessed">Assessed</span>
+      <span><a href="problem_set.html#morning">Graded problem set</a>
+            <span class="note">— answers NOT shown; graded — submit on Canvas</span></span></div>
+    <div class="row"><span class="tag template">Hand-in</span><span><a href="morning_lab_template.Rmd">morning_lab_template.Rmd</a> <span class="note">— knit to HTML and upload to Canvas</span></span></div>
+    <div class="row"><span class="tag lecture">Lecture</span>
+      <span><a href="lecture_day5.html">Day 5 lecture · Bayes II</a></span></div>
+  </div>
+</div>
+
+  <p style="font-size:13px; color:var(--muted); margin: 18px 0 0 0;">
+    Need help with R Markdown? See the <a href="../rmarkdown_tutorial.html">R Markdown tutorial</a>.
+    Other docs for this day: <a href="plain_language_summary.html">plain-language summary</a> &middot;
+    <a href="answer_key.html">practice answer key</a>.
+  </p>
+</div>
+
 <section class="data-card" id="data-files">
 <h2>Data files &amp; R scripts</h2>
 <p>Everything referenced in this lab's exercises and problem sets lives in this folder. Click any link below to download.</p>
@@ -91,25 +110,7 @@ MathJax = {
   <div class="data-row"><a href="NMixture_Nimble.R"><code>NMixture_Nimble.R</code></a><span class="data-desc">NMixture_Nimble.R · four nested N-mixture models + Bayesian p-value</span></div>
 </div>
 </section>
-<div>
-    <div class="session-title">Bayesian modeling problem set 2</div>
-    <div class="row"><span class="tag practice">Practice</span>
-      <span><a href="#morning">Walk through the morning problems on this page</a> <span class="note">— answers visible, in-class</span></span></div>
-    <div class="row"><span class="tag assessed">Assessed</span>
-      <span><a href="problem_set.html#morning">Graded problem set</a>
-            <span class="note">— answers NOT shown; graded — submit on Canvas</span></span></div>
-    <div class="row"><span class="tag template">Hand-in</span><span><a href="morning_lab_template.Rmd">morning_lab_template.Rmd</a> <span class="note">— knit to HTML and upload to Canvas</span></span></div>
-    <div class="row"><span class="tag lecture">Lecture</span>
-      <span><a href="lecture_day5.html">Day 5 lecture · Bayes II</a></span></div>
-  </div>
-</div>
 
-  <p style="font-size:13px; color:var(--muted); margin: 18px 0 0 0;">
-    Need help with R Markdown? See the <a href="../rmarkdown_tutorial.html">R Markdown tutorial</a>.
-    Other docs for this day: <a href="plain_language_summary.html">plain-language summary</a> &middot;
-    <a href="answer_key.html">practice answer key</a>.
-  </p>
-</div>
 
 
 
@@ -369,19 +370,6 @@ samples &lt;- <span class="fn">nimbleMCMC</span>(lizardCode, constants=constants
 </div></details>
 </div>
 
-<div class="exercise" id="ex-5">
-<span class="ex-tag">Exercise 5</span><span class="difficulty easy"> · 15 min · pencil/paper</span>
-<h3>Shrinkage by hand</h3>
-<p>Two sites: site A has 100 measurements with sample mean $\bar y_A = 5$ and within-site SD $\sigma = 2$. Site B has 4 measurements with sample mean $\bar y_B = 5$ and the same within-site SD. The hierarchical prior on $\alpha_j$ is $\mathcal{N}(\mu_\alpha = 0, \sigma_\alpha = 3)$. Using the closed-form shrinkage formula</p>
-<div class="eq-block">$\hat\alpha_j = \dfrac{n_j / \sigma^2 \cdot \bar y_j + 1/\sigma_\alpha^2 \cdot \mu_\alpha}{n_j/\sigma^2 + 1/\sigma_\alpha^2}$</div>
-<p>compute $\hat\alpha_A$ and $\hat\alpha_B$. Which is pulled further toward $\mu_\alpha = 0$?</p>
-<details class="answer"><summary>Reveal worked solution</summary><div class="answer-body">
-<p>Site A: precision from data = $100/4 = 25$; from prior = $1/9 \approx 0.11$. Posterior mean = $(25 \cdot 5 + 0.11 \cdot 0) / (25 + 0.11) = 125 / 25.11 \approx 4.98$. Almost no shrinkage.</p>
-<p>Site B: precision from data = $4/4 = 1$; posterior mean = $(1 \cdot 5 + 0.11 \cdot 0)/1.11 \approx 4.50$. Substantial pull toward 0.</p>
-<p>Sites with less data are pulled more strongly. This is the entire point of hierarchical models.</p>
-</div></details>
-</div>
-
 </section>
 
 <!-- ================================================================== -->
@@ -426,8 +414,8 @@ samples &lt;- <span class="fn">nimbleMCMC</span>(lizardCode, constants=constants
 <p>Notice that we put the derived-quantity lines <em>inside</em> the model block. NIMBLE tracks them as deterministic nodes; at every MCMC iteration their values are computed from the current $(a, b)$ and stored. Posterior summaries of $S_\text{msy}$ and $H_\text{msy}$ come from <code>MCMCsummary</code> with no extra work and with all the parameter correlations properly accounted for.</p>
 </div>
 
-<div class="exercise" id="ex-6">
-<span class="ex-tag">Exercise 6</span><span class="difficulty medium"> · 25 min · R</span>
+<div class="exercise" id="ex-5">
+<span class="ex-tag">Exercise 5</span><span class="difficulty medium"> · 25 min · R</span>
 <h3>Spawner-recruit: fit, predict, derive</h3>
 <p>Open <code>SpawnerRecruit_Nimble.R</code>. The script simulates 20 years of data from a known truth ($a=5, b=5000, \sigma=0.2$), then fits the model.</p>
 <ol type="a">
@@ -486,8 +474,8 @@ samples &lt;- <span class="fn">nimbleMCMC</span>(lizardCode, constants=constants
 
 zst &lt;- <span class="fn">matrix</span>(<span class="nu">1L</span>, Nsites, Nyears) <span class="cm"># THE init trick</span></code></pre>
 
-<div class="exercise" id="ex-7">
-<span class="ex-tag">Exercise 7</span><span class="difficulty hard"> · 35 min · R · latent states</span>
+<div class="exercise" id="ex-6">
+<span class="ex-tag">Exercise 6</span><span class="difficulty hard"> · 35 min · R · latent states</span>
 <h3>Dynamic occupancy: simulate and recover</h3>
 <p>Open <code>DynamicOccupancy_Nimble.R</code> and run end-to-end.</p>
 <ol type="a">
@@ -508,8 +496,14 @@ zst &lt;- <span class="fn">matrix</span>(<span class="nu">1L</span>, Nsites, Nye
 <section id="nmix">
 <h2>F. Latent state models &mdash; N-mixture</h2>
 
+<div class="callout plain"><p class="callout-label">Plain-language summary</p>
+<p><strong>What is an N-mixture model, and why do we need it?</strong> Suppose you want to know how many animals live at a site &mdash; salamanders in a plot, birds at a point, fish in a reach &mdash; but the animals are not individually marked and you cannot count every one. A single count is always an <em>under</em>count: you never detect everything present, and the fraction you miss changes with weather, observer, habitat, and season. So a raw count confounds two very different things &mdash; how many animals are actually there (abundance, controlled by $\lambda$) and what fraction you happened to see (detection, $p$). Comparing raw counts across sites can therefore tell you more about detectability than about biology.</p>
+<p>Royle's (2004) insight is that <strong>repeated visits</strong> break that confounding. If you count the same site several times over a short window during which the population is effectively constant ("closed"), then the <em>variation among the repeated counts</em> at a site carries information about detection, while the <em>overall level</em> of the counts carries information about abundance. With replication the model can estimate detection and abundance <em>separately</em> &mdash; something a plain GLM on raw counts cannot do.</p>
+<p>It is the abundance cousin of the occupancy model. Occupancy asks "is the species present (0/1), correcting for missed detections?"; the N-mixture model asks "<em>how many</em> are present, correcting for missed detections?" Both are <strong>latent-state</strong> models: the quantity you care about (true presence, true abundance) is never observed directly, only through imperfect counts.</p>
+</div>
+
 <h3>Biological setup</h3>
-<p>You visit $N_\text{sites}$ sites $N_\text{reps}$ times each and record a count $y[i, j]$. The classic Royle (2004) N-mixture model treats the true abundance $N_i$ at each site as a latent integer that is sampled with detection probability $p$:</p>
+<p>You visit $N_\text{sites}$ sites, revisiting each $N_\text{reps}$ times, and record a count $y[i, j]$ on visit $j$ to site $i$. The model has two layers. In the <em>process</em> layer, the true abundance $N_i$ at each site is a latent (unobserved) non-negative integer drawn from a Poisson with mean $\lambda$. In the <em>observation</em> layer, each of the $N_i$ individuals present is detected independently with probability $p$, so a visit yields a Binomial count out of $N_i$. The repeated visits to a site all share the same latent $N_i$, and that shared structure is what lets the model tease detection apart from abundance:</p>
 <div class="eq-block">$N_i \sim \text{Poisson}(\lambda), \quad y[i, j] \sim \text{Binomial}(N_i, p)$</div>
 
 <h3>Four nested models</h3>
@@ -529,8 +523,8 @@ zst &lt;- <span class="fn">matrix</span>(<span class="nu">1L</span>, Nsites, Nye
 <div class="eq-block">$p_B = \dfrac{1}{M}\sum_{m=1}^M \mathbb{1}\!\left[ T(y^\text{rep}_m) &gt; T(y_m) \right]$</div>
 <p>If $p_B$ is far from 0.5, the data are "weirder" (or more boring) than the model expects &mdash; evidence of misfit. Values near 0.5 mean the model captures the chosen discrepancy.</p>
 
-<div class="exercise" id="ex-8">
-<span class="ex-tag">Exercise 8</span><span class="difficulty medium"> · 25 min · R</span>
+<div class="exercise" id="ex-7">
+<span class="ex-tag">Exercise 7</span><span class="difficulty medium"> · 25 min · R</span>
 <h3>N-mixture: build up from basic to overdispersed</h3>
 <p>Open <code>NMixture_Nimble.R</code> and run all four models.</p>
 <ol type="a">
@@ -544,8 +538,8 @@ zst &lt;- <span class="fn">matrix</span>(<span class="nu">1L</span>, Nsites, Nye
 </div></details>
 </div>
 
-<div class="exercise" id="ex-9">
-<span class="ex-tag">Exercise 9</span><span class="difficulty hard"> · 35 min · R · synthesis</span>
+<div class="exercise" id="ex-8">
+<span class="ex-tag">Exercise 8</span><span class="difficulty hard"> · 35 min · R · synthesis</span>
 <h3>Add a site-level random effect to the N-mixture model</h3>
 <p>Modify <code>Nmix4Code</code> to add a Poisson-lognormal structure:</p>
 <div class="eq-block">$\log \lambda_i = \beta_0 + \epsilon_i, \quad \epsilon_i \sim \mathcal{N}(0, \sigma_\epsilon^2)$</div>
@@ -573,8 +567,8 @@ zst &lt;- <span class="fn">matrix</span>(<span class="nu">1L</span>, Nsites, Nye
 </div></details>
 </div>
 
-<div class="exercise" id="ex-10">
-<span class="ex-tag">Exercise 10</span><span class="difficulty medium"> · 20 min · synthesis</span>
+<div class="exercise" id="ex-9">
+<span class="ex-tag">Exercise 9</span><span class="difficulty medium"> · 20 min · synthesis</span>
 <h3>Pick the right tool</h3>
 <p>For each scenario, name the model family from today (priors / logistic / multilevel / spawner-recruit / dynamic occupancy / N-mixture / multilevel + N-mixture) and explain the latent vs. observed split.</p>
 <ol type="a">

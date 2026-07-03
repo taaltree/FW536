@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Interactive: conjugate priors &amp; posteriors | FW 536</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../_Shared/css/lab.css" />
+<script defer src="../_Shared/js/lab.js"></script>
+<script>MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] } };</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<style>
+  .widget { background:#fff; border:1px solid var(--border); border-radius:10px; padding:20px 24px; margin:24px 0; box-shadow:0 2px 10px rgba(0,0,0,.05); }
+  .pick { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
+  .pick button { font-family:'Helvetica Neue',Arial,sans-serif; font-size:14px; font-weight:600; border:2px solid var(--border); background:var(--panel-alt); color:var(--osu-stone); border-radius:6px; padding:6px 14px; cursor:pointer; }
+  .pick button.active { background:var(--osu-orange); color:#fff; border-color:var(--osu-orange); }
+  .cols { display:grid; grid-template-columns:1fr 1fr; gap:6px 28px; }
+  .grp { margin-bottom:8px; }
+  .grp .gh { font-family:'Helvetica Neue',Arial,sans-serif; font-size:12px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--osu-orange-dark); margin:6px 0; }
+  .ctl label { font-family:'Helvetica Neue',Arial,sans-serif; font-size:13px; font-weight:600; color:var(--osu-stone); display:flex; justify-content:space-between; }
+  .ctl input[type=range]{ width:100%; accent-color:var(--osu-orange); }
+  .ctl .val { color:var(--osu-orange-dark); font-variant-numeric:tabular-nums; }
+  svg text { font-family:'Helvetica Neue',Arial,sans-serif; }
+  .legend { font-family:'Helvetica Neue',Arial,sans-serif; font-size:13px; display:flex; gap:20px; flex-wrap:wrap; margin-top:6px; }
+  .interp { background:#F7F1E2; border-left:5px solid var(--osu-orange); border-radius:0 8px 8px 0; padding:12px 16px; margin-top:12px; font-size:15px; }
+  .interp b { color:var(--osu-orange-dark); font-variant-numeric:tabular-nums; }
+  @media (max-width:700px){ .cols{ grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+<div class="shell">
+<aside class="sidebar">
+  <h1><a href="../index.html" title="Back to course home">FW 536 · Day 4</a></h1>
+  <div class="subtitle">Conjugate priors &amp; posteriors</div>
+  <nav>
+    <div class="section">This page</div>
+    <ul><li><a href="#explorer">The explorer</a></li><li><a href="#try">Things to try</a></li></ul>
+    <div class="section">Bayesian labs</div>
+    <ul>
+      <li><a href="lab.html">Day 4 practice lab</a></li>
+      <li><a href="explore_likelihood_mcmc.html">Likelihood &amp; MCMC explorer</a></li>
+      <li><a href="../Day5_BayesII/lab.html">Day 5 lab</a></li>
+      <li><a href="../index.html">Course home</a></li>
+    </ul>
+  </nav>
+</aside>
+
+<main class="content">
+<header class="lab-header">
+  <div class="eyebrow">Day 4 · Interactive</div>
+  <h1>Conjugate priors: how data reshapes belief</h1>
+  <p class="lede">Pick a likelihood, set a conjugate prior, and feed in data. Watch the <strong>prior × likelihood → posterior</strong> update happen live. Because each pair is conjugate, the posterior stays in the same family and its parameters have a simple "add the data" form.</p>
+</header>
+
+<section id="explorer">
+<div class="widget">
+  <div class="pick" id="pick" role="group" aria-label="Choose a conjugate family">
+    <button data-f="betabin" class="active">Beta &ndash; Binomial (a probability)</button>
+    <button data-f="gampois">Gamma &ndash; Poisson (a rate)</button>
+    <button data-f="normnorm">Normal &ndash; Normal (a mean)</button>
+  </div>
+
+  <div class="cols">
+    <div class="grp"><div class="gh">Prior</div><div id="priorControls"></div></div>
+    <div class="grp"><div class="gh">Data (the likelihood)</div><div id="dataControls"></div></div>
+  </div>
+
+  <svg id="chart" viewBox="0 0 720 340" width="100%" role="img" aria-label="Prior, likelihood, and posterior densities"></svg>
+  <div class="legend">
+    <span style="color:#666">– – prior</span>
+    <span style="color:#1F5B50">— likelihood (scaled)</span>
+    <span style="color:#D73F09">— posterior</span>
+  </div>
+  <div class="interp" id="interp"></div>
+</div>
+</section>
+
+<section id="try">
+<h2>Things to try</h2>
+<div class="callout key">
+<ol>
+<li><strong>The prior is pseudo-data.</strong> In Beta&ndash;Binomial, a $\text{Beta}(\alpha,\beta)$ prior acts like $\alpha$ prior "successes" and $\beta$ prior "failures." Add real data and the posterior is $\text{Beta}(\alpha + y,\, \beta + n - y)$ — literally add the counts.</li>
+<li><strong>Flat prior = the likelihood.</strong> Set the Beta prior to $\text{Beta}(1,1)$ (the Uniform). The posterior lands right on the scaled likelihood, and its mode is the MLE $y/n$.</li>
+<li><strong>Data overwhelms the prior.</strong> Keep the prior fixed and increase $n$. The likelihood sharpens and drags the posterior onto it — with enough data the prior barely matters.</li>
+<li><strong>A strong prior fights back.</strong> Make the prior very informative (large $\alpha+\beta$, or a tight Normal prior SD). Now it takes a lot of data to move the posterior.</li>
+<li><strong>Same recipe, three families.</strong> Switch families and notice the pattern is always the same: posterior parameters = prior parameters + a simple function of the data.</li>
+</ol>
+</div>
+<p><a href="lab.html">← Back to the Day 4 lab</a> · see also the <a href="explore_likelihood_mcmc.html">likelihood &amp; MCMC explorer</a>.</p>
+</section>
+</main>
+</div>
+<footer>FW 536 · Statistical Modeling for Ecology and Conservation · Oregon State University</footer>
+
+<script>
+// ---------- numerics ----------
+function lgamma(z){const g=7,c=[0.99999999999980993,676.5203681218851,-1259.1392167224028,
+ 771.32342877765313,-176.61502916214059,12.507343278686905,-0.13857109526572012,
+ 9.9843695780195716e-6,1.5056327351493116e-7];
+ if(z<0.5)return Math.log(Math.PI/Math.sin(Math.PI*z))-lgamma(1-z);
+ z-=1;let x=c[0];for(let i=1;i<g+2;i++)x+=c[i]/(z+i);const t=z+g+0.5;
+ return 0.5*Math.log(2*Math.PI)+(z+0.5)*Math.log(t)-t+Math.log(x);}
+const lbeta=(a,b)=>lgamma(a)+lgamma(b)-lgamma(a+b);
+function dbeta(x,a,b){ if(x<=0||x>=1) return 0; return Math.exp((a-1)*Math.log(x)+(b-1)*Math.log(1-x)-lbeta(a,b)); }
+function dgamma(x,k,r){ if(x<=0) return 0; return Math.exp(k*Math.log(r)+(k-1)*Math.log(x)-r*x-lgamma(k)); }
+function dnorm(x,m,s){ return Math.exp(-0.5*((x-m)/s)**2)/(s*Math.sqrt(2*Math.PI)); }
+function dpoisLikeContinuous(lam,sumY,nObs){ // likelihood in lambda (kernel): lam^sumY e^{-nObs lam}
+  if(lam<=0) return 0; return Math.exp(sumY*Math.log(lam)-nObs*lam); }
+
+// ---------- families ----------
+const FAM = {
+ betabin: {
+   prior:[{id:'a',label:'α (prior successes+1)',min:0.5,max:30,step:0.5,val:2},
+          {id:'b',label:'β (prior failures+1)',min:0.5,max:30,step:0.5,val:2}],
+   data:[{id:'y',label:'y (successes observed)',min:0,max:60,step:1,val:8},
+         {id:'n',label:'n (trials)',min:1,max:60,step:1,val:12}],
+ },
+ gampois: {
+   prior:[{id:'a',label:'a (prior shape)',min:0.5,max:30,step:0.5,val:2},
+          {id:'b',label:'b (prior rate)',min:0.2,max:10,step:0.2,val:1}],
+   data:[{id:'sy',label:'Σy (total count observed)',min:0,max:120,step:1,val:24},
+         {id:'no',label:'n (number of observations)',min:1,max:40,step:1,val:6}],
+ },
+ normnorm: {
+   prior:[{id:'m0',label:'μ₀ (prior mean)',min:-10,max:10,step:0.5,val:0},
+          {id:'s0',label:'σ₀ (prior SD)',min:0.2,max:10,step:0.2,val:4}],
+   data:[{id:'ybar',label:'ȳ (sample mean)',min:-10,max:10,step:0.5,val:4},
+         {id:'n',label:'n (sample size)',min:1,max:60,step:1,val:10},
+         {id:'sig',label:'σ (known data SD)',min:0.5,max:10,step:0.5,val:3}],
+ }
+};
+let cur='betabin';
+const P={};
+
+function buildControls(){
+  const pc=document.getElementById('priorControls'), dc=document.getElementById('dataControls');
+  pc.innerHTML=''; dc.innerHTML='';
+  const mk=(pr,box)=>{
+    if(P[cur+'_'+pr.id]===undefined) P[cur+'_'+pr.id]=pr.val;
+    const d=document.createElement('div'); d.className='ctl';
+    d.innerHTML=`<label for="s_${pr.id}">${pr.label}<span class="val" id="v_${pr.id}"></span></label>
+      <input type="range" id="s_${pr.id}" min="${pr.min}" max="${pr.max}" step="${pr.step}" value="${P[cur+'_'+pr.id]}">`;
+    box.appendChild(d);
+    d.querySelector('input').addEventListener('input',e=>{P[cur+'_'+pr.id]=+e.target.value; render();});
+  };
+  FAM[cur].prior.forEach(pr=>mk(pr,pc));
+  FAM[cur].data.forEach(pr=>mk(pr,dc));
+}
+const g=id=>P[cur+'_'+id];
+
+function compute(){
+  let xs=[],prior=[],like=[],post=[],xlab='',story='',readout='';
+  const G=(lo,hi,f)=>{ xs=[];prior=[];like=[];post=[];
+    const N=400; for(let i=0;i<=N;i++){const x=lo+(hi-lo)*i/N; xs.push(x); const r=f(x); prior.push(r[0]); like.push(r[1]); post.push(r[2]);}};
+  if(cur==='betabin'){
+    const a=g('a'),b=g('b'); let y=Math.round(g('y')),n=Math.round(g('n')); if(y>n){y=n;}
+    const pa=a+y, pb=b+n-y;
+    G(0,1,x=>[dbeta(x,a,b), Math.exp(y*Math.log(Math.max(x,1e-9))+(n-y)*Math.log(Math.max(1-x,1e-9))), dbeta(x,pa,pb)]);
+    xlab='p (success probability)';
+    const pm=pa/(pa+pb);
+    story=`Posterior = Beta(α+y, β+n−y) = <b>Beta(${a}+${y}, ${b}+${n-y}) = Beta(${pa}, ${pb})</b>.`;
+    readout=`${story} Posterior mean = ${pa}/${pa+pb} = <b>${pm.toFixed(3)}</b>. `+
+      `MLE = y/n = <b>${(y/n).toFixed(3)}</b>. The posterior mean sits between the prior mean (${(a/(a+b)).toFixed(3)}) and the MLE.`;
+  } else if(cur==='gampois'){
+    const a=g('a'),b=g('b'); const sy=Math.round(g('sy')),no=Math.round(g('no'));
+    const pa=a+sy, pb=b+no;
+    const postMean=pa/pb, postSD=Math.sqrt(pa)/pb;
+    const hi=Math.max(postMean+4*postSD, a/b+4*Math.sqrt(a)/b, 2);
+    G(0,hi,x=>[dgamma(x,a,b), dpoisLikeContinuous(x,sy,no), dgamma(x,pa,pb)]);
+    xlab='λ (rate / mean count)';
+    story=`Posterior = Gamma(a+Σy, b+n) = <b>Gamma(${a}+${sy}, ${b}+${no}) = Gamma(${pa}, ${pb})</b>.`;
+    readout=`${story} Posterior mean = (a+Σy)/(b+n) = <b>${postMean.toFixed(3)}</b>. `+
+      `MLE = Σy/n = <b>${(sy/no).toFixed(3)}</b>.`;
+  } else {
+    const m0=g('m0'),s0=g('s0'),ybar=g('ybar'),sig=g('sig'); const n=Math.round(g('n'));
+    const priorPrec=1/(s0*s0), dataPrec=n/(sig*sig);
+    const postPrec=priorPrec+dataPrec;
+    const postMean=(priorPrec*m0+dataPrec*ybar)/postPrec, postSD=Math.sqrt(1/postPrec);
+    const likeSD=sig/Math.sqrt(n);
+    const lo=Math.min(m0-4*s0, ybar-4*likeSD, postMean-4*postSD);
+    const hi=Math.max(m0+4*s0, ybar+4*likeSD, postMean+4*postSD);
+    G(lo,hi,x=>[dnorm(x,m0,s0), dnorm(x,ybar,likeSD), dnorm(x,postMean,postSD)]);
+    xlab='μ (population mean)';
+    story=`Posterior is Normal with precision = prior precision + data precision, and a precision-weighted mean.`;
+    readout=`${story} Posterior mean = <b>${postMean.toFixed(2)}</b>, posterior SD = <b>${postSD.toFixed(2)}</b>. `+
+      `Prior mean ${m0.toFixed(1)} (SD ${s0.toFixed(1)}), data mean ${ybar.toFixed(1)} (SE ${likeSD.toFixed(2)}). `+
+      `With more data the posterior slides toward ȳ.`;
+  }
+  return {xs,prior,like,post,xlab,readout};
+}
+
+function render(){
+  FAM[cur].prior.concat(FAM[cur].data).forEach(pr=>{const el=document.getElementById('v_'+pr.id); if(el) el.textContent=(pr.step<1?(+g(pr.id)).toFixed(1):Math.round(g(pr.id)));});
+  const {xs,prior,like,post,xlab,readout}=compute();
+  // scale likelihood so its max matches the posterior's max (teaching convention)
+  const pmax=Math.max(...post,1e-9), lmax=Math.max(...like,1e-9);
+  const likeScaled=like.map(v=>v/lmax*pmax);
+  const W=720,H=340,ml=48,mr=16,mt=16,mb=40,pw=W-ml-mr,ph=H-mt-mb;
+  const ymax=Math.max(...prior, ...post, ...likeScaled)*1.1||1;
+  const xlo=xs[0], xhi=xs[xs.length-1];
+  const px=x=>ml+((x-xlo)/(xhi-xlo))*pw, py=v=>mt+ph-(v/ymax)*ph;
+  let s=`<rect width="${W}" height="${H}" fill="white"/>`;
+  s+=`<line x1="${ml}" y1="${mt+ph}" x2="${ml+pw}" y2="${mt+ph}" stroke="#999"/>`;
+  s+=`<line x1="${ml}" y1="${mt}" x2="${ml}" y2="${mt+ph}" stroke="#999"/>`;
+  for(let t=0;t<=5;t++){const xx=xlo+(xhi-xlo)*t/5; s+=`<text x="${px(xx)}" y="${mt+ph+16}" font-size="11" fill="#666" text-anchor="middle">${(xhi-xlo>3?xx.toFixed(0):xx.toFixed(2))}</text>`;}
+  s+=`<text x="${ml+pw/2}" y="${H-4}" font-size="12" fill="#444" text-anchor="middle">${xlab}</text>`;
+  const line=(arr,col,dash,w)=>{let p=arr.map((v,i)=>`${px(xs[i])},${py(v)}`).join(' ');
+    return `<polyline points="${p}" fill="none" stroke="${col}" stroke-width="${w||2}"${dash?` stroke-dasharray="${dash}"`:''}/>`;};
+  s+=line(prior,'#666','5 4',2);
+  s+=line(likeScaled,'#1F5B50',null,2);
+  s+=line(post,'#D73F09',null,3);
+  document.getElementById('chart').innerHTML=s;
+  document.getElementById('interp').innerHTML=readout;
+}
+
+document.querySelectorAll('#pick button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('#pick button').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active'); cur=b.dataset.f; buildControls(); render();
+}));
+buildControls(); render();
+</script>
+</body>
+</html>

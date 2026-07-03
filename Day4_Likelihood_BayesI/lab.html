@@ -51,6 +51,7 @@
  <li><a href="answer_key.html">Answer key</a></li>
  <li><a href="problem_set.html">Graded problem set</a></li>
  <li><a href="explore_likelihood_mcmc.html">Interactive likelihood &amp; MCMC</a></li>
+ <li><a href="explore_conjugate.html">Interactive conjugate prior/posterior</a></li>
  </ul>
  <div class="section">Course</div>
  <ul>
@@ -73,22 +74,6 @@
   
 <div class="session">
   <div class="session-label">Morning · 20 pts</div>
-  
-<section class="data-card" id="data-files">
-<h2>Data files &amp; R scripts</h2>
-<p>Everything referenced in this lab's exercises lives in this folder. Click any link below to download.</p>
-<div class="data-section">
-  <h3 class="data-h">Datasets</h3>
-  <div class="data-row"><a href="data/Vonbert.dat"><code>Vonbert.dat</code></a><span class="data-desc">Length-at-age data for von Bertalanffy growth fitting (sex, age, length).</span></div>
-  <div class="data-row"><a href="data/Whale.dat"><code>Whale.dat</code></a><span class="data-desc">Whale blow counts used for the two-component Poisson mixture example.</span></div>
-  <div class="data-row"><a href="data/Logistic.csv"><code>Logistic.csv</code></a><span class="data-desc">Population size and per-capita growth rate (used for the r/K Bayesian fit).</span></div>
-</div>
-<div class="data-section">
-  <h3 class="data-h">R scripts</h3>
-  <div class="data-row"><a href="Jags_logistic_rK_Lab1.R"><code>Jags_logistic_rK_Lab1.R</code></a><span class="data-desc">Jags_logistic_rK_Lab1.R · original JAGS version of the logistic-growth example, for comparison</span></div>
-  <div class="data-row"><a href="Logistic_BayesianGrowth_Nimble.R"><code>Logistic_BayesianGrowth_Nimble.R</code></a><span class="data-desc">Logistic_BayesianGrowth_Nimble.R · Nimble re-implementation</span></div>
-</div>
-</section>
 <div>
     <div class="session-title">Maximum likelihood problem set</div>
     <div class="row"><span class="tag practice">Practice</span>
@@ -124,6 +109,23 @@
   </p>
 <p style="font-size:13px; color:var(--bad); margin: 12px 0 0 0; padding: 10px; background: #FBE3DD; border-radius: 6px;"><strong>Day 4 topic split:</strong> the morning problem set (problems 1&ndash;3) uses <strong>maximum likelihood only</strong>. The afternoon problem set (problems 4&ndash;10) uses <strong>Bayesian methods</strong>, introduced in the afternoon lecture.</p>
 </div>
+
+<section class="data-card" id="data-files">
+<h2>Data files &amp; R scripts</h2>
+<p>Everything referenced in this lab's exercises lives in this folder. Click any link below to download.</p>
+<div class="data-section">
+  <h3 class="data-h">Datasets</h3>
+  <div class="data-row"><a href="data/Vonbert.dat"><code>Vonbert.dat</code></a><span class="data-desc">Length-at-age data for von Bertalanffy growth fitting (sex, age, length).</span></div>
+  <div class="data-row"><a href="data/Whale.dat"><code>Whale.dat</code></a><span class="data-desc">Whale blow counts used for the two-component Poisson mixture example.</span></div>
+  <div class="data-row"><a href="data/Logistic.csv"><code>Logistic.csv</code></a><span class="data-desc">Population size and per-capita growth rate (used for the r/K Bayesian fit).</span></div>
+</div>
+<div class="data-section">
+  <h3 class="data-h">R scripts</h3>
+  <div class="data-row"><a href="Jags_logistic_rK_Lab1.R"><code>Jags_logistic_rK_Lab1.R</code></a><span class="data-desc">Jags_logistic_rK_Lab1.R · original JAGS version of the logistic-growth example, for comparison</span></div>
+  <div class="data-row"><a href="Logistic_BayesianGrowth_Nimble.R"><code>Logistic_BayesianGrowth_Nimble.R</code></a><span class="data-desc">Logistic_BayesianGrowth_Nimble.R · Nimble re-implementation</span></div>
+</div>
+</section>
+
 
 
 
@@ -473,7 +475,7 @@ The point of this example is not the ZIP per se — it is that mixture likelihoo
 <section id="bayes-rule">
 <h2>Bayes' rule, worked out for a single coin</h2>
 
-<p>To anchor the algebra, fit a Bernoulli model to one binomial observation: $y = 7$ successes in $n = 10$ trials. With a flat prior $p \sim \text{Uniform}(0,1)$:</p>
+<p>To anchor the algebra, fit a binomial model to a single observation: $y = 7$ successes in $n = 10$ trials. Use a flat prior $p \sim \text{Uniform}(0,1)$ — which, note, is exactly a $\text{Beta}(1,1)$ distribution (a constant density on $[0,1]$):</p>
 
 <div class="eq-block">$p(\theta \mid y) \propto \binom{10}{7}\theta^7(1-\theta)^3 \cdot 1 = \theta^7(1-\theta)^3.$</div>
 
@@ -481,7 +483,7 @@ The point of this example is not the ZIP per se — it is that mixture likelihoo
 
 <div class="eq-block">$p(\theta \mid y) = \dfrac{1}{B(8, 4)} \theta^{7}(1-\theta)^{3}, \qquad B(\alpha,\beta) = \dfrac{\Gamma(\alpha)\Gamma(\beta)}{\Gamma(\alpha+\beta)}.$</div>
 
-<p>This is the magic of <strong>conjugacy</strong>: the prior family was chosen so that the posterior stays in the same family. In this case, Beta prior + Binomial likelihood → Beta posterior.</p>
+<p>This is the magic of <strong>conjugacy</strong>: the prior family is chosen so that the posterior stays in the same family. The flat $\text{Uniform}(0,1)$ prior <em>is</em> a $\text{Beta}(1,1)$, so this really is a Beta prior + Binomial likelihood → Beta posterior — and the posterior $\text{Beta}(8,4) = \text{Beta}(1+7,\, 1+3)$ simply adds the 7 successes and 3 failures to the prior's two parameters.</p>
 
 <div class="code-label">R · plot the prior, the likelihood, and the posterior</div>
 <pre><code>theta &lt;- <span class="fn">seq</span>(<span class="nu">0.001</span>, <span class="nu">0.999</span>, length.out = <span class="nu">500</span>)
@@ -504,6 +506,8 @@ posterior &lt;- <span class="fn">dbeta</span>(theta, <span class="nu">8</span>, 
 <div class="eq-block">$p(p \mid y) \;=\; \text{Beta}(\alpha + y,\; \beta + n - y).$</div>
 
 <p>The posterior just adds <em>successes</em> to $\alpha$ and <em>failures</em> to $\beta$.</p>
+
+<div class="callout try"><strong>Play with it.</strong> The <a href="explore_conjugate.html">interactive conjugate prior/posterior explorer</a> lets you drag a Beta prior and binomial data (or a Gamma&ndash;Poisson rate, or a Normal&ndash;Normal mean) and watch the prior × likelihood → posterior update live.</div>
 
 <div class="callout key">
 <strong>Prior as pseudo-observations.</strong> A Beta($\alpha,\beta$) prior is exactly equivalent to having previously seen $\alpha$ "successes" and $\beta$ "failures" in an imaginary pre-experiment. Beta(1,1) means "I've seen no one before." Beta(50,50) means "I've already seen 100 trials with $p=0.5$." That is the prior's information content — measurable in trials.

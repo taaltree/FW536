@@ -73,9 +73,12 @@ def transform(text, depth):
     # lecture pptx links -> accessible notes
     for pptx,notes in PPTX_TO_NOTES.items():
         text = text.replace(f'href="{pptx}"', f'href="{notes}"')
-    # drop links to the visual-only interactive widgets (not useful via screen reader)
+    # drop links to the visual-only interactive widgets (drag-slider SVG/canvas
+    # tools are not useful via a screen reader). Remove whole nav items, then
+    # demote any remaining widget links to plain text so nothing breaks.
     text = re.sub(r'\s*<li><a href="[^"]*explore_[^"]*\.html">[^<]*</a></li>', '', text)
     text = re.sub(r'\s*<div class="activity-row"><span class="tag interactive">[^<]*</span>.*?</div>', '', text)
+    text = re.sub(r'<a href="[^"]*explore_[^"]*\.html">([^<]*)</a>', r'\1', text)
     return text
 
 def copy_html(src, dst, depth):

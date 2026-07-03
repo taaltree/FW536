@@ -53,18 +53,6 @@
   
 <div class="session">
   <div class="session-label">Morning · 20 pts</div>
-  
-<section class="data-card" id="data-files">
-<h2>Data files &amp; R scripts</h2>
-<p>Everything referenced in this lab's exercises lives in this folder. Click any link below to download.</p>
-<div class="data-section">
-  <h3 class="data-h">Datasets</h3>
-  <div class="data-row"><a href="data/mixed1a.txt"><code>mixed1a.txt</code></a><span class="data-desc">Fish density in 18 streams, three observations per stream (random-intercept intro).</span></div>
-  <div class="data-row"><a href="data/mixed1b.txt"><code>mixed1b.txt</code></a><span class="data-desc">Length-weight measurements per individual (random-intercept regression).</span></div>
-  <div class="data-row"><a href="data/week6b.txt"><code>week6b.txt</code></a><span class="data-desc">Age and length measurements per individual fish (nonlinear mixed-effects, von Bertalanffy).</span></div>
-  <div class="data-row"><a href="data/qcbs_w6_data.csv"><code>qcbs_w6_data.csv</code></a><span class="data-desc">QCBS fish trophic position dataset: three species nested across six lakes.</span></div>
-</div>
-</section>
 <div>
     <div class="session-title">Hierarchical modeling problem set</div>
     <div class="row"><span class="tag practice">Practice</span>
@@ -99,6 +87,19 @@
     <a href="answer_key.html">practice answer key</a>.
   </p>
 </div>
+
+<section class="data-card" id="data-files">
+<h2>Data files &amp; R scripts</h2>
+<p>Everything referenced in this lab's exercises lives in this folder. Click any link below to download.</p>
+<div class="data-section">
+  <h3 class="data-h">Datasets</h3>
+  <div class="data-row"><a href="data/mixed1a.txt"><code>mixed1a.txt</code></a><span class="data-desc">Fish density in 18 streams, three observations per stream (random-intercept intro).</span></div>
+  <div class="data-row"><a href="data/mixed1b.txt"><code>mixed1b.txt</code></a><span class="data-desc">Length-weight measurements per individual (random-intercept regression).</span></div>
+  <div class="data-row"><a href="data/week6b.txt"><code>week6b.txt</code></a><span class="data-desc">Age and length measurements per individual fish (nonlinear mixed-effects, von Bertalanffy).</span></div>
+  <div class="data-row"><a href="data/qcbs_w6_data.csv"><code>qcbs_w6_data.csv</code></a><span class="data-desc">QCBS fish trophic position dataset: three species nested across six lakes.</span></div>
+</div>
+</section>
+
 
 
 
@@ -515,10 +516,10 @@ within2 &lt;- <span class="fn">replicate</span>(reps, {
  d &lt;- <span class="fn">AIC</span>(<span class="fn">lm</span>(y ~ x + x2)) - <span class="fn">AIC</span>(<span class="fn">lm</span>(y ~ x))
  d &lt; <span class="nu">2</span>
 })
-<span class="fn">mean</span>(within2) <span class="cm"># &gt; 0.8, often &gt; 0.85</span></code></pre>
+<span class="fn">mean</span>(within2) <span class="cm"># essentially 1.0 &mdash; it is always within 2</span></code></pre>
 
 <details class="answer"><summary>Reveal solution &amp; discussion</summary><div class="answer-body">
-<p>The nonsense-variable model is within 2 AIC units of the correct model <em>more than 80% of the time</em>. Why? AIC's penalty for one extra parameter is exactly 2. So unless the extra variable hurts the likelihood by more than 2 units (which a noise variable rarely does), it stays "competitive."</p>
+<p>The nonsense-variable model is within 2 AIC units of the correct model <em>essentially 100% of the time &mdash; it always is</em>. Here is why. Adding one parameter changes the AIC by $\Delta\text{AIC} = 2 - \chi^2_1$, where $\chi^2_1$ is the likelihood-ratio statistic for the extra term (twice the gain in log-likelihood). Because that statistic is always positive, $\Delta\text{AIC}$ is always below 2. In fact, about 16% of the time $\chi^2_1 &gt; 2$, so the junk model actually has the <em>lower</em> AIC and "wins" outright. The $\Delta\text{AIC} &lt; 2$ rule does not screen out useless variables at all.</p>
 <p><strong>The lesson:</strong> the $\Delta\text{AIC} &lt; 2$ rule is structurally biased toward including junk. Anderson &amp; Burnham's own writing has been used selectively here; many authors (Arnold 2010 is the standard reference) push back on the "include any model within 2" practice and emphasize that the included variable's <em>coefficient and CI</em> have to do real work.</p>
 </div></details>
 </div>
@@ -564,12 +565,12 @@ pstor &lt;- AICstor &lt;- AICcstor &lt;- BICstor &lt;- <span class="fn">rep</spa
 <p>Approximate results across 500 reps (your seed will differ):</p>
 <table>
 <tr><th>Criterion</th><th>P(top model includes ≥ 1 noise variable)</th></tr>
-<tr><td>p &lt; 0.05 (any of 3)</td><td>~0.14</td></tr>
-<tr><td>AIC</td><td>~0.55</td></tr>
-<tr><td>AICc</td><td>~0.50</td></tr>
-<tr><td>BIC</td><td>~0.08</td></tr>
+<tr><td>p &lt; 0.05 (any of 3)</td><td>~0.16</td></tr>
+<tr><td>AIC</td><td>~0.45</td></tr>
+<tr><td>AICc</td><td>~0.39</td></tr>
+<tr><td>BIC</td><td>~0.16</td></tr>
 </table>
-<p>AIC and AICc retain noise predictors in the top model roughly half the time. The p-value approach is much more conservative (Type I error ~ 0.14 ≈ $1 - 0.95^3$, the family-wise rate). BIC is the most conservative because its $\ln n$ penalty (≈ 3.9 for $n=50$) is larger than AIC's 2.</p>
+<p>AIC and AICc retain a noise predictor in the top model about 40&ndash;45% of the time. Selecting variables by $p &lt; 0.05$ and by BIC are both far more conservative here (both ≈ 0.16): the family-wise p-value rate is $1 - 0.95^3 \approx 0.14$, and BIC's heavier $\ln n$ penalty (≈ 3.9 for $n = 50$, versus AIC's fixed 2) makes it about as strict. AIC's penalty of 2 is simply too small to keep junk out.</p>
 <p><strong>When would BIC backfire?</strong> When true effects are <em>weak</em>. BIC's heavier penalty buys Type-I safety at the cost of Type-II error — see the next exercise.</p>
 </div></details>
 </div>
@@ -606,12 +607,12 @@ pstor &lt;- AICstor &lt;- AICcstor &lt;- BICstor &lt;- <span class="fn">rep</spa
 <p>Approximate per-rep averages (out of 3 true effects):</p>
 <table>
 <tr><th>Criterion</th><th>Mean # of <em>missed</em> real effects</th></tr>
-<tr><td>p (variables with p &gt; 0.05)</td><td>~1.4</td></tr>
-<tr><td>AIC</td><td>~0.8</td></tr>
-<tr><td>AICc</td><td>~0.9</td></tr>
-<tr><td>BIC</td><td>~1.3</td></tr>
+<tr><td>p (variables with p &gt; 0.05)</td><td>~1.5</td></tr>
+<tr><td>AIC</td><td>~1.1</td></tr>
+<tr><td>AICc</td><td>~1.2</td></tr>
+<tr><td>BIC</td><td>~1.5</td></tr>
 </table>
-<p>BIC misses about 1.3 of the 3 true predictors on average — comparable to the p-value approach. AIC/AICc are noticeably more inclusive of weak effects. <strong>Lesson:</strong> there is no free lunch. Whatever Type-I behavior you buy with a heavier penalty, you pay back in Type-II.</p>
+<p>BIC misses about 1.5 of the 3 true predictors on average — essentially tied with the p-value approach. AIC and AICc are noticeably more inclusive of weak effects (missing ~1.1&ndash;1.2), which is what you want when the science is about small effects. <strong>Lesson:</strong> there is no free lunch. Whatever Type-I behavior you buy with a heavier penalty, you pay back in Type-II.</p>
 <p><strong>(c) Bigger n.</strong> AIC's Type-I rate stays roughly flat with $n$; BIC's Type-I rate <em>drops</em>; both Type-II rates fall as $n$ grows because effect sizes become detectable. The fundamental trade-off doesn't go away — it just slides.</p>
 </div></details>
 </div>
@@ -686,7 +687,7 @@ m_slop &lt;- <span class="fn">lmer</span>(Z_TP ~ Z_Length + (<span class="nu">1<
 <p>By the end of today, you should be skeptical of three habits:</p>
 <ol>
 <li><strong>Dredging</strong>: fitting every subset of predictors with <code>dredge()</code> or stepwise selection, then reporting the "best" model as if its coefficients were honest. The simulations above show how this manufactures false discoveries.</li>
-<li><strong>Reporting only p-values or $\Delta\text{AIC}$.</strong> A coefficient with a tight CI bounded well away from zero is meaningful. A coefficient with a wide CI that crosses zero is uncertain, regardless of which side of $p = 0.05$ or $\Delta\text{AIC} = 2$ it lands on.</li>
+<li><strong>Reporting only p-values or $\Delta\text{AIC}$ instead of the effect size.</strong> A coefficient with a tight CI bounded well away from zero is a meaningful effect; a coefficient with a wide CI is uncertain no matter what any criterion says. (A 95% CI that overlaps zero <em>is</em> the $p &gt; 0.05$ case — they are the same statement, so they cannot disagree.) The science lives in the <em>magnitude and direction</em> of the effect and how sure you are of it, not in whether it cleared a $p = 0.05$ or $\Delta\text{AIC} = 2$ threshold.</li>
 <li><strong>Confusing prediction quality with effect support.</strong> Two different questions, two different criteria. Cross-validation tells you about prediction; coefficient CIs (and study design) tell you about effects.</li>
 </ol>
 </div>

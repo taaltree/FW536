@@ -29,7 +29,7 @@ MathJax = {
  <ul>
  <li><a href="#p1">1. Acoustic detection</a></li>
  <li><a href="#p2">2. eDNA Bayes (data)</a></li>
- <li><a href="#p3">3. Camera-grid heterogeneity</a></li>
+ <li><a href="#p3">3. Combining two survey indices</a></li>
  <li><a href="#p4">4. Isolated callers</a></li>
  <li><a href="#p5">5. Hair-snare DNA</a></li>
  <li><a href="#p6">6. Voting fishers</a></li>
@@ -62,12 +62,22 @@ MathJax = {
 <section class="callout warn" style="margin-top:24px;"><p class="callout-label">Watch out</p><p><strong>This is the assessed problem set — answers are not shown here.</strong> Write your work in the two R Markdown hand-in templates: <a href="morning_lab_template.Rmd"><code>morning_lab_template.Rmd</code></a> for the morning problems (1&ndash;6) and <a href="afternoon_lab_template.Rmd"><code>afternoon_lab_template.Rmd</code></a> for the afternoon problems (7&ndash;12). Knit each to HTML and upload to the matching Canvas assignment.</p>
 <p>For worked-example study with visible answers, use the <a href="lab.html">in-class practice lab</a>. Need R Markdown help? See the <a href="../rmarkdown_tutorial.html">R Markdown tutorial</a>.</p></section>
 
-<section><p>Problems 2 and 9 supply a small dataset in the <code>data/</code> folder next to this page. Keep the <code>data/</code> folder alongside your <code>.Rmd</code> file so the <code>read.csv()</code> calls resolve. Work each problem in the matching template, knit to HTML, and submit on Canvas.</p></section>
+<section><p>Two problems use small datasets &mdash; download them from the <a href="#datasets">Datasets</a> panel below and keep them in a <code>data/</code> folder beside your <code>.Rmd</code> so the <code>read.csv()</code> calls resolve. Work each problem in the matching template, knit to HTML, and submit on Canvas.</p></section>
 
 
 <!-- ============================= MORNING ============================= -->
+
+<section class="data-card" id="datasets">
+<h2>Datasets for this assignment</h2>
+<p>Click a file to download it, then put it in a <code>data/</code> subfolder beside your <code>.Rmd</code> so the <code>read.csv()</code> / <code>scan()</code> calls resolve.</p>
+<div class="data-section">
+  <div class="data-row"><a href="data/edna_carp_results.csv" download><code>edna_carp_results.csv</code></a><span class="data-desc">qPCR eDNA replicate results for 12 candidate lakes (columns: lake, replicate, positive). Problem 2.</span></div>
+  <div class="data-row"><a href="data/coyote_scat_counts.csv" download><code>coyote_scat_counts.csv</code></a><span class="data-desc">Coyote scat counts on 120 grid cells (columns: grid_id, transect, scats). Problem 9.</span></div>
+</div>
+</section>
+
 <a id="morning"></a>
-<div class="practice-banner"><div class="label">Morning · 20 pts</div><h3>Probability problems</h3><p>Sample-space reasoning, conditional probability, Bayes' rule, heterogeneity, and expected value. Work each on paper first, then confirm numerically in R inside <code>morning_lab_template.Rmd</code>.</p></div>
+<div class="practice-banner"><div class="label">Morning · 20 pts</div><h3>Probability problems</h3><p>Sample-space reasoning, conditional probability, Bayes' rule, expectation, and variance algebra &mdash; using only the probability tools from the morning session (no named distributions yet; those come this afternoon). Work each on paper first, then confirm numerically in R inside <code>morning_lab_template.Rmd</code>.</p></div>
 
 <div class="exercise" id="p1">
 <span class="ex-tag">Problem 1</span><span class="difficulty easy"> · conditional probability</span>
@@ -100,16 +110,17 @@ MathJax = {
 </div>
 
 <div class="exercise" id="p3">
-<span class="ex-tag">Problem 3</span><span class="difficulty medium"> · heterogeneity (beta-binomial preview)</span>
-<h3>Bobcat camera-grid heterogeneity</h3>
-<p>A grid of eight remote cameras is run for one week at a survey site. Across many site-weeks the <em>average</em> per-camera detection probability is $\bar p = 0.20$, but a whole site-week is either good (fresh sign, animals moving) or poor. Model the shared week-level detectability $p$ as a single draw from $\text{Beta}(1.6,\,6.4)$ (mean $0.20$, but highly variable); in a given week <em>all eight cameras share that week's $p$</em>.</p>
+<span class="ex-tag">Problem 3</span><span class="difficulty medium"> · expectation &amp; variance algebra</span>
+<h3>Combining two survey indices</h3>
+<p>Two independent survey methods estimate deer abundance at a site. An aerial count $X$ has mean $E[X] = 40$ and standard deviation $6$ (so $\mathrm{Var}(X) = 36$). A ground transect $Y$ has mean $E[Y] = 30$ and standard deviation $8$ (so $\mathrm{Var}(Y) = 64$). Treat $X$ and $Y$ as independent. Use only the algebra of expectation and variance from this morning: $E[aX + b] = aE[X] + b$, $\mathrm{Var}(aX + b) = a^2\,\mathrm{Var}(X)$, and $\mathrm{Var}(X + Y) = \mathrm{Var}(X) + \mathrm{Var}(Y)$ when $X$ and $Y$ are independent.</p>
 <ol type="a">
-<li>Under a plain $\text{Binomial}(8, 0.20)$ (i.e., $p$ fixed at exactly $0.20$ every week), what is $P(\text{0 of 8 cameras detect})$? What are the mean and variance of the number detecting?</li>
-<li>Now simulate the heterogeneous model: for each of 10,000 site-weeks, draw one $p \sim \text{Beta}(1.6, 6.4)$, then draw the 8 camera outcomes as $\text{Bernoulli}(p)$. Estimate $P(\text{0 detect})$ and the variance of the number detecting.</li>
-<li>Compare (a) and (b). Why does shared week-to-week heterogeneity <em>inflate</em> both the probability of an all-zero week and the variance, even though the average detection probability is unchanged?</li>
+<li>A calibration corrects a known aerial bias: $X_c = 1.2\,X - 3$. Find $E[X_c]$ and $\mathrm{Var}(X_c)$ (and the SD).</li>
+<li>The two methods are combined into a total index $T = X + Y$. Find $E[T]$ and $\mathrm{Var}(T)$.</li>
+<li>A weighted index is formed as $I = 0.6\,X + 0.4\,Y$. Find $E[I]$ and $\mathrm{Var}(I)$. Is its variance larger or smaller than that of the total $T$, and why?</li>
+<li>Suppose $X$ and $Y$ were in fact <em>positively correlated</em> (good survey conditions inflate both). Which of your variance answers in (b) and (c) would be wrong, and would the true variance be larger or smaller than what you computed? One or two sentences &mdash; no calculation needed.</li>
 </ol>
-<div class="callout bio"><p class="callout-label">Biological intuition</p>This is the seed of over-dispersion. Unmodeled variation in detectability, habitat quality, or effort makes real detection/count data more variable — and more prone to all-zero outcomes — than any fixed-$p$ model predicts. You will meet its remedies (beta-binomial, negative binomial, random effects) all week.</div>
-<div class="callout try"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Set a seed and report your simulated numbers in <code>morning_lab_template.Rmd</code> under Problem 3.</div>
+<div class="callout bio"><p class="callout-label">Biological intuition</p>Almost every abundance estimate is a function of other random quantities &mdash; sums, differences, calibrated and weighted combinations. Knowing how means and variances flow through those operations (and how independence, or its absence, changes the variance) is the algebra behind every error bar you will report.</div>
+<div class="callout try"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Show each expectation and variance step in <code>morning_lab_template.Rmd</code> under Problem 3.</div>
 </div>
 
 <div class="exercise" id="p4">
@@ -139,16 +150,16 @@ MathJax = {
 </div>
 
 <div class="exercise" id="p6">
-<span class="ex-tag">Problem 6</span><span class="difficulty medium"> · expected value + binomial tail</span>
+<span class="ex-tag">Problem 6</span><span class="difficulty medium"> · expected value + probability rules</span>
 <h3>Fishers vote on a regulation</h3>
-<p>Twenty commercial fishers vote on a proposed regulation. Each votes "yes" independently with probability $0.4$. The motion passes if <em>more than half</em> (i.e., at least 11 of 20) vote yes.</p>
+<p>Twenty commercial fishers vote on a proposed regulation. Each votes "yes" independently with probability $0.4$.</p>
 <ol type="a">
-<li>What are the expected number of yes votes and its variance?</li>
-<li>What is the probability the motion passes?</li>
-<li>Keeping $p = 0.4$, what is the smallest group size $n$ (with "passes" = more than half of $n$ vote yes) for which the probability of passage drops below $1\%$? Solve numerically in R.</li>
+<li>Treat the number of yes votes as a sum of twenty independent $0/1$ votes. Using linearity of expectation (and the fact that variances of independent things add), find the expected number of yes votes and its variance. (You do not need any named distribution &mdash; just $E$ and $\mathrm{Var}$ of a sum.)</li>
+<li>Two specific fishers, Ana and Ben, vote independently. Using the multiplication and addition rules, find (i) the probability both vote yes, (ii) the probability at least one votes yes, and (iii) the probability exactly one votes yes.</li>
+<li>You then learn that Ana voted yes. Does that change the probability that Ben votes yes? Answer in one sentence, referring to the definition of independence.</li>
 </ol>
-<div class="callout bio"><p class="callout-label">Biological intuition</p>"How many independent yes/no events, at what per-unit probability, before a threshold is crossed?" is the binomial skeleton behind quorum rules, minimum detectable effects, and required sample sizes throughout applied ecology.</div>
-<div class="callout try"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Report the mean, variance, tail probability, and your search for $n$ in <code>morning_lab_template.Rmd</code>.</div>
+<div class="callout bio"><p class="callout-label">Biological intuition</p>The expected value of a sum, and the multiplication/addition rules for independent events, are the two workhorses of everyday probability &mdash; behind quorum counts, joint detection probabilities, and "at least one" calculations throughout ecology. (Next session you will package this exact "count of independent yes/no events" into the Binomial distribution.)</div>
+<div class="callout try"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Report the mean and variance and the three joint probabilities in <code>morning_lab_template.Rmd</code>.</div>
 </div>
 
 
@@ -189,7 +200,7 @@ MathJax = {
 <p>The file <code>data/coyote_scat_counts.csv</code> holds coyote scat counts from a recent survey of 120 grid cells (columns <code>grid_id</code>, <code>transect</code>, <code>scats</code>). You will decide whether a Poisson or a Negative Binomial model fits these counts.</p>
 <ol type="a">
 <li>Load the data. Compute the sample mean and variance of <code>scats</code>. What do you notice, and what does it suggest about the Poisson assumption that mean = variance?</li>
-<li>Using the method of moments, find the Negative Binomial dispersion parameter $k$ (R's <code>size</code>) that matches the sample moments. Recall $\mathrm{Var}(Y) = \mu + \mu^2/k$, so $k = \mu^2 / (\mathrm{Var}(Y) - \mu)$.</li>
+<li>Find the Negative Binomial dispersion parameter $k$ (R's <code>size</code>) by the <strong>method of moments</strong>. (The method of moments is just this: write down the distribution's theoretical mean and variance in terms of its unknown parameters, set them equal to the sample mean and variance you measured, and solve. Here the Negative Binomial has mean $\mu$ and variance $\mathrm{Var}(Y) = \mu + \mu^2/k$; setting that equal to the observed variance and solving gives $k = \mu^2 / (\mathrm{Var}(Y) - \mu)$.) Compute $k$ from your sample moments.</li>
 <li>Compare the <em>observed</em> $P(Y = 0)$ and $P(Y &gt; 15)$ in the data against the values predicted by (i) a Poisson with the sample mean, and (ii) a Negative Binomial with the sample mean and your fitted $k$. Which distribution reproduces the data?</li>
 <li>Plot a histogram of the counts and overlay the Poisson and NB pmfs. In one or two sentences, name an ecological mechanism that could produce this over-dispersion.</li>
 </ol>
@@ -206,12 +217,13 @@ v   &lt;- <span class="fn">var</span>(coyote$scats)
 <div class="exercise" id="p10">
 <span class="ex-tag">Problem 10</span><span class="difficulty easy"> · Multinomial</span>
 <h3>Owl pellet contents</h3>
-<p>Barn owl pellets from a regional diet study are composed of voles $0.65$, shrews $0.20$, mice $0.10$, and birds $0.05$. A pellet contains 15 identifiable prey items.</p>
+<p>Barn owl pellets from a regional diet study are composed of voles $0.65$, shrews $0.20$, mice $0.10$, and birds $0.05$.</p>
+<div class="callout warn"><p class="callout-label">Watch out</p><strong>Simplifying assumption.</strong> Real pellets contain different numbers of items, but for this problem <em>assume every pellet contains exactly 15 identifiable prey items</em>. That fixes the total $n = 15$, so a pellet's contents follow a Multinomial$(n = 15,\ \mathbf{p})$. Parts (c) and (d) below hold this assumption; part (c) in particular treats all 50 pellets as having 15 items each.</p>
 <ol type="a">
-<li>What is the probability of the exact composition $(10, 3, 1, 1)$ &mdash; 10 voles, 3 shrews, 1 mouse, 1 bird?</li>
-<li>What is the marginal distribution of the number of shrews in a single pellet? Give its name, mean, and variance.</li>
-<li>Across 50 pellets, what is the expected total number of mice consumed?</li>
-<li>Simulate 5,000 pellets and confirm that the marginal count of one category (your choice) matches the binomial you named in (b).</li>
+<li>For a pellet with 15 items, what is the probability of the exact composition $(10, 3, 1, 1)$ &mdash; 10 voles, 3 shrews, 1 mouse, 1 bird?</li>
+<li>What is the marginal distribution of the number of shrews in a single 15-item pellet? Give its name, mean, and variance.</li>
+<li>Assuming each of 50 pellets contains 15 items, what is the expected total number of mice across all 50 pellets?</li>
+<li>Simulate 5,000 fifteen-item pellets and confirm that the marginal count of one category (your choice) matches the binomial you named in (b).</li>
 </ol>
 <div class="callout bio"><p class="callout-label">Biological intuition</p>The Multinomial is the distribution for "$n$ items sorted into $k$ mutually exclusive categories." A key fact you will reuse: any single category of a Multinomial is, on its own, Binomial &mdash; which is why diet, habitat-use, and survey-response data can be analyzed one category at a time when convenient.</div>
 <div class="callout try"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Use <code>dmultinom</code> and <code>rmultinom</code> in <code>afternoon_lab_template.Rmd</code> under Problem 10.</div>
@@ -224,7 +236,13 @@ v   &lt;- <span class="fn">var</span>(coyote$scats)
 <ol type="a">
 <li>If you (incorrectly) treat the pooled sample as one Poisson sample, what mean and variance would you estimate? Will the pooled distribution actually be Poisson? Explain why or why not.</li>
 <li>Show by simulation that the pooled distribution is over-dispersed (variance noticeably greater than mean).</li>
-<li>Using the law of total variance, derive the exact mean and variance of the pooled mixture, and compare to your simulation. (Hint: $E[Y] = E[\lambda]$ and $\mathrm{Var}(Y) = E[\lambda] + \mathrm{Var}(\lambda)$ when $Y\mid\lambda \sim \text{Poisson}(\lambda)$.)</li>
+<li><strong>Now derive the pooled mean and variance exactly, step by step</strong> &mdash; you only need the definitions of mean and variance from this morning, no new theorem. A randomly chosen mussel from the pooled sample came from site A (rate $\lambda = 2$) or site B (rate $\lambda = 8$), each with probability $\tfrac12$.
+<ol type="i">
+<li><em>Mean.</em> Average the two site means: $E[Y] = \tfrac12(2) + \tfrac12(8) = 5$.</li>
+<li><em>Second moment.</em> For a single Poisson$(\lambda)$, $\mathrm{Var} = E[Y^2] - (E[Y])^2 = \lambda$, so rearranging, $E[Y^2 \mid \lambda] = \lambda + \lambda^2$. Average this over the two sites: $E[Y^2] = \tfrac12(2 + 2^2) + \tfrac12(8 + 8^2) = \tfrac12(6) + \tfrac12(72) = 39$.</li>
+<li><em>Variance.</em> $\mathrm{Var}(Y) = E[Y^2] - (E[Y])^2 = 39 - 5^2 = 14$.</li>
+</ol>
+So the pooled mean is $5$ but the pooled variance is $14$ &mdash; almost three times larger. Confirm these two numbers match your simulation from (b), and note that a real Poisson would have required variance $= 5$.</li>
 <li>In one or two sentences: what does this exercise tell you about why <em>real</em> count data are over-dispersed even when the process is Poisson within each homogeneous unit?</li>
 </ol>
 <div class="callout bio"><p class="callout-label">Biological intuition</p>This is the mechanism behind the Negative Binomial itself: a Poisson whose rate varies (here across two sites; in the NB, continuously via a gamma distribution). Unmodeled heterogeneity in the rate is the single most common source of over-dispersion in ecological counts.</div>

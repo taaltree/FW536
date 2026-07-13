@@ -76,7 +76,7 @@ head(edna)
 
 ---
 
-# Problem 3 — Bobcat camera-grid heterogeneity
+# Problem 3 — Combining two survey indices
 
 > Eight cameras run one week; a shared week-level detectability p ~ Beta(1.6, 6.4)
 > (mean 0.20). (a) Under fixed p = 0.20, P(0 detect), mean, variance.

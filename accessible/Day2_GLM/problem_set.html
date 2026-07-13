@@ -78,6 +78,17 @@ MathJax = {
 <!-- ============================================================ -->
 <!-- ============================ MORNING ======================= -->
 <!-- ============================================================ -->
+
+<section class="data-card" id="datasets">
+<h2>Datasets for this assignment</h2>
+<p>Click a file to download it, then put it in a <code>data/</code> subfolder beside your <code>.Rmd</code> so the <code>read.csv()</code> / <code>scan()</code> calls resolve.</p>
+<div class="data-section">
+  <div class="data-row"><a href="data/sockeye_adult.csv" download><code>sockeye_adult.csv</code></a><span class="data-desc">Daily adult sockeye counts and flow-corrected qPCR eDNA concentration (Levi et al. 2019).</span></div>
+  <div class="data-row"><a href="data/titanic_long.csv" download><code>titanic_long.csv</code></a><span class="data-desc">One row per Titanic passenger (survived, class, sex, ...). Logistic regression.</span></div>
+  <div class="data-row"><a href="data/titanic_prop.csv" download><code>titanic_prop.csv</code></a><span class="data-desc">Titanic survival aggregated to (Yes, No) counts per class. Binomial-form GLM.</span></div>
+</div>
+</section>
+
 <a id="morning"></a>
 <div class="practice-banner"><div class="label">Morning · 20 pts</div><h3>Continuous distributions</h3><p>Problems 1&ndash;4. Write your work in <a class="hand-in" href="morning_lab_template.Rmd"><code>morning_lab_template.Rmd</code> &darr;</a></p></div>
 
@@ -122,9 +133,8 @@ MathJax = {
 <li>Write the survival function $S(x) = P(X \ge x)$ for an Exponential$(\lambda)$ and state its mean.</li>
 <li>Compute the probability of missing an animal that is 50 m off the transect line.</li>
 <li>At what perpendicular distance does the detection process reach its "half-life" (the distance at which $S(x) = 0.5$)? Show that this equals $\ln 2 / \lambda$.</li>
-<li>The Exponential is <em>memoryless</em>. State what that means for two animals, one first eligible for detection at 0 m and one at 20 m, and why that property is biologically convenient (or suspicious) here.</li>
 </ol>
-<div class="callout try"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Show $S(x)$, the value at 50 m, the half-distance, and one sentence on what memorylessness implies for detection.</div>
+<div class="callout try"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Show $S(x)$, the value at 50 m, and the half-distance.</div>
 </div>
 
 <!-- =========================== PROBLEM 4 =========================== -->
@@ -210,7 +220,7 @@ plot(allEffects(fit))                                  # fitted probabilities
 emmeans(fit, pairwise ~ class | sex, type = "response")  # class contrasts within each sex</code></pre>
 <ol type="a">
 <li>From the <code>emmeans</code> pairwise output (on the odds-ratio scale), which class contrast within a sex is the <em>largest</em>? Report the odds ratio and say what it means in words.</li>
-<li>Add <code>age</code> to the model as a main effect. Express the <code>agechild</code> coefficient as an odds ratio and interpret it.</li>
+<li>The model above already includes <code>age</code> (a two-level factor, <code>adult</code> vs <code>child</code>) as a main effect. Express the <code>agechild</code> coefficient as an odds ratio and interpret it, holding class and sex fixed.</li>
 <li>Using <code>emmeans(fit, ~ class | sex, type = "response")</code>, read off the fitted survival probability for first-class females and third-class females, and report the probability <em>difference</em> between them. Contrast this with what you would conclude from the odds ratio alone.</li>
 <li>Why is a <code>TukeyHSD</code> on an <code>aov</code> object the wrong tool for these class contrasts, whereas <code>emmeans</code> on the fitted GLM is correct?</li>
 </ol>
@@ -272,11 +282,16 @@ emmeans(fit, pairwise ~ class | sex, type = "response")  # class contrasts withi
 <span class="ex-tag">Problem 11</span><span class="difficulty hard"> · logit threshold + marginal effects</span>
 <h3>Occupancy thresholds and choosing a management lever</h3>
 <p>Presence/absence of hermit thrush at 300 sites is modeled as <code>glm(present ~ basal_area + shrub_cover, family = binomial)</code>, giving intercept $-3.0$, basal-area slope $+0.08$ per m&sup2;/ha, and shrub slope $+0.04$ per percent shrub.</p>
+<div class="callout key"><p class="callout-label">Key idea</p><strong>Two tools you will need for parts (c)&ndash;(d).</strong>
+<p><strong>Marginal effect.</strong> On the probability scale the logistic curve is not a straight line, so the change in probability per one-unit change in $x$ depends on where you sit on the curve. Differentiating $p = \operatorname{plogis}(\eta)$ with respect to a predictor $x$ gives the <em>marginal effect</em></p>
+<div class="eq-block">$\dfrac{dp}{dx} = \beta\,p\,(1-p),$</div>
+<p>the slope of the fitted curve — in probability units per unit of $x$ — at a site whose current occupancy probability is $p$. It is largest at $p = 0.5$ (where $p(1-p) = 0.25$) and shrinks toward zero as $p$ approaches the 0 or 1 ceilings. Intuition: adding a unit of habitat moves a coin-flip site (near $p=0.5$) a lot, but barely nudges a site that is already almost certainly occupied or almost certainly empty.</p>
+<p><strong>The divide-by-4 rule.</strong> Because $p(1-p)$ can be at most $0.25$, the <em>largest</em> probability change any predictor can produce per unit $x$ is $\beta \cdot 0.25 = \beta/4$. So $\beta/4$ is a quick upper bound on (and, at $p = 0.5$, the exact value of) the steepest per-unit effect on probability — the back-of-envelope companion to an exact <code>plogis</code> calculation.</p></div>
 <ol type="a">
 <li>For a site with shrub cover = 25%, at what basal area does predicted occupancy probability equal 0.5? (Solve the linear predictor = 0.)</li>
 <li>For a site with shrub cover = 50%, what is the new "threshold" basal area? Interpret the shift.</li>
-<li>Compute the marginal effect of basal area on probability at the $p = 0.5$ inflection, using $\beta\,p(1-p)$. Confirm it against the divide-by-4 rule.</li>
-<li>At a low-suitability site currently at $p = 0.3$, a manager can either raise basal area by 5 m&sup2;/ha or raise shrub cover by 10 percentage points. Using the marginal-effect approximation (or an exact <code>plogis</code> computation), which intervention yields the larger predicted gain in occupancy probability?</li>
+<li>Compute the marginal effect of basal area on probability at the $p = 0.5$ inflection, using $\beta\,p(1-p)$. Confirm it against the divide-by-4 rule ($\beta/4$).</li>
+<li>At a low-suitability site currently at $p = 0.3$, a manager can either raise basal area by 5 m&sup2;/ha or raise shrub cover by 10 percentage points. Using the marginal-effect approximation $\beta\,p(1-p)$ (or an exact <code>plogis</code> computation), which intervention yields the larger predicted gain in occupancy probability?</li>
 </ol>
 <div class="callout try"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Report both threshold basal areas, the marginal effect at $p = 0.5$, the two intervention gains, and one management-relevant sentence.</div>
 </div>
@@ -285,14 +300,15 @@ emmeans(fit, pairwise ~ class | sex, type = "response")  # class contrasts withi
 <div class="exercise" id="p12">
 <span class="ex-tag">Problem 12</span><span class="difficulty medium"> · back-transforming a coefficient and its CI</span>
 <h3>From a log-scale contrast to a percent change with uncertainty</h3>
-<p>A Gamma GLM with a log link returns, for the contrast "fine sediment vs medium sediment" on eelgrass biomass, a coefficient $\hat\beta = -0.65$ with a 95% Wald CI of $(-0.95,\,-0.35)$ on the log scale.</p>
+<p>Eelgrass above-ground biomass is regressed on sediment type (a factor with <em>medium</em> as the reference level) using a Gamma GLM with a log link. The "fine sediment vs medium sediment" contrast returns a coefficient $\hat\beta = -0.65$ with a 95% Wald CI of $(-0.95,\,-0.35)$ on the log scale.</p>
 <ol type="a">
+<li>Write out the full model explicitly in equations, not just prose: the response distribution, the link function, and the linear predictor with all terms. Define your indicator variable(s) and state the reference level.</li>
 <li>Back-transform the point estimate. What multiplicative effect on biomass does it represent?</li>
 <li>Back-transform the confidence interval. Is the resulting interval symmetric around the point estimate on the multiplicative scale?</li>
 <li>Translate the point estimate and CI into a "percent decrease" statement.</li>
 <li>Why is it correct to exponentiate each endpoint of the CI, but wrong in general to exponentiate the <em>midpoint</em>? Under what special condition does exponentiating the midpoint happen to land on the point estimate?</li>
 </ol>
-<div class="callout try"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Give the multiplicative point estimate and CI, the percent-decrease statement, and one sentence on why endpoint-wise back-transformation is the rule.</div>
+<div class="callout try"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Give the explicit model equations, the multiplicative point estimate and CI, the percent-decrease statement, and one sentence on why endpoint-wise back-transformation is the rule.</div>
 </div>
 
 </main>

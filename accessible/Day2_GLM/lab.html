@@ -119,6 +119,8 @@ MathJax = {
 
 
 
+<div class="callout try"><p class="callout-label">Try it yourself</p><strong>Helpful companions for today.</strong> Keep the <a href="log_logit_intuition.html">log &amp; logit intuition guide</a> open while you work &mdash; it has 16 worked examples of reading GLM coefficients as biology. Also useful: the interactive link-function &amp; logit visualizer and the <a href="plain_language_summary.html">plain-language summary</a>.</div>
+
 <section id="orient">
 <h2>Where we are</h2>
 <p>Yesterday we built probability and met the discrete distributions. This morning we'll meet the continuous distributions you need for regression: <strong>Normal, Lognormal, Gamma, Beta, Exponential</strong>. This afternoon we'll plug those distributions into a linear-model framework, generalize via link functions, and fit our first <strong>GLMs</strong>: logistic regression (Bernoulli/Binomial), Poisson regression with log link, and Negative-Binomial regression for overdispersed counts.</p>
@@ -360,7 +362,18 @@ MathJax = {
 <h3>Prove that linear transformations of Normals are Normal</h3>
 <p>Let $Z \sim \mathcal{N}(0,1)$ and $Y = \mu + \sigma Z$. Using $E[aZ + b] = a E[Z] + b$ and $\mathrm{Var}(aZ+b) = a^2 \mathrm{Var}(Z)$, show $E[Y] = \mu$ and $\mathrm{Var}(Y) = \sigma^2$.</p>
 <details class="answer"><summary>Reveal</summary><div class="answer-body">
-<p>$E[Y] = E[\mu + \sigma Z] = \mu + \sigma \cdot 0 = \mu$. $\mathrm{Var}(Y) = \mathrm{Var}(\mu + \sigma Z) = \sigma^2 \cdot 1 = \sigma^2$. The shape stays Normal because a linear transform of a Gaussian is Gaussian.</p>
+<p><strong>Mean — one step at a time.</strong></p>
+<p>$E[Y] = E[\mu + \sigma Z]$ &nbsp; (substitute $Y = \mu + \sigma Z$)</p>
+<p>$\quad = \mu + \sigma\,E[Z]$ &nbsp; (by <em>linearity of expectation</em>, $E[aX+b] = a\,E[X] + b$, here with $a=\sigma,\ b=\mu$)</p>
+<p>$\quad = \mu + \sigma\cdot 0$ &nbsp; (because $E[Z]=0$ for $Z\sim\mathcal N(0,1)$)</p>
+<p>$\quad = \mu.$</p>
+<p><strong>Variance — one step at a time.</strong></p>
+<p>$\mathrm{Var}(Y) = \mathrm{Var}(\mu + \sigma Z)$ &nbsp; (substitute $Y = \mu + \sigma Z$)</p>
+<p>$\quad = \mathrm{Var}(\sigma Z)$ &nbsp; (adding a constant shifts location but not spread: $\mathrm{Var}(X+b) = \mathrm{Var}(X)$)</p>
+<p>$\quad = \sigma^2\,\mathrm{Var}(Z)$ &nbsp; (by the scaling rule $\mathrm{Var}(aX+b) = a^2\,\mathrm{Var}(X)$, here $a=\sigma$)</p>
+<p>$\quad = \sigma^2\cdot 1$ &nbsp; (because $\mathrm{Var}(Z)=1$ for $Z\sim\mathcal N(0,1)$)</p>
+<p>$\quad = \sigma^2.$</p>
+<p><strong>Shape.</strong> The distribution stays Normal because a linear transformation of a Gaussian is Gaussian — the moment-generating function of $\mu+\sigma Z$, namely $e^{\mu t + \sigma^2 t^2/2}$, is exactly the MGF of a $\mathcal N(\mu,\sigma^2)$. So $Y\sim\mathcal N(\mu,\sigma^2)$.</p>
 </div></details>
 </div>
 
@@ -393,12 +406,21 @@ sd(bin); sd(betbin) # ~ 2.4 vs ~ 14</code></pre>
 <div class="exercise" id="a1">
 <span class="ex-tag">Exercise A1</span><span class="difficulty medium"> · Normal vs Poisson vs NB on eDNA counts</span>
 <h3>Sockeye eDNA — find the right distribution</h3>
-<p>Load <code>sockeye_adult.csv</code> (in this Day's <code>data/</code> folder). The response is daily count of adult sockeye; the predictor is <code>Qcorr_qPCR</code> (flow-corrected eDNA concentration). Fit, in sequence:</p>
+<p>Load <code>sockeye_adult.csv</code> from this Day's <code>data/</code> folder. It is in <strong>long format</strong> (one row per <code>Sockeyetype</code> per day), so first subset to adult sockeye. The response is the daily <code>Count</code> of adult sockeye; the predictor is <code>Qcorr_qPCR</code> (flow-corrected eDNA concentration). Build a <code>Year</code> factor from <code>Date</code> and a log-transformed eDNA predictor:</p>
+<pre><code>library(MASS)
+sock &lt;- read.csv("data/sockeye_adult.csv", stringsAsFactors = FALSE)
+table(sock$Sockeyetype)                            # confirm the adult level name
+d &lt;- subset(sock, Sockeyetype == "Sockeye_Adults")
+d$Year &lt;- factor(sub(".*/", "", d$Date))           # "15" or "16"
+d &lt;- d[!is.na(d$Count) &amp; !is.na(d$Qcorr_qPCR), ]   # complete cases (n = 55)
+min_pos &lt;- min(d$Qcorr_qPCR[d$Qcorr_qPCR &gt; 0])      # small constant so log() is finite
+d$logED &lt;- log(d$Qcorr_qPCR + min_pos)</code></pre>
+<p>Fit, in sequence:</p>
 <ol>
-<li><code>lm(log(Sockeye_Adults+1) ~ log(Qcorr_qPCR+min_pos))</code> — the old-school approach.</li>
-<li><code>glm(Sockeye_Adults ~ log(Qcorr_qPCR+min_pos) + factor(Year), family=poisson)</code>.</li>
-<li><code>glm(Sockeye_Adults ~ log(Qcorr_qPCR+min_pos) + factor(Year), family=quasipoisson)</code>.</li>
-<li><code>MASS::glm.nb(Sockeye_Adults ~ log(Qcorr_qPCR+min_pos) + factor(Year))</code>.</li>
+<li><code>lm(log(Count + 1) ~ logED, data = d)</code> — the old-school log-transform approach.</li>
+<li><code>glm(Count ~ logED + Year, family = poisson, data = d)</code>.</li>
+<li><code>glm(Count ~ logED + Year, family = quasipoisson, data = d)</code>.</li>
+<li><code>MASS::glm.nb(Count ~ logED + Year, data = d)</code>.</li>
 </ol>
 <p>For each fit:</p>
 <ul>
@@ -407,8 +429,30 @@ sd(bin); sd(betbin) # ~ 2.4 vs ~ 14</code></pre>
 <li>Back-transform the log-link slope to a multiplicative effect: "a doubling of eDNA concentration is associated with a ×__ change in expected daily count."</li>
 </ul>
 
+<details class="answer"><summary>Reveal worked solution</summary><div class="answer-body">
+<pre><code>f_lm &lt;- lm(log(Count + 1) ~ logED, data = d)
+f_p  &lt;- glm(Count ~ logED + Year, family = poisson,      data = d)
+f_qp &lt;- glm(Count ~ logED + Year, family = quasipoisson, data = d)
+f_nb &lt;- MASS::glm.nb(Count ~ logED + Year, data = d)
+
+# overdispersion diagnostic for the Poisson
+f_p$deviance / f_p$df.residual              # 2296.6 / 52 = 44.2
+summary(f_qp)$dispersion                     # 51.0
+f_nb$deviance / f_nb$df.residual             # 48.8 / 52 = 0.94  (theta = 0.73)
+2^coef(f_nb)["logED"]                         # 1.86</code></pre>
+<table>
+<tr><th scope="col">Fit</th><th scope="col"><code>logED</code> slope</th><th scope="col">SE(<code>logED</code>)</th><th scope="col">dispersion / (resid. dev ÷ df)</th></tr>
+<tr><td>1. lm(log(Count+1))</td><td>0.589</td><td>0.045</td><td>&mdash;</td></tr>
+<tr><td>2. Poisson</td><td>0.737</td><td>0.013</td><td>resid.dev/df = 2296.6/52 = <strong>44.2</strong></td></tr>
+<tr><td>3. Quasipoisson</td><td>0.737</td><td>0.095</td><td>dispersion = <strong>51.0</strong></td></tr>
+<tr><td>4. Negative binomial</td><td>0.897</td><td>0.081</td><td>resid.dev/df = 48.8/52 = <strong>0.94</strong>, $\theta = 0.73$</td></tr>
+</table>
+<p><strong>Overdispersion.</strong> The Poisson residual deviance is 44&times; its df — massive overdispersion, so its SE on <code>logED</code> (0.013) is far too small. The quasipoisson rescales that SE by $\sqrt{51}\approx 7.1$ to 0.095; the negative binomial (a proper likelihood, $\theta = 0.73$) gives 0.081 and a residual-deviance ratio near 1 (0.94) — a well-calibrated fit. Trust fits 3 and 4, not the naive Poisson.</p>
+<p><strong>Back-transform.</strong> Using the NB slope $\hat\beta = 0.897$ on $\log(\text{eDNA})$, a <em>doubling</em> of eDNA multiplies the linear predictor by $0.897\times\ln 2$, hence multiplies the expected count by $2^{0.897} = e^{0.897\cdot\ln 2} = 1.86$. So <strong>a doubling of eDNA concentration is associated with roughly an 87% increase (×1.86) in the expected daily adult sockeye count</strong> — matching the graded Problem 5.</p>
+</div></details>
+
 <div class="callout bio"><p class="callout-label">Biological intuition</p>
-<strong>Where the biology lives.</strong> If the log-link slope is, say, 0.7, then $e^{0.7 \cdot \ln 2} = 2^{0.7} = 1.62$. So a doubling of eDNA is associated with a 62% increase in sockeye. That sentence is what you put in your paper — not "the slope was 0.7 (SE 0.04)."
+<strong>Where the biology lives.</strong> The NB log-link slope here is $\hat\beta = 0.897$, so $e^{0.897 \cdot \ln 2} = 2^{0.897} = 1.86$. A doubling of eDNA is associated with an ~87% increase in expected daily sockeye. That sentence is what you put in your paper — not "the slope was 0.90 (SE 0.08)."
 </div>
 </div>
 
@@ -419,20 +463,25 @@ sd(bin); sd(betbin) # ~ 2.4 vs ~ 14</code></pre>
 <ol type="a">
 <li>Fit <code>glm(survived ~ class, family=binomial, data=titanic_long)</code>.</li>
 <li>Fit <code>glm(cbind(Yes, No) ~ Class, family=binomial, data=titanic_prop)</code>.</li>
-<li>Confirm that coefficients are identical. Why must they be?</li>
+<li>Confirm that the two fits agree — identical fitted probabilities, and identical coefficients once the two data frames use the same reference class. Why must they?</li>
 <li>Convert each class's log-odds to a probability. Compare to raw proportions.</li>
 </ol>
 <details class="answer"><summary>Reveal solution</summary><div class="answer-body">
-<pre><code>library(dplyr)
-long &lt;- read.csv("data/titanic_long.csv")
-prop &lt;- read.csv("titanic_prop.csv")
+<pre><code>long &lt;- read.csv("data/titanic_long.csv")
+prop &lt;- read.csv("data/titanic_prop.csv")
 f1 &lt;- glm(survived ~ class, family=binomial, data=long)
 f2 &lt;- glm(cbind(Yes, No) ~ Class, family=binomial, data=prop)
-coef(f1); coef(f2) # same
-# Probabilities
-plogis(coef(f1)[1] + c(0, coef(f1)[-1]))
-prop$Yes / (prop$Yes + prop$No) # raw proportions match</code></pre>
-<p>(c) Because the binomial likelihood is the product of Bernoulli likelihoods — aggregating $n$ Bernoullis into one Binomial summary is mathematically equivalent. Only the deviance differs (the Bernoulli form includes a constant that the Binomial form doesn't).</p>
+
+# Fitted survival probability per class -- identical across the two forms
+plogis(coef(f1)[1] + c(0, coef(f1)[-1]))    # crew, first, second, third
+tapply(long$survived, long$class, mean)      # exactly the same numbers
+# titanic_prop has one row per Class x Sex x Age, so aggregate to Class first:
+tapply(prop$Yes, prop$Class, sum) / tapply(prop$Yes + prop$No, prop$Class, sum)</code></pre>
+<p>Fitted probabilities per class come out crew 0.240, first 0.625, second 0.414, third 0.252 — identical to the raw proportions (a single categorical predictor gives a <em>saturated</em> model, so each group's MLE is just its empirical proportion).</p>
+<p><strong>(c) Why the two forms agree.</strong> Write $y_i\in\{0,1\}$ for each passenger and group them by class. For a group with $n$ passengers and $y=\sum y_i$ survivors, the two likelihoods are</p>
+<div class="eq-block">$\underbrace{\prod_{i=1}^{n} p^{y_i}(1-p)^{1-y_i}}_{\text{Bernoulli, one row per person}} \;=\; p^{y}(1-p)^{n-y}$ &nbsp; vs. &nbsp; $\underbrace{\binom{n}{y}\,p^{y}(1-p)^{n-y}}_{\text{Binomial, aggregated counts}}$</div>
+<p>They differ only by the factor $\binom{n}{y}$ — the number of ways to arrange $y$ survivors among $n$ people. Taking logs, the two log-likelihoods differ by the additive constant $\log\binom{n}{y}$, which <em>does not contain $p$</em>. Because the MLE and its standard errors depend only on how the log-likelihood changes with $p$ (its derivatives in $p$), a term free of $p$ drops out: the estimated coefficients, fitted probabilities, and SEs are identical. (The coefficient <em>tables</em> can still look different if the two data frames sort their factor levels differently and thus pick different reference classes — align the references and the numbers match exactly.)</p>
+<p>What the constant <em>does</em> shift is the absolute log-likelihood, and therefore the residual deviance and AIC, by the fixed amount $\sum_{\text{groups}}\log\binom{n}{y}$. So never compare the deviance/AIC of a Bernoulli (one-row-per-individual) fit against an aggregated Binomial fit — the gap is bookkeeping, not model fit.</p>
 </div></details>
 </div>
 
@@ -440,13 +489,33 @@ prop$Yes / (prop$Yes + prop$No) # raw proportions match</code></pre>
 <span class="ex-tag">Exercise A3</span><span class="difficulty hard"> · Titanic with interactions</span>
 <h3>Sex × Class effects on survival</h3>
 <p>Fit <code>glm(survived ~ class * sex + age, family=binomial, data=titanic_long)</code>. Use <code>effects::allEffects()</code> to plot fitted probabilities, and use <code>emmeans::emmeans(fit, pairwise ~ class | sex)</code> to compare classes within each sex.</p>
+<p>(Note: in this dataset <code>age</code> is a two-level factor, <code>adult</code> vs <code>child</code> — not a number in years.)</p>
 <ol type="a">
 <li>Which pairwise contrast is largest (in odds ratio)?</li>
 <li>Why is the simple TukeyHSD on an aov object the wrong way to do this comparison?</li>
-<li>Translate the female 1st-vs-3rd-class log-odds difference into a probability difference for a 30-year-old passenger.</li>
+<li>Translate the female 1st-vs-3rd-class log-odds difference into a probability difference for an adult passenger.</li>
 </ol>
-<details class="answer"><summary>Hint and discussion</summary><div class="answer-body">
-<p>TukeyHSD assumes a Normal-error linear model; on a logistic GLM we need methods (like <code>emmeans</code> with type="link" or "response") that respect the binomial likelihood and the non-identity link. The ranking and uncertainty differ between scales.</p>
+<details class="answer"><summary>Reveal worked solution</summary><div class="answer-body">
+<pre><code>library(effects); library(emmeans)
+long &lt;- read.csv("data/titanic_long.csv", stringsAsFactors = TRUE)
+fit  &lt;- glm(survived ~ class * sex + age, family = binomial, data = long)
+plot(allEffects(fit))                                  # fitted probabilities
+emmeans(fit, pairwise ~ class | sex, type = "response")  # class contrasts within each sex</code></pre>
+<p><strong>(a) Largest pairwise odds ratio.</strong> The <code>emmeans</code> pairwise output (odds-ratio scale) gives, among <em>females</em>, first-vs-third class as the largest contrast:</p>
+<pre><code># sex = female:
+#  contrast        odds.ratio     SE  z.ratio  p.value
+#  first / third        48.7    25.7    7.35   &lt;.0001
+# sex = male:
+#  first / third         2.78    0.55   5.14    &lt;.0001</code></pre>
+<p>First-class women had about <strong>49&times;</strong> the odds of survival of third-class women — the sharpest class gradient in the model. Among men the same first-vs-third contrast is only ~2.8&times;: the "women and children first" protocol compressed the class effect for men.</p>
+<p><strong>(b) Why not TukeyHSD on an aov?</strong> <code>TukeyHSD</code> operates on an <code>aov</code> object, which assumes Normal errors, constant variance, and an identity link. A survival GLM has Bernoulli errors (variance $p(1-p)$, not constant) and a logit link, so Tukey on an <code>aov</code> would use the wrong likelihood, ignore the link, and ignore the interaction. <code>emmeans</code> on the fitted GLM forms the contrasts on the correct log-odds scale (optionally back-transformed to the response scale) with proper delta-method SEs and a Tukey multiplicity adjustment.</p>
+<p><strong>(c) Female 1st-vs-3rd, adult passenger.</strong></p>
+<pre><code>predict(fit,
+        newdata = data.frame(class = c("first","third"), sex = "female", age = "adult"),
+        type = "response")
+#     1st        3rd
+#  0.972      0.419</code></pre>
+<p>An adult first-class woman is modeled at $p = 0.972$ versus $p = 0.419$ for an adult third-class woman — a probability difference of about <strong>0.55</strong> (55 percentage points). On the link scale that is a log-odds gap of $3.56 - (-0.33) = 3.89$, i.e. an odds ratio of $e^{3.89} \approx 49$, matching part (a). The odds ratio and the probability difference describe the <em>same</em> effect on two scales; report both, because a huge odds ratio near the probability ceiling still corresponds to a bounded (though here still large) probability gap.</p>
 </div></details>
 </div>
 </section>

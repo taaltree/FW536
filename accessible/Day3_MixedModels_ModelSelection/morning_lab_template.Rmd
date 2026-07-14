@@ -41,26 +41,17 @@ library(MuMIn)
 
 ```{r data}
 # Real-data problems read these files from the data/ folder.
-# Problem 1 — streams (mixed1a.txt); n counts total values (3 fields x 300 rows),
-# so n = 3 * 300 loads all 100 streams
-StreamsRaw <- scan("data/mixed1a.txt",
-                   what = list(Stream = 0, Tst = 0, Density = 0), n = 3 * 300)
-Streams <- data.frame(StreamsRaw); Streams$Stream <- factor(Streams$Stream)
+# Problem 1 — streams (stream_density.csv): 100 streams, three observations each
+Streams <- read.csv("data/stream_density.csv")
+Streams$Stream <- factor(Streams$Stream)
 
-# Problem 2 — length-weight (mixed1b.txt)
-LenWRaw <- scan("data/mixed1b.txt",
-                what = list(Subject = 0, TST1 = 0, TST2 = 0,
-                            Length = 0, Weight = 0, TST3 = 0), n = 6 * 100)
-LenW <- data.frame(LenWRaw); LenW$Subject <- as.factor(LenW$Subject)
+# Problem 2 — length-weight (length_weight.csv)
+LenW <- read.csv("data/length_weight.csv")
+LenW$Subject <- as.factor(LenW$Subject)
 
-# Problem 3 — von Bertalanffy growth (week6b.txt)
-VonBRaw <- scan("data/week6b.txt",
-                what = list(Subject = 0, Age = 0, Length = 0, NULL),
-                skip = 1, n = 4 * 100)
+# Problem 3 — von Bertalanffy growth (fish_growth.csv)
 AgeLen <- groupedData(Length ~ Age | Subject,
-                      data = as.data.frame(cbind(Subject = VonBRaw$Subject,
-                                                 Age = VonBRaw$Age,
-                                                 Length = VonBRaw$Length)))
+                      data = read.csv("data/fish_growth.csv"))
 
 # Problem 4 — trophic position (qcbs_w6_data.csv)
 dat <- read.csv("data/qcbs_w6_data.csv")
@@ -72,7 +63,7 @@ dat$Z_TP         <- scale(dat$Trophic_Pos)[, 1]
 
 ---
 
-# Problem 1 — Streams: complete / no / partial pooling (mixed1a.txt)
+# Problem 1 — Streams: complete / no / partial pooling (stream_density.csv)
 
 > Fit `lm(Density ~ 1)`, `lm(Density ~ Stream - 1)`, and
 > `lme(Density ~ 1, random = ~ 1 | Stream)`. Compare pooling behaviour, residual
@@ -89,7 +80,7 @@ dat$Z_TP         <- scale(dat$Trophic_Pos)[, 1]
 
 ---
 
-# Problem 2 — Length–weight random intercepts (mixed1b.txt)
+# Problem 2 — Length–weight random intercepts (length_weight.csv)
 
 > Fit `lme(Weight ~ Length, random = ~ 1 | Subject)` (and the `lmer` equivalent).
 > Report the fixed slope, the among-subject intercept SD, the residual SD and ICC,
@@ -106,7 +97,7 @@ dat$Z_TP         <- scale(dat$Trophic_Pos)[, 1]
 
 ---
 
-# Problem 3 — Von Bertalanffy nonlinear mixed model (week6b.txt)
+# Problem 3 — Von Bertalanffy nonlinear mixed model (fish_growth.csv)
 
 > Fit the fixed-effect `nls` von Bertalanffy curve and the `nlme` version with a
 > random $L_\infty$ per fish. Compare residual structure and residual SE, and
@@ -189,7 +180,7 @@ knitr::include_graphics("images/problemN_derivation.jpg")
 # Submission checklist
 
 - [ ] Answered every morning (Part 1) problem from `problem_set.html`.
-- [ ] Loaded the data files (`mixed1a.txt`, `mixed1b.txt`, `week6b.txt`, `qcbs_w6_data.csv`) from `data/`.
+- [ ] Loaded the data files (`stream_density.csv`, `length_weight.csv`, `fish_growth.csv`, `qcbs_w6_data.csv`) from `data/`.
 - [ ] Knitted to HTML without errors.
 - [ ] Photos (if any) embedded with `self_contained: true` in the YAML.
 - [ ] Uploaded the `.html` to the matching Canvas assignment.

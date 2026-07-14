@@ -104,7 +104,7 @@ MathJax = {
 <p>Everything referenced in this lab's exercises lives in this folder. Click any link below to download.</p>
 <div class="data-section">
   <h3 class="data-h">Datasets</h3>
-  <div class="data-row"><a href="data/sockeye_adult.csv"><code>sockeye_adult.csv</code></a><span class="data-desc">Daily sockeye salmon counts and flow-corrected qPCR eDNA concentrations (Levi et al. 2019).</span></div>
+  <div class="data-row"><a href="data/sockeye_adult.csv"><code>sockeye_adult.csv</code></a><span class="data-desc">Daily sockeye salmon counts and flow-corrected eDNA (Qcorr_qPCR = qPCR eDNA concentration × stream flow) (Levi et al. 2019).</span></div>
   <div class="data-row"><a href="data/titanic_long.csv"><code>titanic_long.csv</code></a><span class="data-desc">One row per Titanic passenger (binary survived, class, sex, age).</span></div>
   <div class="data-row"><a href="data/titanic_prop.csv"><code>titanic_prop.csv</code></a><span class="data-desc">Titanic survival aggregated to (Yes, No) counts per class for binomial-form GLM.</span></div>
 </div>
@@ -406,7 +406,7 @@ sd(bin); sd(betbin) # ~ 2.4 vs ~ 14</code></pre>
 <div class="exercise" id="a1">
 <span class="ex-tag">Exercise A1</span><span class="difficulty medium"> · Normal vs Poisson vs NB on eDNA counts</span>
 <h3>Sockeye eDNA — find the right distribution</h3>
-<p>Load <code>sockeye_adult.csv</code> from this Day's <code>data/</code> folder. It is in <strong>long format</strong> (one row per <code>Sockeyetype</code> per day), so first subset to adult sockeye. The response is the daily <code>Count</code> of adult sockeye; the predictor is <code>Qcorr_qPCR</code> (flow-corrected eDNA concentration). Build a <code>Year</code> factor from <code>Date</code> and a log-transformed eDNA predictor:</p>
+<p>Load <code>sockeye_adult.csv</code> from this Day's <code>data/</code> folder. It is in <strong>long format</strong> (one row per <code>Sockeyetype</code> per day), so first subset to adult sockeye. The response is the daily <code>Count</code> of adult sockeye; the predictor is <code>Qcorr_qPCR</code>, the <strong>flow-corrected eDNA concentration</strong> &mdash; the raw qPCR eDNA concentration multiplied by stream discharge (flow). Multiplying by flow converts a concentration into a quantity proportional to the total amount of eDNA transported past the sampler, which tracks fish abundance better than concentration alone. Build a <code>Year</code> factor from <code>Date</code> and a log-transformed eDNA predictor:</p>
 <pre><code>library(MASS)
 sock &lt;- read.csv("data/sockeye_adult.csv", stringsAsFactors = FALSE)
 table(sock$Sockeyetype)                            # confirm the adult level name
@@ -523,7 +523,7 @@ emmeans(fit, pairwise ~ class | sex, type = "response")  # class contrasts withi
 <!-- ============================================================ -->
 <section id="interactions">
 <h2>Interaction terms: algebra meets geometry</h2>
-<p>An interaction in a linear model means "the effect of one variable depends on the value of another." The lab walkthrough (<code>InteractionTerms.R</code> in your originals) demonstrates this with simulated data, 2D heatmaps, and 3D <code>plotly</code> surfaces. Four lessons to leave with:</p>
+<p>An interaction in a linear model means "the effect of one variable depends on the value of another." The companion script <code>InteractionTerms.R</code> demonstrates this with simulated data, 2D heatmaps, and 3D <code>plotly</code> surfaces. Four lessons to leave with:</p>
 <ol>
 <li>If the true surface is a <strong>plane</strong>, there is no interaction. A model with $y \sim x_1 \cdot x_2$ should return an interaction coefficient near zero.</li>
 <li>If the surface is <strong>twisted</strong> (saddle/warped), there is an interaction. The sign of the interaction tells you whether the effect of $x_1$ is amplified or dampened as $x_2$ grows.</li>

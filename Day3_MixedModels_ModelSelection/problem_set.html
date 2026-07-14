@@ -53,12 +53,12 @@
 
 <section class="data-card" id="data-files">
 <h2>Data files used in this problem set</h2>
-<p>Every real-data problem below reads one of these files from the <code>data/</code> folder. The <code>scan()</code> / <code>read.csv()</code> calls are copied from the main lab so you can paste them directly.</p>
+<p>Every real-data problem below reads one of these files from the <code>data/</code> folder. The <code>read.csv()</code> calls are copied from the main lab so you can paste them directly.</p>
 <div class="data-section">
   <h3 class="data-h">Datasets</h3>
-  <div class="data-row"><a href="data/mixed1a.txt"><code>mixed1a.txt</code></a><span class="data-desc">Fish density in 100 streams, three observations per stream. Used in Problem 1.</span></div>
-  <div class="data-row"><a href="data/mixed1b.txt"><code>mixed1b.txt</code></a><span class="data-desc">Length–weight measurements per individual, grouped by subject. Used in Problem 2.</span></div>
-  <div class="data-row"><a href="data/week6b.txt"><code>week6b.txt</code></a><span class="data-desc">Age and length per individual fish (von Bertalanffy growth). Used in Problem 3.</span></div>
+  <div class="data-row"><a href="data/stream_density.csv"><code>stream_density.csv</code></a><span class="data-desc">Fish density in 100 streams, three observations per stream. Used in Problem 1.</span></div>
+  <div class="data-row"><a href="data/length_weight.csv"><code>length_weight.csv</code></a><span class="data-desc">Length–weight measurements per individual, grouped by subject. Used in Problem 2.</span></div>
+  <div class="data-row"><a href="data/fish_growth.csv"><code>fish_growth.csv</code></a><span class="data-desc">Age and length per individual fish (von Bertalanffy growth). Used in Problem 3.</span></div>
   <div class="data-row"><a href="data/qcbs_w6_data.csv"><code>qcbs_w6_data.csv</code></a><span class="data-desc">QCBS fish trophic position: three species across six lakes. Used in Problems 4 and 10.</span></div>
 </div>
 </section>
@@ -69,12 +69,12 @@
 
 <section class="data-card" id="datasets">
 <h2>Datasets for this assignment</h2>
-<p>Click a file to download it, then put it in a <code>data/</code> subfolder beside your <code>.Rmd</code> so the <code>read.csv()</code> / <code>scan()</code> calls resolve.</p>
+<p>Click a file to download it, then put it in a <code>data/</code> subfolder beside your <code>.Rmd</code> so the <code>read.csv()</code> calls resolve.</p>
 <div class="data-section">
   <div class="data-row"><a href="data/qcbs_w6_data.csv" download><code>qcbs_w6_data.csv</code></a><span class="data-desc">Fish trophic position across three species and six lakes (mixed models).</span></div>
-  <div class="data-row"><a href="data/mixed1a.txt" download><code>mixed1a.txt</code></a><span class="data-desc">Fish density in 100 streams, 3 observations each (random-intercept intro).</span></div>
-  <div class="data-row"><a href="data/mixed1b.txt" download><code>mixed1b.txt</code></a><span class="data-desc">Length and weight per individual (random-intercept regression).</span></div>
-  <div class="data-row"><a href="data/week6b.txt" download><code>week6b.txt</code></a><span class="data-desc">Age and length per individual fish (nonlinear mixed / von Bertalanffy).</span></div>
+  <div class="data-row"><a href="data/stream_density.csv" download><code>stream_density.csv</code></a><span class="data-desc">Fish density in 100 streams, 3 observations each (random-intercept intro).</span></div>
+  <div class="data-row"><a href="data/length_weight.csv" download><code>length_weight.csv</code></a><span class="data-desc">Length and weight per individual (random-intercept regression).</span></div>
+  <div class="data-row"><a href="data/fish_growth.csv" download><code>fish_growth.csv</code></a><span class="data-desc">Age and length per individual fish (nonlinear mixed / von Bertalanffy).</span></div>
 </div>
 </section>
 
@@ -84,11 +84,11 @@
 <div class="exercise" id="p1">
 <span class="ex-tag">Problem 1</span><span class="difficulty easy"> · real data · pooling decision</span>
 <h3>Streams: complete pooling vs no pooling vs partial pooling</h3>
-<p>The file <code>mixed1a.txt</code> holds fish-density measurements from 100 streams, three replicate observations per stream. Read it with the lab's <code>scan()</code> pattern; <code>n</code> counts total values (3 fields × 300 rows), so use <code>n=3*300</code> to load every stream:</p>
+<p>The file <code>stream_density.csv</code> holds fish-density measurements from 100 streams, three replicate observations per stream. Load it with <code>read.csv()</code>:</p>
 <div class="code-label">Setup</div>
 <pre><code><span class="kw">library</span>(nlme); <span class="kw">library</span>(lme4)
 
-TheData &lt;- <span class="fn">scan</span>(<span class="st">"data/mixed1a.txt"</span>, what=<span class="kw">list</span>(Stream=<span class="nu">0</span>, Tst=<span class="nu">0</span>, Density=<span class="nu">0</span>), n=<span class="nu">3</span>*<span class="nu">300</span>)
+TheData &lt;- <span class="fn">read.csv</span>(<span class="st">"data/stream_density.csv"</span>)
 Streams &lt;- <span class="fn">data.frame</span>(TheData)
 Streams$Stream &lt;- <span class="fn">factor</span>(Streams$Stream)
 
@@ -98,7 +98,7 @@ lm3 &lt;- <span class="fn">lme</span>(fixed = Density ~ <span class="nu">1</span
 <ol type="a">
 <li>Write out the equation each of the three models fits, and state how many parameters each estimates. Which model would you use if you wanted to make inferences about fish density in <em>other</em> Oregon streams not in this dataset, and why?</li>
 <li>Plot residuals from <code>lm1</code> by stream with <code>boxplot(split(resid(lm1), Streams$Stream))</code>. What do you see, and what does it tell you about the validity of <code>lm1</code>?</li>
-<li>Compare <code>coef(lm2)</code> (the 18 no-pooling stream means) with <code>coef(lm3)</code> (the 18 partially-pooled estimates). Pick the most extreme stream and describe how far it shrank toward the overall mean, and why.</li>
+<li>Compare <code>coef(lm2)</code> (the 100 no-pooling stream means) with <code>coef(lm3)</code> (the 100 partially-pooled estimates). Pick the most extreme stream and describe how far it shrank toward the overall mean, and why.</li>
 <li>From <code>summary(lm3)</code> and <code>intervals(lm3)</code>, report the among-stream SD (with its 95% CI), the within-stream residual SD, and compute the ICC. Interpret the ICC in one sentence.</li>
 </ol>
 <div class="callout try" style="margin-top: 12px;"><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
@@ -107,10 +107,9 @@ lm3 &lt;- <span class="fn">lme</span>(fixed = Density ~ <span class="nu">1</span
 <div class="exercise" id="p2">
 <span class="ex-tag">Problem 2</span><span class="difficulty medium"> · real data · random intercepts + covariate</span>
 <h3>Length–weight: random intercepts with a fixed-effect covariate</h3>
-<p><code>mixed1b.txt</code> has length and weight for individuals grouped by subject. The biological question: is there a length–weight relationship, and does the intercept vary by subject?</p>
+<p><code>length_weight.csv</code> has length and weight for individuals grouped by subject. The biological question: is there a length–weight relationship, and does the intercept vary by subject?</p>
 <div class="code-label">Setup</div>
-<pre><code>TheData &lt;- <span class="fn">scan</span>(<span class="st">"data/mixed1b.txt"</span>,
- what=<span class="kw">list</span>(Subject=<span class="nu">0</span>,TST1=<span class="nu">0</span>,TST2=<span class="nu">0</span>,Length=<span class="nu">0</span>,Weight=<span class="nu">0</span>,TST3=<span class="nu">0</span>), n=<span class="nu">6</span>*<span class="nu">100</span>)
+<pre><code>TheData &lt;- <span class="fn">read.csv</span>(<span class="st">"data/length_weight.csv"</span>)
 LenW &lt;- <span class="fn">data.frame</span>(TheData); LenW$Subject &lt;- <span class="fn">as.factor</span>(LenW$Subject)
 
 m1  &lt;- <span class="fn">lme</span>(Weight ~ Length, data=LenW, random = ~ <span class="nu">1</span> | Subject, method=<span class="st">"REML"</span>)
@@ -127,11 +126,11 @@ m1b &lt;- <span class="fn">lmer</span>(Weight ~ Length + (<span class="nu">1</sp
 <div class="exercise" id="p3">
 <span class="ex-tag">Problem 3</span><span class="difficulty hard"> · real data · nonlinear mixed</span>
 <h3>Von Bertalanffy growth — a nonlinear mixed model</h3>
-<p><code>week6b.txt</code> contains age and length measurements for multiple individual fish (<code>Subject</code>). Each fish is expected to follow the von Bertalanffy growth curve</p>
+<p><code>fish_growth.csv</code> contains age and length measurements for multiple individual fish (<code>Subject</code>). Each fish is expected to follow the von Bertalanffy growth curve</p>
 <div class="eq-block">$L(a) = L_\infty\left(1 - e^{-\kappa (a - t_0)}\right),$</div>
 <p>where $L_\infty$ is asymptotic length, $\kappa$ the growth rate, and $t_0$ the theoretical age at length zero.</p>
 <div class="code-label">Fixed-effect fit, then the mixed fit (random $L_\infty$)</div>
-<pre><code>TheData &lt;- <span class="fn">scan</span>(<span class="st">"data/week6b.txt"</span>, what=<span class="kw">list</span>(Subject=<span class="nu">0</span>,Age=<span class="nu">0</span>,Length=<span class="nu">0</span>,<span class="kw">NULL</span>), skip=<span class="nu">1</span>, n=<span class="nu">4</span>*<span class="nu">100</span>)
+<pre><code>TheData &lt;- <span class="fn">read.csv</span>(<span class="st">"data/fish_growth.csv"</span>)
 xx &lt;- <span class="fn">as.data.frame</span>(<span class="kw">cbind</span>(Subject=TheData$Subject, Age=TheData$Age, Length=TheData$Length))
 AgeLen &lt;- <span class="fn">groupedData</span>(Length ~ Age | Subject, data=xx)
 
@@ -183,7 +182,7 @@ M8 &lt;- <span class="fn">lmer</span>(Z_TP ~ Z_Length + (<span class="nu">1</spa
 <div class="exercise" id="p5">
 <span class="ex-tag">Problem 5</span><span class="difficulty medium"> · variance partitioning · binomial GLMM</span>
 <h3>Detection probability across regions — a binomial GLMM</h3>
-<p>You fit a logistic mixed model to detection/non-detection data (a camera-trap or PIT-array design; the algebra is identical). Cameras are nested within regions:</p>
+<p>You fit a binomial mixed model to detection/non-detection data (a camera-trap or PIT-array design; the algebra is identical). Cameras are nested within regions:</p>
 <pre><code>m &lt;- glmer(Detect ~ scale(Covariate) + (1 | Region/Camera), data=d, family=binomial)
 VarCorr(m)
 # Groups        Name        Variance Std.Dev.
@@ -194,7 +193,7 @@ VarCorr(m)
 # (Intercept)       -1.4      0.30     -4.6
 # scale(Covariate)   0.62     0.13      4.8</code></pre>
 <ol type="a">
-<li>On the latent logit scale the implicit residual variance of a Bernoulli draw is $\pi^2/3 \approx 3.29$. What fraction of total non-fixed variation lives between regions, between cameras within regions, and in the residual? Why do we add the $\pi^2/3$ term in the ICC denominator for a binomial GLMM?</li>
+<li>Interpret the output in words. (i) The fixed-effect estimate for <code>scale(Covariate)</code> is $0.62$ on the logit scale &mdash; in which direction does detection change as the covariate increases, and is the effect statistically clear (look at the estimate relative to its standard error)? (ii) Compare the two random-effect standard deviations, Region ($\sqrt{0.46}=0.68$) and Camera-within-Region ($\sqrt{1.05}=1.02$): at which level &mdash; among regions, or among cameras within a region &mdash; is there more unexplained variation in detectability, and what would that suggest biologically?</li>
 <li>For a camera at mean covariate value with average region and camera intercepts, what is the expected detection probability? (Use <code>plogis()</code>.)</li>
 <li>Translate the covariate slope into an odds ratio per 1 SD, with an approximate 95% CI.</li>
 <li>Why include the camera-level (rather than only the region-level) random intercept at all? What does dropping it do to your standard errors?</li>

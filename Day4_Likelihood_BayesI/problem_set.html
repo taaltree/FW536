@@ -48,7 +48,7 @@
 <header class="lab-header">
  <div class="eyebrow">Day 4 · Assessed Problem Set (20 pts)</div>
  <h1>Ten problems on maximum likelihood and Bayesian inference</h1>
- <p class="lede">A dataset-driven problem set that mirrors the two Day 4 lectures. The morning problems are pure <strong>maximum likelihood</strong> — grid search, numerical optimization, likelihood-ratio tests, and profile confidence intervals. The afternoon problems are your first <strong>Bayesian</strong> models, fit with <span class="pill nimble">Nimble</span>. Three problems use the real course datasets (<code>Vonbert.dat</code>, <code>Whale.dat</code>, <code>Logistic.csv</code>); the rest are short simulate-and-fit or conceptual questions.</p>
+ <p class="lede">A dataset-driven problem set that mirrors the two Day 4 lectures. The morning problems are pure <strong>maximum likelihood</strong> — grid search, numerical optimization, likelihood-ratio tests, and profile confidence intervals. The afternoon problems are your first <strong>Bayesian</strong> models, fit with <span class="pill nimble">Nimble</span>. Three problems use the real course datasets (<code>vonbert.csv</code>, <code>whale.csv</code>, <code>Logistic.csv</code>); the rest are short simulate-and-fit or conceptual questions.</p>
 </header>
 
 <section class="callout warn" style="margin-top:24px;"><p><strong>Assessed problem set &middot; worth 20 points.</strong> Answers are <em>not</em> shown here. Write your work in the R Markdown templates: <a href="morning_lab_template.Rmd"><code>morning_lab_template.Rmd</code></a> for the morning (MLE) problems, <a href="afternoon_lab_template.Rmd"><code>afternoon_lab_template.Rmd</code></a> for the afternoon (Bayesian) problems. Knit each to HTML and upload to the matching Canvas assignment.</p><p>For worked examples with visible answers, see <a href="lab.html">the in-class practice lab</a>.</p></section>
@@ -68,10 +68,10 @@
 
 <section class="data-card" id="datasets">
 <h2>Datasets for this assignment</h2>
-<p>Click a file to download it, then put it in a <code>data/</code> subfolder beside your <code>.Rmd</code> so the <code>read.csv()</code> / <code>scan()</code> calls resolve.</p>
+<p>Click a file to download it, then put it in a <code>data/</code> subfolder beside your <code>.Rmd</code> so the <code>read.csv()</code> calls resolve.</p>
 <div class="data-section">
-  <div class="data-row"><a href="data/Vonbert.dat" download><code>Vonbert.dat</code></a><span class="data-desc">Length-at-age data for von Bertalanffy growth (MLE).</span></div>
-  <div class="data-row"><a href="data/Whale.dat" download><code>Whale.dat</code></a><span class="data-desc">Whale blow counts (two-component Poisson mixture MLE).</span></div>
+  <div class="data-row"><a href="data/vonbert.csv" download><code>vonbert.csv</code></a><span class="data-desc">Length-at-age data for von Bertalanffy growth (columns: sex, age, length).</span></div>
+  <div class="data-row"><a href="data/whale.csv" download><code>whale.csv</code></a><span class="data-desc">Whale blow counts, one row per whale (columns: sex, blows) — two-component Poisson mixture of males and females.</span></div>
   <div class="data-row"><a href="data/Logistic.csv" download><code>Logistic.csv</code></a><span class="data-desc">Population size and per-capita growth rate (r/K logistic model).</span></div>
 </div>
 </section>
@@ -85,24 +85,28 @@
 <p>You released 80 fish after barotrauma treatment and tracked them with acoustic tags; 47 were detected alive after 7 days. Treat each fish's outcome as an independent Bernoulli($\phi$), where $\phi$ is the probability of post-release survival.</p>
 <ol type="a">
 <li>Write the joint likelihood $L(\phi)$ for the 80 fish. Take the log, differentiate, and solve algebraically for the MLE $\hat\phi$.</li>
-<li>Compute the observed Fisher information $I(\hat\phi)$ and the Wald 95% confidence interval.</li>
-<li>Use <code>stats4::mle()</code> and <code>confint()</code> to obtain the 95% profile-likelihood CI. Compare it to the Wald interval and explain any asymmetry.</li>
-<li>The manager asks: "What is the probability that true survival is at least 0.5?" Explain why maximum likelihood alone cannot answer that question directly, and name the framework (taught this afternoon) that can. <em>Do not compute the Bayesian answer here.</em></li>
+<li><strong>Two confidence intervals — compute both and compare.</strong> Neither the term "Fisher information" nor the "Wald interval" was covered in lecture, so here is what they mean.
+  <ul>
+  <li>The <em>observed Fisher information</em> is the <strong>curvature of the log-likelihood at the MLE</strong>: the negative second derivative $I(\hat\phi) = -\ell''(\hat\phi)$ (for a model with several parameters it is the negative Hessian matrix). A sharper peak means more information and a smaller standard error, $\text{SE} = 1/\sqrt{I(\hat\phi)}$. The <em>Wald 95% CI</em> is then the symmetric interval $\hat\phi \pm 1.96\,\text{SE}$. Compute $I(\hat\phi)$ and this Wald interval. (For a fitted <code>mle()</code>/<code>optim()</code> object, R hands you the same SE via <code>sqrt(diag(vcov(fit)))</code>, which inverts the Hessian for you.)</li>
+  <li>The <em>profile-likelihood CI</em> — the kind this course teaches — is the set of $\phi$ whose log-likelihood is within <strong>1.92 units of the maximum</strong>, where $1.92 = \tfrac12\chi^2_{1,\,0.95} =$ <code>0.5 * qchisq(0.95, 1)</code>. Obtain it with <code>stats4::mle()</code> and <code>confint()</code>.</li>
+  </ul>
+  Report both intervals side by side and explain any asymmetry: which one can be lopsided about $\hat\phi$, and why.</li>
+<li>The manager asks: "What is the probability that true survival is at least 0.5?" Explain why maximum likelihood alone cannot answer that question directly, and name the framework (taught this afternoon) that can.</li>
 </ol>
 <div class="callout bio">Post-release survival is the single most contested number in catch-and-release fishery management. The same Bernoulli/binomial likelihood structure underlies mark-recapture survival, nest success, and germination trials — you will meet it again all week.</div>
 </div>
 
 <div class="exercise" id="p2">
 <span class="ex-tag">Problem 2</span><span class="difficulty hard"> · Real data · Grid search + optim + LRT · 45 min</span>
-<h3>Von Bertalanffy growth from length-at-age data (<code>Vonbert.dat</code>)</h3>
-<p>The file <code>data/Vonbert.dat</code> holds length-at-age records with three columns — sex (1 or 2), age (years), and length. The Von Bertalanffy growth function (VBGF) is</p>
+<h3>Von Bertalanffy growth from length-at-age data (<code>vonbert.csv</code>)</h3>
+<p>The file <code>data/vonbert.csv</code> holds length-at-age records with three columns — <code>sex</code> (1 or 2), <code>age</code> (years), and <code>length</code>. The Von Bertalanffy growth function (VBGF) is</p>
 <div class="eq-block">$L_a = L_\infty\left(1 - e^{-\kappa a}\right) + \varepsilon, \qquad \varepsilon \sim \mathcal{N}(0, \sigma^2),$</div>
 <p>where $L_\infty$ is asymptotic length and $\kappa$ is the growth coefficient. Load the data exactly as in the lab:</p>
 <div class="code-label">R · load Vonbert</div>
-<pre><code>TheData &lt;- <span class="fn">matrix</span>(<span class="fn">scan</span>(<span class="st">"data/Vonbert.dat"</span>, skip = <span class="nu">1</span>), byrow = <span class="kw">TRUE</span>, ncol = <span class="nu">3</span>)
-Sex &lt;- TheData[, <span class="nu">1</span>]; Age &lt;- TheData[, <span class="nu">2</span>]; Len &lt;- TheData[, <span class="nu">3</span>]</code></pre>
+<pre><code>TheData &lt;- <span class="fn">read.csv</span>(<span class="st">"data/vonbert.csv"</span>)
+Sex &lt;- TheData$sex; Age &lt;- TheData$age; Len &lt;- TheData$length</code></pre>
 <ol type="a">
-<li>Write the negative log-likelihood <code>nll_vbgf(Linf, kappa, sigma)</code> for the pooled data (both sexes). Holding $L_\infty = 100$ and $\sigma = 10$ fixed, run a <strong>grid search</strong> for $\kappa$ over <code>seq(0.05, 0.50, by = 0.005)</code>. Plot the NLL against $\kappa$ and report the grid-optimal $\hat\kappa$.</li>
+<li><strong>Define your own R function</strong> — name it <code>nll_vbgf(Linf, kappa, sigma)</code> — that takes the three parameters as arguments and returns the negative log-likelihood of the pooled data (both sexes). (<code>nll_vbgf</code> is not built in; you write it, exactly as in the lab walk-through.) Holding $L_\infty = 100$ and $\sigma = 10$ fixed, run a <strong>grid search</strong> for $\kappa$ over <code>seq(0.05, 0.50, by = 0.005)</code>. Plot the NLL against $\kappa$ and report the grid-optimal $\hat\kappa$.</li>
 <li>Now free all three parameters. Fit the full model with <code>mle()</code> (method <code>"L-BFGS-B"</code> with sensible lower bounds). Report $\hat L_\infty$, $\hat\kappa$, $\hat\sigma$, and the profile-likelihood 95% CIs from <code>confint()</code>.</li>
 <li>Test whether the sexes share a growth curve with a <strong>likelihood-ratio test</strong>. Fit a null model (one $L_\infty$, one $\kappa$, shared $\sigma$) and an alternative with sex-specific $L_\infty$ and $\kappa$ (shared $\sigma$). Compute $\Lambda = 2(\ell_{\text{alt}} - \ell_{\text{null}})$, compare to $\chi^2_2$, and report the p-value. Cross-check with <code>AIC()</code>.</li>
 <li>Explain why grid search does not scale to the full three-parameter model, and why it remains a useful sanity check on the optimizer.</li>
@@ -111,15 +115,15 @@ Sex &lt;- TheData[, <span class="nu">1</span>]; Age &lt;- TheData[, <span class=
 
 <div class="exercise" id="p3">
 <span class="ex-tag">Problem 3</span><span class="difficulty hard"> · Real data · Numerical MLE · Mixture · 40 min</span>
-<h3>Two-component Poisson mixture for whale blow counts (<code>Whale.dat</code>)</h3>
-<p>The file <code>data/Whale.dat</code> holds blow counts recorded at a hydrophone (column <code>MF</code> is a group code; column <code>Blows</code> is the count). Blow rates fall into two unobserved behavioral regimes — quiet and vocally active — with rates $\lambda_1$ and $\lambda_2$. Each count comes from regime 1 with probability $\pi$:</p>
+<h3>Two-component Poisson mixture for whale blow counts (<code>whale.csv</code>)</h3>
+<p>The file <code>data/whale.csv</code> holds blow counts for individual whales (column <code>sex</code> codes each whale 1 or 2; column <code>blows</code> is the count). The population is a mix of <strong>males and females</strong> that blow at different average rates. Treat each whale's sex as unobserved and model the counts as a two-component mixture: males blow at rate $\lambda_1$, females at rate $\lambda_2$, and a whale is male with probability $\pi$ (the <strong>proportion of males</strong>) and female with probability $1-\pi$. Your goal is to estimate the male rate $\lambda_1$, the female rate $\lambda_2$, and the proportions $\pi$ and $1-\pi$:</p>
 <div class="eq-block">$f(y \mid \lambda_1, \lambda_2, \pi) = \pi\,\text{Pois}(y;\lambda_1) + (1-\pi)\,\text{Pois}(y;\lambda_2).$</div>
 <div class="code-label">R · load Whale</div>
-<pre><code>TheData &lt;- <span class="fn">matrix</span>(<span class="fn">scan</span>(<span class="st">"data/Whale.dat"</span>, skip = <span class="nu">1</span>), byrow = <span class="kw">TRUE</span>, ncol = <span class="nu">2</span>)
-blows &lt;- TheData[, <span class="nu">2</span>]</code></pre>
+<pre><code>TheData &lt;- <span class="fn">read.csv</span>(<span class="st">"data/whale.csv"</span>)
+blows &lt;- TheData$blows   <span class="cm"># the mixture ignores the sex column; fit is unsupervised</span></code></pre>
 <ol type="a">
 <li>Explain, in one or two sentences, why the mixture MLE is <em>not</em> just the pair of single-component Poisson MLEs. Identify precisely which step in the usual derivation ($\log\prod = \sum\log$) breaks down.</li>
-<li>Write the joint negative log-likelihood and fit it with <code>mle()</code>, starting from $\lambda_1 &lt; \lambda_2$ (e.g. <code>lam1 = 10, lam2 = 30, p = 0.4</code>). Report $\hat\lambda_1$, $\hat\lambda_2$, $\hat\pi$ and their standard errors.</li>
+<li>Write the joint negative log-likelihood and fit it with <code>mle()</code>, starting from $\lambda_1 &lt; \lambda_2$ (e.g. <code>lam1 = 10, lam2 = 30, p = 0.4</code>). Report the estimated male rate $\hat\lambda_1$, female rate $\hat\lambda_2$, proportion of males $\hat\pi$, and their standard errors.</li>
 <li>Refit from at least 8 different starting values. How many distinct local optima appear? Report the global best (lowest NLL) and the fraction of starts that reached it.</li>
 <li>The two-component mixture is invariant under relabeling: $(\lambda_1,\lambda_2,\pi)$ and $(\lambda_2,\lambda_1,1-\pi)$ are the same model. Explain how this shows up if you <em>don't</em> constrain $\lambda_1 &lt; \lambda_2$, and why it would corrupt your standard errors.</li>
 </ol>
@@ -134,7 +138,7 @@ blows &lt;- TheData[, <span class="nu">2</span>]</code></pre>
 <pre><code>Logistic &lt;- <span class="fn">read.csv</span>(<span class="st">"data/Logistic.csv"</span>, header = <span class="kw">TRUE</span>)
 Logistic &lt;- Logistic[<span class="fn">order</span>(Logistic$PopulationSize), ]</code></pre>
 <ol type="a">
-<li>The model is linear: intercept $= r$, slope $= -r/K$. Fit it with <code>lm(GrowthRate ~ PopulationSize)</code>. From the fitted coefficients, recover the MLEs $\hat r$ and $\hat K$ (note $\hat K = -\hat r / \widehat{\text{slope}}$).</li>
+<li>The model is linear: intercept $= r$, slope $= -r/K$. Fit it with <code>lm(GrowthRate ~ PopulationSize)</code>. Because a Normal-error linear model fit by least squares <em>is</em> its maximum-likelihood fit, the fitted intercept and slope are already the MLEs of $r$ and $-r/K$. Now use the <strong>invariance property of the MLE</strong>: if $\hat\theta$ is the MLE of $\theta$, then $g(\hat\theta)$ is the MLE of any transformation $g(\theta)$. That is exactly why you may push the fitted coefficients through a formula to get MLEs of the biological parameters — e.g. $\hat K = -\hat r / \widehat{\text{slope}}$ is the MLE of $K$. Recover $\hat r$ and $\hat K$ this way. (You will invoke the same invariance property again in part (c) to turn $\hat r,\hat K$ into the MLE of MSY.)</li>
 <li>Now fit the <em>same</em> model directly by maximum likelihood with <code>mle()</code>, parameterized in $(r, K, \sigma)$ so that $\mu_i = r - (r/K)N_i$. Confirm you recover the same $\hat r$ and $\hat K$ as in (a), and report profile-likelihood 95% CIs.</li>
 <li>Using the invariance of the MLE, compute the plug-in MLE of the maximum sustainable yield $\text{MSY} = \hat r\hat K/4$ and of the population size at maximum growth $K/2$.</li>
 <li>Maximum likelihood gives you point estimates and CIs for $r$ and $K$, but propagating that uncertainty into a derived quantity like MSY is awkward (delta method, bootstrap). Note in one sentence why — you will revisit this exact model in Problem 7, where the Bayesian posterior propagates the uncertainty for free.</li>
@@ -208,7 +212,7 @@ Logistic &lt;- Logistic[<span class="fn">order</span>(Logistic$PopulationSize), 
 <div class="exercise" id="p9">
 <span class="ex-tag">Problem 9</span><span class="difficulty easy"> · Conceptual · BCI vs HPDI · 15 min</span>
 <h3>BCI vs HPDI for a skewed posterior</h3>
-<p>You fit a Poisson model to clutch sizes, $n = 12$ nests, $\sum y = 38$, with a Gamma(2, 1) prior. The posterior on the mean $\lambda$ is Gamma$(2 + 38,\; 1 + 12)$ = Gamma(40, 13).</p>
+<p>You fit a Poisson model to clutch sizes at $n = 12$ nests. Write $y_i$ for the clutch size (number of eggs) at nest $i$; the data enter the Gamma–Poisson posterior only through their total, $\sum_{i=1}^{12} y_i$ — the total number of eggs summed across all 12 nests, here $\sum y_i = 38$. With a Gamma(2, 1) prior, the posterior on the mean clutch size $\lambda$ is Gamma$\bigl(2 + \textstyle\sum y_i,\; 1 + n\bigr)$ = Gamma$(2 + 38,\; 1 + 12)$ = Gamma(40, 13).</p>
 <ol type="a">
 <li>Compute the posterior mean, mode, median, 95% equal-tailed BCI, and 95% HPDI for $\lambda$ (use <code>HDInterval::hdi()</code>).</li>
 <li>Plot the posterior density and overlay both intervals.</li>
@@ -219,10 +223,38 @@ Logistic &lt;- Logistic[<span class="fn">order</span>(Logistic$PopulationSize), 
 <div class="exercise" id="p10">
 <span class="ex-tag">Problem 10</span><span class="difficulty hard"> · Conceptual · Identifiability &amp; label switching · 25 min</span>
 <h3>Identifiability and label switching in a Bayesian mixture</h3>
-<p>You refit the two-component whale-blow mixture from Problem 3 in <span class="pill nimble">Nimble</span> instead of with <code>mle()</code>. With 3 chains and no constraint on the ordering of $\lambda_1$ and $\lambda_2$, the trace plots for "$\lambda_1$" jump between two values across iterations and between chains, and $\hat R$ is enormous.</p>
+<p>You refit the two-component whale-blow mixture from Problem 3 (males vs females) in <span class="pill nimble">Nimble</span> instead of with <code>mle()</code>. With 3 chains and no constraint on the ordering of $\lambda_1$ and $\lambda_2$, the trace plots for "$\lambda_1$" jump between two values across iterations and between chains, and $\hat R$ is enormous.</p>
+<p>The culprit is <strong>identifiability</strong>. A parameter — or a combination of parameters — is <em>non-identifiable</em> when two different parameter values produce <em>exactly the same likelihood</em>, so no amount of data can separate them. Here the mixture is invariant under relabeling: $(\lambda_1,\lambda_2,\pi)$ and $(\lambda_2,\lambda_1,\,1-\pi)$ give an identical likelihood — swapping the "male" and "female" labels changes nothing the data can see. That exchange symmetry is what breaks the sampler.</p>
 <ol type="a">
 <li>Explain geometrically what is happening. Why is $\hat R$ huge even though each chain has, in a sense, "converged" and the model fit is fine?</li>
-<li>Propose <em>three</em> ways to fix the label-switching problem, and for each give one limitation.</li>
+<li><strong>Fix it with an ordering constraint, then confirm the fix.</strong> The clean cure is to make the two rates un-swappable by <em>construction</em> — force $\lambda_1 &lt; \lambda_2$. One simple way: give the lower (male) rate its own prior, build the higher (female) rate on top of it with a positive gap $\delta$, and give each whale a latent sex label. Complete and run this skeleton (3 chains, the same <code>blows</code> vector as Problem 3):
+<div class="code-label">R · Nimble mixture with λ₁ &lt; λ₂ enforced</div>
+<pre><code><span class="kw">library</span>(nimble); <span class="kw">library</span>(MCMCvis); <span class="kw">library</span>(coda)
+mix_code &lt;- <span class="fn">nimbleCode</span>({
+ lam1  ~ <span class="fn">dunif</span>(<span class="nu">0</span>, <span class="nu">50</span>)        <span class="cm"># lower (male) rate</span>
+ delta ~ <span class="fn">dunif</span>(<span class="nu">0</span>, <span class="nu">50</span>)        <span class="cm"># positive gap, so lam[2] &gt; lam[1]</span>
+ lam[<span class="nu">1</span>] &lt;- lam1
+ lam[<span class="nu">2</span>] &lt;- lam1 + delta       <span class="cm"># higher (female) rate</span>
+ pi    ~ <span class="fn">dbeta</span>(<span class="nu">1</span>, <span class="nu">1</span>)        <span class="cm"># P(a whale is component 1 = male)</span>
+ pz[<span class="nu">1</span>] &lt;- pi
+ pz[<span class="nu">2</span>] &lt;- <span class="nu">1</span> - pi
+ <span class="kw">for</span> (i <span class="kw">in</span> <span class="nu">1</span>:n) {
+ z[i] ~ <span class="fn">dcat</span>(pz[<span class="nu">1</span>:<span class="nu">2</span>])       <span class="cm"># latent sex label (1 or 2)</span>
+ y[i] ~ <span class="fn">dpois</span>(lam[z[i]])
+ }
+})
+zinit &lt;- <span class="kw">ifelse</span>(blows &lt; <span class="nu">20</span>, <span class="nu">1</span>, <span class="nu">2</span>)             <span class="cm"># rough starting labels</span>
+out &lt;- <span class="fn">nimbleMCMC</span>(mix_code,
+ constants = <span class="kw">list</span>(n = <span class="fn">length</span>(blows)),
+ data      = <span class="kw">list</span>(y = blows),
+ inits     = <span class="kw">list</span>(<span class="kw">list</span>(lam1 = <span class="nu">8</span>,  delta = <span class="nu">20</span>, pi = <span class="nu">0.4</span>,  z = zinit),
+                  <span class="kw">list</span>(lam1 = <span class="nu">12</span>, delta = <span class="nu">18</span>, pi = <span class="nu">0.5</span>,  z = zinit),
+                  <span class="kw">list</span>(lam1 = <span class="nu">10</span>, delta = <span class="nu">22</span>, pi = <span class="nu">0.35</span>, z = zinit)),
+ monitors  = <span class="kw">c</span>(<span class="st">"lam1"</span>, <span class="st">"delta"</span>, <span class="st">"pi"</span>),
+ nchains = <span class="nu">3</span>, nburnin = <span class="nu">2000</span>, niter = <span class="nu">8000</span>,
+ samplesAsCodaMCMC = <span class="kw">TRUE</span>)
+<span class="fn">MCMCsummary</span>(out)                             <span class="cm"># check Rhat ~ 1</span></code></pre>
+<strong>What to look for:</strong> after the constraint the traces for $\lambda_1$ and $\lambda_2 = $ <code>lam1 + delta</code> stay in their own lanes (no jumping between ~10 and ~30), $\hat R$ drops to $\approx 1$, and the posterior means land on the Problem 3 MLEs ($\lambda_1\approx 10$, $\lambda_2\approx 30$, $\pi\approx 0.42$). Report $\hat R$ for $\lambda_1$ before and after adding the constraint.</li>
 <li>If you relabel the posterior draws post hoc so that $\lambda_1 &lt; \lambda_2$ always, what bias might you introduce, and when is such post hoc relabeling justified?</li>
 </ol>
 <div class="callout bio">The same non-identifiability logic appears throughout fisheries and wildlife modeling — for instance the catchability–biomass product $qB$ in surplus-production stock assessment, where only the product is identified from a single index. Recognizing an unidentified parameter combination is a core modeling skill.</div>

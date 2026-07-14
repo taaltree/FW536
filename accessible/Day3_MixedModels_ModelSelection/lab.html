@@ -101,9 +101,9 @@ MathJax = {
 <p>Everything referenced in this lab's exercises lives in this folder. Click any link below to download.</p>
 <div class="data-section">
   <h3 class="data-h">Datasets</h3>
-  <div class="data-row"><a href="data/mixed1a.txt"><code>mixed1a.txt</code></a><span class="data-desc">Fish density in 18 streams, three observations per stream (random-intercept intro).</span></div>
-  <div class="data-row"><a href="data/mixed1b.txt"><code>mixed1b.txt</code></a><span class="data-desc">Length-weight measurements per individual (random-intercept regression).</span></div>
-  <div class="data-row"><a href="data/week6b.txt"><code>week6b.txt</code></a><span class="data-desc">Age and length measurements per individual fish (nonlinear mixed-effects, von Bertalanffy).</span></div>
+  <div class="data-row"><a href="data/stream_density.csv"><code>stream_density.csv</code></a><span class="data-desc">Fish density in 100 streams, three observations per stream (random-intercept intro).</span></div>
+  <div class="data-row"><a href="data/length_weight.csv"><code>length_weight.csv</code></a><span class="data-desc">Length-weight measurements per individual (random-intercept regression).</span></div>
+  <div class="data-row"><a href="data/fish_growth.csv"><code>fish_growth.csv</code></a><span class="data-desc">Age and length measurements per individual fish (nonlinear mixed-effects, von Bertalanffy).</span></div>
   <div class="data-row"><a href="data/qcbs_w6_data.csv"><code>qcbs_w6_data.csv</code></a><span class="data-desc">QCBS fish trophic position dataset: three species nested across six lakes.</span></div>
 </div>
 </section>
@@ -202,12 +202,12 @@ You'll see two packages in this lab: <code>nlme</code> (Pinheiro &amp; Bates, th
 <div class="exercise" id="ex-1">
 <span class="ex-tag">Exercise 1</span><span class="difficulty easy"> · 20 min · streams</span>
 <h3>Streams: complete pooling vs no pooling vs partial pooling</h3>
-<p>The file <code>mixed1a.txt</code> has fish density measurements from 18 streams, three observations per stream.</p>
+<p>The file <code>stream_density.csv</code> has fish density measurements from 100 streams, three observations per stream.</p>
 
 <div class="code-label">Setup</div>
 <pre><code><span class="kw">library</span>(nlme); <span class="kw">library</span>(lme4); <span class="kw">library</span>(lattice); <span class="kw">library</span>(ggplot2)
 
-TheData &lt;- <span class="fn">scan</span>(<span class="st">"data/mixed1a.txt"</span>, what=<span class="kw">list</span>(Stream=<span class="nu">0</span>, Tst=<span class="nu">0</span>, Density=<span class="nu">0</span>), n=<span class="nu">3</span>*<span class="nu">18</span>)
+TheData &lt;- <span class="fn">read.csv</span>(<span class="st">"data/stream_density.csv"</span>)
 Streams &lt;- <span class="fn">data.frame</span>(TheData)
 Streams$Stream &lt;- <span class="fn">factor</span>(Streams$Stream)
 
@@ -219,7 +219,7 @@ lm3 &lt;- <span class="fn">lme</span>(fixed = Density ~ <span class="nu">1</span
 <ol type="a">
 <li>Write out the equation each of the three models is fitting. How many parameters does each estimate?</li>
 <li>Plot residuals from <code>lm1</code> by stream (use <code>boxplot(split(resid(lm1), Streams$Stream))</code>). What do you see, and what does that tell you about the validity of <code>lm1</code>?</li>
-<li>Compare <code>fixef(lm2)</code> (the 18 stream means) to <code>coef(lm3)</code> (the 18 partially-pooled stream estimates). Pick the most extreme stream and explain how much it shrank toward the overall mean, and why.</li>
+<li>Compare <code>fixef(lm2)</code> (the 100 stream means) to <code>coef(lm3)</code> (the 100 partially-pooled stream estimates). Pick the most extreme stream and explain how much it shrank toward the overall mean, and why.</li>
 <li>From <code>summary(lm3)</code> and <code>intervals(lm3)</code>, report the among-stream standard deviation and its 95% CI, the within-stream residual standard deviation, and the ICC.</li>
 </ol>
 
@@ -255,11 +255,10 @@ intervals(lm3)$sigma
 <div class="exercise" id="ex-2">
 <span class="ex-tag">Exercise 2</span><span class="difficulty medium"> · 25 min · length-weight</span>
 <h3>Length–weight: random intercepts with a fixed-effect covariate</h3>
-<p><code>mixed1b.txt</code> has length and weight for individuals from multiple subjects (groups). The biological question: is there a length–weight relationship, and does the intercept vary by subject?</p>
+<p><code>length_weight.csv</code> has length and weight for individuals from multiple subjects (groups). The biological question: is there a length–weight relationship, and does the intercept vary by subject?</p>
 
 <div class="code-label">Code</div>
-<pre><code>TheData &lt;- <span class="fn">scan</span>(<span class="st">"data/mixed1b.txt"</span>,
- what=<span class="kw">list</span>(Subject=<span class="nu">0</span>,TST1=<span class="nu">0</span>,TST2=<span class="nu">0</span>,Length=<span class="nu">0</span>,Weight=<span class="nu">0</span>,TST3=<span class="nu">0</span>), n=<span class="nu">6</span>*<span class="nu">100</span>)
+<pre><code>TheData &lt;- <span class="fn">read.csv</span>(<span class="st">"data/length_weight.csv"</span>)
 LenW &lt;- <span class="fn">data.frame</span>(TheData); LenW$Subject &lt;- <span class="fn">as.factor</span>(LenW$Subject)
 
 <span class="cm"># Random intercept, REML (default)</span>
@@ -295,12 +294,12 @@ m1b &lt;- <span class="fn">lmer</span>(Weight ~ Length + (<span class="nu">1</sp
 <div class="exercise" id="ex-3">
 <span class="ex-tag">Exercise 3</span><span class="difficulty hard"> · 35 min · nonlinear mixed</span>
 <h3>Von Bertalanffy growth — a nonlinear mixed model</h3>
-<p>The file <code>week6b.txt</code> contains age and length measurements for multiple individual fish ("Subject"). Each fish should follow the von Bertalanffy growth curve:</p>
+<p>The file <code>fish_growth.csv</code> contains age and length measurements for multiple individual fish ("Subject"). Each fish should follow the von Bertalanffy growth curve:</p>
 <div class="eq-block">$L(a) = L_\infty \left(1 - e^{-\kappa (a - t_0)}\right)$</div>
 <p>where $L_\infty$ is the asymptotic length, $\kappa$ the growth rate, and $t_0$ the theoretical age at length zero.</p>
 
 <div class="code-label">Fixed-effect nonlinear model first</div>
-<pre><code>TheData &lt;- <span class="fn">scan</span>(<span class="st">"data/week6b.txt"</span>, what=<span class="kw">list</span>(Subject=<span class="nu">0</span>,Age=<span class="nu">0</span>,Length=<span class="nu">0</span>,<span class="kw">NULL</span>), skip=<span class="nu">1</span>, n=<span class="nu">4</span>*<span class="nu">100</span>)
+<pre><code>TheData &lt;- <span class="fn">read.csv</span>(<span class="st">"data/fish_growth.csv"</span>)
 xx &lt;- <span class="fn">as.data.frame</span>(<span class="kw">cbind</span>(Subject=TheData$Subject, Age=TheData$Age, Length=TheData$Length))
 AgeLen &lt;- <span class="fn">groupedData</span>(Length ~ Age | Subject, data=xx)
 

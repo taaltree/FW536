@@ -77,8 +77,8 @@ confint(fit) <span class="cm"># profile-likelihood CI: (0.461, 0.726)</span></co
 <p>The profile-likelihood for $\kappa$ is built by holding $\kappa$ fixed at each grid point and optimizing the other two parameters; the resulting curve has its minimum at the joint MLE.</p>
 
 <pre><code><span class="kw">library</span>(stats4)
-TheData &lt;- matrix(scan(<span class="st">"Vonbert.dat"</span>, skip = <span class="nu">1</span>), byrow = <span class="kw">TRUE</span>, ncol = <span class="nu">3</span>)
-Age &lt;- TheData[, <span class="nu">2</span>]; Len &lt;- TheData[, <span class="nu">3</span>]
+TheData &lt;- read.csv(<span class="st">"data/vonbert.csv"</span>)
+Age &lt;- TheData$age; Len &lt;- TheData$length
 
 profile_kappa &lt;- function(k) {
  nll &lt;- function(Linf, sigma) {
@@ -101,7 +101,7 @@ abline(v = grid[which.min(prof)], col = <span class="st">"grey"</span>)
 ci &lt;- range(grid[(prof - best) &lt;= <span class="nu">1.92</span>])
 cat(<span class="st">"Profile 95% CI for kappa:"</span>, round(ci, <span class="nu">3</span>), <span class="st">"\n"</span>)</code></pre>
 
-<p>Typical result: $\hat\kappa \approx 0.18$–0.22 (pooled across sexes), CI roughly (0.15, 0.26). The curve is clearly asymmetric — Wald would have given a symmetric (and slightly wrong) CI.</p>
+<p>On the shipped data: $\hat\kappa \approx 0.24$ (pooled across sexes), profile 95% CI roughly $(0.205, 0.285)$. The curve is clearly asymmetric — Wald would have given a symmetric (and slightly wrong) CI.</p>
 
 <div class="callout key"><strong>What to look for:</strong> Common bug — students forget to <em>re-optimize $L_\infty$ and $\sigma$ at each $\kappa$</em> and just plug in their joint-MLE values. That gives a slice of the surface, not the profile. The profile is always shallower (wider 1.92 region) than the slice.</div>
 </section>
@@ -116,11 +116,11 @@ pval &lt;- pchisq(LRT, df = <span class="nu">2</span>, lower.tail = <span class=
 c(LRT = LRT, p_value = pval)
 AIC(fitA, fitB)</code></pre>
 
-<p>For this dataset typical numbers: $\Lambda \approx 8$–12, $p \approx 0.002$–0.02. Both LRT and AIC favor Model B.</p>
+<p>On the shipped data: $\Lambda \approx 75.4$ on 2 df, $p \approx 4\times10^{-17}$ — overwhelming. Both LRT and AIC decisively favor Model B (AIC $\approx 798$ for Model A vs $\approx 727$ for Model B, a drop of ~71).</p>
 
-<p>(b) Intermediate model: shared $L_\infty$, sex-specific $\kappa$. Fit it the same way with 4 parameters. Result typically has lower AIC than both Model A and Model B — the sex effect is concentrated in $\kappa$ (growth rate), while asymptotic length is similar.</p>
+<p>(b) Intermediate model (shared $L_\infty$, sex-specific $\kappa$, 4 parameters): AIC $\approx 767$ — better than the shared Model A ($\approx 798$) but still well above the full Model B ($\approx 727$). Each sex-specific parameter helps, and the fully sex-specific model wins. Fitting Model B shows the difference is concentrated in asymptotic length $L_\infty$ ($\hat L_{\infty,1}\approx 102.5$ vs $\hat L_{\infty,2}\approx 82.6$) more than in growth rate $\kappa$ ($0.284$ vs $0.259$).</p>
 
-<p>(c) Conclusion: females and males grow toward similar maximum sizes but at different rates. AIC will sometimes favor the intermediate model; LRT (which insists on a $\chi^2$ test) will reject Model A in favor of Model B but cannot directly compare the non-nested intermediate without an extra LRT against Model B.</p>
+<p>(c) Conclusion: the sexes differ mainly in asymptotic size $L_\infty$ (one sex reaches a substantially larger maximum length) and only modestly in $\kappa$; the full sex-specific model is preferred by both criteria. LRT requires nesting and delivers a p-value; AIC ranks (no nesting required) and here also points to Model B.</p>
 
 <div class="callout key"><strong>What to look for:</strong> Comfort with both LRT and AIC. Reinforce: LRT requires nesting; AIC does not. LRT delivers a p-value; AIC delivers a ranking, not a test.</div>
 </section>
@@ -158,12 +158,12 @@ do.call(rbind, lapply(c(<span class="nu">1</span>, <span class="nu">2.5</span>, 
 <p>Expected pattern:</p>
 <table>
 <tr><th>$\lambda$</th><th>Observed P(Y=0)</th><th>Poisson-predicted P(Y=0)</th><th>ZIP-predicted P(Y=0)</th><th>$\Delta$ AIC (Pois − ZIP)</th></tr>
-<tr><td>1</td><td>~0.59</td><td>~0.45</td><td>~0.59</td><td>~10</td></tr>
-<tr><td>2.5</td><td>~0.40</td><td>~0.13</td><td>~0.40</td><td>~70</td></tr>
-<tr><td>8</td><td>~0.35</td><td>~0.0001</td><td>~0.35</td><td>~1000</td></tr>
+<tr><td>1</td><td>~0.63</td><td>~0.54</td><td>~0.63</td><td>~32</td></tr>
+<tr><td>2.5</td><td>~0.42</td><td>~0.21</td><td>~0.42</td><td>~118</td></tr>
+<tr><td>8</td><td>~0.36</td><td>~0.006</td><td>~0.36</td><td>~961</td></tr>
 </table>
 
-<p>(c) Why the small-$\lambda$ case is hardest: at $\lambda=1$ a plain Poisson already produces P(Y=0) $= e^{-1} \approx 0.37$, similar to the inflated proportion of 0.59. The likelihood signal that distinguishes Poisson from ZIP is weak. At $\lambda = 8$, plain Poisson predicts essentially zero zeros; any zero inflation is unmistakable.</p>
+<p>(c) Why the small-$\lambda$ case is hardest: at $\lambda=1$ a plain Poisson already produces P(Y=0) $= e^{-1} \approx 0.37$, not far from the inflated observed proportion of ~0.63. The likelihood signal that distinguishes Poisson from ZIP is weak. At $\lambda = 8$, plain Poisson predicts essentially zero zeros; any zero inflation is unmistakable.</p>
 </section>
 
 <!-- ============== EX 5 ============== -->
@@ -212,7 +212,7 @@ lam &lt;- exp(ll[-(<span class="nu">1</span>:<span class="nu">3000</span>)])
 hist(lam, breaks = <span class="nu">60</span>, freq = <span class="kw">FALSE</span>, main = <span class="st">""</span>, xlab = expression(lambda))
 curve(dgamma(x, <span class="nu">2</span> + sum(y), <span class="nu">1</span> + length(y)), add = <span class="kw">TRUE</span>, lwd = <span class="nu">2</span>, col = <span class="st">"red"</span>)</code></pre>
 
-<p>Acceptance with $s = 0.30$ is typically ~35–45%. Posterior approximation matches the closed-form Gamma(27, 11) (mean 2.45) to within MCMC noise.</p>
+<p>Acceptance with $s = 0.30$ is about <strong>58%</strong> here — above the ~30% target, so to tune down you would <em>raise</em> $s$ (bigger jumps get rejected more often). The posterior approximation matches the closed-form Gamma(27, 11) (mean 2.45) to within MCMC noise.</p>
 </section>
 
 <!-- ============== EX 7 ============== -->
@@ -223,16 +223,16 @@ curve(dgamma(x, <span class="nu">2</span> + sum(y), <span class="nu">1</span> + 
 
 <table>
 <tr><th>parameter</th><th>median</th><th>95% BCI</th><th>95% HPDI</th></tr>
-<tr><td>$r$</td><td>~0.20</td><td>(0.16, 0.24)</td><td>(0.16, 0.24)</td></tr>
-<tr><td>$K$</td><td>~1180</td><td>(950, 1500)</td><td>(940, 1490)</td></tr>
-<tr><td>$\sigma$</td><td>~0.014</td><td>(0.010, 0.020)</td><td>(0.009, 0.019)</td></tr>
-<tr><td>$N_{\max\,dN/dt}=K/2$</td><td>~590</td><td>(475, 750)</td><td>(470, 745)</td></tr>
-<tr><td>$\text{MSY}=rK/4$</td><td>~59</td><td>(48, 73)</td><td>(48, 72)</td></tr>
+<tr><td>$r$</td><td>~0.20</td><td>(0.18, 0.22)</td><td>(0.18, 0.22)</td></tr>
+<tr><td>$K$</td><td>~1233</td><td>(1129, 1376)</td><td>(1120, 1363)</td></tr>
+<tr><td>$\sigma$</td><td>~0.028</td><td>(0.023, 0.035)</td><td>(0.023, 0.035)</td></tr>
+<tr><td>$N_{\max\,dN/dt}=K/2$</td><td>~616</td><td>(564, 688)</td><td>(560, 681)</td></tr>
+<tr><td>$\text{MSY}=rK/4$</td><td>~62</td><td>(57, 67)</td><td>(57, 67)</td></tr>
 </table>
 
-<p>(c) $\Pr(r > 0.22 \mid \text{data}) \approx 0.10$–0.20 depending on seed.</p>
-<p>(d) $\Pr(\text{MSY} > 50 \mid \text{data}) \approx 0.85$–0.95.</p>
-<p>(e) The clearest BCI–HPDI separation is on $\sigma$: $\sigma$ is bounded below by zero and the posterior piles up toward the lower bound, so HPDI extends further left and the upper bound is shorter. <em>Why:</em> equal-tail intervals split the 5% miscoverage symmetrically by quantile; HPDI captures the densest 95% of mass, which for a right-skewed distribution shifts the interval toward (but not past) the lower bound.</p>
+<p>(c) $\Pr(r > 0.22 \mid \text{data}) \approx 0.025$ — the $r$ posterior is tight (sd $\approx 0.01$), so 0.22 sits about two SDs above the mean.</p>
+<p>(d) $\Pr(\text{MSY} > 50 \mid \text{data}) \approx 1.0$ — essentially certain, since the entire 95% MSY interval (~57 to 67) lies above 50.</p>
+<p>(e) The clearest BCI–HPDI separation is on $\sigma$, which is bounded below by zero and mildly right-skewed: the HPDI ($\approx 0.023$–$0.035$) sits a hair lower than the equal-tailed BCI and is marginally shorter. <em>Why:</em> equal-tail intervals split the 5% miscoverage symmetrically by quantile; HPDI captures the densest 95% of mass, which for a right-skewed distribution shifts the interval toward (but not past) the lower bound. The effect is modest here because $\sigma$ is well-determined — it would be dramatic for a strongly skewed posterior.</p>
 
 <div class="callout key"><strong>What to look for:</strong> Students should monitor <em>derived quantities</em> directly (MSY, K/2, dNdt) inside the Nimble code, not compute them externally from $r$ and $K$ samples (though that works too — make sure they understand the equivalence: any function of monitored RVs has a posterior that's just the function applied draw-by-draw).</div>
 </section>

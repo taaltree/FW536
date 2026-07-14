@@ -115,8 +115,8 @@
 <p>Everything referenced in this lab's exercises lives in this folder. Click any link below to download.</p>
 <div class="data-section">
   <h3 class="data-h">Datasets</h3>
-  <div class="data-row"><a href="data/Vonbert.dat"><code>Vonbert.dat</code></a><span class="data-desc">Length-at-age data for von Bertalanffy growth fitting (sex, age, length).</span></div>
-  <div class="data-row"><a href="data/Whale.dat"><code>Whale.dat</code></a><span class="data-desc">Whale blow counts used for the two-component Poisson mixture example.</span></div>
+  <div class="data-row"><a href="data/vonbert.csv"><code>vonbert.csv</code></a><span class="data-desc">Length-at-age data for von Bertalanffy growth fitting (columns: sex, age, length).</span></div>
+  <div class="data-row"><a href="data/whale.csv"><code>whale.csv</code></a><span class="data-desc">Whale blow counts, one row per whale (columns: sex, blows), used for the two-component Poisson mixture of males and females.</span></div>
   <div class="data-row"><a href="data/Logistic.csv"><code>Logistic.csv</code></a><span class="data-desc">Population size and per-capita growth rate (used for the r/K Bayesian fit).</span></div>
 </div>
 <div class="data-section">
@@ -220,10 +220,10 @@ The MLE under <em>any</em> Bernoulli/Binomial model is the sample proportion. Th
 <p>The original course code holds $\sigma = 10$ and $L_\infty = 100$ fixed and grids over $\kappa \in \{0.1, 0.2, 0.3, 0.4\}$ to show how the likelihood changes with the parameter. Here is that grid search, complete and runnable.</p>
 
 <div class="code-label">R · grid search for Vonbert κ</div>
-<pre><code><span class="cm"># Load the Vonbert data (3 columns: sex, age, length). Keep sex==1.</span>
-TheData &lt;- <span class="fn">matrix</span>(<span class="fn">scan</span>(<span class="st">"data/Vonbert.dat"</span>, skip = <span class="nu">1</span>), byrow = <span class="kw">TRUE</span>, ncol = <span class="nu">3</span>)
-TheData &lt;- TheData[TheData[, <span class="nu">1</span>] == <span class="nu">1</span>, ]
-age &lt;- TheData[, <span class="nu">2</span>]; len &lt;- TheData[, <span class="nu">3</span>]
+<pre><code><span class="cm"># Load the Vonbert data (columns: sex, age, length). Keep sex==1.</span>
+TheData &lt;- <span class="fn">read.csv</span>(<span class="st">"data/vonbert.csv"</span>)
+TheData &lt;- TheData[TheData$sex == <span class="nu">1</span>, ]
+age &lt;- TheData$age; len &lt;- TheData$length
 
 <span class="cm"># negative log-likelihood as a function of (Linf, kappa, sigma)</span>
 nll_vbgf &lt;- <span class="kw">function</span>(Linf, kappa, sigma) {
@@ -275,15 +275,15 @@ Pick starting values in the same ballpark as the data. <code>L-BFGS-B</code> wit
 <section id="whale-mix">
 <h2>Walk-through 4 · Two-component Poisson mixture (whales)</h2>
 
-<p>Bowhead whale blow counts at a hydrophone fall into two regimes — quiet behavior and vocally-active behavior — with rates $\lambda_1$ and $\lambda_2$. Each observation is from regime 1 with probability $\pi$ and regime 2 with probability $1-\pi$, and the regime is <em>unobserved</em>. The likelihood for one count $y$ is a mixture:</p>
+<p>Bowhead whale blow counts come from a mix of <strong>males and females</strong>, and the two sexes blow at different average rates. Treat each whale's sex as an <em>unobserved</em> (latent) label and model the counts as a two-component mixture: a male component with rate $\lambda_1$ and a female component with rate $\lambda_2$. A whale is male with probability $\pi$ — the <strong>proportion of males</strong> in the population — and female with probability $1-\pi$. The goal is to estimate all three quantities: the male blow rate $\lambda_1$, the female blow rate $\lambda_2$, and the sex proportions $\pi$ (males) and $1-\pi$ (females). The likelihood for one count $y$ is a mixture:</p>
 
 <div class="eq-block">$f(y \mid \lambda_1, \lambda_2, \pi) \;=\; \pi\, \text{Pois}(y; \lambda_1) + (1 - \pi)\, \text{Pois}(y; \lambda_2).$</div>
 
 <p>Three parameters, no closed form. We minimize the joint negative log-likelihood with <code>mle()</code>.</p>
 
 <div class="code-label">R · MLE for a 2-component Poisson mixture</div>
-<pre><code>TheData &lt;- <span class="fn">matrix</span>(<span class="fn">scan</span>(<span class="st">"data/Whale.dat"</span>, skip = <span class="nu">1</span>), byrow = <span class="kw">TRUE</span>, ncol = <span class="nu">2</span>)
-blows &lt;- TheData[, <span class="nu">2</span>]
+<pre><code>TheData &lt;- <span class="fn">read.csv</span>(<span class="st">"data/whale.csv"</span>)   <span class="cm"># columns: sex (1/2, unused here), blows</span>
+blows &lt;- TheData$blows
 
 nll_mix &lt;- <span class="kw">function</span>(lam1, lam2, p) {
  comp &lt;- p * <span class="fn">dpois</span>(blows, lam1) + (<span class="nu">1</span> - p) * <span class="fn">dpois</span>(blows, lam2)
@@ -298,7 +298,7 @@ fit_mix &lt;- <span class="fn">mle</span>(nll_mix,
 <span class="fn">summary</span>(fit_mix)</code></pre>
 
 <div class="callout warn">
-<p><strong>Identifiability.</strong> A two-component mixture is invariant under relabeling: $(\lambda_1, \lambda_2, \pi) = (3, 25, 0.4)$ and $(25, 3, 0.6)$ are the <em>same</em> model. Start with $\lambda_1 < \lambda_2$ and (often) constrain it; otherwise different chains/optimizers can land on relabeled solutions and your standard errors are nonsense.</p>
+<p><strong>Identifiability.</strong> A two-component mixture is invariant under relabeling: $(\lambda_1, \lambda_2, \pi) = (3, 25, 0.4)$ and $(25, 3, 0.6)$ are the <em>same</em> model — which component we call "male" is arbitrary to the likelihood. Start with $\lambda_1 < \lambda_2$ and (often) constrain it; otherwise different chains/optimizers can land on relabeled solutions and your standard errors are nonsense.</p>
 <p>Even with relabeling fixed, mixtures have <em>local optima</em>. Always run from several starting values and keep the best.</p>
 </div>
 </section>
@@ -316,8 +316,8 @@ fit_mix &lt;- <span class="fn">mle</span>(nll_mix,
 <p>Likelihood-ratio statistic: $\Lambda = 2(\ell_B - \ell_A)$. Under $H_0$: $\Lambda \sim \chi^2_{\Delta\,\text{df} = 2}$.</p>
 
 <div class="code-label">R · LRT for sex-specific Vonbert</div>
-<pre><code>TheData &lt;- <span class="fn">matrix</span>(<span class="fn">scan</span>(<span class="st">"data/Vonbert.dat"</span>, skip = <span class="nu">1</span>), byrow = <span class="kw">TRUE</span>, ncol = <span class="nu">3</span>)
-Sex &lt;- TheData[, <span class="nu">1</span>]; Age &lt;- TheData[, <span class="nu">2</span>]; Len &lt;- TheData[, <span class="nu">3</span>]
+<pre><code>TheData &lt;- <span class="fn">read.csv</span>(<span class="st">"data/vonbert.csv"</span>)
+Sex &lt;- TheData$sex; Age &lt;- TheData$age; Len &lt;- TheData$length
 
 nll_A &lt;- <span class="kw">function</span>(Linf, kappa, sigma) {
  pred &lt;- Linf * (<span class="nu">1</span> - <span class="fn">exp</span>(-kappa * Age))
@@ -400,7 +400,7 @@ fit_glm &lt;- <span class="fn">glm</span>(y ~ x, family = <span class="fn">binom
 <span class="fn">cbind</span>(MLE = <span class="fn">sqrt</span>(<span class="fn">diag</span>(<span class="fn">vcov</span>(fit_mle))),
  GLM = <span class="fn">sqrt</span>(<span class="fn">diag</span>(<span class="fn">vcov</span>(fit_glm))))</code></pre>
 
-<p>The estimates agree to 6+ decimal places. The standard errors agree because both methods invert the same observed Fisher information.</p>
+<p>The estimates agree precisely. The standard errors agree because both methods invert the same observed Fisher information.</p>
 
 <div class="callout key">
 <strong>Generalize.</strong> Replace <code>dbinom(..., log=TRUE)</code> with <code>dpois(..., log=TRUE)</code>, swap <code>1/(1+exp(-η))</code> for <code>exp(η)</code>, and you've just written your own Poisson regression. Every link/distribution combination in <code>glm()</code> is a different choice of <em>those two lines</em>.
@@ -415,7 +415,7 @@ fit_glm &lt;- <span class="fn">glm</span>(y ~ x, family = <span class="fn">binom
 
 <div class="eq-block">$\Pr(Y_i = 0) = \pi + (1 - \pi) e^{-\lambda}, \qquad \Pr(Y_i = k) = (1 - \pi) \dfrac{e^{-\lambda} \lambda^k}{k!}\ \text{for}\ k \ge 1.$</div>
 
-<p>Here $\pi$ is the probability of structural zero and $\lambda$ is the Poisson mean among <em>non-structural</em> nests. There is no canned <code>glm()</code> for ZIP — but the negative log-likelihood is one line.</p>
+<p>Here $\pi$ is the probability of structural zero and $\lambda$ is the Poisson mean among <em>non-structural</em> nests. Base R's <code>glm()</code> has no zero-inflated <em>family</em>, so ZIP is not a one-line <code>glm(...)</code> call — but ready-made ZIP fitters do exist: <code>pscl::zeroinfl()</code> is the standard one, and the <code>VGAM</code> and <code>glmmTMB</code> packages fit ZIP models too. We write the negative log-likelihood by hand anyway, because it is a single line and doing so is the transferable skill for the non-standard models that <em>have</em> no canned fitter:</p>
 
 <div class="code-label">R · ZIP simulated and fit by MLE</div>
 <pre><code><span class="kw">library</span>(stats4)
@@ -908,8 +908,8 @@ fit &lt;- <span class="fn">mle</span>(nll, start = <span class="kw">list</span>(
 <p>Using the full Vonbert dataset (both sexes pooled) and the three-parameter model, compute and plot the <em>profile likelihood</em> for $\kappa$. For each $\kappa$ in a grid, optimize <em>over</em> $L_\infty$ and $\sigma$; record the minimum negative log-likelihood. Plot $-\Delta\ell$ vs $\kappa$; mark the 95% CI at the 1.92 line.</p>
 <details class="answer"><summary>Reveal solution</summary><div class="answer-body">
 <pre><code><span class="kw">library</span>(stats4)
-TheData &lt;- <span class="fn">matrix</span>(<span class="fn">scan</span>(<span class="st">"data/Vonbert.dat"</span>, skip = <span class="nu">1</span>), byrow = <span class="kw">TRUE</span>, ncol = <span class="nu">3</span>)
-Age &lt;- TheData[, <span class="nu">2</span>]; Len &lt;- TheData[, <span class="nu">3</span>]
+TheData &lt;- <span class="fn">read.csv</span>(<span class="st">"data/vonbert.csv"</span>)
+Age &lt;- TheData$age; Len &lt;- TheData$length
 
 profile_kappa &lt;- <span class="kw">function</span>(k) {
  nll &lt;- <span class="kw">function</span>(Linf, sigma) {
@@ -1018,7 +1018,7 @@ acc / <span class="fn">length</span>(ll)</code></pre>
 <li>Pick one parameter where BCI and HPDI noticeably differ. Plot both intervals on top of a histogram and explain in 2 sentences why they differ for that parameter.</li>
 </ol>
 <details class="answer"><summary>Reveal expected output</summary><div class="answer-body">
-<p>With this dataset, typical results: $\hat r \approx 0.20$ with 95% HPDI roughly (0.16, 0.24); $\hat K \approx 1{,}100$–$1{,}300$ with wide interval; $\Pr(r > 0.22 \mid y) \approx 0.10$–0.20. Plotting code is in <code>Logistic_BayesianGrowth_Nimble.R</code>. $\sigma$ is the classic asymmetric case where BCI and HPDI separate.</p>
+<p>With this dataset, typical results: $\hat r \approx 0.20$ with 95% HPDI roughly (0.18, 0.22); $\hat K \approx 1{,}230$ with 95% BCI roughly (1{,}130, 1{,}380); $\Pr(r > 0.22 \mid y) \approx 0.02$–0.03. Plotting code is in <code>Logistic_BayesianGrowth_Nimble.R</code>. $\sigma$ is the classic asymmetric case where BCI and HPDI separate.</p>
 </div></details>
 </div>
 
@@ -1043,8 +1043,7 @@ acc / <span class="fn">length</span>(ll)</code></pre>
  <button id="reveal-all" style="background:var(--accent); color:white; border:none; padding:10px 20px; border-radius:4px; cursor:pointer; font-family:'Helvetica Neue',Arial,sans-serif; font-size:14px;">Reveal all answers</button>
  <button id="hide-all" style="background:var(--osu-stone); color:white; border:none; padding:10px 20px; border-radius:4px; cursor:pointer; font-family:'Helvetica Neue',Arial,sans-serif; font-size:14px;">Hide all answers</button>
  <a href="answer_key.html" style="background:var(--osu-orange); color:white; padding:10px 20px; border-radius:4px; text-decoration:none; font-family:'Helvetica Neue',Arial,sans-serif; font-size:14px;">Open full answer key →</a>
- <a href="problem_set.html" style="background:#2B6E61; color:white; padding:10px 20px; border-radius:4px; text-decoration:none; font-family:'Helvetica Neue',Arial,sans-serif; font-size:14px;">Songbird problem set →</a>
- <a href="problem_set.html" style="background:#1C638A; color:white; padding:10px 20px; border-radius:4px; text-decoration:none; font-family:'Helvetica Neue',Arial,sans-serif; font-size:14px;">Marine problem set →</a>
+ <a href="problem_set.html" style="background:#2B6E61; color:white; padding:10px 20px; border-radius:4px; text-decoration:none; font-family:'Helvetica Neue',Arial,sans-serif; font-size:14px;">Graded problem set →</a>
 </div>
 
 </main>

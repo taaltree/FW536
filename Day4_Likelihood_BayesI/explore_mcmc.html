@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Interactive: MCMC samplers (2D) | FW 536</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../_Shared/css/lab.css" />
+<script defer src="../_Shared/js/lab.js"></script>
+<script>MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] } };</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<style>
+  .widget { background:#fff; border:1px solid var(--border); border-radius:10px; padding:20px 24px; margin:24px 0; box-shadow:0 2px 10px rgba(0,0,0,.05); }
+  .pick { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px; }
+  .pick button { font-family:'Helvetica Neue',Arial,sans-serif; font-size:14px; font-weight:600; border:2px solid var(--border); background:var(--panel-alt); color:var(--osu-stone); border-radius:6px; padding:7px 14px; cursor:pointer; }
+  .pick button.active { background:var(--osu-orange); color:#fff; border-color:var(--osu-orange); }
+  .layout { display:grid; grid-template-columns: 1fr 300px; gap:20px; align-items:start; }
+  @media (max-width:820px){ .layout{ grid-template-columns:1fr; } }
+  .controls .ctl { margin-bottom:10px; }
+  .ctl label { font-family:'Helvetica Neue',Arial,sans-serif; font-size:13px; font-weight:600; color:var(--osu-stone); display:flex; justify-content:space-between; }
+  .ctl input[type=range]{ width:100%; accent-color:var(--osu-orange); }
+  .ctl .val { color:var(--osu-orange-dark); font-variant-numeric:tabular-nums; }
+  .btns { display:flex; gap:8px; flex-wrap:wrap; margin:6px 0 12px; }
+  .btns button { font-family:'Helvetica Neue',Arial,sans-serif; font-size:14px; font-weight:600; border:2px solid var(--osu-orange); background:var(--osu-orange); color:#fff; border-radius:6px; padding:6px 14px; cursor:pointer; }
+  .btns button.sec { background:#fff; color:var(--osu-orange-dark); }
+  .readout { font-family:'Helvetica Neue',Arial,sans-serif; font-size:14px; line-height:1.7; }
+  .readout b { color:var(--osu-orange-dark); font-variant-numeric:tabular-nums; }
+  .samp-note { background:#EAF4F2; border-left:5px solid var(--accent); border-radius:0 8px 8px 0; padding:10px 14px; margin-top:10px; font-size:14px; }
+  svg text { font-family:'Helvetica Neue',Arial,sans-serif; }
+  table.cmp td, table.cmp th { font-size:14px; }
+</style>
+</head>
+<body>
+<div class="shell">
+<aside class="sidebar">
+  <h1><a href="../index.html" title="Back to course home">FW 536 · Day 4</a></h1>
+  <div class="subtitle">MCMC samplers in 2D</div>
+  <nav>
+    <div class="section">This page</div>
+    <ul>
+      <li><a href="#what">What MCMC is doing</a></li>
+      <li><a href="#explorer">The 2D sampler</a></li>
+      <li><a href="#compare">Metropolis vs Gibbs vs HMC</a></li>
+      <li><a href="#try">Things to try</a></li>
+    </ul>
+    <div class="section">Related</div>
+    <ul>
+      <li><a href="lab.html">Day 4 lab</a></li>
+      <li><a href="explore_likelihood_mcmc.html">1D likelihood &amp; MCMC</a></li>
+      <li><a href="explore_conjugate.html">Conjugate posteriors</a></li>
+      <li><a href="../index.html">Course home</a></li>
+    </ul>
+  </nav>
+</aside>
+
+<main class="content">
+<header class="lab-header">
+  <div class="eyebrow">Day 4 · Interactive</div>
+  <h1>How MCMC samplers explore a posterior</h1>
+  <p class="lede">MCMC turns "I can't integrate this posterior" into "I can wander through it and let the visits pile up." Watch three different samplers explore the same two-parameter target and see why the choice of sampler matters.</p>
+</header>
+
+<section id="what">
+<h2>What is actually happening</h2>
+<div class="callout key">
+<p>You want the posterior $p(\theta \mid y)$ but you cannot compute its normalizing constant (the integral in the denominator of Bayes' rule). MCMC sidesteps that: it builds a <strong>random walk through parameter space whose long-run visiting frequency equals the posterior</strong>. You never compute the integral — you just take steps according to a simple rule, and the histogram of where the chain has been <em>is</em> the posterior.</p>
+<p>Every sampler below only ever needs the posterior <em>up to a constant</em> — i.e., prior × likelihood — because the unknown constant cancels in every accept/reject ratio. That is the whole trick.</p>
+</div>
+<p>The target here is a two-parameter posterior shaped like a tilted ellipse (a correlated bivariate normal — think of two parameters, like a slope and an intercept, whose estimates are correlated). Correlation is what makes samplers struggle, so you can dial it up and watch each sampler cope.</p>
+</section>
+
+<section id="explorer">
+<div class="widget">
+  <div class="pick" id="pick" role="group" aria-label="Choose a sampler">
+    <button data-s="rwm" class="active">Random-walk Metropolis</button>
+    <button data-s="gibbs">Gibbs</button>
+    <button data-s="hmc">Hamiltonian (HMC)</button>
+  </div>
+
+  <div class="layout">
+    <div>
+      <svg id="plot" viewBox="0 0 500 500" width="100%" role="img" aria-label="2D parameter space with target contours and the sampler's path"></svg>
+    </div>
+    <div>
+      <div class="controls" id="controls"></div>
+      <div class="btns">
+        <button id="run">▶ Run</button>
+        <button id="step" class="sec">Step ×5</button>
+        <button id="reset" class="sec">Reset</button>
+      </div>
+      <div class="readout" id="readout"></div>
+      <div class="samp-note" id="note"></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<section id="compare">
+<h2>Metropolis vs Gibbs vs HMC — pros and cons</h2>
+<table class="cmp">
+<tr><th>Sampler</th><th>How it proposes a move</th><th>Strengths</th><th>Weaknesses</th></tr>
+<tr>
+  <td><strong>Random-walk Metropolis</strong></td>
+  <td>Jump a random step from the current point; accept with probability $\min(1, \text{posterior ratio})$.</td>
+  <td>Dead simple; needs only the un-normalized posterior; works on anything.</td>
+  <td>Slow, especially in high dimensions or with correlation. Step size must be tuned: too small → crawls; too large → mostly rejects. Acceptance ~23% is the classic sweet spot.</td>
+</tr>
+<tr>
+  <td><strong>Gibbs</strong></td>
+  <td>Update one parameter at a time by drawing it from its <em>full conditional</em> distribution, holding the others fixed.</td>
+  <td>No tuning, no rejections — every draw is accepted. Excellent when the conditionals are known (conjugate models); this is what classic BUGS/JAGS lean on.</td>
+  <td>Needs the conditionals in closed form. Moves are axis-aligned, so strong correlation between parameters makes it inch along a ridge very slowly.</td>
+</tr>
+<tr>
+  <td><strong>Hamiltonian Monte Carlo (HMC)</strong></td>
+  <td>Give the point "momentum" and roll it along the posterior's gradient (physics simulation), then accept/reject to correct for numerical error.</td>
+  <td>Takes long, informed jumps that follow the shape of the posterior, so it mixes far faster in high dimensions and under correlation. The engine behind Stan and Nimble's HMC.</td>
+  <td>Needs the <em>gradient</em> of the log-posterior. Two knobs (step size $\epsilon$, number of leapfrog steps $L$) to tune; a bad choice diverges. More work per iteration.</td>
+</tr>
+</table>
+<p><strong>And NUTS?</strong> The No-U-Turn Sampler is HMC that automatically chooses how many leapfrog steps to take (it stops when the trajectory starts doubling back), removing the hardest tuning knob. It is the default in Stan and a good default when you have gradients. The practical ladder: reach for Gibbs when conjugacy gives you the conditionals, HMC/NUTS when you have gradients and correlation or high dimension, and random-walk Metropolis as the always-available fallback (and the easiest to understand).</p>
+</section>
+
+<section id="try">
+<h2>Things to try</h2>
+<div class="callout key">
+<ol>
+<li><strong>Crank up the correlation.</strong> Slide the correlation toward $\pm 0.95$. Watch random-walk Metropolis and Gibbs both bog down, crawling along the diagonal ridge, while HMC still slides along it in big strokes.</li>
+<li><strong>Mis-tune Metropolis.</strong> Set its step size very small (chain barely moves, acceptance near 100% but useless) then very large (almost every proposal rejected). Find the middle where acceptance is ~20–40%.</li>
+<li><strong>Watch Gibbs turn corners.</strong> Gibbs only ever moves horizontally then vertically — you can see the right-angle staircase. Under high correlation those steps get tiny.</li>
+<li><strong>HMC trajectories.</strong> With HMC, each proposal is the end of a curved glide across the posterior (shown faintly). Increase the leapfrog steps $L$ and each move reaches further.</li>
+</ol>
+</div>
+<p><a href="explore_likelihood_mcmc.html">← See the 1D version (likelihood → posterior → MCMC)</a> · <a href="lab.html">Day 4 lab</a></p>
+</section>
+</main>
+</div>
+<footer>FW 536 · Statistical Modeling for Ecology and Conservation · Oregon State University</footer>
+
+<script>
+// ---------- Gaussian RNG ----------
+let spare=null;
+function randn(){ if(spare!==null){const s=spare;spare=null;return s;}
+  let u=0,v=0,s=0; do{u=Math.random()*2-1;v=Math.random()*2-1;s=u*u+v*v;}while(s>=1||s===0);
+  const m=Math.sqrt(-2*Math.log(s)/s); spare=v*m; return u*m; }
+
+// ---------- target: bivariate normal, unit var, corr rho ----------
+let rho=0.8;
+function logp(x,y){ const d=1-rho*rho; return -(x*x - 2*rho*x*y + y*y)/(2*d); }
+function gradU(x,y){ const d=1-rho*rho; return [ (x - rho*y)/d, (y - rho*x)/d ]; } // grad of U=-logp
+
+// ---------- state ----------
+let sampler='rwm';
+const S={ step:0.6, eps:0.18, L:20 };
+let cur=[ -2.5, 2.5 ], chain=[], iters=0, accepts=0, lastTraj=null, timer=null;
+
+function resetChain(){ cur=[-2.5,2.5]; chain=[cur.slice()]; iters=0; accepts=0; lastTraj=null; draw(); }
+
+// ---------- one iteration per sampler ----------
+function iterate(){
+  if(sampler==='rwm'){
+    const cand=[cur[0]+S.step*randn(), cur[1]+S.step*randn()];
+    const la=logp(cand[0],cand[1])-logp(cur[0],cur[1]);
+    if(Math.log(Math.random())<la){cur=cand;accepts++;}
+    lastTraj=null;
+  } else if(sampler==='gibbs'){
+    const d=Math.sqrt(1-rho*rho);
+    cur=[ rho*cur[1] + d*randn(), cur[1] ];      // x | y
+    cur=[ cur[0], rho*cur[0] + d*randn() ];       // y | x
+    accepts++; lastTraj=null;
+  } else { // HMC (leapfrog on Gaussian)
+    let q=cur.slice(); let p=[randn(),randn()];
+    const H0 = -logp(q[0],q[1]) + 0.5*(p[0]*p[0]+p[1]*p[1]);
+    const traj=[q.slice()];
+    let g=gradU(q[0],q[1]); p=[p[0]-0.5*S.eps*g[0], p[1]-0.5*S.eps*g[1]];
+    for(let i=0;i<S.L;i++){
+      q=[q[0]+S.eps*p[0], q[1]+S.eps*p[1]]; traj.push(q.slice());
+      g=gradU(q[0],q[1]);
+      const last=(i===S.L-1);
+      p=[p[0]-(last?0.5:1)*S.eps*g[0], p[1]-(last?0.5:1)*S.eps*g[1]];
+    }
+    const H1 = -logp(q[0],q[1]) + 0.5*(p[0]*p[0]+p[1]*p[1]);
+    if(Math.log(Math.random())<(H0-H1)){cur=q;accepts++; lastTraj=traj;} else {lastTraj=traj;}
+  }
+  chain.push(cur.slice()); iters++;
+}
+
+// ---------- controls ----------
+const CTL = {
+  rwm:[{id:'step',label:'proposal step size',min:0.05,max:2.5,stepv:0.05}],
+  gibbs:[],
+  hmc:[{id:'eps',label:'leapfrog step size ε',min:0.05,max:0.4,stepv:0.01},
+       {id:'L',label:'leapfrog steps L',min:3,max:60,stepv:1}]
+};
+function buildControls(){
+  const box=document.getElementById('controls'); box.innerHTML='';
+  // rho slider always present
+  const mk=(id,label,min,max,stepv,val)=>{
+    const d=document.createElement('div'); d.className='ctl';
+    d.innerHTML=`<label for="s_${id}">${label}<span class="val" id="v_${id}"></span></label>
+      <input type="range" id="s_${id}" min="${min}" max="${max}" step="${stepv}" value="${val}">`;
+    box.appendChild(d);
+    d.querySelector('input').addEventListener('input',e=>{
+      if(id==='rho'){rho=+e.target.value;} else {S[id]=+e.target.value;} render();
+    });
+  };
+  mk('rho','target correlation ρ',-0.95,0.95,0.05,rho);
+  CTL[sampler].forEach(c=>mk(c.id,c.label,c.min,c.max,c.stepv,S[c.id]));
+}
+
+const NOTE={
+  rwm:'Random-walk Metropolis: propose a random jump, then accept it with probability min(1, posterior(new)/posterior(old)). Rejected proposals mean the chain stays put (a repeated point).',
+  gibbs:'Gibbs: update x from its conditional given y, then y from its conditional given x. Every draw is accepted — but each move is purely horizontal then vertical, so correlation slows it.',
+  hmc:'HMC: give the point random momentum and simulate it rolling along the posterior for L leapfrog steps of size ε (faint curve), then accept/reject to correct numerical error. Long, informed moves.'
+};
+
+// ---------- drawing ----------
+function toPx(x,y,W){ const lo=-4.2,hi=4.2; return [ (x-lo)/(hi-lo)*W, W-(y-lo)/(hi-lo)*W ]; }
+function ellipse(r){ // Mahalanobis radius r contour of the bivariate normal
+  const pts=[]; const a=Math.sqrt(1+rho), b=Math.sqrt(1-rho); // eigen semi-axes dirs (1,1)/(1,-1)
+  for(let t=0;t<=Math.PI*2+0.01;t+=0.1){
+    // point in eigen coords then rotate 45deg
+    const e1=r*a*Math.cos(t), e2=r*b*Math.sin(t);
+    const x=(e1+e2)/Math.SQRT2, y=(e1-e2)/Math.SQRT2;
+    pts.push([x,y]);
+  } return pts;
+}
+function render(){
+  document.getElementById('v_rho').textContent=(+rho).toFixed(2);
+  CTL[sampler].forEach(c=>{const el=document.getElementById('v_'+c.id); if(el) el.textContent=(c.stepv<1?(+S[c.id]).toFixed(2):Math.round(S[c.id]));});
+  draw();
+}
+function draw(){
+  const W=500;
+  let s=`<rect width="${W}" height="${W}" fill="white"/>`;
+  // axes through origin
+  const o=toPx(0,0,W);
+  s+=`<line x1="0" y1="${o[1]}" x2="${W}" y2="${o[1]}" stroke="#eee"/>`;
+  s+=`<line x1="${o[0]}" y1="0" x2="${o[0]}" y2="${W}" stroke="#eee"/>`;
+  // target contours
+  [1,2,3].forEach(r=>{
+    const pts=ellipse(r).map(([x,y])=>{const p=toPx(x,y,W);return p[0]+','+p[1];}).join(' ');
+    s+=`<polyline points="${pts}" fill="none" stroke="#C9B79A" stroke-width="1.5"/>`;
+  });
+  s+=`<text x="8" y="16" font-size="12" fill="#8a7a5c">target posterior (contours)</text>`;
+  // HMC trajectory (faint)
+  if(lastTraj && sampler==='hmc'){
+    const tp=lastTraj.map(([x,y])=>{const p=toPx(x,y,W);return p[0]+','+p[1];}).join(' ');
+    s+=`<polyline points="${tp}" fill="none" stroke="#9AAEC9" stroke-width="1.5" stroke-dasharray="3 3"/>`;
+  }
+  // chain path (last 250)
+  const tail=chain.slice(-250);
+  const pathPts=tail.map(([x,y])=>{const p=toPx(x,y,W);return p[0]+','+p[1];}).join(' ');
+  s+=`<polyline points="${pathPts}" fill="none" stroke="#1F5B50" stroke-width="1" opacity="0.7"/>`;
+  // recent points
+  tail.forEach(([x,y],i)=>{ if(i%3&&i<tail.length-1)return; const p=toPx(x,y,W);
+    s+=`<circle cx="${p[0]}" cy="${p[1]}" r="1.6" fill="#1F5B50" opacity="0.5"/>`; });
+  // current point
+  const c=toPx(cur[0],cur[1],W);
+  s+=`<circle cx="${c[0]}" cy="${c[1]}" r="5" fill="#D73F09"/>`;
+  document.getElementById('plot').innerHTML=s;
+
+  const accRate=iters?accepts/iters:0;
+  const post=chain.slice(Math.floor(chain.length*0.2));
+  const mx=post.reduce((a,b)=>a+b[0],0)/(post.length||1), my=post.reduce((a,b)=>a+b[1],0)/(post.length||1);
+  document.getElementById('readout').innerHTML=
+    `Iterations: <b>${iters}</b><br>`+
+    (sampler==='gibbs'?`Acceptance: <b>100%</b> (Gibbs never rejects)`:`Acceptance rate: <b>${(accRate*100).toFixed(0)}%</b>`)+`<br>`+
+    `Posterior mean estimate: <b>(${mx.toFixed(2)}, ${my.toFixed(2)})</b><br>`+
+    `<span style="color:var(--muted)">true posterior mean = (0, 0)</span>`;
+  document.getElementById('note').textContent=NOTE[sampler];
+}
+
+document.querySelectorAll('#pick button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('#pick button').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active'); sampler=b.dataset.s; buildControls(); resetChain(); render();
+}));
+document.getElementById('run').addEventListener('click',function(){
+  if(timer){clearInterval(timer);timer=null;this.textContent='▶ Run';}
+  else{this.textContent='⏸ Pause'; timer=setInterval(()=>{ const n=(sampler==='hmc')?1:4; for(let i=0;i<n;i++) iterate(); draw();},70);}
+});
+document.getElementById('step').addEventListener('click',()=>{for(let i=0;i<5;i++)iterate();draw();});
+document.getElementById('reset').addEventListener('click',()=>resetChain());
+
+buildControls(); resetChain(); render();
+</script>
+</body>
+</html>

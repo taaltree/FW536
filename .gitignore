@@ -18,6 +18,10 @@ Icon?
 *.swp
 *~
 
+# Local dev tooling (preview server config) — not course content
+.claude/
+_tools/__pycache__/
+
 # Instructor answer keys — never publish. Kept locally; release via Canvas
 # after grading. (Practice-lab answer_key.html stays public by design.)
 *_KEY.html

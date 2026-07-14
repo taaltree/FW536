@@ -65,6 +65,15 @@
 
 <section id="mcmc">
 <h2>2. A Metropolis sampler builds the posterior</h2>
+<div class="callout key">
+<p><strong>What the sampler does, one step at a time.</strong> It wanders over values of $p$, and the values it visits pile up into the posterior. Each step:</p>
+<ol>
+<li><strong>Propose.</strong> From the current $p$, jump to a nearby candidate $p' = p + \text{(a random nudge of size "step")}$.</li>
+<li><strong>Score.</strong> Compute the posterior ratio $r = \dfrac{\text{posterior}(p')}{\text{posterior}(p)}$. Because the unknown normalizing constant cancels, this is just $\dfrac{p'^{\,k}(1-p')^{\,n-k}}{p^{\,k}(1-p)^{\,n-k}}$ — likelihood × (flat) prior.</li>
+<li><strong>Accept or reject.</strong> If the candidate is <em>more</em> probable ($r \ge 1$), move there. If it is <em>less</em> probable, move there only with probability $r$ (flip a biased coin); otherwise stay put and record the current value again.</li>
+</ol>
+<p>That is the entire algorithm. Downhill moves are sometimes accepted, which is what lets the chain explore the whole posterior instead of just climbing to the peak. Run it and watch the histogram fill in the exact posterior curve &mdash; without ever computing the integral in Bayes' rule.</p>
+</div>
 <div class="widget">
   <div class="controls">
     <div class="ctl"><label for="step">Proposal step size<span class="val" id="v_step"></span></label><input id="step" type="range" min="0.01" max="0.5" step="0.01" value="0.1"></div>
@@ -90,6 +99,7 @@
 <li><strong>More data → tighter posterior.</strong> Raise n (keeping k/n fixed) and both the likelihood and the posterior get narrower.</li>
 </ol>
 </div>
+<div class="callout try"><strong>Go further:</strong> the <a href="explore_mcmc.html">2D MCMC sampler playground</a> shows this same idea in two parameters and lets you compare random-walk Metropolis, Gibbs, and Hamiltonian Monte Carlo (HMC) on a correlated posterior, with a discussion of each sampler's pros and cons.</div>
 <p><a href="lab.html">← Back to the Day 4 lab</a></p>
 </section>
 </main>

@@ -35,8 +35,8 @@ library(dplyr)
 library(stats4)   # mle() and confint() for profile-likelihood CIs
 
 # The morning problems load three real course datasets from the data/ folder:
-#   data/Vonbert.dat   (Problem 2, von Bertalanffy growth)
-#   data/Whale.dat     (Problem 3, two-component Poisson mixture)
+#   data/vonbert.csv   (Problem 2, von Bertalanffy growth)
+#   data/whale.csv     (Problem 3, two-component Poisson mixture)
 #   data/Logistic.csv  (Problem 4, logistic r/K growth by MLE)
 ```
 
@@ -57,14 +57,14 @@ library(stats4)   # mle() and confint() for profile-likelihood CIs
 
 ---
 
-# Problem 2 — Von Bertalanffy growth from length-at-age data (Vonbert.dat)
+# Problem 2 — Von Bertalanffy growth from length-at-age data (vonbert.csv)
 
-> Load `data/Vonbert.dat` (sex, age, length). Run a grid search for $\kappa$, fit the full 3-parameter model with `mle()`, and test for a sex effect with a likelihood-ratio test.
+> Load `data/vonbert.csv` (sex, age, length). Run a grid search for $\kappa$, fit the full 3-parameter model with `mle()`, and test for a sex effect with a likelihood-ratio test.
 
 ```{r}
 # Load exactly as in the lab:
-# TheData <- matrix(scan("data/Vonbert.dat", skip = 1), byrow = TRUE, ncol = 3)
-# Sex <- TheData[, 1]; Age <- TheData[, 2]; Len <- TheData[, 3]
+# TheData <- read.csv("data/vonbert.csv")
+# Sex <- TheData$sex; Age <- TheData$age; Len <- TheData$length
 ```
 
 **My work:**
@@ -78,14 +78,14 @@ library(stats4)   # mle() and confint() for profile-likelihood CIs
 
 ---
 
-# Problem 3 — Two-component Poisson mixture for whale blow counts (Whale.dat)
+# Problem 3 — Two-component Poisson mixture for whale blow counts (whale.csv)
 
-> Load `data/Whale.dat` (MF, Blows). Fit the mixture $f(y) = \pi\,\text{Pois}(y;\lambda_1) + (1-\pi)\text{Pois}(y;\lambda_2)$ with `mle()` from several starts; discuss multimodality and label switching.
+> Load `data/whale.csv` (sex, blows). Fit the mixture $f(y) = \pi\,\text{Pois}(y;\lambda_1) + (1-\pi)\text{Pois}(y;\lambda_2)$ with `mle()` from several starts; discuss multimodality and label switching (the two components correspond to males and females).
 
 ```{r}
 # Load exactly as in the lab:
-# TheData <- matrix(scan("data/Whale.dat", skip = 1), byrow = TRUE, ncol = 2)
-# blows <- TheData[, 2]
+# TheData <- read.csv("data/whale.csv")
+# blows <- TheData$blows
 ```
 
 **My work:**
@@ -132,7 +132,7 @@ knitr::include_graphics("images/problemN_derivation.jpg")
 
 - [ ] Answered every morning problem (1–4) from `problem_set.html`.
 - [ ] Used **maximum likelihood only** — no priors, posteriors, or MCMC.
-- [ ] Loaded `Vonbert.dat`, `Whale.dat`, and `Logistic.csv` from the `data/` folder.
+- [ ] Loaded `vonbert.csv`, `whale.csv`, and `Logistic.csv` from the `data/` folder.
 - [ ] Knitted to HTML without errors.
 - [ ] Photos (if any) embedded with `self_contained: true` in the YAML.
 - [ ] Uploaded the `.html` to the matching Canvas assignment.

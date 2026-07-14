@@ -108,8 +108,8 @@ out_c &lt;- <span class="fn">nimbleMCMC</span>(antCode, constants=constsC,
  nchains=<span class="nu">3</span>, niter=<span class="nu">10000</span>, nburnin=<span class="nu">500</span>,
  samplesAsCodaMCMC=<span class="kw">TRUE</span>)
 <span class="fn">MCMCsummary</span>(out_c) <span class="cm"># nearly identical to (b)</span></code></pre>
-<p><strong>Expected posterior medians</strong> (scaled): $b_1$ (forest) &asymp; 0.6 [0.4, 0.8], $b_2$ (latitude) &asymp; -0.3 [-0.5, -0.1], $b_3$ (elevation) &asymp; -0.4 [-0.6, -0.2]. These match <code>glm()</code> output to 2 decimals.</p>
-<p><em>Instructor note.</em> The "vague prior on raw scale" case often produces NaN log densities and a stalled chain. Show this live; it makes the point unforgettable.</p>
+<p><strong>Posterior means from an actual run</strong> (scaled predictors, <code>set.seed(10)</code>, 3 chains &times; 10000 iter, 500 burn-in): $b_1$ (forest) &asymp; 0.32 [0.21, 0.45], $b_2$ (latitude) &asymp; &minus;0.25 [&minus;0.39, &minus;0.13], $b_3$ (elevation) &asymp; &minus;0.18 [&minus;0.30, &minus;0.07], all with R-hat = 1.00 and n.eff &asymp; 5000&ndash;6000. These match the scaled <code>glm()</code> coefficients (0.32, &minus;0.25, &minus;0.18) to two decimals. The intercept is $b_0$ &asymp; 1.84 [1.71, 1.96] (glm 1.85).</p>
+<p><em>Instructor note.</em> With RAW predictors and the same vague prior, the intercept and latitude coefficient fail to converge &mdash; in an actual run <code>b0</code> = 6.26 and <code>b2</code> = &minus;0.10 come back with <strong>R-hat = 1.13 and n.eff &asymp; 6</strong>, nowhere near the <code>glm()</code> values (intercept 11.94, latitude &minus;0.24), because un-centred latitude ($\approx$ 42) is nearly collinear with the intercept. With poor inits you instead get NaN log densities and a stalled chain outright. Either way the lesson is the same &mdash; scale first. Show it live.</p>
 </section>
 
 <section id="a3">
@@ -196,7 +196,7 @@ b.post &lt;- <span class="fn">as.matrix</span>(samples)[, <span class="st">"b"</
 <section id="a7">
 <h2>Exercise 7 — Dynamic occupancy</h2>
 <p>Run <code>DynamicOccupancy_Nimble.R</code>.</p>
-<p><strong>(a-c)</strong> Posterior medians for $\phi_t, \gamma_t, \psi_t$ plotted vs truth: scattered around the 1:1 line, but with large per-parameter uncertainty due to small sample size (30 sites, 3 reps, 7 transitions).</p>
+<p><strong>(a-c)</strong> From an actual run (<code>set.seed(2025)</code>; 3 chains, 20000 iter, 10000 burn-in, thin 5; every parameter R-hat = 1.00): the quantities informed by all the data are recovered well &mdash; detection $p$ = 0.63 [0.55, 0.70] (truth 0.60) and baseline occupancy $\psi$ = 0.33 [0.18, 0.51] (truth 0.37). Posterior medians for $\phi_t, \gamma_t, \psi_t$ plotted vs truth scatter around the 1:1 line but with large per-parameter uncertainty (e.g. $\phi_3$ = 0.52 [0.16, 0.89], $\gamma_1$ = 0.47 [0.26, 0.70]) due to the small sample size (30 sites, 3 reps, 7 transitions). This is honest small-sample uncertainty, not a convergence failure.</p>
 <p><strong>(d) Without z-init trick.</strong> Try:</p>
 <pre><code>bad.z &lt;- <span class="fn">matrix</span>(<span class="fn">rbinom</span>(Nsites*Nyears, <span class="nu">1</span>, <span class="nu">0.3</span>), Nsites, Nyears)
 inits.bad &lt;- <span class="fn">list</span>(<span class="fn">list</span>(z=bad.z, phi=<span class="fn">runif</span>(Nyears-<span class="nu">1</span>,.<span class="nu">1</span>,.<span class="nu">9</span>),

@@ -148,7 +148,7 @@
 
 <!-- ================================================================== -->
 <a id="morning"></a>
-<div class="practice-banner"><div class="label">Practice — answers visible</div><h3>Morning practice problems</h3><p>The exercises below are walk-through practice. Your graded morning assignment uses a separate, novel problem set &mdash; <strong>choose either theme below</strong> and write your answers in <code>morning_lab_template.Rmd</code>.</p><p style="margin: 8px 0 0 0;"><a class="hand-in" href="problem_set.html#morning">Open the graded morning problem set &rarr;</a> &nbsp;&nbsp; <a class="hand-in" href="morning_lab_template.Rmd" style="background:#1C638A; color:white; border-color:#1C638A;">morning_lab_template.Rmd &darr;</a></p></div>
+<div class="practice-banner"><div class="label">Practice — answers visible</div><h3>Morning practice problems</h3><p>The exercises below are walk-through practice. Your graded morning assignment uses a separate, novel problem set &mdash; <strong>open the graded problem set below</strong> and write your answers in <code>morning_lab_template.Rmd</code>.</p><p style="margin: 8px 0 0 0;"><a class="hand-in" href="problem_set.html#morning">Open the graded morning problem set &rarr;</a> &nbsp;&nbsp; <a class="hand-in" href="morning_lab_template.Rmd" style="background:#1C638A; color:white; border-color:#1C638A;">morning_lab_template.Rmd &darr;</a></p></div>
 <section id="priors">
 <h2>A. Priors on the link scale &mdash; the ant richness example</h2>
 
@@ -230,8 +230,18 @@ eff2 &lt;- <span class="fn">exp</span>(beta * <span class="nu">1</span>) <span c
  <li>With SCALED predictors and the same prior. Compare R-hat, effective sample size, and the posterior medians of (b1, b2, b3) to the frequentist <code>glm()</code> output.</li>
  <li>Now keep the scaled predictors but tighten the prior to $\mathcal{N}(0, \sigma=2)$ (i.e. <code>dnorm(0, 1/4)</code>). Does the posterior change meaningfully? Why or why not?</li>
 </ol>
-<details class="answer"><summary>Reveal expected output</summary><div class="answer-body">
-<p>(a) Often you'll see <code>Inf</code> log densities and a stuck chain, or chains that drift slowly with R-hat &gt; 1.5. (b) Posterior medians match <code>glm()</code> to 2 decimals; R-hat &asymp; 1.00. (c) Posterior is essentially unchanged because the data are very informative for these coefficients. Tight priors only matter when data are weak.</p>
+<details class="answer"><summary>Reveal worked solution (actual NIMBLE run)</summary><div class="answer-body">
+<p>Numbers below are from an actual run (<code>set.seed(10)</code>, 3 chains, <code>niter=10000</code>, <code>nburnin=500</code>): posterior mean [95% CI] with R-hat and effective sample size from <code>MCMCsummary</code>. Coefficients are <code>b1</code>=forest, <code>b2</code>=latitude, <code>b3</code>=elevation.</p>
+<p><strong>(a) Raw predictors, <code>dnorm(0, tau=1/10000)</code> (i.e. $\sigma=100$).</strong> The intercept and latitude are badly non-identified because raw latitude ($\approx$ 42&deg;) is far from 0 and strongly correlated with the intercept: <code>b0</code> = 6.26 [1.46, 10.38] and <code>b2</code> = &minus;0.10 [&minus;0.20, 0.01] both come back with <strong>R-hat = 1.13 and only n.eff &asymp; 6</strong> effective draws &mdash; the chains have <em>not</em> converged, and they disagree with <code>glm()</code> (which gives intercept 11.94, latitude &minus;0.24). Forest (<code>b1</code> = 0.64, R-hat 1.00) and elevation happen to mix, but the fit is broken. Longer chains help only slowly; the real fix is scaling.</p>
+<p><strong>(b) Scaled predictors, same vague prior.</strong> Everything converges (R-hat = 1.00, n.eff &asymp; 5000&ndash;6000) and the posterior means match <code>glm()</code> to two decimals:</p>
+<table>
+<tr><th>Coefficient</th><th>Posterior mean [95% CI]</th><th>R-hat</th><th><code>glm()</code></th></tr>
+<tr><td>b0 (intercept)</td><td>1.84 [1.71, 1.96]</td><td>1.00</td><td>1.85</td></tr>
+<tr><td>b1 (forest)</td><td>0.32 [0.21, 0.45]</td><td>1.00</td><td>0.32</td></tr>
+<tr><td>b2 (latitude)</td><td>&minus;0.25 [&minus;0.39, &minus;0.13]</td><td>1.00</td><td>&minus;0.25</td></tr>
+<tr><td>b3 (elevation)</td><td>&minus;0.18 [&minus;0.30, &minus;0.07]</td><td>1.00</td><td>&minus;0.18</td></tr>
+</table>
+<p><strong>(c) Scaled predictors, tight prior <code>dnorm(0, 1/4)</code> (i.e. $\sigma=2$).</strong> The posterior is essentially unchanged: b0 1.84 [1.71, 1.96], b1 0.32 [0.20, 0.44], b2 &minus;0.25 [&minus;0.39, &minus;0.13], b3 &minus;0.19 [&minus;0.31, &minus;0.07]. With 44 bogs the data dominate both priors, so tightening $\sigma$ from 100 to 2 moves nothing. Tight priors matter most when the data are weak.</p>
 </div></details>
 </div>
 
@@ -284,9 +294,74 @@ samples &lt;- <span class="fn">nimbleMCMC</span>(lizardCode, constants=constants
 </div>
 
 <h3>The tighter-prior fix</h3>
-<p>Recall the link-scale problem from section A. The same issue appears in logistic regression: vague <code>dnorm(0, 1e-6)</code> on $a$ and $b$ means the prior on $p_i$ is bimodal at 0 and 1, not flat. The fix is a moderate prior:</p>
+<p>Recall the link-scale problem from section A. The same issue appears in logistic regression: a vague <code>dnorm(0, 1e-6)</code> on $a$ and $b$ does <em>not</em> imply a flat prior on the probability $p_i$. Pushed through the inverse-logit, that "vague" normal piles almost all of its mass out at $p_i = 0$ and $p_i = 1$ &mdash; the implied prior on $p_i$ is <strong>U-shaped (bimodal at the boundaries), not flat</strong>.</p>
+
+<div class="callout warn">
+<p><strong>Is that bimodal prior actually a problem? It depends on where the likelihood sits.</strong> A prior that spikes at 0 and 1 can still be <em>effectively uninformative and harmless</em> &mdash; as long as the likelihood has essentially no weight near $p=0$ or $p=1$. If the data pin $p$ somewhere in the interior (say a species detected at roughly a third of sites), the posterior is driven almost entirely by the likelihood; the prior's boundary spikes sit in a region the likelihood has already ruled out, so they never come into play, and the posterior is indistinguishable from what a flat prior would give.</p>
+<p>But if the likelihood <em>does</em> place weight near a boundary &mdash; a rare species detected at almost no sites, or a near-ubiquitous one detected at nearly all &mdash; then multiplying the likelihood by a prior that itself spikes at that boundary drags the posterior into the corner and makes it <strong>very informative and distorted in exactly the region you cared about</strong> (overconfident that $p$ is essentially 0 or 1). Because you rarely know in advance whether a boundary is in play, a genuinely flat (or gently weakly-informative) prior on $p$ is the safer default.</p>
+</div>
+
+<p>The practical fix is a moderate prior on the logit-scale coefficients:</p>
 <div class="eq-block">$a, b \sim \mathcal{N}(0, \sigma^2 = 2.71) \quad\Leftrightarrow\quad \texttt{dnorm(0, 1/2.71)}$</div>
-<p>This is the "Gelman default" weakly-informative prior for logistic regression with standardised predictors. The implied marginal prior on $p_i$ is almost uniform on $[0, 1]$.</p>
+<p>This is the "Gelman default" weakly-informative prior for logistic regression with standardised predictors. The implied marginal prior on $p_i$ is almost uniform on $[0, 1]$ &mdash; it flattens out the boundary spikes without smuggling in real information.</p>
+
+<figure class="prior-figure">
+<svg viewBox="0 0 844 298" role="img" aria-labelledby="priorfig-title priorfig-desc" xmlns="http://www.w3.org/2000/svg">
+  <title id="priorfig-title">How a vague logit-scale prior interacts with the likelihood</title>
+  <desc id="priorfig-desc">Three panels on a 0-to-1 probability axis. Panel A: a vague normal prior on the logit becomes a U-shaped (bimodal) prior on p, spiking at 0 and 1. Panel B: when the likelihood has its weight in the middle of the interval, the posterior essentially equals the likelihood and the prior is harmless. Panel C: when the likelihood has weight near a boundary, multiplying by the boundary-spiking prior pulls the posterior hard toward 0, distorting it.</desc>
+  <style>
+    .pf-ttl{font:600 13px system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;fill:#1B1B1B}
+    .pf-lg{font:12px system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;fill:#1B1B1B}
+    .pf-tk{font:11px system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;fill:#6B6B6B}
+    .pf-cap{font:italic 12px system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
+  </style>
+
+  <!-- Legend -->
+  <line x1="92" y1="24" x2="120" y2="24" stroke="#6C2C8A" stroke-width="2.5" stroke-dasharray="6 4"/>
+  <text class="pf-lg" x="126" y="28">Vague prior (U-shaped on p)</text>
+  <line x1="360" y1="24" x2="388" y2="24" stroke="#2B6E61" stroke-width="2.5"/>
+  <text class="pf-lg" x="394" y="28">Likelihood (data)</text>
+  <rect x="560" y="18.5" width="28" height="11" fill="#D73F09" fill-opacity="0.18" stroke="#D73F09" stroke-width="2"/>
+  <text class="pf-lg" x="594" y="28">Posterior</text>
+
+  <!-- ===== Panel A: prior alone ===== -->
+  <text class="pf-ttl" x="158" y="52" text-anchor="middle">A. The prior by itself</text>
+  <line x1="48" y1="70" x2="48" y2="250" stroke="#DDD7C7" stroke-width="1"/>
+  <line x1="48" y1="250" x2="268" y2="250" stroke="#6B6B6B" stroke-width="1.2"/>
+  <path d="M48,250 L48,75 L59,153.8 L70,183.5 L92,208 L125,223.8 L158,229 L191,223.8 L224,208 L246,183.5 L257,153.8 L268,75 L268,250 Z" fill="#6C2C8A" fill-opacity="0.09"/>
+  <path d="M48,75 L59,153.8 L70,183.5 L92,208 L125,223.8 L158,229 L191,223.8 L224,208 L246,183.5 L257,153.8 L268,75" fill="none" stroke="#6C2C8A" stroke-width="2.5" stroke-dasharray="6 4"/>
+  <line x1="48" y1="250" x2="48" y2="255" stroke="#6B6B6B"/><text class="pf-tk" x="48" y="266" text-anchor="middle">0</text>
+  <line x1="158" y1="250" x2="158" y2="255" stroke="#6B6B6B"/><text class="pf-tk" x="158" y="266" text-anchor="middle">0.5</text>
+  <line x1="268" y1="250" x2="268" y2="255" stroke="#6B6B6B"/><text class="pf-tk" x="268" y="266" text-anchor="middle">1</text>
+  <text class="pf-cap" x="158" y="284" text-anchor="middle" fill="#6B6B6B">spikes at 0 and 1</text>
+
+  <!-- ===== Panel B: likelihood in the middle ===== -->
+  <text class="pf-ttl" x="422" y="52" text-anchor="middle">B. Likelihood in the middle</text>
+  <line x1="312" y1="70" x2="312" y2="250" stroke="#DDD7C7" stroke-width="1"/>
+  <line x1="312" y1="250" x2="532" y2="250" stroke="#6B6B6B" stroke-width="1.2"/>
+  <path d="M334,250 L334,248.3 L345,243.7 L356,233.7 L367,214.3 L378,184.4 L389,148.5 L400,118.4 L411,106.5 L422,118.4 L433,148.5 L444,184.4 L455,214.3 L466,233.7 L477,243.7 L488,248.3 L488,250 Z" fill="#D73F09" fill-opacity="0.18"/>
+  <path d="M334,248.3 L345,243.7 L356,233.7 L367,214.3 L378,184.4 L389,148.5 L400,118.4 L411,106.5 L422,118.4 L433,148.5 L444,184.4 L455,214.3 L466,233.7 L477,243.7 L488,248.3" fill="none" stroke="#2B6E61" stroke-width="2.5"/>
+  <path d="M312,75 L323,153.8 L334,183.5 L356,208 L389,223.8 L422,229 L455,223.8 L488,208 L510,183.5 L521,153.8 L532,75" fill="none" stroke="#6C2C8A" stroke-width="2" stroke-dasharray="6 4" opacity="0.7"/>
+  <line x1="312" y1="250" x2="312" y2="255" stroke="#6B6B6B"/><text class="pf-tk" x="312" y="266" text-anchor="middle">0</text>
+  <line x1="422" y1="250" x2="422" y2="255" stroke="#6B6B6B"/><text class="pf-tk" x="422" y="266" text-anchor="middle">0.5</text>
+  <line x1="532" y1="250" x2="532" y2="255" stroke="#6B6B6B"/><text class="pf-tk" x="532" y="266" text-anchor="middle">1</text>
+  <text class="pf-cap" x="422" y="284" text-anchor="middle" fill="#2E6B2A">harmless: posterior &#8776; likelihood</text>
+
+  <!-- ===== Panel C: likelihood near a boundary ===== -->
+  <text class="pf-ttl" x="686" y="52" text-anchor="middle">C. Likelihood near a boundary</text>
+  <line x1="576" y1="70" x2="576" y2="250" stroke="#DDD7C7" stroke-width="1"/>
+  <line x1="576" y1="250" x2="796" y2="250" stroke="#6B6B6B" stroke-width="1.2"/>
+  <path d="M576,250 L576,75 L582.6,145 L589.2,192.3 L598,223.8 L609,239.5 L620,246.5 L631,248.6 L631,250 Z" fill="#D73F09" fill-opacity="0.18"/>
+  <path d="M576,75 L582.6,145 L589.2,192.3 L598,223.8 L609,239.5 L620,246.5 L631,248.6" fill="none" stroke="#D73F09" stroke-width="2.5"/>
+  <path d="M576,124 L587,145 L598,166 L609,185.3 L620,201 L631,213.3 L642,223.8 L664,237.8 L686,244.8 L708,247.9 L730,249.3" fill="none" stroke="#2B6E61" stroke-width="2.5"/>
+  <path d="M576,75 L587,153.8 L598,183.5 L620,208 L653,223.8 L686,229 L719,223.8 L752,208 L774,183.5 L785,153.8 L796,75" fill="none" stroke="#6C2C8A" stroke-width="2" stroke-dasharray="6 4" opacity="0.7"/>
+  <line x1="576" y1="250" x2="576" y2="255" stroke="#6B6B6B"/><text class="pf-tk" x="576" y="266" text-anchor="middle">0</text>
+  <line x1="686" y1="250" x2="686" y2="255" stroke="#6B6B6B"/><text class="pf-tk" x="686" y="266" text-anchor="middle">0.5</text>
+  <line x1="796" y1="250" x2="796" y2="255" stroke="#6B6B6B"/><text class="pf-tk" x="796" y="266" text-anchor="middle">1</text>
+  <text class="pf-cap" x="686" y="284" text-anchor="middle" fill="#A22020">distorted: posterior pushed to 0</text>
+</svg>
+<figcaption>A "vague" $\mathcal{N}(0,\text{large})$ prior on the logit becomes <strong>U-shaped on the probability $p$</strong> (A). When the likelihood sits in the interior, the posterior is essentially the likelihood and the prior does no harm (B). But when the likelihood has weight near a boundary, multiplying by the boundary-spiking prior drags the posterior into the corner and makes it overconfident (C) &mdash; which is why a flat prior on $p$ is the safer default.</figcaption>
+</figure>
 
 <div class="exercise" id="ex-3">
 <span class="ex-tag">Exercise 3</span><span class="difficulty medium"> · 20 min · R · convergence</span>
@@ -345,10 +420,19 @@ samples &lt;- <span class="fn">nimbleMCMC</span>(lizardCode, constants=constants
  }
 })</code></pre>
 
-<h3>Modeling the random intercept itself</h3>
-<p>The next layer: rather than letting $\mu_\alpha$ be a single number, regress the per-site mean on a <strong>site-level covariate</strong> $w_j$ (e.g. log-soil-carbon at site $j$):</p>
+<h3>Modeling the random intercept itself &mdash; a genuinely new idea</h3>
+<p>The next layer is the conceptual jump of this whole section. So far the random intercept only told us <em>that</em> sites differ (each $\alpha_j$ is a draw from $\mathcal{N}(\mu_\alpha, \sigma_\alpha^2)$). Now, rather than letting $\mu_\alpha$ be a single number, we regress the per-site mean intercept on a <strong>site-level covariate</strong> $w_j$ (e.g. log-soil-carbon at site $j$) &mdash; a predictor that has one value <em>per group</em>, not one value per observation:</p>
 <div class="eq-block">$\alpha_j \sim \mathcal{N}\left(\kappa + \eta \cdot w_j,\ \sigma_\alpha^2\right)$</div>
-<p>This is "group-level regression" and is what lets you say things like "after accounting for differences in N input, sites with higher SOC tend to emit more N2O on average."</p>
+<p>This is <strong>"group-level regression"</strong>: a regression that lives one level up, on the group intercepts themselves.</p>
+
+<div class="callout key">
+<p><strong>Why this is worth its own slide.</strong> Adding a covariate on the random intercept does three things a plain random-intercept model cannot:</p>
+<ul>
+ <li><strong>It explains <em>why</em> groups differ, not just that they do.</strong> A plain random intercept absorbs site-to-site variation into a black-box $\sigma_\alpha$. The term $\eta \cdot w_j$ turns that variation into a testable statement: "after accounting for N input, sites with higher soil carbon emit more N<sub>2</sub>O on average," with $\eta$ carrying a real posterior and credible interval.</li>
+ <li><strong>It borrows strength twice over.</strong> Partial pooling still shrinks data-poor sites toward the population mean &mdash; but now that "mean" is itself informed by each site's covariate, so a site with few observations is pulled toward the value its $w_j$ predicts, not just toward the global average. Better shrinkage, tighter site estimates.</li>
+ <li><strong>It predicts brand-new, unsampled sites.</strong> Because the intercept is a function of $w_j$, you can forecast the baseline emission of a site you never measured, as long as you know its soil carbon &mdash; $\hat\alpha_\text{new} = \kappa + \eta \cdot w_\text{new}$. A plain random-intercept model has nothing to say about a site not in the data.</li>
+</ul>
+</div>
 
 <div class="exercise" id="ex-4">
 <span class="ex-tag">Exercise 4</span><span class="difficulty medium"> · 30 min · R · core lab</span>
@@ -480,8 +564,11 @@ zst &lt;- <span class="fn">matrix</span>(<span class="nu">1L</span>, Nsites, Nye
  <li>What happens if you (mistakenly) omit the z-init trick &mdash; replace <code>zst</code> with <code>matrix(rbinom(Nsites*Nyears, 1, 0.3), Nsites, Nyears)</code>?</li>
  <li>Posterior intervals on individual $\phi_t$ are wide. Why? What would you do in a real analysis to tighten them?</li>
 </ol>
-<details class="answer"><summary>Reveal expected discussion</summary><div class="answer-body">
-<p>(a-c) Estimates near the 1:1 line but with substantial scatter. (d) You will often get "initial values produce a likelihood of 0" errors. (e) Each individual year-transition $\phi_t$ is estimated from only ~30 site-by-2-year combos. The standard fix is to assume $\phi_t \sim \mathcal{N}(\mu_\phi, \sigma_\phi^2)$ on the logit scale (hierarchical prior on the transitions) and/or to add a covariate model for $\phi$.</p>
+<details class="answer"><summary>Reveal worked solution (actual NIMBLE run)</summary><div class="answer-body">
+<p>Numbers below are from actually running the script (<code>set.seed(2025)</code>: 30 sites, 8 years, 3 reps, true $p=0.6$, baseline occupancy $\approx 0.37$; 3 chains, 20000 iter, 10000 burn-in, thin 5). Every monitored parameter has <strong>R-hat = 1.00</strong>.</p>
+<p><strong>(a&ndash;c)</strong> The two quantities informed by <em>all</em> the data are recovered well: detection $p$ = 0.63 [0.55, 0.70] (truth 0.60) and baseline occupancy $\psi$ = 0.33 [0.18, 0.51] (truth 0.37). Year-specific persistence and colonization scatter around the 1:1 line but with <strong>very wide 95% CIs</strong> &mdash; e.g. $\phi_3$ = 0.52 [0.16, 0.89], $\phi_5$ = 0.08 [0.00, 0.36], $\gamma_1$ = 0.47 [0.26, 0.70] (its truth 0.47, recovered almost exactly; others land anywhere in their wide interval). The derived yearly occupancy $\psi_t$ tracks the true trajectory, including the dip in year 3 (true 0.13, posterior 0.18 [0.08, 0.34]).</p>
+<p><strong>(d)</strong> Replacing the all-ones <code>zst</code> with random 0/1 inits triggers an "initial values produce a density/likelihood of 0" error (a $-\infty$ log-prob), because any site-year where a randomly-drawn $z=0$ collides with an observed $y=1$ is logically impossible.</p>
+<p><strong>(e)</strong> Each year-transition $\phi_t,\gamma_t$ is informed by only ~30 sites across a single two-year step, so the CIs are wide even though R-hat is a perfect 1.00 &mdash; Bayes is being honest about a genuinely small sample, not failing to converge. The standard fixes: put a hierarchical prior on the transitions, e.g. $\text{logit}(\phi_t) \sim \mathcal{N}(\mu_\phi, \sigma_\phi^2)$ so years borrow strength, and/or add a covariate model for $\phi$ and $\gamma$.</p>
 </div></details>
 </div>
 
@@ -606,7 +693,7 @@ zst &lt;- <span class="fn">matrix</span>(<span class="nu">1L</span>, Nsites, Nye
 </ul>
 
 <h3>If you want to keep going</h3>
-<p>The two problem sets (<a href="problem_set.html">v2 carnivores</a>, <a href="problem_set.html">v3 fish</a>) give you 20 more hierarchical, latent-state, and derived-quantity problems with reveal-able solutions in <span class="pill nimble">NIMBLE</span>. Pick the one that matches your study system and work through it on your own data afterward.</p>
+<p>The <a href="problem_set.html">graded problem set</a> gives you ten more hierarchical, latent-state, and derived-quantity problems in <span class="pill nimble">NIMBLE</span>, fit on the same real datasets in <code>data/</code>. Work through it, then try the same modelling patterns on your own study system's data.</p>
 </section>
 
 </main>

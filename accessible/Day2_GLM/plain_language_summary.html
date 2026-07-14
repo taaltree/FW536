@@ -61,7 +61,7 @@ MathJax = {
 <section id="cont">
 <h2>Continuous distributions: the morning's cast</h2>
 <ul>
-<li><strong>Normal</strong> — symmetric, unbounded. Workhorse for measurements like temperatures, fish lengths, residuals.</li>
+<li><strong>Normal</strong> — symmetric, unbounded. Workhorse for measurements that can fall on either side of a mean, like temperatures and model residuals. Because it puts probability on negative values, it is a poor default for strictly positive quantities such as lengths and masses — those belong with the Lognormal or Gamma below.</li>
 <li><strong>Lognormal</strong> — log(Y) is Normal. Always positive, right-skewed. Use for abundances, concentrations, body sizes.</li>
 <li><strong>Gamma</strong> — flexible positive continuous. Use when variance grows with the mean (common in biology).</li>
 <li><strong>Beta</strong> — for proportions strictly between 0 and 1 (not derived from a count).</li>

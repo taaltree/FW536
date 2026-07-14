@@ -49,6 +49,13 @@
   .card .extras a { color: var(--osu-orange-dark); text-decoration: none; font-weight: 600; }
   .card .extras a.featured { font-size: 13px; padding: 1px 6px; border-radius: 4px; background: var(--panel-alt); }
   .card .extras a:hover { color: var(--osu-orange); }
+  /* Prominent "read first" plain-language summary row at the top of each day card */
+  .card .primer { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; padding: 9px 12px; background: linear-gradient(90deg, #FDEBD9, #FFF9F2); border-left: 4px solid var(--osu-orange); border-radius: 0 8px 8px 0; text-decoration: none; transition: background .15s, box-shadow .15s; }
+  .card .primer:hover { background: linear-gradient(90deg, #FBDCC0, #FFF3E4); box-shadow: 0 2px 8px rgba(215,63,9,0.12); }
+  .card .primer-tag { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 3px 7px; border-radius: 10px; background: var(--osu-orange); color: #fff; white-space: nowrap; }
+  .card .primer-text { flex: 1; font-size: 13px; font-weight: 700; color: var(--osu-black); }
+  .card .primer-sub { display: block; color: var(--muted); font-weight: 400; font-style: italic; font-size: 12px; margin-top: 1px; }
+  .card .primer-arrow { color: var(--osu-orange); font-weight: 700; font-size: 15px; }
   .features { padding: 30px 60px; max-width: 1200px; margin: 0 auto; }
   .features h2 { font-size: 26px; }
   .feat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
@@ -91,6 +98,12 @@
     <a class="day-num-link" href="Day1_Probability/lab.html">Day 1 &rarr;</a>
     <h2><a href="Day1_Probability/lab.html">Probability &amp; discrete distributions</a></h2>
 
+    <a class="primer" href="Day1_Probability/plain_language_summary.html">
+      <span class="primer-tag">Read first</span>
+      <span class="primer-text">Plain-language summary <span class="primer-sub">the why before the how &mdash; 5 min, no math</span></span>
+      <span class="primer-arrow">&rarr;</span>
+    </a>
+
     <div class="session-block">
       <div class="session-label"><a href="Day1_Probability/lab.html#morning">Morning · Probability · 20 pts · pre-course exam at start</a></div>
       <div class="activity-row"><span class="tag lecture">Lecture</span><span><a href="Day1_Probability/FW536_Day1_Morning_intro%20to%20probability.pptx">Slides: intro to probability (PPT)</a></span></div>
@@ -109,7 +122,6 @@
     </div>
 
     <div class="extras">
-      <a class="featured" href="Day1_Probability/plain_language_summary.html">Plain-language summary</a> ·
       <a href="Day1_Probability/answer_key.html">Practice answer key</a> ·
       <a href="accessible/Day1_Probability/lecture_day1_morning.html">Accessible lecture notes</a>
     </div>
@@ -119,6 +131,12 @@
   <div class="card">
     <a class="day-num-link" href="Day2_GLM/lab.html">Day 2 &rarr;</a>
     <h2><a href="Day2_GLM/lab.html">Continuous distributions, LMs &amp; GLMs</a></h2>
+
+    <a class="primer" href="Day2_GLM/plain_language_summary.html">
+      <span class="primer-tag">Read first</span>
+      <span class="primer-text">Plain-language summary <span class="primer-sub">the why before the how &mdash; 5 min, no math</span></span>
+      <span class="primer-arrow">&rarr;</span>
+    </a>
 
     <div class="session-block">
       <div class="session-label"><a href="Day2_GLM/lab.html#morning">Morning · Continuous distributions · 20 pts</a></div>
@@ -139,7 +157,6 @@
 
     <div class="extras">
       <a class="featured" href="Day2_GLM/log_logit_intuition.html"><strong>★ Log &amp; logit intuition guide</strong></a> ·
-      <a class="featured" href="Day2_GLM/plain_language_summary.html">Plain-language summary</a> ·
       <a href="Day2_GLM/answer_key.html">Practice answer key</a> ·
       <a href="accessible/Day2_GLM/lecture_day2_morning.html">Accessible lecture notes</a>
     </div>
@@ -149,6 +166,12 @@
   <div class="card">
     <a class="day-num-link" href="Day3_MixedModels_ModelSelection/lab.html">Day 3 &rarr;</a>
     <h2><a href="Day3_MixedModels_ModelSelection/lab.html">Mixed models &amp; model selection</a></h2>
+
+    <a class="primer" href="Day3_MixedModels_ModelSelection/plain_language_summary.html">
+      <span class="primer-tag">Read first</span>
+      <span class="primer-text">Plain-language summary <span class="primer-sub">the why before the how &mdash; 5 min, no math</span></span>
+      <span class="primer-arrow">&rarr;</span>
+    </a>
 
     <div class="session-block">
       <div class="session-label"><a href="Day3_MixedModels_ModelSelection/lab.html#morning">Morning · Mixed models · 20 pts</a></div>
@@ -168,7 +191,6 @@
     </div>
 
     <div class="extras">
-      <a class="featured" href="Day3_MixedModels_ModelSelection/plain_language_summary.html">Plain-language summary</a> ·
       <a href="Day3_MixedModels_ModelSelection/answer_key.html">Practice answer key</a> ·
       <a href="accessible/Day3_MixedModels_ModelSelection/lecture_day3_morning.html">Accessible lecture notes</a>
     </div>
@@ -178,6 +200,12 @@
   <div class="card">
     <a class="day-num-link" href="Day4_Likelihood_BayesI/lab.html">Day 4 &rarr;</a>
     <h2><a href="Day4_Likelihood_BayesI/lab.html">Maximum likelihood &amp; Bayes I</a></h2>
+
+    <a class="primer" href="Day4_Likelihood_BayesI/plain_language_summary.html">
+      <span class="primer-tag">Read first</span>
+      <span class="primer-text">Plain-language summary <span class="primer-sub">the why before the how &mdash; 5 min, no math</span></span>
+      <span class="primer-arrow">&rarr;</span>
+    </a>
 
     <div class="session-block">
       <div class="session-label"><a href="Day4_Likelihood_BayesI/lab.html#morning">Morning · Maximum likelihood · 20 pts</a></div>
@@ -198,7 +226,6 @@
     </div>
 
     <div class="extras">
-      <a class="featured" href="Day4_Likelihood_BayesI/plain_language_summary.html">Plain-language summary</a> ·
       <a href="Day4_Likelihood_BayesI/answer_key.html">Practice answer key</a> ·
       <a href="Day4_Likelihood_BayesI/Logistic_BayesianGrowth_Nimble.R">Nimble R: logistic growth</a> ·
       <a href="accessible/Day4_Likelihood_BayesI/lecture_day4_morning.html">Accessible lecture notes</a>
@@ -209,6 +236,12 @@
   <div class="card">
     <a class="day-num-link" href="Day5_BayesII/lab.html">Day 5 &rarr;</a>
     <h2><a href="Day5_BayesII/lab.html">Bayesian hierarchical modeling</a></h2>
+
+    <a class="primer" href="Day5_BayesII/plain_language_summary.html">
+      <span class="primer-tag">Read first</span>
+      <span class="primer-text">Plain-language summary <span class="primer-sub">the why before the how &mdash; 5 min, no math</span></span>
+      <span class="primer-arrow">&rarr;</span>
+    </a>
 
     <div class="session-block">
       <div class="session-label"><a href="Day5_BayesII/lab.html#morning">Morning · Bayes II · 20 pts</a></div>
@@ -225,7 +258,6 @@
     </div>
 
     <div class="extras">
-      <a class="featured" href="Day5_BayesII/plain_language_summary.html">Plain-language summary</a> ·
       <a href="Day5_BayesII/answer_key.html">Practice answer key</a><br/>
       Nimble R: <a href="Day5_BayesII/Lizards_Nimble.R">Lizards</a>,
       <a href="Day5_BayesII/SpawnerRecruit_Nimble.R">Spawner-recruit</a>,

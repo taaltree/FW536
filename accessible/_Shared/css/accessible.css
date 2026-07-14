@@ -297,7 +297,7 @@ footer { border-top: 2px solid var(--border-soft); padding: 1.5rem 1.25rem; colo
   a { text-decoration-thickness: 2px; }
 }
 @media (forced-colors: active) {
-  .callout, .exercise, .lab-toc, .data-card, .practice-banner, .quiz, details.answer, pre, th, td {
+  .callout, .exercise, .lab-toc, .data-card, .practice-banner, .primer-banner, .quiz, details.answer, pre, th, td {
     border: 1px solid CanvasText;
   }
   .exercise .ex-tag, .practice-banner .hand-in, .tab-buttons button[aria-selected="true"] {
@@ -309,3 +309,42 @@ footer { border-top: 2px solid var(--border-soft); padding: 1.5rem 1.25rem; colo
 .day-list { list-style: none; padding: 0; max-width: 75ch; margin: 0 auto; }
 .day-list > li { border: 2px solid var(--border); border-radius: 8px; padding: 1rem 1.25rem; margin: 1rem 0; }
 .day-list h2 { margin-top: 0; }
+
+/* ---- Plain-language primer banner (prominent "read first" link) ---- */
+.primer-banner {
+  display: block;
+  border: 2px solid var(--orange);
+  border-left: 8px solid var(--orange);
+  background: #FFF6EC;
+  padding: 1rem 1.25rem;
+  margin: 1.5rem 0;
+  border-radius: 0 6px 6px 0;
+  text-decoration: none;
+  color: inherit;
+}
+.primer-banner:hover { background: #FDEBD9; }
+.primer-banner .label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--orange-strong);
+}
+.primer-banner .pb-title {
+  display: block;
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin: 0.25rem 0 0.35rem;
+  color: var(--link);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.primer-banner .pb-desc { display: block; }
+.primer-banner .pb-cta {
+  display: inline-block;
+  margin-top: 0.5rem;
+  font-weight: 700;
+  color: var(--link);
+  text-decoration: underline;
+}

@@ -105,7 +105,14 @@
 
 
 
-<div class="callout try"><strong>Helpful companions for today.</strong> Try the <a href="explore_shrinkage.html">interactive shrinkage / partial-pooling demo</a> to see how a random effect pulls group estimates toward the overall mean, and skim the <a href="plain_language_summary.html">plain-language summary</a>.</div>
+<a class="primer-banner" href="plain_language_summary.html">
+  <span class="label">Read this first</span>
+  <span class="pb-title">Day 3 in plain language &mdash; the why before the how</span>
+  <span class="pb-desc">A short, no-math explanation of what a random effect actually does, why partial pooling beats both extremes, and what model selection can and cannot tell you. Five minutes here makes the whole walkthrough below click.</span>
+  <span class="pb-cta">Open the plain-language summary &rarr;</span>
+</a>
+
+<div class="callout try"><strong>Helpful companions for today.</strong> Try the <a href="explore_shrinkage.html">interactive shrinkage / partial-pooling demo</a> to see how a random effect pulls group estimates toward the overall mean.</div>
 
 <section id="orient">
 <h2>Where we are in the week</h2>
@@ -127,6 +134,7 @@
 <p>A <strong>fixed effect</strong> is an effect you care about by name: badjuice concentration, body length, treatment. A <strong>random effect</strong> is a grouping variable whose individual levels you don't particularly care about, but which violates independence if you ignore it: which stream, which lake, which subject. We don't estimate a separate intercept for each stream as a "thing we want to know"; we estimate <em>how much streams vary</em> and let each stream's estimate be pulled toward the overall mean. That pulling is called <strong>shrinkage</strong> and it's the magic of mixed models: streams with little data borrow strength from the rest.</p>
 <p>This afternoon we ask the next obvious question: with several candidate models on the table, how do we pick? We meet <strong>LRT</strong> for nested models, <strong>AIC / AICc / BIC</strong> for ranking on a common scale, and <strong>cross-validation</strong> when the goal is honest prediction error. We also take the lab time to make a hard but important argument: that picking "the best model" from a long candidate list and then reporting its p-values is one of the most common ways scientists fool themselves.</p>
 </div>
+<p><strong><a href="plain_language_summary.html">Read the full plain-language summary for Day 3 &rarr;</a></strong> &mdash; the same ideas worked through slowly, with examples and no math.</p>
 </section>
 
 <!-- ================================================================== -->

@@ -358,6 +358,58 @@ h4 {
 }
 .practice-banner .hand-in:hover { background: #A22020; color: white; }
 
+/* Plain-language primer banner — prominent, whole-block "read this first" link */
+.primer-banner {
+  display: block;
+  text-decoration: none;
+  background: linear-gradient(90deg, #FDEBD9, #FFF9F2);
+  border-left: 6px solid var(--osu-orange);
+  padding: 16px 22px;
+  margin: 30px 0;
+  border-radius: 0 10px 10px 0;
+  transition: background .15s, box-shadow .15s;
+}
+.primer-banner:hover {
+  background: linear-gradient(90deg, #FBDCC0, #FFF3E4);
+  box-shadow: 0 3px 12px rgba(215,63,9,0.15);
+}
+.primer-banner .label {
+  display: block;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--osu-orange);
+}
+.primer-banner .pb-title {
+  display: block;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--osu-black);
+  margin: 4px 0 6px 0;
+}
+.primer-banner .pb-desc {
+  display: block;
+  color: var(--osu-stone);
+  font-size: 14px;
+  line-height: 1.6;
+}
+.primer-banner .pb-cta {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 4px 10px;
+  border-radius: 4px;
+  background: white;
+  border: 1px solid var(--osu-orange);
+  color: var(--osu-orange-dark);
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+}
+.primer-banner:hover .pb-cta { background: var(--osu-orange); color: white; }
+
 /* Exercises */
 .exercise {
   background: var(--panel);

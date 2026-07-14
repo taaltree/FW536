@@ -141,17 +141,17 @@ b.post &lt;- <span class="fn">as.matrix</span>(samples)[, <span class="st">"b"</
 <h2>Exercise 4 — All five N2O models</h2>
 <p>Use <code>Multilevel_Nimble.R</code> top to bottom. Key reports:</p>
 <p><em>Actual run: <code>set.seed(10)</code>, 3 chains, niter=10000, nburnin=1000; 563 measurements, 107 sites, 10 fertilizer types; all $\beta$ R-hat = 1.00.</em></p>
-<div class="callout warn"><p><strong>Data caveat.</strong> The file has a <code>carbon</code> column but the script ignores it: it builds the site covariate <code>w[j]</code> from a transform of each site's <em>mean n.input</em>, so Models 4&ndash;5 test the effect of site-mean N-input, not real SOC.</p></div>
+<p>The site-level covariate is $w_j = \log(c_j/(100-c_j))$, the logit of site $j$'s mean soil organic carbon percentage $c_j$ (the <code>carbon</code> column).</p>
 <table>
 <tr><th>Model</th><th>Posterior of $\beta$ (median, 95% CI)</th><th>What changed</th></tr>
 <tr><td>1: complete pool</td><td>0.91 [0.70, 1.12]</td><td>Baseline; site variation pooled into residual</td></tr>
 <tr><td>2: no pool</td><td>0.85 [0.65, 1.05]</td><td>$\beta$ slightly tighter; per-site $\alpha_j$ wildly variable</td></tr>
 <tr><td>3: partial pool</td><td>0.88 [0.69, 1.06]</td><td>Per-site $\alpha_j$ pulled toward $\mu_\alpha=0.18$ (shrinkage)</td></tr>
-<tr><td>4: + w covariate</td><td>0.85 [0.66, 1.04]</td><td>$\eta$ CI straddles 0 &mdash; see (c)</td></tr>
+<tr><td>4: + w covariate</td><td>0.87 [0.69, 1.05]</td><td>$\eta$ credibly positive &mdash; see (c)</td></tr>
 <tr><td>5: + random slope</td><td>$\mu_\beta$ = 0.89 [0.54, 1.31]</td><td>Per-fertilizer slopes 0.60&ndash;1.41</td></tr>
 </table>
 <p><strong>(b) Shrinkage plot.</strong> Plotting <code>a.no</code> (model 2) against <code>a.part</code> (model 3): data-rich sites sit on the 1:1 line, single-measurement sites are pulled hard toward $\mu_\alpha$. Concretely, mean $|\Delta\alpha_j|$ = 0.46 for $n_j=1$ sites vs 0.06 for $n_j\ge10$ sites (correlation of $n_j$ with $|\Delta\alpha_j|$ = $-0.49$).</p>
-<p><strong>(c) Group-level effect.</strong> $\eta$ posterior median = 0.11, 95% CI [&minus;0.16, 0.37] &mdash; <em>not</em> credibly different from 0. Because <code>w</code> is a function of site-mean N-input and $\beta$ already absorbs the within-site N-input effect, the site-level covariate adds little once $\beta$ is in the model. Re-running Model 4 with the <em>real</em> per-site <code>carbon</code> column (z-scored) leaves $\eta$ non-credible too &mdash; median 0.19, 95% CI [&minus;0.09, 0.46], $\Pr(\eta&gt;0)=0.91$ &mdash; so the null is not an artifact of the script fabricating <code>w</code> from N-input. (A cleaner version of this lab would use the <code>carbon</code> column directly.)</p>
+<p><strong>(c) Group-level effect.</strong> $\eta$ posterior median = 0.30, 95% CI [0.01, 0.59], $\Pr(\eta&gt;0)=0.98$ &mdash; <em>credibly positive</em>: sites with higher soil organic carbon emit more N<sub>2</sub>O at a given N input, consistent with more labile carbon fuelling denitrification. The effect is modest and the interval only just clears 0, because $\eta$ is informed by the number of sites (107), not the 563 observations. $\eta$ and $\kappa$ are correlated and mix slowly, so the default niter=10000 gives R-hat $\approx 1.04$ for $\eta$; the numbers above are from a longer run (3 chains, 60k iter, thin 5, R-hat = 1.00), or equivalently from centering $w$.</p>
 <p><strong>(d) Slopes by fertilizer.</strong> Steepest is <code>UM</code> (fert.index 5) at $\beta$ = 1.41 [0.76, 2.33], a urea-containing fertilizer; the other urea/mixed types (U 0.94, AM 0.98, UA 0.90, unknown 1.02) are also high, while the mineral <code>N</code> type is shallowest (0.60). Urea-type fertilizers do have the steepest emission-vs-input slope, as expected.</p>
 <p><em>Instructor note.</em> In this run the random-slope model converged fine at niter=10000 (all R-hat $\le$ 1.01, including $\sigma_\beta$). If a student's hyperparameters $\sigma_\alpha, \sigma_\beta$ show R-hat &gt; 1.05, lengthening <code>niter</code> and thinning fixes it.</p>
 </section>

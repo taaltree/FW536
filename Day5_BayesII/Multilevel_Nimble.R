@@ -37,11 +37,12 @@ set.seed(10)
 # ----- Data ----------------------------------------------------------------
 N2OEmission <- read.csv("data/N2OEmission.csv")
 head(N2OEmission)
-# If you have a site-level summary (mean SOC %), load here. If not, we'll
-# fabricate one from per-site means of n.input so the script runs end-to-end.
+# Site-level summary: mean soil organic carbon (%) per site. The N2OEmission
+# file carries a `carbon` column, so we use it directly as the group-level
+# covariate w[j] in Models 4-5.
 if (!exists("SiteCarbon")) {
   SiteCarbon <- N2OEmission %>% group_by(group.index) %>%
-    summarise(mean = mean(n.input))
+    summarise(mean = mean(carbon))
 }
 
 # Center the predictor on the log scale (centering improves MCMC mixing).
@@ -168,7 +169,7 @@ abline(h = mean(a.part), col = "red", lty = 2)
 # MODEL 4: PARTIAL POOLING with site-level covariate w[j] on random intercept
 # =============================================================================
 # w[j] = logit-percent of soil organic carbon for site j
-w <- log(SiteCarbon$mean / (max(SiteCarbon$mean) + 1 - SiteCarbon$mean))
+w <- log(SiteCarbon$mean / (100 - SiteCarbon$mean))
 
 mod4 <- nimbleCode({
   kappa ~ dnorm(0, 1/10000)

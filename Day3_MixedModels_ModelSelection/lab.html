@@ -131,6 +131,7 @@
 <section id="big-picture">
 <h2>Plain-language overview</h2>
 <div class="callout plain">
+<p><strong>Today's running example &mdash; and yes, "badjuice" is made up.</strong> A new graduate student joins your lab to study <strong>razor clam abundance along 10 beaches on the Oregon coast</strong>. At each beach they record clam abundance and the local concentration of <strong>badjuice</strong> &mdash; a <em>fictitious</em> environmental toxin invented for this course; it is not a real chemical &mdash; and they repeat the survey for four years. The student wants to know: <strong>does badjuice affect clam abundance?</strong> Hold on to that scenario &mdash; it is the example we return to all day, and it already contains the whole fixed-vs-random distinction.</p>
 <p>A <strong>fixed effect</strong> is an effect you care about by name: badjuice concentration, body length, treatment. A <strong>random effect</strong> is a grouping variable whose individual levels you don't particularly care about, but which violates independence if you ignore it: which stream, which lake, which subject. We don't estimate a separate intercept for each stream as a "thing we want to know"; we estimate <em>how much streams vary</em> and let each stream's estimate be pulled toward the overall mean. That pulling is called <strong>shrinkage</strong> and it's the magic of mixed models: streams with little data borrow strength from the rest.</p>
 <p>This afternoon we ask the next obvious question: with several candidate models on the table, how do we pick? We meet <strong>LRT</strong> for nested models, <strong>AIC / AICc / BIC</strong> for ranking on a common scale, and <strong>cross-validation</strong> when the goal is honest prediction error. We also take the lab time to make a hard but important argument: that picking "the best model" from a long candidate list and then reporting its p-values is one of the most common ways scientists fool themselves.</p>
 </div>
@@ -703,8 +704,8 @@ m_slop &lt;- <span class="fn">lmer</span>(Z_TP ~ Z_Length + (<span class="nu">1<
 
 <p>A defensible workflow:</p>
 <ol>
-<li><strong>State the question first.</strong> "Does badjuice affect clam abundance, controlling for beach?" is different from "Predict clam abundance at a new beach next year."</li>
-<li><strong>Decide the model structure from biology and design</strong>, not from automated selection. Beach and year are random effects because you want to generalize. Badjuice is a fixed effect because you care about its coefficient.</li>
+<li><strong>State the question first.</strong> Back in the razor-clam scenario from this morning (badjuice, the fictitious toxin, measured on 10 Oregon beaches): "Does badjuice affect clam abundance, controlling for beach?" is a different question from "Predict clam abundance at a new beach next year."</li>
+<li><strong>Decide the model structure from biology and design</strong>, not from automated selection. Beach and year are random effects because you want to generalize beyond the particular beaches you sampled. Badjuice is a fixed effect because you care about its coefficient &mdash; that slope <em>is</em> the answer to the student's question.</li>
 <li><strong>Fit one principal model</strong>; check assumptions; report the coefficient of interest with a CI.</li>
 <li><strong>If competing structures are scientifically interesting</strong>, compare them with LRT (random effects) or AICc (parsimony) <em>and</em> show the coefficient under each — does the conclusion change?</li>
 <li><strong>If the goal is prediction</strong>, evaluate with cross-validation, not in-sample AIC.</li>

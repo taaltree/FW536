@@ -41,9 +41,9 @@ not part of the student-facing site.
    During this revision, agents found and fixed several numeric errors by running
    the code; a CI harness makes that permanent.
 
-3. **Grading rubrics.** Each 20-point problem set and each 50-point exam should
-   ship with a rubric (points per problem, partial-credit guidance). This makes
-   grading consistent and lets the pre/post exam comparison be scored identically.
+3. **Grading rubrics.** Each 20-point problem set and the 50-point pre-course
+   exam should ship with a rubric (points per problem, partial-credit guidance).
+   This makes grading consistent and transparent.
 
 4. **Reproducible environment.** Add an `renv.lock` (or a documented
    `install.packages` list with versions) so students and graders run the same
@@ -98,8 +98,6 @@ not part of the student-facing site.
 - Confirm the practice `lab.html` code on Day 2 uses the real `sockeye_adult.csv`
   schema (the graded problem set and key already do; the practice lab's exercise
   A1 may still assume the old column names).
-- Confirm the pre-course and post-course exams are strictly parallel in topic and
-  difficulty so the gain score is meaningful.
 - Spot-check that every Nimble example actually compiles on a fresh machine that
   followed the install guide (the single most common day-of failure).
 

@@ -12,8 +12,9 @@ screen-reader-optimized edition lives in [`accessible/`](accessible/index.html).
 - **Each session** has a lecture followed by a hands-on lab.
 - **Each session's graded work** is a single 20-point problem set, submitted as a
   knitted R Markdown HTML on Canvas.
-- **Pre-course exam** at the start of Day 1 morning; **post-course exam** at the
-  end of Day 5 afternoon (parallel exams to measure learning gain).
+- **Pre-course exam** at the start of Day 1 morning — a generously-scored
+  diagnostic used to gauge where the class is starting from. Day 5 afternoon is
+  open lab time to finish any unfinished problem sets.
 
 ## Before the course
 

@@ -78,12 +78,6 @@ The accessible pages were produced by transforming the standard site, so if you
 update content in `../FW536_2026/`, regenerate this edition rather than editing
 both by hand.
 
-## Note on the post-course exam filename
-
-The student-facing post-course exam is `post_course_exam_off.html`. (In the
-standard repo, a few pages link to `post_course_exam.html`, which does not
-exist — those links are corrected here.)
-
 ## Credits
 
 Course design and content by **Taal Levi**, Department of Fisheries, Wildlife,

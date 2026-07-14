@@ -142,25 +142,27 @@ samples &lt;- <span class="fn">nimbleMCMC</span>(lizCode, constants=consts,
 b.post &lt;- <span class="fn">as.matrix</span>(samples)[, <span class="st">"b"</span>]
 <span class="fn">mean</span>(b.post &lt; <span class="nu">0</span>) <span class="cm"># ~ 0.99+</span>
 <span class="fn">MCMCsummary</span>(samples, params=<span class="fn">c</span>(<span class="st">"y10"</span>,<span class="st">"y20"</span>,<span class="st">"diff"</span>))</code></pre>
-<p><strong>Expected.</strong> R-hat &asymp; 1.00 on all parameters. $P(b &lt; 0) &gt; 0.99$, confirming higher PA reduces occupancy. <code>diff</code> posterior median &lt; 0 with 95% CI also negative.</p>
+<p><strong>Result (actual run; <code>set.seed(2025)</code>, 3 chains, niter=6000, nburnin=1000, n=19 islands).</strong> All R-hat = 1.00 (<code>gelman.diag</code> upper C.I. &le; 1.01) and <code>heidel.diag</code> stationarity passes. $P(b &lt; 0)$ = 0.9995, confirming higher PA reduces occupancy. Predicted occupancy falls from $y_{10}$ = 0.73 [0.47, 0.91] to $y_{20}$ = 0.41 [0.17, 0.68], so <code>diff</code> has posterior median &minus;0.30, 95% CI [&minus;0.54, &minus;0.10] &mdash; credibly negative. (Refitting with the vague <code>dnorm(0, 1e-6)</code> prior instead pushes the slope to $b$ mean &minus;4.97 [&minus;10.2, &minus;1.5], versus the tight-prior &minus;2.44 [&minus;4.5, &minus;0.8]: with only 19 near-separated islands the prior visibly regularizes $b$, though both agree $P(b&lt;0)\approx1$.)</p>
 <p><strong>Biology.</strong> Higher perimeter:area ratio means more edge habitat per unit interior, which on small or irregular islands corresponds to more predation pressure and less stable microhabitat &mdash; consistent with the lizards' lower occurrence probability there.</p>
 </section>
 
 <section id="a4">
 <h2>Exercise 4 — All five N2O models</h2>
 <p>Use <code>Multilevel_Nimble.R</code> top to bottom. Key reports:</p>
+<p><em>Actual run: <code>set.seed(10)</code>, 3 chains, niter=10000, nburnin=1000; 563 measurements, 107 sites, 10 fertilizer types; all $\beta$ R-hat = 1.00.</em></p>
+<div class="callout warn"><p class="callout-label">Watch out</p><p><strong>Data caveat.</strong> The file has a <code>carbon</code> column but the script ignores it: it builds the site covariate <code>w[j]</code> from a transform of each site's <em>mean n.input</em>, so Models 4&ndash;5 test the effect of site-mean N-input, not real SOC.</p></div>
 <table>
 <tr><th scope="col">Model</th><th scope="col">Posterior of $\beta$ (median, 95% CI)</th><th scope="col">What changed</th></tr>
-<tr><td>1: complete pool</td><td>~ 0.55 [0.45, 0.65]</td><td>Baseline; site variation pooled into residual</td></tr>
-<tr><td>2: no pool</td><td>~ 0.50 [0.40, 0.60]</td><td>$\beta$ slightly tighter; per-site $\alpha_j$ wildly variable</td></tr>
-<tr><td>3: partial pool</td><td>~ 0.50 [0.40, 0.60]</td><td>Per-site $\alpha_j$ pulled toward $\mu_\alpha$ (shrinkage)</td></tr>
-<tr><td>4: + SOC covariate</td><td>~ 0.50 [0.40, 0.60]</td><td>$\eta &gt; 0$ credibly &mdash; SOC matters</td></tr>
-<tr><td>5: + random slope</td><td>$\beta$ now per-fertilizer</td><td>Some fertilizers steeper than others</td></tr>
+<tr><td>1: complete pool</td><td>0.91 [0.70, 1.12]</td><td>Baseline; site variation pooled into residual</td></tr>
+<tr><td>2: no pool</td><td>0.85 [0.65, 1.05]</td><td>$\beta$ slightly tighter; per-site $\alpha_j$ wildly variable</td></tr>
+<tr><td>3: partial pool</td><td>0.88 [0.69, 1.06]</td><td>Per-site $\alpha_j$ pulled toward $\mu_\alpha=0.18$ (shrinkage)</td></tr>
+<tr><td>4: + w covariate</td><td>0.85 [0.66, 1.04]</td><td>$\eta$ CI straddles 0 &mdash; see (c)</td></tr>
+<tr><td>5: + random slope</td><td>$\mu_\beta$ = 0.89 [0.54, 1.31]</td><td>Per-fertilizer slopes 0.60&ndash;1.41</td></tr>
 </table>
-<p><strong>(b) Shrinkage plot.</strong> Plot <code>a.no</code> (median per-site $\alpha$ from model 2) against <code>a.part</code> (from model 3). The smallest absolute $\alpha_j$ moves stay near the 1:1 line; the extremes are pulled toward the population mean of <code>a.part</code>.</p>
-<p><strong>(c) Group-level effect.</strong> $\eta$ posterior median is positive with 95% CI not crossing 0 in most fits: higher SOC sites tend to have higher baseline emissions, controlling for N input.</p>
-<p><strong>(d) Slopes by fertilizer.</strong> Urea-type fertilizers typically have the steepest emission-vs-input slope; mineral fertilizers (ammonium nitrate etc.) tend to be lower.</p>
-<p><em>Instructor note.</em> If a student reports R-hat &gt; 1.05 for the random-slope model, they may need to lengthen <code>niter</code> to 50,000 and thin; this is a model where the default chain length sometimes isn't enough for the hyperparameters $\sigma_\alpha$ and $\sigma_\beta$ to converge.</p>
+<p><strong>(b) Shrinkage plot.</strong> Plotting <code>a.no</code> (model 2) against <code>a.part</code> (model 3): data-rich sites sit on the 1:1 line, single-measurement sites are pulled hard toward $\mu_\alpha$. Concretely, mean $|\Delta\alpha_j|$ = 0.46 for $n_j=1$ sites vs 0.06 for $n_j\ge10$ sites (correlation of $n_j$ with $|\Delta\alpha_j|$ = $-0.49$).</p>
+<p><strong>(c) Group-level effect.</strong> $\eta$ posterior median = 0.11, 95% CI [&minus;0.16, 0.37] &mdash; <em>not</em> credibly different from 0. Because <code>w</code> is a function of site-mean N-input and $\beta$ already absorbs the within-site N-input effect, the site-level covariate adds little once $\beta$ is in the model. Re-running Model 4 with the <em>real</em> per-site <code>carbon</code> column (z-scored) leaves $\eta$ non-credible too &mdash; median 0.19, 95% CI [&minus;0.09, 0.46], $\Pr(\eta&gt;0)=0.91$ &mdash; so the null is not an artifact of the script fabricating <code>w</code> from N-input. (A cleaner version of this lab would use the <code>carbon</code> column directly.)</p>
+<p><strong>(d) Slopes by fertilizer.</strong> Steepest is <code>UM</code> (fert.index 5) at $\beta$ = 1.41 [0.76, 2.33], a urea-containing fertilizer; the other urea/mixed types (U 0.94, AM 0.98, UA 0.90, unknown 1.02) are also high, while the mineral <code>N</code> type is shallowest (0.60). Urea-type fertilizers do have the steepest emission-vs-input slope, as expected.</p>
+<p><em>Instructor note.</em> In this run the random-slope model converged fine at niter=10000 (all R-hat $\le$ 1.01, including $\sigma_\beta$). If a student's hyperparameters $\sigma_\alpha, \sigma_\beta$ show R-hat &gt; 1.05, lengthening <code>niter</code> and thinning fixes it.</p>
 </section>
 
 <section id="a5">
@@ -178,18 +180,18 @@ b.post &lt;- <span class="fn">as.matrix</span>(samples)[, <span class="st">"b"</
 <section id="a6">
 <h2>Exercise 6 — Beverton-Holt: fit, predict, derive</h2>
 <p>Run <code>SpawnerRecruit_Nimble.R</code> top to bottom.</p>
-<p><strong>(a) Posterior summaries (typical):</strong></p>
+<p><strong>(a) Posterior summaries</strong> (<code>set.seed(2025)</code>, 3 chains, niter=10000, nburnin=1000; Nyears=20). Every 95% CI contains the truth (R-hat = 1.00&ndash;1.01):</p>
 <table>
 <tr><th scope="col">Parameter</th><th scope="col">Median</th><th scope="col">95% CI</th><th scope="col">Truth</th></tr>
-<tr><td>$a$</td><td>~ 4.8</td><td>[3.0, 7.2]</td><td>5</td></tr>
-<tr><td>$b$</td><td>~ 4900</td><td>[3500, 7100]</td><td>5000</td></tr>
-<tr><td>$\sigma$</td><td>~ 0.21</td><td>[0.15, 0.31]</td><td>0.2</td></tr>
-<tr><td>$N_\text{eq}$</td><td>~ 3800</td><td>[2400, 5800]</td><td>4000</td></tr>
-<tr><td>$S_\text{msy}$</td><td>~ 1300</td><td>[700, 2200]</td><td>1316</td></tr>
-<tr><td>$H_\text{msy}$</td><td>~ 0.55</td><td>[0.42, 0.68]</td><td>0.553</td></tr>
+<tr><td>$a$</td><td>5.32</td><td>[3.22, 9.25]</td><td>5</td></tr>
+<tr><td>$b$</td><td>4977</td><td>[3927, 7151]</td><td>5000</td></tr>
+<tr><td>$\sigma$</td><td>0.245</td><td>[0.181, 0.351]</td><td>0.2</td></tr>
+<tr><td>$N_\text{eq}$</td><td>4044</td><td>[3393, 5099]</td><td>4000</td></tr>
+<tr><td>$S_\text{msy}$</td><td>1216</td><td>[889, 1770]</td><td>1236</td></tr>
+<tr><td>$H_\text{msy}$</td><td>0.566</td><td>[0.443, 0.671]</td><td>0.553</td></tr>
 </table>
-<p><strong>(b) Conservative management value.</strong> 5th percentile of $H_\text{msy}$ from your <code>quantile()</code> call &mdash; typically around 0.40 with the default 20-year dataset. That is the "if I want to be 95% confident I'm not over-fishing" harvest rate.</p>
-<p><strong>(c) More data, tighter posteriors.</strong> With $N=100$ years, $H_\text{msy}$ CI half-width shrinks by roughly $\sqrt{5} \approx 2.2$. Bayesian inference obeys the same $\sqrt{N}$ rule as frequentist inference at large $N$; the prior matters only at small $N$.</p>
+<p><strong>(b) Conservative management value.</strong> 5th percentile of $H_\text{msy}$ = 0.46 (median is 0.57). That is the "if I want to be 95% confident I'm not over-fishing" harvest rate &mdash; noticeably below the point estimate.</p>
+<p><strong>(c) More data, tighter posteriors.</strong> Refitting with $N=100$ years shrinks the $H_\text{msy}$ 95% CI from width 0.228 (20 yr: [0.44, 0.67]) to 0.069 (100 yr: [0.53, 0.60]), a factor of 3.3&times;. That is a bit <em>more</em> than the $\sqrt{5}\approx2.24$ the pure $\sqrt{N}$ rule predicts: at 20 years the BH curvature is weakly identified ($a$'s posterior runs to 9.25, near its prior ceiling), inflating the small-sample interval; 100 years both add data and pull the posterior into its well-identified regime. The lesson still holds &mdash; more data buy tighter management quantities, on the order of $\sqrt{N}$.</p>
 <p><em>Instructor note.</em> Some students will get NaN <code>log()</code> values on iteration 1 if the random initial $a$ leads to a negative argument inside <code>log(1 + a/b * S[t])</code>. The prior bounds <code>dunif(1, 10)</code> and <code>dunif(1000, 10000)</code> usually prevent this; if not, supply explicit <code>inits</code>.</p>
 </section>
 
@@ -210,10 +212,11 @@ inits.bad &lt;- <span class="fn">list</span>(<span class="fn">list</span>(z=bad.
 
 <section id="a8">
 <h2>Exercise 8 — N-mixture build-up</h2>
-<p><strong>(a) Basic.</strong> Posterior medians: $\lambda \approx 5.9$ [4.5, 7.6], $p \approx 0.78$ [0.62, 0.91]. Truth $\lambda=6, p=0.8$.</p>
-<p><strong>(b) Covariate on abundance.</strong> $\beta_1$ posterior median $\approx 1.0$ with 95% CI well away from 0. The recovered slope matches the simulation truth ($\beta_1 = 1$).</p>
-<p><strong>(c) Covariate on both.</strong> $\beta_1$ posterior is very similar to (b) here (because data are clean), but in general, ignoring detection heterogeneity inflates the apparent abundance heterogeneity. The slope estimates for both abundance and detection are well-recovered.</p>
-<p><strong>(d) Overdispersion + Bayesian p-value.</strong> Bayesian p-value typically &lt; 0.05 or &gt; 0.95 &mdash; clear evidence the Poisson model can't capture the variance. The point is that the discrepancy test catches a model that would otherwise produce confident-sounding (and wrong) posteriors for $\lambda$.</p>
+<p><em>Actual run: <code>set.seed(2025)</code>, 3 chains, niter=10000, nburnin=1000, thin 5; all R-hat = 1.00&ndash;1.02.</em></p>
+<p><strong>(a) Basic.</strong> Posterior medians $\lambda$ = 6.24 [5.06, 7.78], $p$ = 0.80 [0.67, 0.87] (truth $\lambda=6, p=0.8$) &mdash; both cover truth, intervals wide with only 20 sites.</p>
+<p><strong>(b) Covariate on abundance.</strong> $\beta_1$ = 1.00 [0.94, 1.07], credibly positive and matching the simulation truth ($\beta_1 = 1$); $\beta_0$ = 2.99 [2.91, 3.07].</p>
+<p><strong>(c) Covariate on both.</strong> $\beta_1$ barely moves &mdash; from 1.00 to 1.04 [0.97, 1.10] &mdash; and the detection coefficients are recovered ($a_0$ = 0.92 [0.70, 1.11], $a_1$ = 1.00 [0.91, 1.09]). These data are clean, so modeling detection here neither biases nor much tightens $\beta_1$; in messier data, ignoring detection heterogeneity inflates apparent abundance heterogeneity.</p>
+<p><strong>(d) Overdispersion + Bayesian p-value.</strong> Data simulated from a negative binomial, fit with Poisson: Bayesian p-value = 0.008 ($T(\text{data})$ median 367 vs $T(y^\text{rep})$ median 332), far from 0.5 &mdash; clear evidence the Poisson model can't capture the variance. The discrepancy test catches a model that still returns a confident-looking $\lambda$ = 5.81 [5.46, 6.17].</p>
 </section>
 
 <section id="a9">

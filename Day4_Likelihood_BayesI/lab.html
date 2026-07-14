@@ -935,8 +935,12 @@ best &lt;- <span class="fn">min</span>(prof)
 <span class="ex-tag">Exercise 3</span><span class="difficulty medium"> · 20 min · LRT + AIC</span>
 <h3>Sex-specific VBGF revisited</h3>
 <p>Use the LRT code from the walk-through above. Report (a) the LRT statistic and p-value, (b) AIC for both models, (c) your conclusion. Then refit Model B with $L_\infty$ shared but $\kappa$ sex-specific (4 parameters) and run a second LRT against the same null. Comment on what you learn.</p>
-<details class="answer"><summary>Reveal expected output</summary><div class="answer-body">
-<p>The full vs intercept-only LRT will produce a large $\Lambda$ (typically &gt; 6) and reject the null at $\alpha = 0.05$ with 2 df. AIC will agree (the 5-parameter model is &gt; 2 AIC units below the 3-parameter one). The intermediate (shared $L_\infty$, sex-specific $\kappa$) model usually has the best AIC: most of the sex effect is in growth rate, not asymptotic length.</p>
+<details class="answer"><summary>Reveal worked solution (actual R run)</summary><div class="answer-body">
+<p><em>Deterministic MLE fit (<code>stats4::mle</code>, L-BFGS-B) on the full <code>data/vonbert.csv</code> ($n = 100$, 50 per sex), model $L_a = L_\infty(1 - e^{-\kappa a})$ — no seed needed.</em></p>
+<p>(a) <strong>Full (Model B, 5 param) vs null (Model A, 3 param), 2 df:</strong> $\Lambda = 2(\ell_B - \ell_A) = 75.4$, $p \approx 4\times10^{-17}$ — the null of a single shared growth curve is decisively rejected.</p>
+<p>(b) <strong>AIC (lower is better):</strong> Model A (pooled, 3p) $= 798.0$; intermediate (shared $L_\infty$, sex-specific $\kappa$, 4p) $= 767.1$; Model B (full sex-specific $L_\infty$ and $\kappa$, 5p) $= \mathbf{726.6}$. The full model wins by ~40 AIC over the intermediate and ~71 over the null — far beyond the 2-unit rule of thumb. AIC and the LRT agree.</p>
+<p>(c) <strong>Second LRT — intermediate (4p) vs null (3p), 1 df:</strong> $\Lambda = 32.9$, $p \approx 9.7\times10^{-9}$. A single sex-specific $\kappa$ already helps a lot, but it is <em>not</em> where the action is: fitting Model B shows the sex difference is concentrated in asymptotic length $L_\infty$ ($\hat L_{\infty,1} \approx 102.5$ vs $\hat L_{\infty,2} \approx 82.6$) far more than in growth coefficient $\kappa$ ($0.284$ vs $0.259$). When the intermediate model is forced to share $L_\infty$, it can only compensate by splaying the two $\kappa$'s apart ($0.335$ vs $0.167$) — and still lands ~40 AIC units short of the full model.</p>
+<p><strong>Conclusion:</strong> the sexes differ mainly in asymptotic size $L_\infty$ (one sex reaches a substantially larger maximum length) and only modestly in $\kappa$; the fully sex-specific model is preferred by both criteria. Remember the division of labor — the LRT needs nesting and returns a p-value; AIC needs no nesting and returns a ranking.</p>
 </div></details>
 </div>
 
@@ -1017,8 +1021,20 @@ acc / <span class="fn">length</span>(ll)</code></pre>
 <li>Compute $\Pr(\text{MSY} > 50 \mid \text{data})$.</li>
 <li>Pick one parameter where BCI and HPDI noticeably differ. Plot both intervals on top of a histogram and explain in 2 sentences why they differ for that parameter.</li>
 </ol>
-<details class="answer"><summary>Reveal expected output</summary><div class="answer-body">
-<p>With this dataset, typical results: $\hat r \approx 0.20$ with 95% HPDI roughly (0.18, 0.22); $\hat K \approx 1{,}230$ with 95% BCI roughly (1{,}130, 1{,}380); $\Pr(r > 0.22 \mid y) \approx 0.02$–0.03. Plotting code is in <code>Logistic_BayesianGrowth_Nimble.R</code>. $\sigma$ is the classic asymmetric case where BCI and HPDI separate.</p>
+<details class="answer"><summary>Reveal worked solution (actual NIMBLE run)</summary><div class="answer-body">
+<p><em>Ran <code>Logistic_BayesianGrowth_Nimble.R</code> as shipped: <code>data/Logistic.csv</code>, flat priors ($K\sim U(0,4000)$, $r\sim U(0,2)$, $\sigma\sim U(0,2)$), <code>set.seed(10)</code>, 3 chains, 25{,}000 iterations, 5{,}000 burn-in → 60{,}000 posterior draws. All $\hat R = 1.00$.</em></p>
+<p>(a) Posterior median with 95% equal-tailed BCI and 95% HPDI (including the two primary parameters $r$ and $K$):</p>
+<table>
+<tr><th>quantity</th><th>median</th><th>95% BCI (equal-tail)</th><th>95% HPDI</th></tr>
+<tr><td>$r$</td><td>0.201</td><td>(0.181, 0.220)</td><td>(0.181, 0.219)</td></tr>
+<tr><td>$K$</td><td>1{,}234</td><td>(1{,}131, 1{,}378)</td><td>(1{,}122, 1{,}365)</td></tr>
+<tr><td>$K/2$</td><td>617</td><td>(565, 689)</td><td>(561, 683)</td></tr>
+<tr><td>$\text{MSY}=rK/4$</td><td>62.0</td><td>(57.1, 67.1)</td><td>(57.1, 67.0)</td></tr>
+<tr><td>$\sigma$</td><td>0.0284</td><td>(0.0234, 0.0353)</td><td>(0.0229, 0.0346)</td></tr>
+</table>
+<p>(c) $\Pr(r > 0.22 \mid \text{data}) = 0.023$ — the $r$ posterior is tight ($\text{sd} \approx 0.010$), so $0.22$ sits about two SDs above the median.</p>
+<p>(d) $\Pr(\text{MSY} > 50 \mid \text{data}) = 1.00$ — essentially certain: the entire 95% MSY interval (~57 to 67) lies above 50.</p>
+<p>(e) <strong>$\sigma$</strong> is the parameter where BCI and HPDI noticeably separate. It is bounded below by 0 and mildly right-skewed, so its HPDI $(0.0229, 0.0346)$ sits a touch lower and is marginally shorter than the equal-tailed BCI $(0.0234, 0.0353)$: an equal-tail interval splits the 5% miss symmetrically by quantile, whereas the HPDI captures the densest 95% of mass, which for a right-skewed posterior shifts toward the lower bound. The gap is modest here because $\sigma$ is well-determined — it would be dramatic for a strongly skewed posterior ($K$ and $K/2$ show the same rightward skew). Derived-quantity plotting code ($dN/dt$ vs $N$ with median and HPDI band) is in <code>Logistic_BayesianGrowth_Nimble.R</code>.</p>
 </div></details>
 </div>
 

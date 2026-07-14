@@ -373,8 +373,12 @@ samples &lt;- <span class="fn">nimbleMCMC</span>(lizardCode, constants=constants
  <li>Compute and report the posterior median and 95% CI for $\text{diff} = P(\text{presence} \mid \text{PA}=20) - P(\text{presence} \mid \text{PA}=10)$.</li>
  <li>Compare the marginal posterior of $b$ under <code>dnorm(0, 1e-6)</code> versus <code>dnorm(0, 1/2.71)</code>. With this sample size, does the prior matter much?</li>
 </ol>
-<details class="answer"><summary>Reveal expected output</summary><div class="answer-body">
-<p>(a) R-hat &asymp; 1.00, Heidelberger stationarity passes. (b) $P(b &lt; 0) &gt; 0.99$. (c) <code>diff</code> is negative with 95% CI not crossing 0 &mdash; islands with more perimeter per unit area are less likely to host the lizard. (d) The two priors give nearly identical posteriors here because the data are informative; the practical difference matters most when sample size is small.</p>
+<details class="answer"><summary>Reveal worked solution (actual NIMBLE run)</summary><div class="answer-body">
+<p>Numbers below are from an actual run. <code>Lizards_Nimble.R</code> sets no seed, so we fixed <code>set.seed(2025)</code>; both the vague and the tight model use 3 chains, <code>niter=6000</code>, <code>nburnin=1000</code> on the $n=19$ islands.</p>
+<p><strong>(a) Convergence.</strong> For the vague-prior model <code>gelman.diag</code> returns R-hat = 1.00 for both $a$ and $b$ (upper C.I. 1.01) and <code>heidel.diag</code> passes the stationarity test for both ($p=0.62$ for $a$, $0.84$ for $b$). The tight-prior model behaves the same (R-hat = 1.00, stationarity passes); its only blemish is that the halfwidth precision test on $a$ flags, purely because $a$'s posterior mean sits almost exactly at 0. All three chains agree &mdash; the model converges.</p>
+<p><strong>(b) Sign of the slope.</strong> The slope is negative with near-certainty: $P(b&lt;0)$ = <strong>1.00</strong> under the vague prior and <strong>0.9995</strong> under the tight prior. Higher perimeter:area &rArr; lower occupancy.</p>
+<p><strong>(c) Management difference.</strong> Using the tight-prior model, predicted occupancy falls from $y_{10}$ = 0.73 [0.47, 0.91] at PA = 10 to $y_{20}$ = 0.41 [0.17, 0.68] at PA = 20, so <code>diff</code> $= P(\text{PA}=20)-P(\text{PA}=10)$ has posterior median <strong>&minus;0.30</strong>, 95% CI <strong>[&minus;0.54, &minus;0.10]</strong> &mdash; credibly negative (the interval excludes 0).</p>
+<p><strong>(d) Does the prior matter?</strong> Here it does. With only 19 islands and near-separation (small-PA islands are almost all occupied, large-PA almost all empty), the vague <code>dnorm(0, 1e-6)</code> lets the logit slope run large and diffuse: $b$ mean <strong>&minus;4.97</strong>, 95% CI [&minus;10.2, &minus;1.5]. The Gelman-default <code>dnorm(0, 1/2.71)</code> regularises it to $b$ mean <strong>&minus;2.44</strong>, 95% CI [&minus;4.5, &minus;0.8] &mdash; roughly half the magnitude and half the width. Both priors agree on the sign and the biological conclusion, but the marginal posterior of $b$ itself is much tighter and less extreme under the weakly-informative prior. This is exactly the small-$n$ regime, foreshadowed by the U-shaped-prior figure above, where the prior does real work rather than washing out.</p>
 </div></details>
 </div>
 
@@ -444,8 +448,24 @@ samples &lt;- <span class="fn">nimbleMCMC</span>(lizardCode, constants=constants
  <li>For model 4 (covariate on random intercept), is the posterior of $\eta$ (the effect of SOC on baseline emissions) credibly different from 0?</li>
  <li>For model 5 (random slope by fertilizer), which fertilizer has the largest absolute effect of N input on emissions?</li>
 </ol>
-<details class="answer"><summary>Reveal expected discussion</summary><div class="answer-body">
-<p>(a) $\beta$ remains positive and tight across all five models. (b) The smallest-N sites move most under partial pooling. (c) $\eta &gt; 0$ with most of the posterior away from zero. (d) Among the fertilizer types, urea-based fertilizers tend to show the steepest emission response &mdash; consistent with the agronomic literature. Exact numerics depend on your data version; the qualitative answer is what matters here.</p>
+<details class="answer"><summary>Reveal worked solution (actual NIMBLE run)</summary><div class="answer-body">
+<p>From an actual run of <code>Multilevel_Nimble.R</code> (<code>set.seed(10)</code>; 563 measurements across 107 sites and 10 fertilizer types; 3 chains, <code>niter=10000</code>, <code>nburnin=1000</code>). Every $\beta$ has R-hat = 1.00.</p>
+<div class="callout warn">
+<p><strong>Data caveat &mdash; read before (c).</strong> The N2O file <em>does</em> contain a <code>carbon</code> column, but the script never uses it. It fabricates its site-level covariate <code>w[j]</code> from a logit-style transform of each site's <em>mean N-input</em> (<code>SiteCarbon &lt;- group_by(group.index) |&gt; summarise(mean = mean(n.input))</code>). So "$\eta$ = effect of soil organic carbon" is really "effect of a transform of site-mean N-input," entered <em>on top of</em> the within-site N-input slope $\beta$.</p>
+</div>
+<p><strong>(a) The N-input slope $\beta$ is positive and stable across the whole pooling spectrum</strong> (posterior median [95% CI]):</p>
+<table>
+<tr><th>Model</th><th>$\beta$ median</th><th>95% CI</th></tr>
+<tr><td>1 &mdash; complete pooling</td><td>0.91</td><td>[0.70, 1.12]</td></tr>
+<tr><td>2 &mdash; no pooling</td><td>0.85</td><td>[0.65, 1.05]</td></tr>
+<tr><td>3 &mdash; partial pooling</td><td>0.88</td><td>[0.69, 1.06]</td></tr>
+<tr><td>4 &mdash; + covariate on intercept</td><td>0.85</td><td>[0.66, 1.04]</td></tr>
+<tr><td>5 &mdash; random slope ($\mu_\beta$)</td><td>0.89</td><td>[0.54, 1.31]</td></tr>
+</table>
+<p>Pooling barely moves the average slope; it mostly tightens the per-site intercepts. (Model 5 reports the mean slope $\mu_\beta$; individual fertilizers spread around it &mdash; see (d).)</p>
+<p><strong>(b) Shrinkage is largest for the data-poor sites.</strong> Comparing per-site $\alpha_j$ medians from Model 2 (no pooling) to Model 3 (partial pooling, grand mean $\mu_\alpha=0.18$), the sites that move most toward the mean are all single-measurement sites: e.g. site 51 ($n_j=1$) shifts 0.72, site 39 ($n_j=1$) 0.63, site 42 ($n_j=1$) 0.61. Averaged over all sites, $|\Delta\alpha_j|$ = <strong>0.46</strong> for $n_j=1$ sites versus only <strong>0.06</strong> for sites with $n_j\ge10$, and the correlation between $n_j$ and $|\Delta\alpha_j|$ is $-0.49$: more data &rArr; less shrinkage, exactly as the hierarchical prior intends.</p>
+<p><strong>(c) $\eta$ is <em>not</em> credibly different from 0 here:</strong> median 0.11, 95% CI <strong>[&minus;0.16, 0.37]</strong> &mdash; the interval straddles 0. Given the caveat above, that makes sense: <code>w[j]</code> is a function of site-mean N-input, and the within-site N-input effect is already captured by $\beta$, so this site-level covariate adds little once $\beta$ is in the model. We also re-ran Model 4 with the <em>real</em> per-site <code>carbon</code> column (z-scored) in place of the fabricated <code>w</code>: $\eta$ stays non-credible &mdash; median 0.19, 95% CI [&minus;0.09, 0.46], with $\Pr(\eta &gt; 0)$ rising only from 0.80 to 0.91. So the null is <em>not</em> an artifact of the fabricated covariate: at this sample size, once the within-site slope $\beta$ is in the model, neither the fabricated covariate nor genuine soil carbon adds a credibly non-zero group-level effect. (A cleaner version of this lab would drop the fabrication and use the <code>carbon</code> column directly.)</p>
+<p><strong>(d) Fertilizer with the steepest N-input response (Model 5).</strong> Per-fertilizer slopes range from 0.60 (fertilizer <code>N</code>) up to <strong>1.41</strong> for <strong><code>UM</code></strong> (fert.index 5; 95% CI [0.76, 2.33]) &mdash; a urea-containing type. The other urea/mixed types (<code>U</code> 0.94, <code>unknown</code> 1.02, <code>AM</code> 0.98, <code>UA</code> 0.90) are also among the steepest, while the plain mineral-N type is shallowest. So urea-based fertilizers do show the steepest emission response, consistent with the agronomic literature. (At these settings $\sigma_\beta$ and the per-fertilizer slopes all reached R-hat $\le$ 1.01, so the default 10k iterations sufficed.)</p>
 </div></details>
 </div>
 
@@ -502,8 +522,20 @@ samples &lt;- <span class="fn">nimbleMCMC</span>(lizardCode, constants=constants
  <li>Plot the posterior of $H_\text{msy}$ as a histogram. What is the 5th percentile? In management language, the harvest rate you'd allow if you wanted to be 95% confident you weren't overfishing.</li>
  <li>Increase <code>Nyears</code> from 20 to 100, regenerate data, refit. How much does the posterior of $H_\text{msy}$ tighten? Is the gain linear in $N$?</li>
 </ol>
-<details class="answer"><summary>Reveal expected output</summary><div class="answer-body">
-<p>(a) Posterior medians close to truth; 95% CIs include truth. (b) 5th percentile of $H_\text{msy}$ is the conservative estimate; this is exactly the kind of risk-based number Bayes lets you write down. (c) Doubling $N$ shrinks CI by roughly $\sqrt{2}$ &mdash; the standard $\sqrt{N}$ rule.</p>
+<details class="answer"><summary>Reveal worked solution (actual NIMBLE run)</summary><div class="answer-body">
+<p>From an actual run of <code>SpawnerRecruit_Nimble.R</code> (<code>set.seed(2025)</code>; 3 chains, <code>niter=10000</code>, <code>nburnin=1000</code>). Truth $a=5,\ b=5000,\ \sigma=0.2$ implies $N_\text{eq}=4000$, $S_\text{msy}=1236$, $H_\text{msy}=0.553$.</p>
+<p><strong>(a) Posterior medians and 95% CIs (Nyears = 20).</strong> Every CI contains the truth (R-hat = 1.00&ndash;1.01):</p>
+<table>
+<tr><th>Quantity</th><th>Median</th><th>95% CI</th><th>Truth</th></tr>
+<tr><td>$a$</td><td>5.32</td><td>[3.22, 9.25]</td><td>5</td></tr>
+<tr><td>$b$</td><td>4977</td><td>[3927, 7151]</td><td>5000</td></tr>
+<tr><td>$\sigma$</td><td>0.245</td><td>[0.181, 0.351]</td><td>0.2</td></tr>
+<tr><td>$N_\text{eq}$</td><td>4044</td><td>[3393, 5099]</td><td>4000</td></tr>
+<tr><td>$S_\text{msy}$</td><td>1216</td><td>[889, 1770]</td><td>1236</td></tr>
+<tr><td>$H_\text{msy}$</td><td>0.566</td><td>[0.443, 0.671]</td><td>0.553</td></tr>
+</table>
+<p><strong>(b) Conservative harvest rate.</strong> The 5th percentile of the $H_\text{msy}$ posterior is <strong>0.46</strong> &mdash; the harvest rate you could allow while staying 95% confident you are not exceeding the true $H_\text{msy}$. Note how much lower this risk-based number sits than the median 0.57.</p>
+<p><strong>(c) More data, tighter posterior.</strong> Regenerating from the same truth with <code>Nyears = 100</code> shrinks the $H_\text{msy}$ 95% CI from width <strong>0.228</strong> (20 yr: [0.44, 0.67]) to <strong>0.069</strong> (100 yr: [0.53, 0.60]) &mdash; a factor of <strong>3.3&times;</strong>. That is actually a bit <em>more</em> than the $\sqrt{100/20}=\sqrt5\approx2.24$ the pure $\sqrt N$ rule predicts: at only 20 years the Beverton-Holt curvature is weakly identified (note $a$'s posterior runs to 9.25, up against its prior ceiling of 10), so the 20-year interval is inflated; 100 years both add information and pull the posterior into its well-identified, roughly-Gaussian regime, so it tightens faster than $\sqrt N$ alone. The qualitative lesson holds &mdash; more data buy tighter management quantities, on the order of $\sqrt N$.</p>
 </div></details>
 </div>
 
@@ -615,8 +647,12 @@ zst &lt;- <span class="fn">matrix</span>(<span class="nu">1L</span>, Nsites, Nye
  <li>Model 3 (covariate on both): does adding the detection covariate change inference on the abundance covariate?</li>
  <li>Model 4 (overdispersion): what is the Bayesian p-value? What does it say about the Poisson assumption?</li>
 </ol>
-<details class="answer"><summary>Reveal expected output</summary><div class="answer-body">
-<p>(a) Both close to truth. (b) Yes, well-separated from 0. (c) Modest change; properly modeling detection variation usually tightens posteriors on abundance covariates. (d) Bayesian p-value far from 0.5 (often near 0 or 1) &mdash; the data have more variance than Poisson allows. The fix is a Poisson-lognormal or NB N-mixture.</p>
+<details class="answer"><summary>Reveal worked solution (actual NIMBLE run)</summary><div class="answer-body">
+<p>From an actual run of <code>NMixture_Nimble.R</code> (<code>set.seed(2025)</code>; 3 chains, <code>niter=10000</code>, <code>nburnin=1000</code>, thin 5). All R-hat = 1.00&ndash;1.02.</p>
+<p><strong>(a) Basic model (20 sites, 3 reps; truth $\lambda=6,\ p=0.8$).</strong> Recovered cleanly: $\lambda$ = 6.24 [5.06, 7.78] and $p$ = 0.80 [0.67, 0.87]. With only 20 sites the intervals are wide, but both comfortably cover truth.</p>
+<p><strong>(b) Covariate on abundance (truth $\beta_1=1$).</strong> $\beta_1$ = <strong>1.00</strong> [0.94, 1.07] &mdash; credibly positive and bang on the simulated value; $\beta_0$ = 2.99 [2.91, 3.07].</p>
+<p><strong>(c) Covariate on both.</strong> Adding the detection covariate ($a_0$ = 0.92 [0.70, 1.11], $a_1$ = 1.00 [0.91, 1.09], both recovering truth 1) leaves the abundance-covariate inference essentially unchanged: $\beta_1$ moves only from 1.00 to <strong>1.04</strong> [0.97, 1.10]. Because these data are simulated clean, modeling detection heterogeneity here neither biases nor much tightens $\beta_1$; in messier data, ignoring detection structure is what would distort it.</p>
+<p><strong>(d) Overdispersion + Bayesian p-value.</strong> The 200-site data were generated from a negative binomial but fit with a Poisson N-mixture. The discrepancy sits almost entirely on one side &mdash; observed $T(\text{data})$ median 367 vs replicated $T(y^\text{rep})$ median 332 &mdash; giving a <strong>Bayesian p-value of 0.008</strong>, far from 0.5. The Poisson model cannot absorb the extra variance, so it is decisively rejected; the fix is a Poisson-lognormal or negative-binomial N-mixture (Exercise 8/9). Note $\lambda$ = 5.81 [5.46, 6.17] still looks confident and reasonable &mdash; the GOF check is what exposes the misfit the point estimate alone would hide.</p>
 </div></details>
 </div>
 

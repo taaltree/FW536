@@ -26,7 +26,6 @@
  <li><a href="#a7">Exercise 7 — dynamic occupancy</a></li>
  <li><a href="#a8">Exercise 8 — N-mixture build-up</a></li>
  <li><a href="#a9">Exercise 9 — Poisson-lognormal N-mix</a></li>
- <li><a href="#a10">Exercise 10 — pick the tool</a></li>
  </ul>
  <div class="section">Day 5 docs</div>
  <ul>
@@ -235,19 +234,6 @@ inits.bad &lt;- <span class="fn">list</span>(<span class="fn">list</span>(z=bad.
 })</code></pre>
 <p><strong>Expected.</strong> Bayesian p-value moves toward 0.5 (usually 0.3-0.7). $\sigma_\epsilon$ posterior median is around 0.5-0.7 with 95% CI well away from 0, capturing the overdispersion the Poisson alone missed.</p>
 <p><em>Conceptual.</em> The Poisson-lognormal is the workhorse fix for overdispersed N-mixture data. Some authors prefer a negative-binomial latent abundance (<code>N[i] ~ dnegbin(...)</code>), which is equivalent in the limit but parameterised differently.</p>
-</section>
-
-<section id="a10">
-<h2>Exercise 10 — Pick the right tool</h2>
-<table>
-<tr><th>Scenario</th><th>Model</th><th>Latent vs. observed</th></tr>
-<tr><td>(a) 30 forest plots × 10 years, marten presence</td><td>Dynamic occupancy with year-specific or hierarchical $\phi, \gamma$</td><td>z = true occupancy; y = detection</td></tr>
-<tr><td>(b) Pellet quadrats, repeat visits, overdispersed</td><td>Poisson-lognormal N-mixture, or NB N-mixture</td><td>N = true count; y = observed count</td></tr>
-<tr><td>(c) Mark-recapture with site-varying survival</td><td>Cormack-Jolly-Seber with random effects on $\phi$</td><td>z = alive/dead state; y = capture history</td></tr>
-<tr><td>(d) Salmon escapement / recruits, harvest rate decision</td><td>Beverton-Holt; report 5th percentile of $H_\text{msy}$</td><td>No latent state; derived management quantity</td></tr>
-<tr><td>(e) 200 streams × replicate eDNA × basin covariate</td><td>Multilevel dynamic occupancy with basin-level random intercept and discharge covariate</td><td>z = true occupancy; y = eDNA detection; nested grouping</td></tr>
-</table>
-<p><em>Instructor note.</em> Good answers will explicitly name the latent state variable and the observation model, not just the distribution family. The structural choice (where to put the random effects, what to treat as latent) matters more than the choice of $p$ vs. $\text{logit}\,p$ vs. $\Phi(p)$.</p>
 </section>
 
 </main>

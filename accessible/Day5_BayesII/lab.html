@@ -206,6 +206,17 @@ samples &lt;- <span class="fn">nimbleMCMC</span>(antCode, constants = constants,
 <p>Why <code>tau = 1/10</code> and not <code>tau = 1/10000</code>? On the log link, a $\mathcal{N}(0, \sigma=\sqrt{10})$ prior on each $\beta$ corresponds to roughly a $e^{\pm 6}$ range of multiplicative effects &mdash; still very wide, but not crazy. The truly "vague" $\mathcal{N}(0, 100)$ is informative in the wrong direction: it puts huge prior weight on impossible parameter values.</p>
 </div>
 
+<div class="callout key"><p class="callout-label">Key idea</p>
+<p><strong>How to choose and specify a prior &mdash; a short checklist.</strong> A prior is a deliberate modeling choice, not a nuisance to zero out. Every model in today's lab follows these same rules.</p>
+<ul>
+ <li><strong>Think on the scale the parameter lives on.</strong> A prior that looks "vague" on a link scale (log, logit) can be violently informative on the natural scale (a rate, a probability) &mdash; you just saw a "flat" log-scale prior imply 1000-fold effects. Always ask what the prior implies for the quantity you actually care about, ideally by simulating from it: a <em>prior predictive check</em> draws parameters from the prior, pushes them through the model, and looks at the fake data they produce.</li>
+ <li><strong>Default to weakly-informative, not "flat."</strong> On standardized predictors, $\mathcal{N}(0, \sigma \approx 1\text{–}2)$ for logit/log coefficients rules out physically impossible effects while letting the data dominate. The genuinely flat priors ($\mathcal{N}(0, 10000)$) are the ones that misbehave.</li>
+ <li><strong>Standardize predictors first.</strong> It puts every coefficient on a common, interpretable scale, so one prior width is sensible for all of them &mdash; and it fixes the overflow and mixing problems shown above.</li>
+ <li><strong>Match the prior's support to the parameter.</strong> Use <code>dunif(0,1)</code> or <code>dbeta</code> for probabilities, a positive-only prior (<code>dunif(0,&middot;)</code> or half-normal) for standard deviations, and a Normal on the unconstrained link scale for regression coefficients.</li>
+ <li><strong>Use an informative prior only when you genuinely have prior information</strong> &mdash; a published survival rate, a physical bound &mdash; and state it explicitly. Reserve it for real knowledge, not convenience.</li>
+</ul>
+</div>
+
 <div class="exercise" id="ex-1">
 <span class="ex-tag">Exercise 1</span><span class="difficulty easy"> · 10 min · prior intuition</span>
 <h3>What does a "vague" log-scale prior actually look like?</h3>
@@ -262,6 +273,44 @@ eff2 &lt;- <span class="fn">exp</span>(beta * <span class="nu">1</span>) <span c
 <p>You have presence/absence of a lizard species on $n$ islands, plus each island's perimeter:area ratio (a proxy for habitat edge per unit interior). Logistic regression on the logit scale:</p>
 <div class="eq-block">$y_i \sim \text{Bernoulli}(p_i), \quad \text{logit}\,p_i = a + b \cdot x_i$</div>
 
+<figure class="prior-figure">
+<svg viewBox="0 0 540 360" width="100%" role="img" aria-label="Island lizard presence (1) or absence (0) plotted against perimeter-to-area ratio for 19 islands, with the fitted logistic curve declining from near 1 at low ratios to near 0 at high ratios, crossing p equals 0.5 at a ratio of about 16." font-family="'Helvetica Neue',Arial,sans-serif">
+  <!-- axes -->
+  <line x1="64" y1="300" x2="496" y2="300" stroke="#6B6B6B" stroke-width="1.2"/>
+  <line x1="64" y1="300" x2="64" y2="40" stroke="#6B6B6B" stroke-width="1.2"/>
+  <!-- y ticks p -->
+  <g fill="#6B6B6B" font-size="10" text-anchor="end">
+    <line x1="59" y1="300" x2="64" y2="300" stroke="#6B6B6B"/><text x="55" y="304">0</text>
+    <line x1="59" y1="170" x2="64" y2="170" stroke="#6B6B6B"/><text x="55" y="174">0.5</text>
+    <line x1="59" y1="40" x2="64" y2="40" stroke="#6B6B6B"/><text x="55" y="44">1</text>
+  </g>
+  <!-- x ticks PA -->
+  <g fill="#6B6B6B" font-size="10" text-anchor="middle">
+    <text x="64" y="316">0</text>
+    <line x1="197" y1="300" x2="197" y2="305" stroke="#6B6B6B"/><text x="197" y="316">20</text>
+    <line x1="330" y1="300" x2="330" y2="305" stroke="#6B6B6B"/><text x="330" y="316">40</text>
+    <line x1="463" y1="300" x2="463" y2="305" stroke="#6B6B6B"/><text x="463" y="316">60</text>
+  </g>
+  <text x="280" y="340" text-anchor="middle" fill="#333" font-size="12.5">perimeter : area ratio</text>
+  <text transform="rotate(-90 20 170)" x="20" y="170" text-anchor="middle" fill="#333" font-size="12.5">P(presence)</text>
+  <!-- p = 0.5 guide -->
+  <line x1="64" y1="170" x2="173" y2="170" stroke="#6C2C8A" stroke-width="1" stroke-dasharray="2 3" opacity="0.7"/>
+  <line x1="173" y1="170" x2="173" y2="300" stroke="#6C2C8A" stroke-width="1" stroke-dasharray="2 3" opacity="0.7"/>
+  <text x="178" y="150" fill="#6C2C8A" font-size="10">p = 0.5 near ratio 16</text>
+  <!-- fitted logistic curve -->
+  <path d="M64,47 L88,55 L104,64 L120,78 L136,99 L152,126 L168,159 L184,193 L200,224 L216,249 L232,267 L248,280 L264,288 L280,293 L296,296 L320,298 L344,299 L376,300 L416,300 L464,300 L496,300" fill="none" stroke="#D73F09" stroke-width="2.6"/>
+  <text x="360" y="286" fill="#D73F09" font-size="11" text-anchor="middle">fitted logistic curve</text>
+  <!-- data: presence = 1 (top), presence = 0 (bottom) -->
+  <g fill="#2B6E61" fill-opacity="0.7">
+    <circle cx="166" cy="48" r="3.6"/><circle cx="101" cy="48" r="3.6"/><circle cx="236" cy="48" r="3.6"/><circle cx="151" cy="48" r="3.6"/><circle cx="141" cy="48" r="3.6"/><circle cx="104" cy="48" r="3.6"/><circle cx="79" cy="48" r="3.6"/><circle cx="91" cy="48" r="3.6"/><circle cx="65" cy="48" r="3.6"/><circle cx="81" cy="48" r="3.6"/>
+    <circle cx="165" cy="292" r="3.6"/><circle cx="189" cy="292" r="3.6"/><circle cx="270" cy="292" r="3.6"/><circle cx="216" cy="292" r="3.6"/><circle cx="144" cy="292" r="3.6"/><circle cx="462" cy="292" r="3.6"/><circle cx="484" cy="292" r="3.6"/><circle cx="215" cy="292" r="3.6"/><circle cx="220" cy="292" r="3.6"/>
+  </g>
+  <text x="440" y="60" fill="#2B6E61" font-size="10" text-anchor="middle">present (y=1)</text>
+  <text x="392" y="283" fill="#2B6E61" font-size="10" text-anchor="middle">absent (y=0)</text>
+</svg>
+<figcaption>The 19 islands (teal): lizards are mostly <em>present</em> on low-edge islands (small perimeter:area) and <em>absent</em> on high-edge islands, with real scatter in between. The fitted logistic curve (orange) is the model's estimate of $P(\text{presence})$ as edge ratio increases &mdash; it falls from near 1 to near 0 and passes $p=0.5$ at a ratio of about 16. This is the data and fit behind Exercise 3.</figcaption>
+</figure>
+
 <h3>The full NIMBLE template</h3>
 <div class="code-label">R · Lizards_Nimble.R (excerpt)</div>
 <pre><code><span class="kw">library</span>(nimble); <span class="kw">library</span>(MCMCvis); <span class="kw">library</span>(coda)
@@ -294,6 +343,47 @@ samples &lt;- <span class="fn">nimbleMCMC</span>(lizardCode, constants=constants
 <span class="fn">MCMCsummary</span>(samples, params=<span class="fn">c</span>(<span class="st">"a"</span>,<span class="st">"b"</span>))
 <span class="fn">gelman.diag</span>(samples[, <span class="fn">c</span>(<span class="st">"a"</span>,<span class="st">"b"</span>)])
 <span class="fn">heidel.diag</span>(samples[, <span class="fn">c</span>(<span class="st">"a"</span>,<span class="st">"b"</span>)])</code></pre>
+
+<details class="answer"><summary>Show the full probability model (likelihood + priors) and its DAG</summary><div class="answer-body">
+<p>The <code>nimbleCode</code> above <em>is</em> the model, but it helps to see it written out as a likelihood times priors &mdash; every Bayesian model has exactly this shape.</p>
+<p><strong>Likelihood (how the data arise):</strong></p>
+<div class="eq-block">$y_i \sim \text{Bernoulli}(p_i), \qquad \text{logit}\,p_i = a + b\,x_i, \qquad i = 1,\dots,n$</div>
+<p><strong>Priors (what we believe about the parameters before seeing data):</strong></p>
+<div class="eq-block">$a \sim \mathcal{N}(0,\ \sigma^2 = 2.71), \qquad b \sim \mathcal{N}(0,\ \sigma^2 = 2.71)$</div>
+<p>The posterior NIMBLE samples is proportional to the product of these: $p(a,b \mid y) \propto \big[\prod_i \text{Bernoulli}(y_i \mid p_i)\big]\,\mathcal{N}(a \mid 0,2.71)\,\mathcal{N}(b \mid 0,2.71)$. The $\mathcal{N}(0,2.71)$ priors are the weakly-informative choice from section A: on standardized $x$, they keep each coefficient in a biologically sane range and make the implied prior on $p_i$ nearly flat, without injecting real information.</p>
+<p><strong>The same model as a DAG</strong> (directed acyclic graph). Arrows run from causes to effects; each node is a quantity, and the graph is exactly the factorization above &mdash; the parents of a node are the things that appear on the right of its <code>~</code> or <code>&lt;-</code>.</p>
+<svg viewBox="0 0 440 300" width="100%" role="img" aria-label="Directed acyclic graph of the lizard logistic model. Parameters a and b (with normal priors) and the observed covariate x_i all point into the deterministic node p_i, which points into the observed data y_i. The nodes x_i, p_i, y_i sit inside a plate repeated over islands i = 1 to n." font-family="'Helvetica Neue',Arial,sans-serif" font-size="13">
+  <defs>
+    <marker id="dagarrow" markerWidth="9" markerHeight="9" refX="7.5" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#6B6B6B"/></marker>
+  </defs>
+  <!-- plate over islands -->
+  <rect x="70" y="105" width="310" height="165" rx="7" fill="none" stroke="#9A8C6B" stroke-width="1.3"/>
+  <text x="371" y="261" text-anchor="end" fill="#9A8C6B" font-size="11" font-style="italic">islands  i = 1 &hellip; n</text>
+  <!-- edges -->
+  <g stroke="#6B6B6B" stroke-width="1.5" fill="none" marker-end="url(#dagarrow)">
+    <line x1="137" y1="58" x2="281" y2="139"/>   <!-- a -> p -->
+    <line x1="300" y1="68" x2="300" y2="126"/>   <!-- b -> p -->
+    <line x1="161" y1="162" x2="277" y2="152"/>  <!-- x -> p -->
+    <line x1="300" y1="172" x2="300" y2="198"/>  <!-- p -> y -->
+  </g>
+  <!-- parameter nodes (stochastic, white) -->
+  <circle cx="120" cy="48" r="21" fill="#fff" stroke="#333" stroke-width="1.5"/><text x="120" y="53" text-anchor="middle">a</text>
+  <circle cx="300" cy="48" r="21" fill="#fff" stroke="#333" stroke-width="1.5"/><text x="300" y="53" text-anchor="middle">b</text>
+  <!-- covariate (observed, shaded) -->
+  <circle cx="140" cy="165" r="21" fill="#E7E0CF" stroke="#333" stroke-width="1.5"/><text x="140" y="170" text-anchor="middle">x&#8203;<tspan baseline-shift="sub" font-size="9">i</tspan></text>
+  <!-- p deterministic (dashed) -->
+  <circle cx="300" cy="150" r="23" fill="#fff" stroke="#333" stroke-width="1.5" stroke-dasharray="4 3"/><text x="300" y="155" text-anchor="middle">p&#8203;<tspan baseline-shift="sub" font-size="9">i</tspan></text>
+  <!-- y observed (shaded) -->
+  <circle cx="300" cy="220" r="21" fill="#E7E0CF" stroke="#333" stroke-width="1.5"/><text x="300" y="225" text-anchor="middle">y&#8203;<tspan baseline-shift="sub" font-size="9">i</tspan></text>
+  <!-- legend -->
+  <g font-size="10.5" fill="#6B6B6B">
+    <circle cx="80" cy="288" r="6.5" fill="#E7E0CF" stroke="#333"/><text x="92" y="292">observed</text>
+    <circle cx="182" cy="288" r="6.5" fill="#fff" stroke="#333" stroke-dasharray="3 2"/><text x="194" y="292">deterministic</text>
+    <circle cx="300" cy="288" r="6.5" fill="#fff" stroke="#333"/><text x="312" y="292">parameter (has a prior)</text>
+  </g>
+</svg>
+<p style="font-size:0.92em; color:#555;">Read it as: the parameters $a,b$ and the island's edge ratio $x_i$ together determine the detection-scale probability $p_i$ (a deterministic node &mdash; no randomness of its own), which in turn generates the observed presence/absence $y_i$. The plate means that inner structure repeats independently for every island; $a$ and $b$ sit <em>outside</em> the plate because they are shared by all islands.</p>
+</div></details>
 
 <h3>Init gotchas</h3>
 <div class="callout warn"><p class="callout-label">Watch out</p>
@@ -497,6 +587,53 @@ samples &lt;- <span class="fn">nimbleMCMC</span>(lizardCode, constants=constants
 </ul>
 <p>In a maximum likelihood fit you'd plug in point estimates and either accept zero uncertainty in the management quantities or bootstrap them. In Bayes, you compute them <em>inside the model</em> and the MCMC delivers their full joint posterior &mdash; correctly propagating the correlated uncertainty in $a$ and $b$.</p>
 
+<figure class="prior-figure">
+<svg viewBox="0 0 580 420" width="100%" role="img" aria-label="Fitted Beverton-Holt stock-recruitment curve with the 1:1 replacement line, showing the equilibrium N_eq where the curve crosses the replacement line and the maximum surplus (MSY) as the largest vertical gap between the curve and the replacement line at S_msy." font-family="'Helvetica Neue',Arial,sans-serif">
+  <!-- axes -->
+  <line x1="72" y1="344" x2="548" y2="344" stroke="#6B6B6B" stroke-width="1.2"/>
+  <line x1="72" y1="344" x2="72" y2="44" stroke="#6B6B6B" stroke-width="1.2"/>
+  <!-- x ticks -->
+  <g fill="#6B6B6B" font-size="10" text-anchor="middle">
+    <line x1="231" y1="344" x2="231" y2="349" stroke="#6B6B6B"/><text x="231" y="361">2000</text>
+    <line x1="389" y1="344" x2="389" y2="349" stroke="#6B6B6B"/><text x="389" y="361">4000</text>
+    <line x1="548" y1="344" x2="548" y2="349" stroke="#6B6B6B"/><text x="548" y="361">6000</text>
+    <text x="72" y="361">0</text>
+  </g>
+  <!-- y ticks -->
+  <g fill="#6B6B6B" font-size="10" text-anchor="end">
+    <line x1="67" y1="244" x2="72" y2="244" stroke="#6B6B6B"/><text x="63" y="248">2000</text>
+    <line x1="67" y1="144" x2="72" y2="144" stroke="#6B6B6B"/><text x="63" y="148">4000</text>
+    <line x1="67" y1="44" x2="72" y2="44" stroke="#6B6B6B"/><text x="63" y="48">6000</text>
+  </g>
+  <text x="310" y="392" text-anchor="middle" fill="#333" font-size="12.5">Spawners S (this year)</text>
+  <text transform="rotate(-90 22 194)" x="22" y="194" text-anchor="middle" fill="#333" font-size="12.5">Recruits R (next year)</text>
+  <!-- 1:1 replacement line -->
+  <line x1="72" y1="344" x2="548" y2="44" stroke="#1C638A" stroke-width="1.8" stroke-dasharray="7 4"/>
+  <text x="452" y="70" fill="#1C638A" font-size="11" transform="rotate(-32 452 70)">replacement  R = S</text>
+  <!-- data points -->
+  <g fill="#2B6E61" fill-opacity="0.78">
+    <circle cx="308" cy="166" r="3.4"/><circle cx="220" cy="156" r="3.4"/><circle cx="469" cy="106" r="3.4"/><circle cx="265" cy="171" r="3.4"/><circle cx="198" cy="226" r="3.4"/><circle cx="269" cy="196" r="3.4"/><circle cx="207" cy="185" r="3.4"/><circle cx="181" cy="210" r="3.4"/><circle cx="324" cy="124" r="3.4"/><circle cx="177" cy="228" r="3.4"/><circle cx="107" cy="233" r="3.4"/><circle cx="174" cy="235" r="3.4"/><circle cx="336" cy="128" r="3.4"/><circle cx="409" cy="166" r="3.4"/><circle cx="195" cy="226" r="3.4"/><circle cx="210" cy="176" r="3.4"/><circle cx="272" cy="211" r="3.4"/><circle cx="122" cy="228" r="3.4"/>
+  </g>
+  <!-- fitted Beverton-Holt curve -->
+  <path d="M72,344 L96,283 L120,246 L137,228 L153,214 L169,203 L185,194 L201,186 L217,179 L233,174 L258,166 L282,160 L306,155 L330,151 L354,147 L379,144 L403,141 L427,138 L451,136 L475,134 L500,132 L524,130 L548,129" fill="none" stroke="#D73F09" stroke-width="2.6"/>
+  <text x="486" y="120" fill="#D73F09" font-size="11" text-anchor="middle">fitted B-H curve</text>
+  <!-- N_eq: where curve meets replacement line -->
+  <line x1="393" y1="344" x2="393" y2="142" stroke="#1C638A" stroke-width="1" stroke-dasharray="2 3" opacity="0.8"/>
+  <circle cx="393" cy="142" r="4.5" fill="#1C638A"/>
+  <text x="399" y="132" fill="#1C638A" font-size="11" font-weight="bold">N&#8203;<tspan baseline-shift="sub" font-size="8">eq</tspan> &#8776; 4040</text>
+  <text x="399" y="146" fill="#1C638A" font-size="9.5">equilibrium: R = S</text>
+  <!-- S_msy vertical + MSY gap -->
+  <line x1="169" y1="344" x2="169" y2="203" stroke="#6C2C8A" stroke-width="1" stroke-dasharray="2 3" opacity="0.7"/>
+  <line x1="169" y1="283" x2="169" y2="203" stroke="#6C2C8A" stroke-width="4"/>
+  <line x1="165" y1="283" x2="173" y2="283" stroke="#6C2C8A" stroke-width="1.5"/>
+  <line x1="165" y1="203" x2="173" y2="203" stroke="#6C2C8A" stroke-width="1.5"/>
+  <text x="169" y="361" fill="#6C2C8A" font-size="10" text-anchor="middle">S&#8203;<tspan baseline-shift="sub" font-size="8">msy</tspan></text>
+  <text x="182" y="238" fill="#6C2C8A" font-size="11" font-weight="bold">MSY</text>
+  <text x="182" y="251" fill="#6C2C8A" font-size="9.5">max surplus</text>
+</svg>
+<figcaption>The fitted Beverton-Holt curve (orange) through the 20 years of data (teal), with the 1:1 <strong>replacement line</strong> $R=S$ (blue dashed) where each spawner produces exactly one recruit. <strong>$N_\text{eq}$</strong> is where the curve crosses the replacement line: recruits exactly replace spawners, so an unfished population settles there. The vertical gap between the curve and the replacement line is the <strong>surplus</strong> &mdash; recruits above replacement, the part you can harvest sustainably. That gap is largest at <strong>$S_\text{msy}$</strong>, and its height is the <strong>maximum sustainable yield</strong>. <strong>$H_\text{msy}=1-\sqrt{1/a}\approx 0.57$</strong> is that maximum surplus expressed as a fraction of the recruits &mdash; the harvest rate that takes MSY. Because $(a,b)$ carry a joint posterior, so does every one of these lines and points.</figcaption>
+</figure>
+
 <div class="code-label">R · Beverton-Holt model body (NIMBLE)</div>
 <pre><code>BHcode &lt;- <span class="fn">nimbleCode</span>({
  <span class="cm"># Likelihood</span>
@@ -592,6 +729,42 @@ samples &lt;- <span class="fn">nimbleMCMC</span>(lizardCode, constants=constants
 
 zst &lt;- <span class="fn">matrix</span>(<span class="nu">1L</span>, Nsites, Nyears) <span class="cm"># THE init trick</span></code></pre>
 
+<h3>Derived quantities: turning raw transitions into metapopulation summaries</h3>
+<p>The raw parameters $\phi_t$ (persistence) and $\gamma_t$ (colonization) are hard to read one at a time. As in the fisheries model, the biologically meaningful numbers are <em>derived</em> from them &mdash; and because we compute them inside the model, MCMC returns a full posterior for each. Add this block to <code>DynOccCode</code> and monitor the new names:</p>
+<div class="code-label">R · derived quantities, added inside DynOccCode</div>
+<pre><code> <span class="cm"># Derived quantities -- each gets a full posterior for free</span>
+ psi.t[<span class="nu">1</span>] &lt;- psi
+ <span class="kw">for</span> (t <span class="kw">in</span> <span class="nu">2</span>:Nyears) {
+ psi.t[t] &lt;- psi.t[t-<span class="nu">1</span>]*phi[t-<span class="nu">1</span>] + (<span class="nu">1</span>-psi.t[t-<span class="nu">1</span>])*gamma[t-<span class="nu">1</span>] <span class="cm"># expected occupancy</span>
+ lambda[t-<span class="nu">1</span>] &lt;- psi.t[t] / psi.t[t-<span class="nu">1</span>] <span class="cm"># finite rate of change</span>
+ turnover[t-<span class="nu">1</span>] &lt;- (gamma[t-<span class="nu">1</span>]*(<span class="nu">1</span>-psi.t[t-<span class="nu">1</span>])) /
+ (gamma[t-<span class="nu">1</span>]*(<span class="nu">1</span>-psi.t[t-<span class="nu">1</span>]) + phi[t-<span class="nu">1</span>]*psi.t[t-<span class="nu">1</span>]) <span class="cm"># newly-colonized share</span>
+ equilib[t-<span class="nu">1</span>] &lt;- gamma[t-<span class="nu">1</span>] / (gamma[t-<span class="nu">1</span>] + (<span class="nu">1</span>-phi[t-<span class="nu">1</span>])) <span class="cm"># equilibrium occupancy</span>
+ }</code></pre>
+
+<div class="callout key"><p class="callout-label">Key idea</p>
+<p>Each derived quantity answers a different management question:</p>
+<ul>
+ <li><strong>Expected occupancy $\psi_t$</strong> &mdash; the fraction of sites occupied in year $t$, carried forward by $\psi_t = \psi_{t-1}\phi_{t-1} + (1-\psi_{t-1})\gamma_{t-1}$. This is the metapopulation's <em>state</em>: how widespread is the species right now?</li>
+ <li><strong>Finite rate of change $\lambda_t = \psi_{t+1}/\psi_t$</strong> &mdash; year-over-year growth of occupancy. $\lambda &gt; 1$ means the range is expanding, $\lambda &lt; 1$ contracting; it is the occupancy analogue of a population growth rate.</li>
+ <li><strong>Turnover $\tau_t = \dfrac{\gamma_t(1-\psi_t)}{\gamma_t(1-\psi_t) + \phi_t\psi_t}$</strong> &mdash; of the sites occupied next year, what fraction were <em>empty</em> this year (newly colonized)? High turnover means constant local extinction-and-recolonization churn even when total occupancy looks steady &mdash; a very different conservation picture from a static, stable set of occupied patches.</li>
+ <li><strong>Equilibrium occupancy $\hat\psi_\text{eq} = \dfrac{\gamma}{\gamma + (1-\phi)}$</strong> &mdash; where occupancy would settle <em>if</em> this year's rates held forever. Comparing $\hat\psi_\text{eq}$ to the current $\psi_t$ shows which way, and how far, the system is heading.</li>
+</ul>
+</div>
+
+<p>From the same run as Exercise 6 (30 sites, 8 years; every derived quantity has R-hat = 1.00), the posterior medians tell a story the raw $\phi,\gamma$ cannot:</p>
+<table>
+<tr><th scope="col">Transition</th><th scope="col">$\psi_t \rightarrow \psi_{t+1}$</th><th scope="col">$\lambda_t$</th><th scope="col">$\tau_t$</th><th scope="col">$\hat\psi_{\text{eq}}$</th></tr>
+<tr><td>1 &rarr; 2</td><td>0.33 &rarr; 0.37</td><td>1.13</td><td>0.85</td><td>0.36</td></tr>
+<tr><td>2 &rarr; 3</td><td>0.37 &rarr; 0.18</td><td><strong>0.49</strong></td><td>0.47</td><td>0.15</td></tr>
+<tr><td>3 &rarr; 4</td><td>0.18 &rarr; 0.43</td><td><strong>2.38</strong></td><td>0.79</td><td>0.47</td></tr>
+<tr><td>4 &rarr; 5</td><td>0.43 &rarr; 0.31</td><td>0.72</td><td>0.81</td><td>0.34</td></tr>
+<tr><td>5 &rarr; 6</td><td>0.31 &rarr; 0.41</td><td>1.31</td><td>0.95</td><td>0.38</td></tr>
+<tr><td>6 &rarr; 7</td><td>0.41 &rarr; 0.43</td><td>1.07</td><td>0.79</td><td>0.43</td></tr>
+<tr><td>7 &rarr; 8</td><td>0.43 &rarr; 0.40</td><td>0.92</td><td>0.52</td><td>0.40</td></tr>
+</table>
+<p>The year-3 crash ($\lambda \approx 0.5$, occupancy roughly halved) and the year-4 rebound ($\lambda \approx 2.4$) jump straight out of the $\lambda$ column, and turnover stays high throughout (0.5&ndash;0.95) &mdash; so this is a <em>churny</em> metapopulation, sites blinking on and off, not a stable core of occupied patches. None of that is visible in the raw per-year $\phi_t,\gamma_t$.</p>
+
 <div class="exercise" id="ex-6">
 <span class="ex-tag">Exercise 6</span><span class="difficulty hard"> · 35 min · R · latent states</span>
 <h3>Dynamic occupancy: simulate and recover</h3>
@@ -627,6 +800,17 @@ zst &lt;- <span class="fn">matrix</span>(<span class="nu">1L</span>, Nsites, Nye
 <p>You visit $N_\text{sites}$ sites, revisiting each $N_\text{reps}$ times, and record a count $y[i, j]$ on visit $j$ to site $i$. The model has two layers. In the <em>process</em> layer, the true abundance $N_i$ at each site is a latent (unobserved) non-negative integer drawn from a Poisson with mean $\lambda$. In the <em>observation</em> layer, each of the $N_i$ individuals present is detected independently with probability $p$, so a visit yields a Binomial count out of $N_i$. The repeated visits to a site all share the same latent $N_i$, and that shared structure is what lets the model tease detection apart from abundance:</p>
 <div class="eq-block">$N_i \sim \text{Poisson}(\lambda), \quad y[i, j] \sim \text{Binomial}(N_i, p)$</div>
 
+<div class="callout warn"><p class="callout-label">Watch out</p>
+<p><strong>Assumptions &mdash; check these before trusting $\hat\lambda$.</strong> The N-mixture model can separate abundance from detection only if a few conditions hold:</p>
+<ul>
+ <li><strong>Population closure.</strong> $N_i$ is constant across the replicate visits &mdash; no births, deaths, or movement in or out during the survey window. Space the visits closely enough in time that this is credible.</li>
+ <li><strong>No double counting.</strong> Within a visit each individual is counted <em>at most once</em>, and detections are independent. If the same animal is counted twice &mdash; a bird singing from several perches, a mobile animal re-entering the plot, overlapping observers double-recording &mdash; the counts are inflated <em>and</em> the extra visit-to-visit variance masquerades as imperfect detection: the model "explains" it by pushing $p$ down and $\hat\lambda$ up, biasing abundance high. This is the assumption most often broken in the field, so design the count protocol to prevent it.</li>
+ <li><strong>Homogeneous detection.</strong> Every individual present shares the same $p$ (or a $p$ fully captured by covariates). Unmodelled detection heterogeneity biases abundance, usually upward.</li>
+ <li><strong>Correct abundance distribution.</strong> The Poisson $N_i$ assumes mean $=$ variance; real counts are often clumpier (overdispersed). Catching exactly that is what Model 4 and the Bayesian p-value below are for, with the Poisson-lognormal or negative-binomial as the fix.</li>
+ <li><strong>Independence among sites</strong> given their covariates.</li>
+</ul>
+</div>
+
 <h3>Four nested models</h3>
 <ol>
  <li><strong>Basic:</strong> constant $\lambda$, constant $p$.</li>
@@ -640,9 +824,13 @@ zst &lt;- <span class="fn">matrix</span>(<span class="nu">1L</span>, Nsites, Nye
 </div>
 
 <h3>Bayesian p-value as a goodness-of-fit check</h3>
-<p>For each MCMC draw of parameters, simulate a replicate dataset $y^\text{rep}$ from the model, compute a discrepancy statistic $T$ on both real and replicate data, and report:</p>
+<p>This is likely the first time you have met a Bayesian p-value, so let's build it up slowly. The question it answers is simple: <em>could data like mine plausibly have come from this fitted model?</em> If the model is right, fake datasets simulated from it should look statistically like the real one. If the real data are systematically weirder than anything the model can produce, the model is missing something.</p>
+<p><strong>Step 1 &mdash; pick a discrepancy statistic $T(y)$.</strong> Choose a single number that captures a feature you care about &mdash; here, how spread out the counts are (a chi-square-type sum $\sum_i (y_i - \mathbb{E}[y_i])^2 / \mathbb{E}[y_i]$, which grows large when the data are more variable than the model expects). Compute it on the real data.</p>
+<p><strong>Step 2 &mdash; build a reference distribution from the model itself.</strong> At each MCMC iteration $m$ you already hold a full set of parameter draws. Use them to simulate a fresh "replicate" dataset $y^\text{rep}_m$ of the same size &mdash; a dataset the fitted model considers perfectly ordinary &mdash; and compute the same statistic on it, $T(y^\text{rep}_m)$. Repeating over all $M$ iterations gives a whole distribution of $T$-values the model believes are normal.</p>
+<p><strong>Step 3 &mdash; ask where the real data land in that distribution.</strong> The Bayesian p-value is the fraction of replicates whose statistic exceeds the observed one:</p>
 <div class="eq-block">$p_B = \dfrac{1}{M}\sum_{m=1}^M \mathbb{1}\!\left[ T(y^\text{rep}_m) &gt; T(y_m) \right]$</div>
-<p>If $p_B$ is far from 0.5, the data are "weirder" (or more boring) than the model expects &mdash; evidence of misfit. Values near 0.5 mean the model captures the chosen discrepancy.</p>
+<p>Reading the notation: $\mathbb{1}[\cdot]$ is an <em>indicator</em> that equals 1 when the bracketed comparison is true and 0 when it is false, so the sum simply counts how many of the $M$ replicates were <em>more extreme</em> than the data, and dividing by $M$ turns that count into a proportion. Both sides use iteration $m$'s parameters (that is why $y_m$ carries the subscript), so the data and its replicate are always compared at matching draws &mdash; this pairing is what makes it a <em>posterior predictive</em> check rather than a plug-in one.</p>
+<p><strong>Reading the number.</strong> If the model fits, the real data are a typical draw, so roughly half the replicates land above it and half below: $p_B \approx 0.5$. A value near 0 means the observed statistic is larger than almost every replicate (the data are far more variable &mdash; or more clustered &mdash; than the model can generate); a value near 1 means the opposite. Either extreme is evidence of misfit, and, unlike a bare point estimate, it tells you <em>which</em> feature (whatever $T$ measured) the model gets wrong. Values from about 0.1 to 0.9 are unremarkable.</p>
 
 <div class="exercise" id="ex-7">
 <span class="ex-tag">Exercise 7</span><span class="difficulty medium"> · 25 min · R</span>
@@ -659,7 +847,7 @@ zst &lt;- <span class="fn">matrix</span>(<span class="nu">1L</span>, Nsites, Nye
 <p><strong>(a) Basic model (20 sites, 3 reps; truth $\lambda=6,\ p=0.8$).</strong> Recovered cleanly: $\lambda$ = 6.24 [5.06, 7.78] and $p$ = 0.80 [0.67, 0.87]. With only 20 sites the intervals are wide, but both comfortably cover truth.</p>
 <p><strong>(b) Covariate on abundance (truth $\beta_1=1$).</strong> $\beta_1$ = <strong>1.00</strong> [0.94, 1.07] &mdash; credibly positive and bang on the simulated value; $\beta_0$ = 2.99 [2.91, 3.07].</p>
 <p><strong>(c) Covariate on both.</strong> Adding the detection covariate ($a_0$ = 0.92 [0.70, 1.11], $a_1$ = 1.00 [0.91, 1.09], both recovering truth 1) leaves the abundance-covariate inference essentially unchanged: $\beta_1$ moves only from 1.00 to <strong>1.04</strong> [0.97, 1.10]. Because these data are simulated clean, modeling detection heterogeneity here neither biases nor much tightens $\beta_1$; in messier data, ignoring detection structure is what would distort it.</p>
-<p><strong>(d) Overdispersion + Bayesian p-value.</strong> The 200-site data were generated from a negative binomial but fit with a Poisson N-mixture. The discrepancy sits almost entirely on one side &mdash; observed $T(\text{data})$ median 367 vs replicated $T(y^\text{rep})$ median 332 &mdash; giving a <strong>Bayesian p-value of 0.008</strong>, far from 0.5. The Poisson model cannot absorb the extra variance, so it is decisively rejected; the fix is a Poisson-lognormal or negative-binomial N-mixture (Exercise 8/9). Note $\lambda$ = 5.81 [5.46, 6.17] still looks confident and reasonable &mdash; the GOF check is what exposes the misfit the point estimate alone would hide.</p>
+<p><strong>(d) Overdispersion + Bayesian p-value.</strong> The 200-site data were generated from a negative binomial but fit with a Poisson N-mixture. The discrepancy sits almost entirely on one side &mdash; observed $T(\text{data})$ median 367 vs replicated $T(y^\text{rep})$ median 332 &mdash; giving a <strong>Bayesian p-value of 0.008</strong>, far from 0.5. The Poisson model cannot absorb the extra variance, so it is decisively rejected; the fix is a Poisson-lognormal or negative-binomial N-mixture (Exercise 8). Note $\lambda$ = 5.81 [5.46, 6.17] still looks confident and reasonable &mdash; the GOF check is what exposes the misfit the point estimate alone would hide.</p>
 </div></details>
 </div>
 
@@ -689,22 +877,6 @@ zst &lt;- <span class="fn">matrix</span>(<span class="nu">1L</span>, Nsites, Nye
  sig.eps ~ <span class="fn">dunif</span>(<span class="nu">0</span>, <span class="nu">5</span>)
 })</code></pre>
 <p>After fitting, the Bayesian p-value moves much closer to 0.5 and the posterior of $\sigma_\epsilon$ is bounded away from 0.</p>
-</div></details>
-</div>
-
-<div class="exercise" id="ex-9">
-<span class="ex-tag">Exercise 9</span><span class="difficulty medium"> · 20 min · synthesis</span>
-<h3>Pick the right tool</h3>
-<p>For each scenario, name the model family from today (priors / logistic / multilevel / spawner-recruit / dynamic occupancy / N-mixture / multilevel + N-mixture) and explain the latent vs. observed split.</p>
-<ol type="a">
- <li>30 forest plots, each surveyed once per year for 10 years for marten presence; you want trends.</li>
- <li>Pellet count quadrats with repeat visits, expected to be overdispersed because deer cluster.</li>
- <li>Mark-recapture data with annual survival probabilities that vary by site.</li>
- <li>Salmon escapement and recruitment for one stock; manager wants conservative harvest rate.</li>
- <li>200 streams with replicate eDNA samples; you want occupancy by basin and by year, and you have a basin-level covariate (mean discharge).</li>
-</ol>
-<details class="answer"><summary>Reveal sketches</summary><div class="answer-body">
-<p>(a) Dynamic occupancy with random year effects on $\phi, \gamma$. (b) N-mixture with overdispersion (Poisson-lognormal). (c) Multilevel survival (Cormack-Jolly-Seber with random effects on $\phi$). (d) Beverton-Holt, report posterior 5th percentile of $H_\text{msy}$. (e) Multilevel dynamic occupancy with basin-level random intercept and discharge covariate.</p>
 </div></details>
 </div>
 

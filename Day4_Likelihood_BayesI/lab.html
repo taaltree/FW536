@@ -837,9 +837,10 @@ mass_g &lt;- true_int + true_slope * length_mm + <span class="fn">rnorm</span>(n
  mass_rep[i] ~ <span class="fn">dnorm</span>(mu[i], sd = sigma) <span class="cm"># replicate dataset</span>
  }
 
- <span class="cm"># discrepancy statistic: posterior predictive SD of residuals</span>
- obs_sd &lt;- <span class="fn">sd</span>(mass[<span class="nu">1</span>:n])
- rep_sd &lt;- <span class="fn">sd</span>(mass_rep[<span class="nu">1</span>:n])
+ <span class="cm"># No discrepancy statistics in here. sd(mass) is a constant — putting it in the</span>
+ <span class="cm"># model re-computes it every iteration and monitors a number that never moves.</span>
+ <span class="cm"># We compute discrepancies in R below from mu and mass_rep, so we can try</span>
+ <span class="cm"># several of them without refitting.</span>
 })
 
 constants &lt;- <span class="kw">list</span>(n = n, length_mm = length_mm)
@@ -854,16 +855,30 @@ reg_samps &lt;- <span class="fn">nimbleMCMC</span>(
  constants = constants,
  data = data,
  inits = inits,
- monitors = <span class="kw">c</span>(<span class="st">"beta0"</span>, <span class="st">"beta1"</span>, <span class="st">"sigma"</span>, <span class="st">"mass_rep"</span>, <span class="st">"obs_sd"</span>, <span class="st">"rep_sd"</span>),
+ monitors = <span class="kw">c</span>(<span class="st">"beta0"</span>, <span class="st">"beta1"</span>, <span class="st">"sigma"</span>, <span class="st">"mu"</span>, <span class="st">"mass_rep"</span>),
  nchains = <span class="nu">3</span>, nburnin = <span class="nu">3000</span>, niter = <span class="nu">15000</span>,
  samplesAsCodaMCMC = <span class="kw">TRUE</span>)
 <span class="fn">MCMCsummary</span>(reg_samps, params = <span class="kw">c</span>(<span class="st">"beta0"</span>, <span class="st">"beta1"</span>, <span class="st">"sigma"</span>), round = <span class="nu">3</span>)</code></pre>
 
 <div class="code-label">R · posterior predictive check</div>
-<pre><code>obs_sd_post &lt;- <span class="fn">MCMCchains</span>(reg_samps, <span class="st">"obs_sd"</span>)
-rep_sd_post &lt;- <span class="fn">MCMCchains</span>(reg_samps, <span class="st">"rep_sd"</span>)
-<span class="cm"># Bayesian p-value: should be near 0.5 if the model fits the SD adequately</span>
-<span class="fn">mean</span>(rep_sd_post &gt;= obs_sd_post)
+<pre><code>mu_post  &lt;- <span class="fn">MCMCchains</span>(reg_samps, <span class="st">"mu"</span>)        <span class="cm"># fitted means, one row per draw</span>
+rep_post &lt;- <span class="fn">MCMCchains</span>(reg_samps, <span class="st">"mass_rep"</span>)  <span class="cm"># replicate datasets</span>
+
+<span class="cm"># Pick a discrepancy the model does NOT already fit. sigma is estimated from the</span>
+<span class="cm"># residual spread, so ANY statistic based on that spread (sd of the data, or sd of</span>
+<span class="cm"># the residuals) comes out near 0.5 even when the model is badly wrong. Each of</span>
+<span class="cm"># these targets one specific assumption instead:</span>
+discrep &lt;- <span class="kw">function</span>(e, mu) <span class="fn">c</span>(
+ het = <span class="fn">cor</span>(<span class="fn">abs</span>(e), mu), <span class="cm"># constant variance? spread vs fitted value</span>
+ curve = <span class="fn">cor</span>(e, (length_mm - <span class="fn">mean</span>(length_mm))^<span class="nu">2</span>), <span class="cm"># linear mean? curvature left over</span>
+ tails = <span class="fn">max</span>(<span class="fn">abs</span>(e))) <span class="cm"># normal tails? worst outlier</span>
+
+S &lt;- <span class="fn">nrow</span>(mu_post)
+obs &lt;- <span class="fn">t</span>(<span class="fn">sapply</span>(<span class="nu">1</span>:S, <span class="kw">function</span>(s) <span class="fn">discrep</span>(mass_g - mu_post[s, ], mu_post[s, ])))
+rep &lt;- <span class="fn">t</span>(<span class="fn">sapply</span>(<span class="nu">1</span>:S, <span class="kw">function</span>(s) <span class="fn">discrep</span>(rep_post[s, ] - mu_post[s, ], mu_post[s, ])))
+
+<span class="cm"># Bayesian p-values: near 0.5 = assumption looks fine; near 0 or 1 = it is violated</span>
+<span class="fn">colMeans</span>(rep &gt;= obs)
 
 <span class="cm"># Visual PPC: overlay 100 replicate datasets on the data</span>
 mass_rep_chain &lt;- <span class="fn">MCMCchains</span>(reg_samps, <span class="st">"mass_rep"</span>)
@@ -874,7 +889,7 @@ mass_rep_chain &lt;- <span class="fn">MCMCchains</span>(reg_samps, <span class="
 <span class="fn">points</span>(length_mm, mass_g, pch = <span class="nu">19</span>, col = <span class="st">"red"</span>)</code></pre>
 
 <div class="callout key">
-A Bayesian p-value near 0.5 says: "replicate datasets simulated from the posterior have the same residual SD as my observed dataset." Values near 0 or 1 are red flags. Posterior predictive checks are how you catch under- or over-dispersion, wrong link functions, missing variance components — all before you publish.
+A Bayesian p-value near 0.5 says: "on this particular feature, replicate datasets simulated from the posterior look like my observed dataset." Values near 0 or 1 are red flags. <strong>The check is only as good as the statistic you choose.</strong> A discrepancy the model already fits will always pass: <code>sigma</code> is estimated from the residual spread, so the posterior simply inflates <code>sigma</code> until the replicates spread like the data. Both the SD of the data and the SD of the residuals return p ≈ 0.5 even for data that are strongly heteroscedastic, heavy-tailed, or curved — they cannot fail, so they tell you nothing. Choose a statistic that targets an assumption the model is <em>not</em> free to absorb: spread against fitted value (constant variance), leftover curvature (linear mean), the worst outlier (normal tails). Then a red flag means something.
 </div>
 </section>
 

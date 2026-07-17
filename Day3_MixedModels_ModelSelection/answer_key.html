@@ -52,7 +52,7 @@
 <p><strong>(a) Equations and parameter counts.</strong></p>
 <ul>
 <li><code>lm1</code>: $y_{ij} = \beta_0 + \varepsilon_{ij}$, $\varepsilon \sim \mathcal{N}(0, \sigma^2)$. Two parameters: $\beta_0, \sigma^2$.</li>
-<li><code>lm2</code>: $y_{ij} = \alpha_j + \varepsilon_{ij}$ with $j = 1, \ldots, 18$ and a free $\alpha_j$ per stream. 19 parameters (18 means + $\sigma^2$).</li>
+<li><code>lm2</code>: $y_{ij} = \alpha_j + \varepsilon_{ij}$ with $j = 1, \ldots, 100$ and a free $\alpha_j$ per stream. 101 parameters (100 means + $\sigma^2$).</li>
 <li><code>lm3</code>: $y_{ij} = \beta_0 + b_{0,j} + \varepsilon_{ij}$, $b_{0,j} \sim \mathcal{N}(0, \sigma_\text{stream}^2)$. Just 3 parameters regardless of the number of streams ($\beta_0, \sigma_\text{stream}^2, \sigma^2$).</li>
 </ul>
 
@@ -61,7 +61,7 @@
 <pre><code>boxplot(split(resid(lm1), Streams$Stream), ylab="Residual", xlab="Stream")
 abline(0, 0, lwd=3)</code></pre>
 
-<p><strong>(c) Shrinkage in action.</strong> Comparing <code>fixef(lm2)</code> with <code>coef(lm3)</code> stream by stream, every <code>lm3</code> estimate is shifted slightly toward the grand mean (~60.4). With only 3 observations per stream, the data have moderate leverage, so the shrinkage is modest — typically a few percent of the deviation. The most extreme stream (Stream 11 at ~12) gets pulled toward the grand mean by ~3–5%.</p>
+<p><strong>(c) Shrinkage in action.</strong> Comparing <code>coef(lm2)</code> with <code>coef(lm3)</code> stream by stream, every <code>lm3</code> estimate is shifted slightly toward the grand mean (63.26). With only 3 observations per stream, the data have moderate leverage, so the shrinkage is modest — typically a few percent of the deviation. The most extreme stream (Stream 11 at ~12) gets pulled toward the grand mean by ~3–5%.</p>
 
 <pre><code># Compare side by side
 data.frame(
@@ -73,13 +73,13 @@ data.frame(
 <pre><code>Random effects:
  Formula: ~1 | Stream
  (Intercept) Residual
-StdDev: 24.9 4.6
+StdDev: 21.43 4.56
 
 intervals(lm3)
  lower est. upper
-sd((Intercept)) 17.8 24.9 34.9
+sd((Intercept)) 18.60 21.43 24.68
 sigma 3.6 4.6 5.8</code></pre>
-<p>ICC = $24.9^2 / (24.9^2 + 4.6^2) \approx 0.97$. <strong>97% of the variance is between streams</strong>; only 3% is the within-stream replicate noise. Ignoring the random effect (using <code>lm1</code>) would give standard errors that are far too small — the effective sample size is closer to 18 (streams) than to 54 (observations).</p>
+<p>ICC = $21.43^2 / (21.43^2 + 4.56^2) \approx 0.957$. <strong>97% of the variance is between streams</strong>; only 3% is the within-stream replicate noise. Ignoring the random effect (using <code>lm1</code>) would give standard errors that are far too small — the effective sample size is closer to 18 (streams) than to 54 (observations).</p>
 
 <div class="callout key"><strong>What to look for:</strong> students explicitly counting parameters in each model; recognizing that residual clustering by group is the diagnostic that motivates a random effect; computing ICC as an interpretable summary. Bonus: noticing that with only 3 observations per stream, the partial-pool shrinkage is small — and articulating why.</div>
 </section>
@@ -99,7 +99,7 @@ Length 0.96 0.03 94 31.5</code></pre>
 
 <p><strong>(c) Among-subject SD.</strong> ~1.6 g. So two subjects of the same length are expected to differ in weight by about $\pm 1.6$ g (1 SD), or roughly $\pm 3.2$ g (2 SD covers most of the population).</p>
 
-<p><strong>(d) Within-subject residual SD.</strong> ~4.5 g. ICC = $1.6^2 / (1.6^2 + 4.5^2) \approx 0.11$. After accounting for length, only ~11% of remaining variation in weight is between subjects — much less than in the streams example, because the length covariate explains most of the among-subject variation.</p>
+<p><strong>(d) Within-subject residual SD.</strong> ~0.21. ICC = $0.211^2 / (0.211^2 + 0.206^2) \approx 0.51$. Even after accounting for length, about half the remaining variation is between subjects &mdash; individual fish sit persistently above or below the population line, so repeated measures on a fish are strongly non-independent. <em>Grading note:</em> a student reporting ICC near 0.5 and concluding the random intercept is doing real work is right; the covariate does <em>not</em> explain away the among-subject variation here.</p>
 
 <p><strong>(e) Random-slope test.</strong></p>
 <pre><code>m_slope &lt;- lmer(Weight ~ Length + (1 + Length | Subject), data=LenW)
@@ -152,15 +152,15 @@ VarCorr(m_nlme) # SD(Linf | Subject) ~ 8.5</code></pre>
 summary(M8)
 Random effects:
  Groups Name Variance Std.Dev. Corr
- Lake (Intercept) 0.046 0.214
- Fish_Species (Intercept) 0.286 0.535
- Z_Length 0.075 0.273 -0.99
- Residual 0.040 0.200
+ Lake (Intercept) 0.205 0.453
+ Fish_Species (Intercept) 0.867 0.931
+ Z_Length 0.025 0.157 1.00
+ Residual 0.050 0.224
 Fixed effects:
  Estimate Std.Error
-(Intercept) -0.0009 0.32
-Z_Length 0.422 0.17</code></pre>
-<p>Almost all the slope variability lives across species (different feeding ecologies → different length-TP slopes). Lake variability mostly shifts the intercept (a lake-wide trophic-position baseline). Within-fish residual is small. <strong>Note the correlation of −0.99</strong> for the species (intercept, slope) — a singular fit, unsurprising given only 3 species.</p>
+(Intercept) -0.0009 0.569
+Z_Length 0.422 0.092</code></pre>
+<p>Almost all the slope variability lives across species (different feeding ecologies → different length-TP slopes). Lake variability mostly shifts the intercept (a lake-wide trophic-position baseline). Within-fish residual is small. <strong>Note the correlation of −0.99</strong> for the species (intercept, slope) — a singular fit, unsurprising given only 3 species. Note the slope&ndash;intercept correlation of <strong>+1.00</strong>: that is a degenerate (boundary) estimate &mdash; lmer has run out of data to identify the correlation and has pinned it at the edge of its range. Treat it as a warning that the random-slope structure is over-specified for this dataset, not as a real biological correlation.</p>
 
 <p><strong>(d) Practical risk with few levels.</strong> Variance components are essentially unidentifiable, singular fits are common, and any inference about the variance (CIs, LRTs) is poorly calibrated. Switch to fixed effects when (i) ≤ 3–4 levels, (ii) you care about each level by name, or (iii) the "draw from a larger population" interpretation is not credible. In this dataset, a model with fixed effects for Species and an interaction Length × Species — with Lake either fixed or random depending on the science question — would be very defensible.</p>
 

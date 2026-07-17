@@ -220,7 +220,7 @@ lm3 &lt;- <span class="fn">lme</span>(fixed = Density ~ <span class="nu">1</span
 <ol type="a">
 <li>Write out the equation each of the three models is fitting. How many parameters does each estimate?</li>
 <li>Plot residuals from <code>lm1</code> by stream (use <code>boxplot(split(resid(lm1), Streams$Stream))</code>). What do you see, and what does that tell you about the validity of <code>lm1</code>?</li>
-<li>Compare <code>fixef(lm2)</code> (the 100 stream means) to <code>coef(lm3)</code> (the 100 partially-pooled stream estimates). Pick the most extreme stream and explain how much it shrank toward the overall mean, and why.</li>
+<li>Compare <code>coef(lm2)</code> (the 100 stream means) to <code>coef(lm3)</code> (the 100 partially-pooled stream estimates). Pick the most extreme stream and explain how much it shrank toward the overall mean, and why.</li>
 <li>From <code>summary(lm3)</code> and <code>intervals(lm3)</code>, report the among-stream standard deviation and its 95% CI, the within-stream residual standard deviation, and the ICC.</li>
 </ol>
 
@@ -235,20 +235,20 @@ lm3 &lt;- <span class="fn">lme</span>(fixed = Density ~ <span class="nu">1</span
 <pre><code>Random effects:
  Formula: ~1 | Stream
  (Intercept) Residual
-StdDev: 24.9 4.6
+StdDev: 21.43 4.56
 
 Fixed effects: Density ~ 1
  Value Std.Error DF t-value
-(Intercept) 60.4 6.0 36 10.1
+(Intercept) 63.26 2.16 200 29.3
 
 intervals(lm3)$reStruct$Stream
  lower est. upper
-sd((Intercept)) 17.8 24.9 34.9
+sd((Intercept)) 18.60 21.43 24.68
 intervals(lm3)$sigma
  lower est. upper
- 3.65 4.60 5.80
+ 4.14 4.56 5.03
 </code></pre>
-<p>ICC = $24.9^2 / (24.9^2 + 4.6^2) \approx 620 / 641 \approx 0.97$. Almost all variation in fish density is between streams; within a stream, the three replicate measurements are very similar. That is exactly the situation in which ignoring the random effect would give you wildly over-confident inference.</p>
+<p>ICC = $21.43^2 / (21.43^2 + 4.56^2) \approx 459 / 480 \approx 0.957$. Almost all variation in fish density is between streams; within a stream, the three replicate measurements are very similar. That is exactly the situation in which ignoring the random effect would give you wildly over-confident inference.</p>
 </div></details>
 </div>
 
@@ -281,11 +281,11 @@ m1b &lt;- <span class="fn">lmer</span>(Weight ~ Length + (<span class="nu">1</sp
 <details class="answer"><summary>Reveal worked solution</summary><div class="answer-body">
 <p><strong>(a)</strong> $W_{ij} = \beta_0 + b_{0,j} + \beta_1 L_{ij} + \varepsilon_{ij}$, with $b_{0,j}\sim\mathcal{N}(0,\sigma_S^2)$ and $\varepsilon_{ij}\sim\mathcal{N}(0,\sigma^2)$. $\beta_1$ is the population-average slope of weight on length, shared across subjects. $b_{0,j}$ is the subject's intercept deviation from the population mean.</p>
 
-<p><strong>(b)</strong> Approximate output: $\hat\beta_0 \approx 1.3$, $\hat\beta_1 \approx 0.96$ — i.e., a one-unit increase in length corresponds to ~0.96 grams of weight on average across subjects. CIs from <code>intervals(m1)</code> exclude zero comfortably.</p>
+<p><strong>(b)</strong> Approximate output: $\hat\beta_0 \approx -0.03$, $\hat\beta_1 \approx 3.02$ — i.e., a one-unit increase in length corresponds to ~0.96 grams of weight on average across subjects. CIs from <code>intervals(m1)</code> exclude zero comfortably.</p>
 
-<p><strong>(c)</strong> Among-subject SD on the intercept is around 1.6 g; so subjects of the same length differ in expected weight by roughly $\pm 1.6$ g (1 SD) or $\pm 3.2$ g (2 SD) from one another, even after accounting for the length effect.</p>
+<p><strong>(c)</strong> Among-subject SD on the intercept is around 0.21; so subjects of the same length differ in expected weight by roughly $\pm 1.6$ g (1 SD) or $\pm 3.2$ g (2 SD) from one another, even after accounting for the length effect.</p>
 
-<p><strong>(d)</strong> Within-subject residual SD around 4.5 g. ICC = $1.6^2 / (1.6^2 + 4.5^2) \approx 2.6 / 22.8 \approx 0.11$. After the length covariate, only ~11% of remaining variation is between subjects — much smaller than in the streams example, because length explains a lot of the among-subject variation.</p>
+<p><strong>(d)</strong> Within-subject residual SD around 0.21. ICC = $0.211^2 / (0.211^2 + 0.206^2) \approx 0.045 / 0.087 \approx 0.51$. Even after the length covariate, about half the remaining variation is between subjects: individual fish are persistently heavier or lighter than the population line predicts, so repeated measurements on one fish are far from independent. That is exactly why the random intercept is needed here.</p>
 
 <p><strong>(e)</strong> The REML LRT (use <code>refit = FALSE</code> because we are comparing random-effect structures, not fixed effects, and REML likelihoods are valid for that comparison). With this dataset, the random-slope model usually shows little improvement — the LRT $p$-value is large, and the slope variance is near zero (singular fit warning). Conclusion: a random intercept suffices.</p>
 </div></details>
@@ -383,16 +383,16 @@ M8 &lt;- <span class="fn">lmer</span>(Z_TP ~ Z_Length + (<span class="nu">1</spa
 <p><strong>(c)</strong> Best AICc is typically M8 (random intercept &amp; slope on species, random intercept on lake). Approximate variance components:</p>
 <pre><code>Random effects:
  Groups Name Variance Std.Dev. Corr
- Lake (Intercept) 0.046 0.214
- Fish_Species (Intercept) 0.286 0.535
- Z_Length 0.075 0.273 -0.99
- Residual 0.040 0.200
+ Lake (Intercept) 0.205 0.453
+ Fish_Species (Intercept) 0.867 0.931
+ Z_Length 0.025 0.157 1.00
+ Residual 0.050 0.224
 Fixed effects:
  Estimate Std.Error
-(Intercept) -0.0009 0.32
-Z_Length 0.422 0.17
+(Intercept) -0.0009 0.569
+Z_Length 0.422 0.092
 </code></pre>
-<p>Most slope variation lives across species — different feeding ecologies. Lake mostly shifts intercepts, not slopes. Within-fish residual is small relative to species variation. <em>Note</em> the perfect-correlation warning: the slope-intercept correlation is essentially $-1$, a classic singular fit. With only 3 species this is not surprising.</p>
+<p>Most slope variation lives across species — different feeding ecologies. Lake mostly shifts intercepts, not slopes. Within-fish residual is small relative to species variation. <em>Note</em> the perfect-correlation warning: the slope-intercept correlation is essentially $-1$, a classic singular fit. With only 3 species this is not surprising. Note the slope&ndash;intercept correlation of <strong>+1.00</strong>: that is a degenerate (boundary) estimate &mdash; lmer has run out of data to identify the correlation and has pinned it at the edge of its range. Treat it as a warning that the random-slope structure is over-specified for this dataset, not as a real biological correlation.</p>
 
 <p><strong>(d)</strong> With few levels, the variance components are estimated with so little information that singular fits and unstable correlations are common — and the inferential machinery (Wald CIs, LRTs) is poorly calibrated. Switch to fixed effects for species when (i) you have ≤ 3–4 levels, (ii) you care about each level by name (Bluegill vs Walleye is biologically meaningful), or (iii) you cannot defend a "population of species" sampling story.</p>
 </div></details>

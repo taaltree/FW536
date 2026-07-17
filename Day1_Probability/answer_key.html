@@ -108,10 +108,10 @@ sims %&gt;% summarise(across(everything(),
  list(mean=mean, var=var, p0=~mean(.==0), pgt20=~mean(.&gt;20))))</code></pre>
 <table>
 <tr><th>Distribution</th><th>Mean (≈)</th><th>Variance (≈)</th><th>P(0)</th><th>P(&gt;20)</th></tr>
-<tr><td>Pois(10)</td><td>10.0</td><td>10.0</td><td>0.000</td><td>0.003</td></tr>
-<tr><td>NB(10, k=5)</td><td>10.0</td><td>30</td><td>0.020</td><td>0.06</td></tr>
-<tr><td>NB(10, k=1)</td><td>10.0</td><td>110</td><td>0.09</td><td>0.16</td></tr>
-<tr><td>NB(10, k=0.5)</td><td>10.0</td><td>210</td><td>0.18</td><td>0.21</td></tr>
+<tr><td>Pois(10)</td><td>10.0</td><td>10</td><td>0.000</td><td>0.002</td></tr>
+<tr><td>NB(10, k=5)</td><td>10.0</td><td>30</td><td>0.004</td><td>0.046</td></tr>
+<tr><td>NB(10, k=1)</td><td>10.0</td><td>110</td><td>0.091</td><td>0.135</td></tr>
+<tr><td>NB(10, k=0.5)</td><td>10.0</td><td>210</td><td>0.218</td><td>0.155</td></tr>
 </table>
 <p>(d) Many-zero, occasional-large data is the NB k=0.5 pattern.</p>
 
@@ -128,10 +128,10 @@ sims %&gt;% summarise(across(everything(),
 <section id="a7">
 <h2>Exercise 7 — CWD surveillance</h2>
 <p>(a) $Y \sim \text{Bin}(24, 0.12)$.</p>
-<pre><code>dbinom(3, 24, 0.12) # 0.2429
-pbinom(4, 24, 0.12) # 0.8722
-dbinom(0, 24, 0.12) # 0.0479</code></pre>
-<p>(d) The 4.8% chance of zero detections despite 12% prevalence is the critical surveillance message: sampling too few animals fails to certify "free of disease" even when present. Real-world surveillance programs use this exact calculation to set minimum sample sizes for declarations of freedom from disease.</p>
+<pre><code>dbinom(3, 24, 0.12) # 0.2387
+pbinom(4, 24, 0.12) # 0.8471
+dbinom(0, 24, 0.12) # 0.0465</code></pre>
+<p>(d) The 4.65% chance of zero detections despite 12% prevalence is the critical surveillance message: sampling too few animals fails to certify "free of disease" even when present. Real-world surveillance programs use this exact calculation to set minimum sample sizes for declarations of freedom from disease.</p>
 </section>
 
 <section id="a8">

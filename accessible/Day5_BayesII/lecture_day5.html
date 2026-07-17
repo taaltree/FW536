@@ -43,9 +43,6 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li><a href="#slide-21">21. Slide 21</a></li>
 <li><a href="#slide-22">22. Slide 22</a></li>
 <li><a href="#slide-23">23. Slide 23</a></li>
-<li><a href="#slide-24">24. Slide 24</a></li>
-<li><a href="#slide-25">25. Slide 25</a></li>
-<li><a href="#slide-26">26. Slide 26</a></li>
 </ul></nav></aside>
 <main class="content" id="main-content" tabindex="-1">
 <header class="lab-header">
@@ -53,7 +50,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <h1>Bayesian statistics II</h1>
 <p class="lede">A screen-reader-friendly transcript of the lecture slides: all slide text, tables, figure descriptions, and speaker notes.</p>
 </header>
-<div class="callout key"><p class="callout-label">About these notes</p>Each section is one slide. Figures carry text descriptions where available. For the concepts with worked examples, also read the <a href="plain_language_summary.html">plain-language summary</a> and <a href="lab.html">lab</a> for this session. You can also download the <a href="../../Day5_BayesII/FW536_Day5_BayesII_accessible.pptx">alt-texted PowerPoint deck</a> (the same slides with image descriptions embedded).</div>
+<div class="callout key"><p class="callout-label">About these notes</p>Each section is one slide. Figures carry text descriptions where available. For the concepts with worked examples, also read the <a href="plain_language_summary.html">plain-language summary</a> and <a href="lab.html">lab</a> for this session.</div>
 <section aria-labelledby="slide-1-h">
 <h2 id="slide-1-h"><span id="slide-1"></span>Slide 1</h2>
 <p>Introduction to Bayesian Analysis Part Deux</p>
@@ -91,7 +88,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 </section>
 <section aria-labelledby="slide-5-h">
 <h2 id="slide-5-h"><span id="slide-5"></span>Slide 5</h2>
-<figure role="group"><figcaption><strong>Figure 5.1.</strong> Equation: [b0,b1,sigma | y] proportional to product over i of normal(y_i | g(b0,b1,x_i), sigma^2) times normal(b0|0,1000) normal(b1|0,1000) uniform(sigma|0,100); g = b0 + b1*x_i. Below, JAGS code for this normal regression.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 5.1.</strong> [β0, β1, σ | y]  ∝  ∏i=1N normal(yi | g(β0, β1, xi), σ²)         × normal(β0 | 0, 1000) normal(β1 | 0, 1000)         × uniform(σ | 0, 100) g(β0, β1, xi)  =  β0 + β1 xi  b0 ~ dnorm(0, .001) b1 ~ dnorm(0, .001) sigma ~ dunif(0, 100) tau &lt;- 1/sigma^2 for (i in 1:length(y)){   mu[i] &lt;- b0 + b1 * x[i]   y[i] ~ dnorm(mu[i], tau) }</figcaption></figure>
 </section>
 <section aria-labelledby="slide-6-h">
 <h2 id="slide-6-h"><span id="slide-6"></span>Slide 6</h2>
@@ -128,60 +125,23 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <section aria-labelledby="slide-8-h">
 <h2 id="slide-8-h"><span id="slide-8"></span>Slide 8</h2>
 <figure role="group"><figcaption><strong>Figure 8.1.</strong> Table &#x27;You don&#x27;t have to be normal!&#x27; mapping data types to distribution, mean function, and link: continuous/normal (identity), discrete-positive/Poisson (log), 0-or-1/Bernoulli (logit), [0,1]/beta (logit), positive/lognormal and gamma (log).</figcaption></figure>
-<p>Wrong</p>
+<p>Wrong→</p>
 </section>
 <section aria-labelledby="slide-9-h">
 <h2 id="slide-9-h"><span id="slide-9"></span>Slide 9</h2>
-<figure role="group"><figcaption><strong>Figure 9.1.</strong> Equation: [b0,b1|y] proportional to product over i of Poisson(y_i | g(b0,b1,x_i)) times normal(b0|0,1000) normal(b1|0,1000); g = exp(b0 + b1*x_i). Below, JAGS Poisson-regression code using log link.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 9.1.</strong> [β0, β1 | y]  ∝  ∏i=1N Poisson(yi | g(β0, β1, xi))         × normal(β0 | 0, 1000) normal(β1 | 0, 1000) g(β0, β1, xi)  =  exp(β0 + β1 xi)  b0 ~ dnorm(0, .001) b1 ~ dnorm(0, .001) for(i in 1:length(y)){   log(mu[i]) &lt;- b0 + b1 * x[i]   y[i] ~ dpois(mu[i]) } or mu[i] &lt;- exp(b0 + b1 * x[i]) y[i] ~ dpois(mu[i])</figcaption></figure>
+<ul>
+<li>Ant Species Richness:</li>
+<li>Beware of Vague Priors with Link Functions</li>
+</ul>
 </section>
 <section aria-labelledby="slide-10-h">
 <h2 id="slide-10-h"><span id="slide-10"></span>Slide 10</h2>
-<ul>
-<li>Many models have nonlinear transformations such as link functions</li>
-<li>We will use a Poisson regression model for ant richness to highlight issues to be aware of</li>
-</ul>
-<p>Priors Lab</p>
+<figure role="group"><figcaption><strong>Figure 10.1.</strong> Bernoulli, 0 or 1 (aka logistic)   [β0, β1 | y]  ∝  ∏i=1N Bernoulli(yi | g(β0, β1, xi))         × normal(β0 | 0, 2.7) normal(β1 | 0, 2.7) g(β0, β1, xi)  =  exp(β0 + β1 xi) / (exp(β0 + β1 xi) + 1)  b0 ~ dnorm(0, .37) b1 ~ dnorm(0, .37) for(i in 1:length(y)){   logit(p[i]) &lt;- b0 + b1 * x[i]   y[i] ~ dbern(p[i]) } or p[i] &lt;- inv.logit(b0 + b1 * x[i]) y[i] ~ dbern(p[i])</figcaption></figure>
+<p>Lizard Occurrence on Islands</p>
 </section>
 <section aria-labelledby="slide-11-h">
 <h2 id="slide-11-h"><span id="slide-11"></span>Slide 11</h2>
-<figure role="group"><figcaption><strong>Figure 11.1.</strong> Equation: [b0,b1|y] proportional to product over i of Bernoulli(y_i | g) times normal(b0|0,2.7) normal(b1|0,2.7); g = exp(b0+b1*x_i)/(exp(b0+b1*x_i)+1). Below, JAGS logistic-regression code with logit link.</figcaption></figure>
-</section>
-<section aria-labelledby="slide-12-h">
-<h2 id="slide-12-h"><span id="slide-12"></span>Slide 12</h2>
-<ul>
-<li>Work Through the Lizards Labs</li>
-<li>There are two bugs to fix left intentionally.</li>
-<li>Use the html file to guide you through the code</li>
-<li>Fit the models in both JAGS and Nimble.</li>
-<li>I wrote logistic growth Nimble code.</li>
-<li>You will have to write the Island Lizards Nimble code.</li>
-<li>Visualize and interpret the output</li>
-</ul>
-<p>Lizard Occurrence on Islands Labs</p>
-</section>
-<section aria-labelledby="slide-13-h">
-<h2 id="slide-13-h"><span id="slide-13"></span>Slide 13</h2>
-<p>Latent Variable Modeling I - Occupancy</p>
-<figure role="group"><figcaption><strong>Figure 13.1.</strong> Tree diagram of occupancy detection: surveying an area leads to not seeing the species (y=0), which means either absent (z=0) or present but undetected (z=1); or seeing it (y=1), meaning present (z=1).</figcaption></figure>
-<p>“Latent variable” inferred rather than observed</p>
-<figure role="group"><figcaption><strong>Figure 13.2.</strong> Equation: y_i | z_i ~ Bernoulli(p_i * z_i); z_i ~ Bernoulli(psi_i); logit(p_i) = alpha_0 + alpha_1 * covariate_1; logit(psi_i) = beta_0 + beta_1 * covariate_1.</figcaption></figure>
-<p>What should the priors be?</p>
-</section>
-<section aria-labelledby="slide-14-h">
-<h2 id="slide-14-h"><span id="slide-14"></span>Slide 14</h2>
-<figure role="group"><figcaption><strong>Figure 14.1.</strong> Slide &#x27;Choosing reasonable flat priors on logit intercept.&#x27; Four panels: a normal(0, var=10000) prior on logit(p) gives a U-shaped bathtub distribution of p (mass at 0 and 1), while normal(0, var=2.7) gives a roughly uniform p.</figcaption></figure>
-<ul>
-<li>An implied Uniform(0,1) prior for ψ is a Logistic distribution prior for intercept centered at 0 with scale parameter 1</li>
-<li>Logistic(μ = 0, σ = 1)</li>
-</ul>
-</section>
-<section aria-labelledby="slide-15-h">
-<h2 id="slide-15-h"><span id="slide-15"></span>Slide 15</h2>
-<p>DYNAMIC OCCUPANCY MODELING LAB</p>
-<figure role="group"><figcaption><strong>Figure 15.1.</strong> Diagram of dynamic occupancy transitions from year t-1 to year t between states z=0 (absent) and z=1 (present), with rates: colonization gamma, persistence phi, and complements 1-gamma and 1-phi.</figcaption></figure>
-</section>
-<section aria-labelledby="slide-16-h">
-<h2 id="slide-16-h"><span id="slide-16"></span>Slide 16</h2>
 <p>Hierarchical Models</p>
 <ul>
 <li>From Wikipedia:</li>
@@ -189,13 +149,13 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 </ul>
 <p>Hierarchical models are very natural in a Bayesian framework</p>
 </section>
-<section aria-labelledby="slide-17-h">
-<h2 id="slide-17-h"><span id="slide-17"></span>Slide 17</h2>
-<figure role="group"><figcaption><strong>Figure 17.1.</strong> Slide text: Clark 2003 modeled fecundity of spotted owls and its implications for population growth; data were offspring counts per pair of owls, sample size n=197.</figcaption></figure>
+<section aria-labelledby="slide-12-h">
+<h2 id="slide-12-h"><span id="slide-12"></span>Slide 12</h2>
+<figure role="group"><figcaption><strong>Figure 12.1.</strong> Slide text: Clark 2003 modeled fecundity of spotted owls and its implications for population growth; data were offspring counts per pair of owls, sample size n=197.</figcaption></figure>
 </section>
-<section aria-labelledby="slide-18-h">
-<h2 id="slide-18-h"><span id="slide-18"></span>Slide 18</h2>
-<figure role="group"><figcaption><strong>Figure 18.1.</strong> Directed graph with arrows from alpha and beta pointing to lambda_i. Equation: [lambda,alpha,beta|y] proportional to product Poisson(y_i|lambda_i) gamma(lambda_i|alpha,beta) times gamma(alpha|.001,.001) gamma(beta|.001,.001).</figcaption></figure>
+<section aria-labelledby="slide-13-h">
+<h2 id="slide-13-h"><span id="slide-13"></span>Slide 13</h2>
+<figure role="group"><figcaption><strong>Figure 13.1.</strong> Directed graph with arrows from alpha and beta pointing to lambda_i. Equation: [lambda,alpha,beta|y] proportional to product Poisson(y_i|lambda_i) gamma(lambda_i|alpha,beta) times gamma(alpha|.001,.001) gamma(beta|.001,.001).</figcaption></figure>
 <p>Gamma is the conjugate prior and flexible/non-negative. Good choice here</p>
 <ul>
 <li>These are called hyperpriors.</li>
@@ -207,9 +167,9 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li>Not just variance in counts, but variance within owl pair and among owl pairs!</li>
 </ul>
 </section>
-<section aria-labelledby="slide-19-h">
-<h2 id="slide-19-h"><span id="slide-19"></span>Slide 19</h2>
-<figure role="group"><figcaption><strong>Figure 19.1.</strong> Directed graph with arrows from alpha and beta pointing to lambda_i. Equation: [lambda,alpha,beta|y] proportional to product Poisson(y_i|lambda_i) gamma(lambda_i|alpha,beta) times gamma(alpha|.001,.001) gamma(beta|.001,.001).</figcaption></figure>
+<section aria-labelledby="slide-14-h">
+<h2 id="slide-14-h"><span id="slide-14"></span>Slide 14</h2>
+<figure role="group"><figcaption><strong>Figure 14.1.</strong> Directed graph with arrows from alpha and beta pointing to lambda_i. Equation: [lambda,alpha,beta|y] proportional to product Poisson(y_i|lambda_i) gamma(lambda_i|alpha,beta) times gamma(alpha|.001,.001) gamma(beta|.001,.001).</figcaption></figure>
 <p>Gamma is the conjugate prior and flexible/non-negative. Good choice here</p>
 <ul>
 <li>These are called hyperpriors.</li>
@@ -222,56 +182,84 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <p>Every individual has one of these</p>
 <p>But they arise from a common distribution</p>
 </section>
-<section aria-labelledby="slide-20-h">
-<h2 id="slide-20-h"><span id="slide-20"></span>Slide 20</h2>
-<p>MULTILEVEL MODELING LAB</p>
-<p>MultiLevelModelingLab.html</p>
-<figure role="group"><figcaption><strong>Figure 20.1.</strong> Screenshot of lab introduction text on multilevel models of nitrous oxide (N2O) emissions from agricultural soils, using Qian et al. 2010 data with soil carbon as a group-level covariate across 107 sites.</figcaption></figure>
-<p>Sensitivity: changes in parameters of &quot;vague&quot; priors meaningfully changes the posterior when data sets are small or when they have high variance</p>
+<section aria-labelledby="slide-15-h">
+<h2 id="slide-15-h"><span id="slide-15"></span>Slide 15</h2>
+<p>MULTILEVEL MODELING</p>
+<p>Soil nitrous-oxide emissions are measured at multiple sites across the world. Each site has multiple measurements of (nitrogen input, emission). Different sites have wildly different soil organic carbon, climate, and microbial communities — so we expect site-level structure.</p>
+<ul>
+<li>Build complexity incrementally!</li>
+<li>We will fit no pooling, complete pooling, andrandom intercept model, before adding more complexity</li>
+</ul>
 </section>
-<section aria-labelledby="slide-21-h">
-<h2 id="slide-21-h"><span id="slide-21"></span>Slide 21</h2>
+<section aria-labelledby="slide-16-h">
+<h2 id="slide-16-h"><span id="slide-16"></span>Slide 16</h2>
 <p>Complete pooling</p>
-<figure role="group"><figcaption><strong>Figure 21.1.</strong> JAGS complete-pooling model code: single alpha and beta priors, sigma, and one likelihood loop regressing log.emission on centered log nitrogen input, plus a loop deriving predicted emissions.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 16.1.</strong> JAGS complete-pooling model code: single alpha and beta priors, sigma, and one likelihood loop regressing log.emission on centered log nitrogen input, plus a loop deriving predicted emissions.</figcaption></figure>
 <p>Iterate likelihood over the data</p>
 <p>Only one alpha and beta</p>
 <p>Only one alpha and beta</p>
 </section>
-<section aria-labelledby="slide-22-h">
-<h2 id="slide-22-h"><span id="slide-22"></span>Slide 22</h2>
+<section aria-labelledby="slide-17-h">
+<h2 id="slide-17-h"><span id="slide-17"></span>Slide 17</h2>
 <p>No pooling</p>
-<figure role="group"><figcaption><strong>Figure 22.1.</strong> JAGS no-pooling model code: a separate alpha[j] prior for each of n.sites, shared beta and sigma; likelihood uses alpha[group[i]], with nested loops for site-level predicted emissions.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 17.1.</strong> JAGS no-pooling model code: a separate alpha[j] prior for each of n.sites, shared beta and sigma; likelihood uses alpha[group[i]], with nested loops for site-level predicted emissions.</figcaption></figure>
 <p>Every site gets its own alpha</p>
 <ul>
 <li>Every site gets its own alpha</li>
 <li>“group” was passed as data</li>
 </ul>
 </section>
-<section aria-labelledby="slide-23-h">
-<h2 id="slide-23-h"><span id="slide-23"></span>Slide 23</h2>
+<section aria-labelledby="slide-18-h">
+<h2 id="slide-18-h"><span id="slide-18"></span>Slide 18</h2>
 <ul>
 <li>Random intercept</li>
 <li>Partial pooling</li>
 </ul>
-<figure role="group"><figcaption><strong>Figure 23.1.</strong> Directed acyclic graph for a partial-pooling random-intercept model: y_ij depends on beta, alpha_j, sigma, and covariate x_ij; alpha_j depends on hyperparameters mu_alpha and varsigma_alpha.</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 23.2.</strong> JAGS partial-pooling model code: hyperpriors mu.alpha and sigma.alpha, site intercepts alpha[j] drawn from dnorm(mu.alpha, tau.alpha), shared beta/sigma, likelihood, and predicted emissions loops.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 18.1.</strong> Directed acyclic graph for a partial-pooling random-intercept model: y_ij depends on beta, alpha_j, sigma, and covariate x_ij; alpha_j depends on hyperparameters mu_alpha and varsigma_alpha.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 18.2.</strong> JAGS partial-pooling model code: hyperpriors mu.alpha and sigma.alpha, site intercepts alpha[j] drawn from dnorm(mu.alpha, tau.alpha), shared beta/sigma, likelihood, and predicted emissions loops.</figcaption></figure>
 <p>Alpha varies by site but within shared distribution</p>
 </section>
-<section aria-labelledby="slide-24-h">
-<h2 id="slide-24-h"><span id="slide-24"></span>Slide 24</h2>
+<section aria-labelledby="slide-19-h">
+<h2 id="slide-19-h"><span id="slide-19"></span>Slide 19</h2>
 <ul>
 <li>Random intercept</li>
 <li>Partial pooling, but also attempt to EXPLAIN site-level differences</li>
 </ul>
-<figure role="group"><figcaption><strong>Figure 24.1.</strong> JAGS model code adding a site-level carbon covariate: mu.alpha[j] &lt;- kappa + eta*w[j] and alpha[j] ~ dnorm(mu.alpha[j], tau.alpha), explaining variation in intercepts among sites, plus predicted emissions.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 19.1.</strong> JAGS model code adding a site-level carbon covariate: mu.alpha[j] &lt;- kappa + eta*w[j] and alpha[j] ~ dnorm(mu.alpha[j], tau.alpha), explaining variation in intercepts among sites, plus predicted emissions.</figcaption></figure>
 <p>Every site gets its own alpha</p>
-<figure role="group"><figcaption><strong>Figure 24.2.</strong> Directed acyclic graph: y_ij depends on alpha_j, beta, sigma, and covariate x_ij; alpha_j depends on kappa, eta, varsigma_alpha, and site covariate w_j feeds into alpha_j.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 19.2.</strong> Directed acyclic graph: y_ij depends on alpha_j, beta, sigma, and covariate x_ij; alpha_j depends on kappa, eta, varsigma_alpha, and site covariate w_j feeds into alpha_j.</figcaption></figure>
 <p>In the previous example, we assumed that the variation in the intercept was attributable to spatial variation among sites. We did not try to explain that variation, we simply acknowledged that it exists. Now we are going to “model a parameter” using soil carbon content data at the site-level to explain variation in the intercepts among sites.</p>
 <p>Alpha varies by site but within shared distribution</p>
 <p>Flexibility! Intercepts can depend on soil carbon</p>
 </section>
-<section aria-labelledby="slide-25-h">
-<h2 id="slide-25-h"><span id="slide-25"></span>Slide 25</h2>
+<section aria-labelledby="slide-20-h">
+<h2 id="slide-20-h"><span id="slide-20"></span>Slide 20</h2>
+<p>Latent Variable Modeling I - Occupancy</p>
+<figure role="group"><figcaption><strong>Figure 20.1.</strong> Tree diagram of occupancy detection: surveying an area leads to not seeing the species (y=0), which means either absent (z=0) or present but undetected (z=1); or seeing it (y=1), meaning present (z=1).</figcaption></figure>
+<p>“Latent variable” inferred rather than observed</p>
+<p>What should the priors be?</p>
+<ul>
+<li>yi | zi ~ Bernoulli(pi · zi)</li>
+<li>zi ~ Bernoulli(ψi)</li>
+<li>logit(pi) = α0 + α1 · covariate1</li>
+<li>logit(ψi) = β0 + β1 · covariate1</li>
+</ul>
+</section>
+<section aria-labelledby="slide-21-h">
+<h2 id="slide-21-h"><span id="slide-21"></span>Slide 21</h2>
+<figure role="group"><figcaption><strong>Figure 21.1.</strong> Slide &#x27;Choosing reasonable flat priors on logit intercept.&#x27; Four panels: a normal(0, var=10000) prior on logit(p) gives a U-shaped bathtub distribution of p (mass at 0 and 1), while normal(0, var=2.7) gives a roughly uniform p.</figcaption></figure>
+<ul>
+<li>An implied Uniform(0,1) prior for ψ is a Logistic distribution prior for intercept centered at 0 with scale parameter 1</li>
+<li>Logistic(μ = 0, σ = 1)</li>
+</ul>
+</section>
+<section aria-labelledby="slide-22-h">
+<h2 id="slide-22-h"><span id="slide-22"></span>Slide 22</h2>
+<p>DYNAMIC OCCUPANCY MODELING LAB</p>
+<figure role="group"><figcaption><strong>Figure 22.1.</strong> Diagram of dynamic occupancy transitions from year t-1 to year t between states z=0 (absent) and z=1 (present), with rates: colonization gamma, persistence phi, and complements 1-gamma and 1-phi.</figcaption></figure>
+</section>
+<section aria-labelledby="slide-23-h">
+<h2 id="slide-23-h"><span id="slide-23"></span>Slide 23</h2>
 <ul>
 <li>N-mixture Models</li>
 <li>Separating Process and Observation Error</li>
@@ -284,11 +272,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li>What should the prior distributions be?</li>
 <li>How should we link these variables to environmental covariates?</li>
 </ul>
-<figure role="group"><figcaption><strong>Figure 25.1.</strong> Equation: N_i ~ Poisson(lambda) is the ecological process for true population size; y_ij | N_i ~ Binomial(N_i, p) is the observation process giving counts with detection probability p.</figcaption></figure>
-</section>
-<section aria-labelledby="slide-26-h">
-<h2 id="slide-26-h"><span id="slide-26"></span>Slide 26</h2>
-<p>N-MIXTURE MODELING LAB</p>
+<p class="callout warn" role="note"><span class="callout-label">Figure 23.1 — needs description</span> This slide contains an image not yet described in text. <em>Instructor: add a description.</em></p>
 </section>
 </main>
 

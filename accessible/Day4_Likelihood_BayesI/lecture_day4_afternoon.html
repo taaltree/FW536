@@ -88,7 +88,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <h1>Bayesian statistics I</h1>
 <p class="lede">A screen-reader-friendly transcript of the lecture slides: all slide text, tables, figure descriptions, and speaker notes.</p>
 </header>
-<div class="callout key"><p class="callout-label">About these notes</p>Each section is one slide. Figures carry text descriptions where available. For the concepts with worked examples, also read the <a href="plain_language_summary.html">plain-language summary</a> and <a href="lab.html">lab</a> for this session. You can also download the <a href="../../Day4_Likelihood_BayesI/FW536_Day4_Afternoon_BayesI_accessible.pptx">alt-texted PowerPoint deck</a> (the same slides with image descriptions embedded).</div>
+<div class="callout key"><p class="callout-label">About these notes</p>Each section is one slide. Figures carry text descriptions where available. For the concepts with worked examples, also read the <a href="plain_language_summary.html">plain-language summary</a> and <a href="lab.html">lab</a> for this session.</div>
 <section aria-labelledby="slide-1-h">
 <h2 id="slide-1-h"><span id="slide-1"></span>Slide 1</h2>
 <p>Introduction to Bayesian Analysis</p>
@@ -167,7 +167,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li>It’s the integral (or sum) of the numerator!</li>
 <li>This “scales” the numerator so that it integrates to 1.</li>
 </ul>
-<p class="sr-only">Figure 8.2: decorative image, no description needed.</p>
+<figure role="group"><figcaption><strong>Figure 8.2.</strong> Animated reaction clip of a man in a suit holding his head with both hands, an overwhelmed &quot;mind blown&quot; reaction.</figcaption></figure>
 <p>L(θ|y) = [y| θ] ≠ [θ | y]</p>
 <p>We call this a normalizing constant</p>
 </section>
@@ -274,8 +274,8 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <p>We have 5 heads out of 12 flips – 5/12 = 0.417.  Now let’s use an informative prior, Beta(3,2).</p>
 <p>Why is posterior mean larger than 0.417?</p>
 <p>Question: What is the mean of a Beta(3,2)? What are we saying with this?</p>
-<figure role="group"><figcaption><strong>Figure 17.4.</strong> Equation: E[X] = alpha / (alpha + beta).</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 17.5.</strong> Equation: var[X] = (alpha times beta) / ((alpha + beta)^2 (alpha + beta + 1)).</figcaption></figure>
+<p>E[X] = α / (α + β)</p>
+<p>var[X] = αβ / ((α + β)² (α + β + 1))</p>
 </section>
 <section aria-labelledby="slide-18-h">
 <h2 id="slide-18-h"><span id="slide-18"></span>Slide 18</h2>
@@ -301,7 +301,10 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li>Each value was divided by the integral of the prior*likelihood, to “normalize” or scale so that it integrates to 1 (thereby satisfying a definition of probability).</li>
 <li>This gave us a posterior for p to make probabilistic inference</li>
 </ul>
-<figure role="group"><figcaption><strong>Figure 19.1.</strong> Slide &#x27;The components of Bayes theorem&#x27; showing equation 12: posterior [theta|y] equals likelihood [y|theta] times prior [theta], divided by the integral over theta (the marginal distribution of the data).</figcaption></figure>
+<ul>
+<li>[θ|y] = [y|θ] [θ] / ∫θ [y|θ] [θ] dθ</li>
+<li>(posterior = likelihood × prior ÷ marginal distribution of the data)</li>
+</ul>
 </section>
 <section aria-labelledby="slide-20-h">
 <h2 id="slide-20-h"><span id="slide-20"></span>Slide 20</h2>
@@ -366,18 +369,8 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 </section>
 <section aria-labelledby="slide-29-h">
 <h2 id="slide-29-h"><span id="slide-29"></span>Slide 29</h2>
-<figure role="group"><figcaption><strong>Figure 29.1.</strong> Equation: alpha_new = y + alpha, beta_new = beta + n - y (Beta-binomial conjugate update).</figcaption></figure>
 <p>Mean of the NEW Beta distribution is</p>
 <p>The new Beta distribution for the posterior of p</p>
-<figure role="group"><figcaption><strong>Figure 29.2.</strong> Equation: alpha_new = y + alpha, beta_new = beta + n - y (Beta-binomial conjugate update).</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 29.3.</strong> Equation: alpha_new = y + alpha, beta_new = beta + n - y (Beta-binomial conjugate update).</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 29.4.</strong> Equation: alpha_new = y + alpha, beta_new = beta + n - y (Beta-binomial conjugate update).</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 29.5.</strong> Equation: alpha_new = y + alpha, beta_new = beta + n - y (Beta-binomial conjugate update).</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 29.6.</strong> Equation: alpha_new = y + alpha, beta_new = beta + n - y (Beta-binomial conjugate update).</figcaption></figure>
-<p>+</p>
-<p>=</p>
-<figure role="group"><figcaption><strong>Figure 29.7.</strong> Equation: alpha_new = y + alpha, beta_new = beta + n - y (Beta-binomial conjugate update).</figcaption></figure>
-<p>+</p>
 <ul>
 <li>Now we can see precisely how much information the prior adds!</li>
 <li>A Beta(1,1) prior is like observing 1 more success and 1 more failure because y increases by 1 and n increases by 2</li>
@@ -386,13 +379,12 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li>That is called the Haldane prior – an “improper prior”.  What is its functional form here?</li>
 </ul>
 <p>Sampling from a known posterior is called “Gibbs sampling”</p>
+<p>αnew = y + α,    βnew = β + n − y</p>
+<p>αnew / (αnew + βnew)  =  (y + α) / (α + β + n)</p>
 </section>
 <section aria-labelledby="slide-30-h">
 <h2 id="slide-30-h"><span id="slide-30"></span>Slide 30</h2>
-<ul>
-<li>Taal, work through</li>
-<li>Beta-Binomial Lab</li>
-</ul>
+<p>Beta-Binomial Walkthrough</p>
 </section>
 <section aria-labelledby="slide-31-h">
 <h2 id="slide-31-h"><span id="slide-31"></span>Slide 31</h2>
@@ -407,11 +399,11 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 </section>
 <section aria-labelledby="slide-32-h">
 <h2 id="slide-32-h"><span id="slide-32"></span>Slide 32</h2>
-<figure role="group"><figcaption><strong>Figure 32.1.</strong> Slide &#x27;So what?&#x27; with equation 15 for [theta|y] and a plot over theta of the prior PDF (green), observed likelihood (red), and their product/numerator (dashed blue).</figcaption></figure>
+<p class="callout warn" role="note"><span class="callout-label">Figure 32.1 — needs description</span> This slide contains an image not yet described in text. <em>Instructor: add a description.</em></p>
 </section>
 <section aria-labelledby="slide-33-h">
 <h2 id="slide-33-h"><span id="slide-33"></span>Slide 33</h2>
-<figure role="group"><figcaption><strong>Figure 33.1.</strong> Slide &#x27;So what?&#x27; with equation 17 and a plot of prior (green), likelihood (red), and posterior (blue) versus theta, the posterior lying between them.</figcaption></figure>
+<p class="callout warn" role="note"><span class="callout-label">Figure 33.1 — needs description</span> This slide contains an image not yet described in text. <em>Instructor: add a description.</em></p>
 </section>
 <section aria-labelledby="slide-34-h">
 <h2 id="slide-34-h"><span id="slide-34"></span>Slide 34</h2>
@@ -561,6 +553,10 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <p>Greatest per-capita growth rate</p>
 <p>“Negative density dependence”</p>
 <p>Estimating parameters in logistic population growth</p>
+<p>dN/dt = rN(1 − N/K)</p>
+<p>(1/N) dN/dt = r(1 − N/K) = r − rN/K</p>
+<p>(1/N) dN/dt</p>
+<p>N</p>
 </section>
 <section aria-labelledby="slide-50-h">
 <h2 id="slide-50-h"><span id="slide-50"></span>Slide 50</h2>
@@ -569,22 +565,22 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li>estimating parameters in logistic population growth</li>
 <li>From Hobbs and Che-Castaldo’s SESYNC course</li>
 </ul>
-<figure role="group"><figcaption><strong>Figure 50.1.</strong> Equation: (1/N)(dN/dt) = r - (r/K) N, the per-capita logistic growth rate.</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 50.2.</strong> Line graph of per-capita growth rate dN/(N dt) versus population size N: a straight red line starting at r on the y-axis and declining with slope -r/K to zero at N = K.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 50.1.</strong> Line graph of per-capita growth rate dN/(N dt) versus population size N: a straight red line starting at r on the y-axis and declining with slope -r/K to zero at N = K.</figcaption></figure>
 <ul>
 <li>Observations of per-capita growth rate paired with population size</li>
 <li>Ah ha, our scientific model is a line! We know what to do with lines!</li>
 <li style="margin-left:1.2em">Let’s try it with our standard tools.</li>
 </ul>
+<p>(1/N)(dN/dt) = r − (r/K) N</p>
 </section>
 <section aria-labelledby="slide-51-h">
 <h2 id="slide-51-h"><span id="slide-51"></span>Slide 51</h2>
 <p>reg=lm(GrowthRate~PopulationSize,data=Logistic)</p>
 <p>Good Ole Regression Approach</p>
-<figure role="group"><figcaption><strong>Figure 51.1.</strong> Equation: (1/N)(dN/dt) = r - (r/K) N, the per-capita logistic growth rate.</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 51.2.</strong> R lm() summary for GrowthRate ~ PopulationSize: intercept 0.2018, slope -1.647e-04 (both p &lt; 2e-16), residual SE 0.02789, R-squared 0.744.</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 51.3.</strong> R console output: coef(reg) gives intercept 0.2018 and slope -0.0001647; derived rmax = 0.2018 and K = 1224.99.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 51.1.</strong> R lm() summary for GrowthRate ~ PopulationSize: intercept 0.2018, slope -1.647e-04 (both p &lt; 2e-16), residual SE 0.02789, R-squared 0.744.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 51.2.</strong> R console output: coef(reg) gives intercept 0.2018 and slope -0.0001647; derived rmax = 0.2018 and K = 1224.99.</figcaption></figure>
 <p>But what can we say about K, K/2 or MSY?</p>
+<p>(1/N)(dN/dt) = r − (r/K) N</p>
 </section>
 <section aria-labelledby="slide-52-h">
 <h2 id="slide-52-h"><span id="slide-52"></span>Slide 52</h2>
@@ -598,7 +594,11 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li>The gamma is the conjugate prior for the precision term in Normal distribution</li>
 <li>But why gamma(0.001, 0.001)</li>
 </ul>
-<figure role="group"><figcaption><strong>Figure 52.1.</strong> Equation: mu_i = r - r x_i / K, and the joint posterior [r,K,tau|y] proportional to the product of normal likelihoods times gamma(0.001,0.001) priors on K, tau, and r.</figcaption></figure>
+<ul>
+<li>μi = r − r xi / K</li>
+<li>[r, K, τ | y] ∝ ∏i=1n [yi | μi, τ] [r] [K] [τ]</li>
+<li>[r, K, τ | y] ∝ ∏i=1n normal(yi | μi, τ) · gamma(K | .001, .001) · gamma(τ | .001, .001) · gamma(r | .001, .001)</li>
+</ul>
 </section>
 <section aria-labelledby="slide-53-h">
 <h2 id="slide-53-h"><span id="slide-53"></span>Slide 53</h2>
@@ -623,7 +623,6 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 </section>
 <section aria-labelledby="slide-55-h">
 <h2 id="slide-55-h"><span id="slide-55"></span>Slide 55</h2>
-<figure role="group"><figcaption><strong>Figure 55.1.</strong> JAGS model code screenshot: gamma(0.001,0.001) priors on K, r, tau; sigma = 1/sqrt(tau); likelihood loop mu[i] = r - r/K*x[i], y[i] ~ dnorm(mu[i], tau).</figcaption></figure>
 <p>Some other priors</p>
 <ul>
 <li>sink(&quot;LogisticJAGS.R&quot;)</li>
@@ -644,6 +643,11 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 </ul>
 <p>Use “sink” to keep all your code in one R script, but can also make JAGS code separately</p>
 <p>Normal distribution in JAGS is parameterized with precision, not variance or standard deviation</p>
+<ul>
+<li>μi = r − r xi / K</li>
+<li>τ = 1 / σ²</li>
+<li>[r, K, σ | y] ∝ ∏i=1n normal(yi | μi, τ) · uniform(K | 0, 4000) · uniform(σ | 0, 5) · uniform(r | 0, 2)</li>
+</ul>
 </section>
 <section aria-labelledby="slide-56-h">
 <h2 id="slide-56-h"><span id="slide-56"></span>Slide 56</h2>
@@ -698,7 +702,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <figure role="group"><figcaption><strong>Figure 60.1.</strong> Nimble model code screenshot: nimbleCode with uniform priors K~dunif(0,4000), r~dunif(0,2), sigma~dunif(0,2), tau=1/sigma^2, and a likelihood loop y[i]~dnorm(mu[i],tau).</figcaption></figure>
 <ul>
 <li>BUGS Code is written in a nimbleCode() function.</li>
-<li>Models compiled into C++ and are more customizeable</li>
+<li>Models compiled into C++ and are more customizable</li>
 <li>Can be much faster than JAGS</li>
 <li>Can produce MCMC output in one line with nimbleMCMC()</li>
 <li style="margin-left:1.2em">No separate adaption phase to tune MCMC</li>
@@ -708,7 +712,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 </section>
 <section aria-labelledby="slide-61-h">
 <h2 id="slide-61-h"><span id="slide-61"></span>Slide 61</h2>
-<p>Logistic Growth Lab. Use the html file and code to guide you. Fit the model in both JAGS and Nimble. Visualize and interpret the output</p>
+<p>Logistic Growth in Nimble. Visualize and interpret the output</p>
 </section>
 </main>
 

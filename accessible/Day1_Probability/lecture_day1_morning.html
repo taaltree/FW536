@@ -20,7 +20,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <p class="brand"><a href="../index.html">FW 536 · Day 1 Morning</a></p>
 <div class="subtitle">Lecture notes: Introduction to probability</div>
 <nav aria-label="Slides in this lecture"><div class="section">Slides</div><ul>
-<li><a href="#slide-1">1. FW599 - Fall 2025Get your data on!</a></li>
+<li><a href="#slide-1">1. FW536 – Statistical modeling for ecology and conservation AKA Get your data on!</a></li>
 <li><a href="#slide-2">2. What is this course?</a></li>
 <li><a href="#slide-3">3. Course oath</a></li>
 <li><a href="#slide-4">4. Grading</a></li>
@@ -72,7 +72,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li><a href="#slide-50">50. Slide 50</a></li>
 <li><a href="#slide-51">51. Slide 51</a></li>
 <li><a href="#slide-52">52. Algebra with Expectation and Variance</a></li>
-<li><a href="#slide-53">53. Answer: Algebra with Expectation and Variance</a></li>
+<li><a href="#slide-53">53. Algebra with Expectation and Variance</a></li>
 <li><a href="#slide-54">54. Algebra with Expectation and Variance</a></li>
 <li><a href="#slide-55">55. Answer: Algebra with Expectation and Variance</a></li>
 <li><a href="#slide-56">56. Key terms moving forward</a></li>
@@ -83,9 +83,9 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <h1>Introduction to probability</h1>
 <p class="lede">A screen-reader-friendly transcript of the lecture slides: all slide text, tables, figure descriptions, and speaker notes.</p>
 </header>
-<div class="callout key"><p class="callout-label">About these notes</p>Each section is one slide. Figures carry text descriptions where available. For the concepts with worked examples, also read the <a href="plain_language_summary.html">plain-language summary</a> and <a href="lab.html">lab</a> for this session. You can also download the <a href="../../Day1_Probability/FW536_Day1_Morning_intro%20to%20probability_accessible.pptx">alt-texted PowerPoint deck</a> (the same slides with image descriptions embedded).</div>
+<div class="callout key"><p class="callout-label">About these notes</p>Each section is one slide. Figures carry text descriptions where available. For the concepts with worked examples, also read the <a href="plain_language_summary.html">plain-language summary</a> and <a href="lab.html">lab</a> for this session.</div>
 <section aria-labelledby="slide-1-h">
-<h2 id="slide-1-h"><span id="slide-1"></span>Slide 1: FW599 - Fall 2025Get your data on!</h2>
+<h2 id="slide-1-h"><span id="slide-1"></span>Slide 1: FW536 – Statistical modeling for ecology and conservation AKA Get your data on!</h2>
 <p><em>(No text on this slide.)</em></p>
 </section>
 <section aria-labelledby="slide-2-h">
@@ -104,8 +104,8 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <section aria-labelledby="slide-4-h">
 <h2 id="slide-4-h"><span id="slide-4"></span>Slide 4: Grading</h2>
 <ul>
-<li>Participation and group work (100 points)</li>
-<li>Labs (200 points)</li>
+<li>Precourse exam (50 points)</li>
+<li>Labs (180 points)</li>
 </ul>
 </section>
 <section aria-labelledby="slide-5-h">
@@ -223,8 +223,9 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <section aria-labelledby="slide-14-h">
 <h2 id="slide-14-h"><span id="slide-14"></span>Slide 14: Classical Probability</h2>
 <figure role="group"><figcaption><strong>Figure 14.1.</strong> Diagram: a large outer region labeled S (sample space) containing two small overlapping regions A and B, with their overlap shaded. Illustrates events as subsets of the sample space.</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 14.2.</strong> Equation: Pr{A} = (Area of A) divided by (Area of S); probability of event A is its area relative to the whole sample space S.</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 14.3.</strong> Book cover: The Theoretical Biologist&#x27;s Toolbox by Marc Mangel.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 14.2.</strong> Book cover: The Theoretical Biologist&#x27;s Toolbox by Marc Mangel.</figcaption></figure>
+<p>In probability theory, we are concerned with outcomes of “experiments,” broadly defined. We let S be all the possible outcomes (often called the sample space) and A, B, etc., particular outcomes that might interest us (Figure 3.1a). We then define the probability that A occurs, denoted by Pr{A}, by</p>
+<p>Pr{A} = (Area of A) / (Area of S)                    (3.1)</p>
 </section>
 <section aria-labelledby="slide-15-h">
 <h2 id="slide-15-h"><span id="slide-15"></span>Slide 15: Classical Probability-II(Example)</h2>
@@ -275,6 +276,8 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li>The complement of the event E is the set of outcomes not part of E. The probability of the complement of E (denoted E ’) is:</li>
 </ul>
 <p>Why “1” here?</p>
+<p>0 ≤ P(E) ≤ 1</p>
+<p>P(E&#x27;) = 1 − P(E)</p>
 </section>
 <section aria-labelledby="slide-20-h">
 <h2 id="slide-20-h"><span id="slide-20"></span>Slide 20: Example</h2>
@@ -345,8 +348,9 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <section aria-labelledby="slide-25-h">
 <h2 id="slide-25-h"><span id="slide-25"></span>Slide 25: Conditional Probability-V</h2>
 <figure role="group"><figcaption><strong>Figure 25.1.</strong> Diagram: sample space S containing two overlapping events A and B with the overlap shaded, used to illustrate conditional probability.</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 25.2.</strong> Equation: Pr{A given B} = (Area common to A and B) divided by (Area of B); conditioning on B restricts the sample space to B.</figcaption></figure>
 <p>Mangel’s Toolbox</p>
+<p>Now suppose we are told that B has occurred. We may then ask, what is the probability that A has also occurred? The answer to this question is called the conditional probability of A given B and is denoted by Pr{A|B}. If we know that B has occurred, the collection of all possible outcomes is no longer S, but is B. Applying the definition in Eq. (3.1) to this situation (Figure 3.1a) we must have</p>
+<p>Pr{A|B} = (Area common to A and B) / (Area of B)                    (3.4)</p>
 </section>
 <section aria-labelledby="slide-26-h">
 <h2 id="slide-26-h"><span id="slide-26"></span>Slide 26: Independent Events-I</h2>
@@ -354,6 +358,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li>Two events are said to be independent if the occurrence of one does not affect the probability of the other</li>
 <li>Two events are independent therefore if:</li>
 </ul>
+<p>P(A) = P(A | B);        P(B) = P(B | A)</p>
 </section>
 <section aria-labelledby="slide-27-h">
 <h2 id="slide-27-h"><span id="slide-27"></span>Slide 27: “AND” - The Multiplication RuleThe “joint distribution” of A and B</h2>
@@ -361,12 +366,15 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li>The probability that two events A and B will occur in sequence is:</li>
 <li>If A and B are independent, then the multiplication rule becomes:</li>
 </ul>
+<p>P(A and B) = P(A ∩ B) = P(A) · P(B | A)</p>
+<p>P(A and B) = P(A) · P(B)</p>
 </section>
 <section aria-labelledby="slide-28-h">
 <h2 id="slide-28-h"><span id="slide-28"></span>Slide 28: “AND” - The Multiplication RuleThe “joint distribution” of A and B</h2>
-<figure role="group"><figcaption><strong>Figure 28.1.</strong> Equation: Pr{A, B} = (Area common to A and B) divided by (Area of S); the joint probability of A and B.</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 28.2.</strong> Diagram: sample space S with two overlapping events A and B, their overlap shaded, illustrating the joint probability of A and B.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 28.1.</strong> Diagram: sample space S with two overlapping events A and B, their overlap shaded, illustrating the joint probability of A and B.</figcaption></figure>
 <p>Note the multiplication. What’s another way to write this?</p>
+<p>Pr{A, B} = (Area common to A and B) / (Area of S)</p>
+<p>P(A and B) = P(A ∩ B) = P(A) · P(B | A)</p>
 </section>
 <section aria-labelledby="slide-29-h">
 <h2 id="slide-29-h"><span id="slide-29"></span>Slide 29</h2>
@@ -401,12 +409,15 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 </ul>
 <p>Note the addition</p>
 <p>Why?</p>
+<p>P(A or B) = P(A ∪ B) = P(A) + P(B) − P(A and B)</p>
+<p>P(A or B) = P(A) + P(B)</p>
 </section>
 <section aria-labelledby="slide-33-h">
 <h2 id="slide-33-h"><span id="slide-33"></span>Slide 33: “OR” - The Additive Rule</h2>
 <p>The probability that events A or B will occur</p>
 <figure role="group"><figcaption><strong>Figure 33.1.</strong> Diagram: sample space S with two overlapping events A and B, overlap shaded, illustrating why the overlap is subtracted in the additive (OR) rule to avoid double counting.</figcaption></figure>
 <p>To avoid double count</p>
+<p>P(A or B) = P(A ∪ B) = P(A) + P(B) − P(A and B)</p>
 </section>
 <section aria-labelledby="slide-34-h">
 <h2 id="slide-34-h"><span id="slide-34"></span>Slide 34: Using the Rules of Probability(Example)</h2>
@@ -429,11 +440,21 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 </section>
 <section aria-labelledby="slide-35-h">
 <h2 id="slide-35-h"><span id="slide-35"></span>Slide 35: Review of Concepts and Formulae</h2>
-<figure role="group"><figcaption><strong>Figure 35.1.</strong> The word &#x27;complement&#x27; rendered as an image, labeling the complement rule in the review of probability concepts.</figcaption></figure>
+<ul>
+<li>P(A) : probability of event A</li>
+<li>P(A&#x27;) = 1 − P(A) : probability of the complement of the event A</li>
+<li>P(A) = P(A and B) + P(A and B&#x27;) : decomposition of the probability of event A</li>
+<li>P(B | A) = P(A and B) / P(A) : conditional events</li>
+<li>P(B | A) = P(B) : independent events</li>
+<li>P(A and B) = P(B | A) · P(A) : multiplication rule</li>
+<li>P(A and B) = P(A) · P(B) : independent events</li>
+<li>P(A or B) = P(A) + P(B) − P(A ∩ B) : addition rule</li>
+<li>P(A or B) = P(A) + P(B) : mutually exclusive events</li>
+</ul>
 </section>
 <section aria-labelledby="slide-36-h">
 <h2 id="slide-36-h"><span id="slide-36"></span>Slide 36: QUESTION: Prove the equality in Bayes rule using simple probability rules</h2>
-<figure role="group"><figcaption><strong>Figure 36.1.</strong> Equation: P(A given B) = P(B given A) times P(A), divided by P(B). This is Bayes&#x27; rule.</figcaption></figure>
+<p>P(A | B) = ( P(B | A) · P(A) ) / P(B)</p>
 </section>
 <section aria-labelledby="slide-37-h">
 <h2 id="slide-37-h"><span id="slide-37"></span>Slide 37: BREAK: Up Next - Operationalizing Probability</h2>
@@ -500,8 +521,9 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 </ul>
 <p>The probability of each value of the discrete random variable is between 0 and 1, inclusive.</p>
 <p>The sum of all the probabilities is 1.</p>
-<p>Upper summation limit</p>
-<p>Lower summation limit</p>
+<p>{xi : i = 1, …, N}</p>
+<p>0 ≤ P(xi) ≤ 1</p>
+<p>Σi=1N P(xi) = 1</p>
 </section>
 <section aria-labelledby="slide-44-h">
 <h2 id="slide-44-h"><span id="slide-44"></span>Slide 44: Discrete Cumulative Distribution Function</h2>
@@ -509,7 +531,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li>The probability that random variable X takes values less than or equal to a specific value x</li>
 <li>It is common for f(x), or here p(x), to refer to the probability mass function (what people usually mean when they say “distribution”) and F(x) to refer to the cumulative distribution function</li>
 </ul>
-<figure role="group"><figcaption><strong>Figure 44.1.</strong> Equation: F(x) = P(X &lt;= x) = sum over x_i &lt;= x of P(X = x_i) = sum over x_i &lt;= x of p(x_i). The discrete cumulative distribution function sums the pmf up to x.</figcaption></figure>
+<p>F(x) = P(X ≤ x) = ∑x_i ≤ x P(X = xi) = ∑x_i ≤ x p(xi)</p>
 </section>
 <section aria-labelledby="slide-45-h">
 <h2 id="slide-45-h"><span id="slide-45"></span>Slide 45: Discrete Cumulative Distribution Function</h2>
@@ -518,19 +540,21 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li>The probability that X is between a and b is</li>
 <li style="margin-left:1.2em">Notice the inequalities are not the same. Why?</li>
 </ul>
-<figure role="group"><figcaption><strong>Figure 45.1.</strong> Equation: F(x) = P(X &lt;= x) = sum over x_i &lt;= x of P(X = x_i) = sum over x_i &lt;= x of p(x_i). The discrete cumulative distribution function.</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 45.2.</strong> Equation: P(a &lt; X &lt;= b) = F_X(b) minus F_X(a); the probability X falls in an interval is a difference of CDF values.</figcaption></figure>
+<p>F(x) = P(X ≤ x) = ∑x_i ≤ x P(X = xi) = ∑x_i ≤ x p(xi)</p>
+<p>P(a &lt; X ≤ b) = FX(b) − FX(a)</p>
 </section>
 <section aria-labelledby="slide-46-h">
 <h2 id="slide-46-h"><span id="slide-46"></span>Slide 46: Means, Variances and Standard Deviations-I</h2>
 <p>The mean of a discrete random variable is given by:</p>
 <p>Each value of x is multiplied by its corresponding probability and the products are added.</p>
 <p>This is just a weighted average!</p>
+<p>μ = Σi=1N xi P(xi)</p>
 </section>
 <section aria-labelledby="slide-47-h">
 <h2 id="slide-47-h"><span id="slide-47"></span>Slide 47: Expected Value</h2>
 <p>The expected value of a discrete random variable (jargon for the mean) is:</p>
 <p>This is just a weighted average!</p>
+<p>E(X) = μX = Σi=1N xi P(xi)</p>
 </section>
 <section aria-labelledby="slide-48-h">
 <h2 id="slide-48-h"><span id="slide-48"></span>Slide 48: Means, Variances and Standard Deviations-II</h2>
@@ -542,6 +566,8 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <p>Var{X} =</p>
 <p>Recall that</p>
 <p>Var{X} = E{X2} - (E{X})2</p>
+<p>σ2 = Σi=1N (xi − μ)2 P(xi)</p>
+<p>E(X) = μX = Σi=1N xi P(xi)</p>
 </section>
 <section aria-labelledby="slide-49-h">
 <h2 id="slide-49-h"><span id="slide-49"></span>Slide 49</h2>
@@ -549,34 +575,45 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 </section>
 <section aria-labelledby="slide-50-h">
 <h2 id="slide-50-h"><span id="slide-50"></span>Slide 50</h2>
-<figure role="group"><figcaption><strong>Figure 50.1.</strong> Example slide: table giving a pmf for X with values 1 to 5 and probabilities 1/10, 2/10, 4/10, 2/10, 1/10. Asks to compute the variance and standard deviation.</figcaption></figure>
+<p>Computation from tables</p>
+<p>Example. Compute the variance and standard deviation of X.</p>
+<table><thead><tr><th scope="col">values x</th><th scope="col">1</th><th scope="col">2</th><th scope="col">3</th><th scope="col">4</th><th scope="col">5</th></tr></thead>
+<tbody>
+<tr><td>pmf p(x)</td><td>1/10</td><td>2/10</td><td>4/10</td><td>2/10</td><td>1/10</td></tr>
+</tbody>
+</table>
 </section>
 <section aria-labelledby="slide-51-h">
 <h2 id="slide-51-h"><span id="slide-51"></span>Slide 51</h2>
-<figure role="group"><figcaption><strong>Figure 51.1.</strong> Worked solution: mean mu = 3; a row for (X - mu)^2 is added (4,1,0,1,4); variance E[(X-mu)^2] = 1.2 and standard deviation = square root of 1.2.</figcaption></figure>
+<p>Computation from tables</p>
+<p>From the table we compute the mean:</p>
+<p>μ = 1/10 + 4/10 + 12/10 + 8/10 + 5/10 = 3</p>
+<p>Then we add a line to the table for (X − μ)2.</p>
+<table><thead><tr><th scope="col">values X</th><th scope="col">1</th><th scope="col">2</th><th scope="col">3</th><th scope="col">4</th><th scope="col">5</th></tr></thead>
+<tbody>
+<tr><td>pmf p(x)</td><td>1/10</td><td>2/10</td><td>4/10</td><td>2/10</td><td>1/10</td></tr>
+<tr><td>(X − μ)2</td><td>4</td><td>1</td><td>0</td><td>1</td><td>4</td></tr>
+</tbody>
+</table>
+<p>Using the table we compute variance E((X − μ)2):</p>
+<p>1/10 · 4 + 2/10 · 1 + 4/10 · 0 + 2/10 · 1 + 1/10 · 4 = 1.2</p>
+<p>The standard deviation is then σ = √1.2.</p>
 </section>
 <section aria-labelledby="slide-52-h">
 <h2 id="slide-52-h"><span id="slide-52"></span>Slide 52: Algebra with Expectation and Variance</h2>
+<figure role="group"><figcaption><strong>Figure 52.1.</strong> A math equations on a white background  Description automatically generated</figcaption></figure>
+</section>
+<section aria-labelledby="slide-53-h">
+<h2 id="slide-53-h"><span id="slide-53"></span>Slide 53: Algebra with Expectation and Variance</h2>
 <ul>
 <li>Expectation is a linear operator that can be distributed across a function of a random variable, X, but variance is not</li>
 <li>What is E{a + bX}</li>
 <li>What is Var{a + bX}</li>
 </ul>
-<p>Recall: Var{X} = E{X2} - (E{X})2</p>
-</section>
-<section aria-labelledby="slide-53-h">
-<h2 id="slide-53-h"><span id="slide-53"></span>Slide 53: Answer: Algebra with Expectation and Variance</h2>
-<ul>
-<li>E{a + bX} = E{a} +b*E{X} = a + b*E{X}</li>
-<li>Var{a + bX} = E{(a + bX)2} - (E{a + bX})2 = E{a2 + 2abX + b2X2} – (a + b*E{X})2</li>
-<li>a2+2abE{X}+b2 E{X2} – (a2+2abE{X}+b2 E{X}2)</li>
-<li>b2(E{X2} - E{X}2)</li>
-<li>b2Var{X}</li>
-</ul>
 </section>
 <section aria-labelledby="slide-54-h">
 <h2 id="slide-54-h"><span id="slide-54"></span>Slide 54: Algebra with Expectation and Variance</h2>
-<p>If X and Y are independent, what is Var{X + Y}?</p>
+<p>If X and Y are independent, what is Var{X + Y}? Let’s derive rather than look at rules</p>
 <p>Recall: Var{X} = E{X2} - (E{X})2</p>
 </section>
 <section aria-labelledby="slide-55-h">

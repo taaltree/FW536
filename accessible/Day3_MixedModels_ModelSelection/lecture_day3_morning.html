@@ -27,7 +27,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li><a href="#slide-5">5. Three Options for Structured Data</a></li>
 <li><a href="#slide-6">6. Complete pooling: Fit of the Standard Linear Model(complete pooling of observations)</a></li>
 <li><a href="#slide-7">7. No pooling: Fit a Model with a “Stream-Effect”</a></li>
-<li><a href="#slide-8">8. Partial pooling: A Mixed Effects Model</a></li>
+<li><a href="#slide-8">8. Partial pooling: A Mixed Effects Modelor really random effect model in this simplified case</a></li>
 <li><a href="#slide-9">9. Finally: A Mixed Effects Model(Some notes-I)</a></li>
 <li><a href="#slide-10">10. Finally: A Mixed Effects Model</a></li>
 <li><a href="#slide-11">11. Time for some R</a></li>
@@ -77,12 +77,11 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li><a href="#slide-55">55. Fitting Length and Age Data(Standard non-linear model-II)</a></li>
 <li><a href="#slide-56">56. The NLME Function-I</a></li>
 <li><a href="#slide-57">57. The NLME Function-II</a></li>
-<li><a href="#slide-58">58. The NLME Function-III</a></li>
-<li><a href="#slide-59">59. Fitting Length and Age Data(Non-linear mixed model-I)</a></li>
-<li><a href="#slide-60">60. Fitting Length and Age Data(Non-linear mixed model-II)</a></li>
-<li><a href="#slide-61">61. Fitting Length and Age Data(Non-linear mixed model-III)</a></li>
-<li><a href="#slide-62">62. Fitting Length and Age Data(Non-linear mixed model-IV)</a></li>
-<li><a href="#slide-63">63. Fitting Length and Age Data(Non-linear mixed model-V)</a></li>
+<li><a href="#slide-58">58. Fitting Length and Age Data(Non-linear mixed model-I)</a></li>
+<li><a href="#slide-59">59. Fitting Length and Age Data(Non-linear mixed model-II)</a></li>
+<li><a href="#slide-60">60. Fitting Length and Age Data(Non-linear mixed model-III)</a></li>
+<li><a href="#slide-61">61. Fitting Length and Age Data(Non-linear mixed model-IV)</a></li>
+<li><a href="#slide-62">62. Fitting Length and Age Data(Non-linear mixed model-V)</a></li>
 </ul></nav></aside>
 <main class="content" id="main-content" tabindex="-1">
 <header class="lab-header">
@@ -90,7 +89,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <h1>Mixed effects models</h1>
 <p class="lede">A screen-reader-friendly transcript of the lecture slides: all slide text, tables, figure descriptions, and speaker notes.</p>
 </header>
-<div class="callout key"><p class="callout-label">About these notes</p>Each section is one slide. Figures carry text descriptions where available. For the concepts with worked examples, also read the <a href="plain_language_summary.html">plain-language summary</a> and <a href="lab.html">lab</a> for this session. You can also download the <a href="../../Day3_MixedModels_ModelSelection/FW536_Day3_Morning_mixed%20effects_accessible.pptx">alt-texted PowerPoint deck</a> (the same slides with image descriptions embedded).</div>
+<div class="callout key"><p class="callout-label">About these notes</p>Each section is one slide. Figures carry text descriptions where available. For the concepts with worked examples, also read the <a href="plain_language_summary.html">plain-language summary</a> and <a href="lab.html">lab</a> for this session.</div>
 <section aria-labelledby="slide-1-h">
 <h2 id="slide-1-h"><span id="slide-1"></span>Slide 1</h2>
 <p>Mixed Effects Modeling</p>
@@ -137,35 +136,49 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <section aria-labelledby="slide-6-h">
 <h2 id="slide-6-h"><span id="slide-6"></span>Slide 6: Complete pooling: Fit of the Standard Linear Model(complete pooling of observations)</h2>
 <figure role="group"><figcaption><strong>Figure 6.1.</strong> Scatterplot of fish density against stream from the complete-pooling linear model; all points share one fitted mean, so between-stream variation is visible in the scatter but unmodeled.</figcaption></figure>
-<p>This analysis attributed all the error to within-stream variation. However, it is clear that there is between-stream variation in density but we have no way to comment on it.</p>
+<p>This analysis attributed all the error to within-stream variation. There is between-stream variation in density but (1) we have no way to comment on it, and (2) independence violated (are 1000 measurements from 2 streams just as informative about fish density in typical stream as 10 measurements from 200 streams)</p>
+<ul>
+<li>yi,j = β + εi,j</li>
+<li>i = 1,2,..,6;  j = 1,2,3</li>
+<li>β̂ = 78.63;  σ̂ = 16.03</li>
+</ul>
 </section>
 <section aria-labelledby="slide-7-h">
 <h2 id="slide-7-h"><span id="slide-7"></span>Slide 7: No pooling: Fit a Model with a “Stream-Effect”</h2>
 <p>The residual pattern has been removed with fixed effects, but we have no overall mean and no way to comment on between-stream variance, i.e. we cannot say anything about the population of streams.</p>
+<ul>
+<li>yi,j = βi + εi,j</li>
+<li>i = 1,2,..,6;  j = 1,2,3</li>
+<li>σ̂ = 6.1</li>
+</ul>
 </section>
 <section aria-labelledby="slide-8-h">
-<h2 id="slide-8-h"><span id="slide-8"></span>Slide 8: Partial pooling: A Mixed Effects Model</h2>
+<h2 id="slide-8-h"><span id="slide-8"></span>Slide 8: Partial pooling: A Mixed Effects Modelor really random effect model in this simplified case</h2>
 <ul>
 <li>We construct a random effects model as follows:</li>
-<li> is the mean density across the population,</li>
+<li>β is the mean density across the population,</li>
 <li>bi is a random variable representing the deviation from the population mean:</li>
-<li>i,j is a random variable representing the deviation for observation j from mean density for stream i, i.e.</li>
+<li>εi,j is a random variable representing the deviation for observation j from mean density for stream i, i.e.</li>
 </ul>
 <p>Within stream variation relative to stream mean</p>
 <p>Variation in stream mean</p>
+<p>yi,j = β + bi + εi,j</p>
+<p>bi ~ N(0; σ2b)</p>
+<p>εi,j ~ N(0; σ2)</p>
 </section>
 <section aria-labelledby="slide-9-h">
 <h2 id="slide-9-h"><span id="slide-9"></span>Slide 9: Finally: A Mixed Effects Model(Some notes-I)</h2>
 <ul>
 <li>The residuals are assumed to be independent, normally distributed random variables with constant variance.</li>
 <li>The random effects are assumed to be normally distributed.</li>
-<li>The number of parameters in this model is three (,  and b) because stream is just another level of random variation (with fixed effects model, each stream gets a parameter).</li>
+<li>The number of parameters in this model is three (β, σ and σb) because stream is just another level of random variation (with fixed effects model, each stream gets a parameter).</li>
 </ul>
 </section>
 <section aria-labelledby="slide-10-h">
 <h2 id="slide-10-h"><span id="slide-10"></span>Slide 10: Finally: A Mixed Effects Model</h2>
 <p>The results from fitting the mixed effects model are:</p>
 <p>What can we learn from this?</p>
+<p>β = 78.63;  σb = 15.79;  σ = 6.1</p>
 </section>
 <section aria-labelledby="slide-11-h">
 <h2 id="slide-11-h"><span id="slide-11"></span>Slide 11: Time for some R</h2>
@@ -198,7 +211,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li>random – the random effects (random effects can be nested);</li>
 <li>correlation – correlation structure of the residuals (optional);</li>
 <li style="margin-left:1.2em">For example “correlation=corAR1()” for autoregressive term</li>
-<li>weights – variance structure of the residuals (optional);</li>
+<li>weights – variance structure of the residuals (optional to account for unequal variance);</li>
 <li>subset – which rows of the data set to include (vector of boolean)</li>
 <li>method – ML or REML</li>
 <li>control – optional control specifications (some of these are pretty useful).</li>
@@ -209,7 +222,8 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <ul>
 <li>The linear mixed model can be fit using Maximum Likelihood (ML) or Restricted Maximum Likelihood (REML). If you have many experimental units, this hardly matters, but if you have few replicates, this can make a major difference (use REML).</li>
 <li>REML is default</li>
-<li>The distinction is due to the fact that the MLE for the variance is biased (it has 1/n rather than 1/n-1)</li>
+<li>The distinction is due to the fact that the MLE for the variance parameter is biased (it has 1/n rather than 1/n-1)</li>
+<li style="margin-left:1.2em">This is only relevant for Normal distribution (lmm not glmm)</li>
 <li>REML uses an unbiased estimator for the variance</li>
 <li style="margin-left:1.2em">This is nitpicky, but can matter with small sample size</li>
 </ul>
@@ -246,7 +260,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <section aria-labelledby="slide-16-h">
 <h2 id="slide-16-h"><span id="slide-16"></span>Slide 16: Fixed and Random Effects Together</h2>
 <ul>
-<li>Typically we will have cases in which there are some known sources of variability (the random effects) and some factors that may have different impacts.</li>
+<li>Typically we will have cases in which there are some known sources of variability (the random effects) and some variables that may have different impacts.</li>
 <li>These mixed models will have both fixed and random effects.</li>
 </ul>
 </section>
@@ -277,6 +291,8 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li style="margin-left:1.2em">Modeling decision – do we care about estimate for each individual fish? Not at all. So let’s let intercept be random</li>
 <li style="margin-left:1.2em">lme(Weight~Length,data=LenW,random = ~1 |Subject,method=&quot;REML&quot;)</li>
 </ul>
+<p>W = aLb;        ln Wi,j = ln ai + bi ln Li,j + εi,j</p>
+<p>Note that weight and length have been log transformed in the data to make this power function linear</p>
 </section>
 <section aria-labelledby="slide-20-h">
 <h2 id="slide-20-h"><span id="slide-20"></span>Slide 20: Where does the variation in weight arise from?</h2>
@@ -311,7 +327,6 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <section aria-labelledby="slide-23-h">
 <h2 id="slide-23-h"><span id="slide-23"></span>Slide 23: Tricks and Traps</h2>
 <ul>
-<li>If you use REML estimation, you can only compare models with the same fixed-effects structure.</li>
 <li>The standard output does not provide:</li>
 <li style="margin-left:1.2em">the “best estimates” of the group-level random effects - use coef(lmout) to find them.</li>
 <li style="margin-left:1.2em">the confidence intervals for the variance parameters – use intervals(lmout, 0.95)</li>
@@ -319,10 +334,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 </section>
 <section aria-labelledby="slide-24-h">
 <h2 id="slide-24-h"><span id="slide-24"></span>Slide 24: Mixed Effects Models</h2>
-<ul>
-<li>LOTS OF UNANSWERED QUESTIONS! ESPECIALLY FOR NON-NORMAL RESIDUALS, NONLINEAR MODELS, AND MODEL SELECTION!</li>
-<li>Let’s let Ben Bolker help us:</li>
-</ul>
+<p>Ben Bolker’s FAQ on GLMMs can help us:</p>
 <p>https://bbolker.github.io/mixedmodels-misc/glmmFAQ.html</p>
 </section>
 <section aria-labelledby="slide-25-h">
@@ -340,11 +352,11 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <ul>
 <li>1. No pooling. Separate regressions for every species in every lake</li>
 <li style="margin-left:1.2em">estimate a slope and intercept parameter for each regression (2 parameters x 3 species X 6 lakes = 36 parameter estimates) and the sample size for each analysis would be 10.</li>
-<li style="margin-left:1.2em">We’re also not scientifically interested in variation among lakes.</li>
+<li style="margin-left:1.2em">We’re also not scientifically interested in the lakes.</li>
 <li>2. Complete pooling</li>
 <li style="margin-left:1.2em">Only need to estimate 2 parameters.</li>
 <li style="margin-left:1.2em">Pseudoreplication? Measurements within same lake or species correlated.</li>
-<li style="margin-left:1.2em">Noise – Surely some is due to interlake or species variation</li>
+<li style="margin-left:1.2em">Noise – Surely some is due to interlake or interspecies variation</li>
 </ul>
 <figure role="group"><figcaption><strong>Figure 26.1.</strong> Scatterplot titled &#x27;Species 1 in Lake 1&#x27;: Trophic Position (y, 3.4 to 4.0) versus Length in mm (x, 100 to 400). Ten points, weak positive trend, much scatter.</figcaption></figure>
 <figure role="group"><figcaption><strong>Figure 26.2.</strong> Scatterplot titled &#x27;All Data&#x27;: Trophic Position (y, 3.3 to 5.0) versus Length in mm (x, 100 to 400). Points rise with length but cluster vertically.</figcaption></figure>
@@ -370,7 +382,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <section aria-labelledby="slide-30-h">
 <h2 id="slide-30-h"><span id="slide-30"></span>Slide 30: Ignore structure in residuals?</h2>
 <ul>
-<li>Biased standard errors and confidence intervals (typically underestimated).</li>
+<li>Biased standard errors and confidence intervals (underestimated).</li>
 <li>Inflated type I error for tests of significance.</li>
 <li>Wrong effect estimates if slope varies strongly between groups and you force a single slope.</li>
 <li>Poor predictive performance.</li>
@@ -388,9 +400,9 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li>lmer(Z_TP~Z_Length + (1|Fish_Species))</li>
 <li>You might also use</li>
 <li style="margin-left:1.2em">lm(Z_TP~Z_Length + Fish_Species)</li>
-<li style="margin-left:1.2em">What’s the difference?</li>
+<li style="margin-left:1.2em">What’s the difference? Which actually makes more sense here?</li>
 </ul>
-<figure role="group"><figcaption><strong>Figure 32.1.</strong> Random-intercept schematic: three parallel colored lines (species 1 blue lowest, 2 red, 3 green highest) around the black species-level mean line, with a normal curve showing intercept spread.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 32.1.</strong> Schematic: three parallel Trophic-Position-versus-Length lines, species 1 (blue, low), 2 (red), 3 (green, high), around a black species-level line; a normal curve shows intercepts varying about the mean.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-33-h">
 <h2 id="slide-33-h"><span id="slide-33"></span>Slide 33: Should we use fixed or random effects for groups?</h2>
@@ -420,7 +432,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li>“Shrinkage” toward the mean</li>
 <li>Species with few data rely more on average parameter values</li>
 <li>Here we have balanced design, so not issue</li>
-<li>Inappropriate use of random effects with unbalanced designs + shrinkage can lead to incorrect conclusions.</li>
+<li>use of random effects with unbalanced designs + shrinkage can lead to incorrect conclusions if, say, rare species are different from common species.</li>
 </ul>
 <figure role="group"><figcaption><strong>Figure 36.1.</strong> Schematic of shrinkage: the fitted line for species 1 (blue, three data points) is pulled toward the black species-level mean line rather than fitting its own points, illustrating borrowing strength.</figcaption></figure>
 </section>
@@ -432,14 +444,14 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 </section>
 <section aria-labelledby="slide-38-h">
 <h2 id="slide-38-h"><span id="slide-38"></span>Slide 38: Crossed vs Nested random effects</h2>
-<figure role="group"><figcaption><strong>Figure 38.1.</strong> Diagram of crossed random effects: three School ovals each send arrows to all three Class boxes, so the same classes appear across every school.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 38.1.</strong> nter image description here</figcaption></figure>
 <ul>
 <li>Note that fish species appear in multiple lakes. This is a crossed random effect, but effects can also be nested</li>
 <li>Consider measurements on student within classes within schools</li>
 <li style="margin-left:1.2em">If the classes are “remedial”, “average”, and “gifted”, then they could be crossed among schools.</li>
 <li style="margin-left:1.2em">But if they are just different teachers, then this would be a nested design, R uses different syntax for each.</li>
 </ul>
-<figure role="group"><figcaption><strong>Figure 38.2.</strong> Diagram of nested random effects: each of School1, School2, School3 has its own separate Class1, Class2, Class3 boxes; classes belong to a single school only.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 38.2.</strong> nter image description here</figcaption></figure>
 <ul>
 <li>Nested</li>
 <li>Use (1|School/Class)</li>
@@ -481,31 +493,88 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 </section>
 <section aria-labelledby="slide-42-h">
 <h2 id="slide-42-h"><span id="slide-42"></span>Slide 42</h2>
-<figure role="group"><figcaption><strong>Figure 42.1.</strong> White Stork GLMM example figure (Oliver Gimenez); vector graphic could not be rendered on this system for a precise description.</figcaption></figure>
+<p>White stork: Is breeding success affected by weather conditions?</p>
+<ul>
+<li>nbchicks = c(151,105,73,107,113,87,77,108,118,122,112,120,122,89,69,71,</li>
+<li>53,41,53,31,35,14,18)</li>
+<li>nbpairs = c(173,164,103,113,122,112,98,121,132,136,133,137,145,117,90,</li>
+<li>80,67,54,58,39,42,23,23)</li>
+<li>temp = c(15.1,13.3,15.3,13.3,14.6,15.6,13.1,13.1,15.0,11.7,15.3,14.4,</li>
+<li>14.4,12.7,11.7,11.9,15.9,13.4,14.0,13.9,12.9,15.1,13.0)</li>
+<li>rainfall = c(67,52,88,61,32,36,72,43,92,32,86,28,57,55,66,26,28,96,48,</li>
+<li>90,86,78,87)</li>
+<li>year = seq(1,length(nbchicks))</li>
+</ul>
+<p>286</p>
 </section>
 <section aria-labelledby="slide-43-h">
 <h2 id="slide-43-h"><span id="slide-43"></span>Slide 43</h2>
-<figure role="group"><figcaption><strong>Figure 43.1.</strong> White Stork GLMM example figure; vector graphic could not be rendered on this system for a precise description.</figcaption></figure>
+<p>Standard GLM on proportions</p>
+<ul>
+<li>nbchicksi ∼ Binomial(nbpairsi, pi)</li>
+<li>logit(pi) = β0 + β1 tempi + β2 rainfalli</li>
+</ul>
+<p>287</p>
 </section>
 <section aria-labelledby="slide-44-h">
 <h2 id="slide-44-h"><span id="slide-44"></span>Slide 44: What if we have substantial additional interannual variation not explained by weather?</h2>
-<figure role="group"><figcaption><strong>Figure 44.1.</strong> Figure for the White Stork example on additional interannual variation not explained by weather; vector graphic could not be rendered on this system for a precise description.</figcaption></figure>
+<p>Standard GLM on proportions in R</p>
+<ul>
+<li>stork_glm &lt;- glm(cbind(nbchicks,nbpairs-nbchicks) ~ temp + rainfall,</li>
+<li>family = binomial)</li>
+<li>tidy(stork_glm)</li>
+<li>#&gt; # A tibble: 3 x 5</li>
+<li>#&gt;   term        estimate std.error statistic p.value</li>
+<li>#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;</li>
+<li>#&gt; 1 (Intercept)   1.62      0.629     2.58   0.00999</li>
+<li>#&gt; 2 temp          0.0239    0.0465    0.515  0.607</li>
+<li>#&gt; 3 rainfall     -0.00656   0.00260  -2.52   0.0116</li>
+</ul>
+<p>288</p>
 </section>
 <section aria-labelledby="slide-45-h">
 <h2 id="slide-45-h"><span id="slide-45"></span>Slide 45</h2>
-<figure role="group"><figcaption><strong>Figure 45.1.</strong> White Stork GLMM example figure; vector graphic could not be rendered on this system for a precise description.</figcaption></figure>
+<p>GLMM on proportions with year as a random effect</p>
+<ul>
+<li>nbchicksi ∼ Binomial(nbpairsi, pi)</li>
+<li>logit(pi) = β0i + β1 tempi + β2 rainfalli</li>
+<li>β0i ∼ Normal(μy, σ2y)</li>
+</ul>
+<p>289</p>
 </section>
 <section aria-labelledby="slide-46-h">
 <h2 id="slide-46-h"><span id="slide-46"></span>Slide 46</h2>
-<figure role="group"><figcaption><strong>Figure 46.1.</strong> White Stork GLMM example figure; vector graphic could not be rendered on this system for a precise description.</figcaption></figure>
+<p>GLMM on proportions with year as a random effect in R</p>
+<ul>
+<li>m &lt;- glmer(cbind(nbchicks,nbpairs-nbchicks) ~ temp + rainfall</li>
+<li>+ (1 | year), family = binomial)</li>
+</ul>
+<p>290</p>
 </section>
 <section aria-labelledby="slide-47-h">
 <h2 id="slide-47-h"><span id="slide-47"></span>Slide 47</h2>
-<figure role="group"><figcaption><strong>Figure 47.1.</strong> White Stork GLMM example figure; vector graphic could not be rendered on this system for a precise description.</figcaption></figure>
+<p>GLMM on proportions with year as a random effect in R</p>
+<ul>
+<li>#&gt; Generalized linear mixed model fit by maximum likelihood (Laplace</li>
+<li>#&gt;   Approximation) [glmerMod]</li>
+<li>#&gt;  Family: binomial  ( logit )</li>
+<li>#&gt; Formula: cbind(nbchicks, nbpairs - nbchicks) ~ temp + rainfall + (1 |</li>
+<li>#&gt;     year)</li>
+<li>#&gt;      AIC      BIC   logLik deviance df.resid</li>
+<li>#&gt; 159.7418 164.2838 -75.8709 151.7418       19</li>
+<li>#&gt; Random effects:</li>
+<li>#&gt;  Groups Name        Std.Dev.</li>
+<li>#&gt;  year   (Intercept) 0.478</li>
+<li>#&gt; Number of obs: 23, groups:  year, 23</li>
+<li>#&gt; Fixed Effects:</li>
+<li>#&gt; (Intercept)         temp     rainfall</li>
+<li>#&gt;    2.478277    -0.026616    -0.008226</li>
+</ul>
+<p>291</p>
 </section>
 <section aria-labelledby="slide-48-h">
 <h2 id="slide-48-h"><span id="slide-48"></span>Slide 48</h2>
-<figure role="group"><figcaption><strong>Figure 48.1.</strong> White Stork GLMM example figure; vector graphic could not be rendered on this system for a precise description.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 48.1.</strong> Caterpillar (dot-and-line) plot of the estimated yearly random intercepts from the mixed model, from the R output labelled &#x27;$year&#x27;. The horizontal axis is the intercept deviation from the overall mean, running from about -1.0 to +1.3; each row is one year (years 1 to about 22). A blue dot marks each year&#x27;s estimated random intercept and a horizontal line shows its confidence interval. Years are sorted from the highest intercept at the top (year 4, near +0.8) down to the lowest at the bottom (year 2, near -1.0). Most intervals overlap zero, showing how much the baseline response varies from year to year around the population mean.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-49-h">
 <h2 id="slide-49-h"><span id="slide-49"></span>Slide 49: Example 2 – Nonlinear mixed model for length and age</h2>
@@ -514,16 +583,18 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li style="margin-left:1.2em">Growth follows a von Bertalanffy growth equation</li>
 </ul>
 <figure role="group"><figcaption><strong>Figure 49.1.</strong> von Bertalanffy growth curve: Total Length in mm (y) versus Age (x, 0 to 12). Points scatter around a curve rising then leveling at asymptote L-infinity (dashed line); t0 marked at length zero.</figcaption></figure>
+<p>ℓi,j = ℓ∞,i(1 − exp(−κ(ai,j − t0))) + εi,j</p>
 </section>
 <section aria-labelledby="slide-50-h">
 <h2 id="slide-50-h"><span id="slide-50"></span>Slide 50: Example – length and age</h2>
 <ul>
 <li>We shall assume that:</li>
 <li style="margin-left:1.2em">Growth follows a von Bertalanffy growth equation</li>
-<li style="margin-left:1.2em">t0 and  are the same for all animals in the population while the asymptotic size differs among individuals.</li>
-<li style="margin-left:1.2em">There is normally distributed measurement error.</li>
+<li style="margin-left:1.2em">t0 and κ are the same for all animals in the population while the asymptotic size differs among individuals.</li>
+<li style="margin-left:1.2em">There is normally distributed error.</li>
 <li style="margin-left:1.2em">R can be used to fit non-linear mixed effects models (function nlme).</li>
 </ul>
+<p>ℓi,j = ℓ∞,i(1 − exp(−κ(ai,j − t0))) + εi,j</p>
 </section>
 <section aria-labelledby="slide-51-h">
 <h2 id="slide-51-h"><span id="slide-51"></span>Slide 51: Example – length and age</h2>
@@ -531,6 +602,8 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <p>The random effect</p>
 <p>The fixed effects</p>
 <p>The covariate</p>
+<p>ℓi,j = ℓ∞,i(1 − exp(−κ(ai,j − t0))) + εi,j</p>
+<p>Residual variation</p>
 </section>
 <section aria-labelledby="slide-52-h">
 <h2 id="slide-52-h"><span id="slide-52"></span>Slide 52: Fitting Length and Age Data(Background)</h2>
@@ -577,13 +650,16 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li>fixed: “fixed = c(fix1~var1,fix2~var2)”.</li>
 <li style="margin-left:1.2em">There are several ways to specify the fixed effects structure.</li>
 </ul>
+<ul>
+<li>random: “random=c(rnd1 ~ var1, rnd1 ~ 1)”. Leaving out a “random” specification implies all fixed effects have an associated random effect.</li>
+<li>start: “start = c(fix1=x1,fix2=x2,..)” – the initial values for the fixed parameters of the model.</li>
+</ul>
 </section>
 <section aria-labelledby="slide-57-h">
 <h2 id="slide-57-h"><span id="slide-57"></span>Slide 57: The NLME Function-II</h2>
 <ul>
 <li>random: “random=c(rnd1 ~ var1, rnd1 ~ 1)”. Leaving out a “random” specification implies all fixed effects have an associated random effect.</li>
 <li>start: “start = c(fix1=x1,fix2=x2,..)” – the initial values for the fixed parameters of the model.</li>
-<li>Be wary of using NLME to make predictions when some of the parameters are non-linear.</li>
 </ul>
 <ul>
 <li>nlme(model, data, fixed, random, groups,</li>
@@ -591,25 +667,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 </ul>
 </section>
 <section aria-labelledby="slide-58-h">
-<h2 id="slide-58-h"><span id="slide-58"></span>Slide 58: The NLME Function-III</h2>
-<ul>
-<li>update</li>
-<li>logLik</li>
-<li>plot</li>
-<li>predict</li>
-</ul>
-<ul>
-<li>You can use many of the functions defined for linear models</li>
-<li>with nlme, e.g.:</li>
-</ul>
-<ul>
-<li>intervals</li>
-<li>anova</li>
-<li>residuals</li>
-</ul>
-</section>
-<section aria-labelledby="slide-59-h">
-<h2 id="slide-59-h"><span id="slide-59"></span>Slide 59: Fitting Length and Age Data(Non-linear mixed model-I)</h2>
+<h2 id="slide-58-h"><span id="slide-58"></span>Slide 58: Fitting Length and Age Data(Non-linear mixed model-I)</h2>
 <ul>
 <li>lm2 &lt;- nlme(model=Length~Linf*(1-exp(-1*Kappa*(Age-Tzero))), data=AgeLen,</li>
 <li>random=Linf~1, fixed=Linf+Kappa+Tzero~1,start=c(Linf=100,Kappa=0.2,Tzero=0))</li>
@@ -625,19 +683,19 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li>Kappa</li>
 <li>t0</li>
 </ul>
-<figure role="group"><figcaption><strong>Figure 59.1.</strong> Diagnostic figure for the nonlinear mixed-effects fit (random Linf by subject; fixed Linf, Kappa, Tzero); vector graphic could not be rendered for exact values.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 58.1.</strong> Diagnostic figure for the nonlinear mixed-effects fit (random Linf by subject; fixed Linf, Kappa, Tzero); vector graphic could not be rendered for exact values.</figcaption></figure>
 </section>
-<section aria-labelledby="slide-60-h">
-<h2 id="slide-60-h"><span id="slide-60"></span>Slide 60: Fitting Length and Age Data(Non-linear mixed model-II)</h2>
+<section aria-labelledby="slide-59-h">
+<h2 id="slide-59-h"><span id="slide-59"></span>Slide 59: Fitting Length and Age Data(Non-linear mixed model-II)</h2>
 <p>plot(lm2,Subject ~ resid(.),abline=0)</p>
 <ul>
 <li>Try “intervals (lm2)” to see</li>
 <li>the confidence intervals</li>
 </ul>
-<figure role="group"><figcaption><strong>Figure 60.1.</strong> Plot of residuals by Subject from the nonlinear mixed model (plot(lm2, Subject ~ resid(.))), residuals now centered near zero across subjects; vector graphic could not be rendered for exact values.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 59.1.</strong> Plot of residuals by Subject from the nonlinear mixed model (plot(lm2, Subject ~ resid(.))), residuals now centered near zero across subjects; vector graphic could not be rendered for exact values.</figcaption></figure>
 </section>
-<section aria-labelledby="slide-61-h">
-<h2 id="slide-61-h"><span id="slide-61"></span>Slide 61: Fitting Length and Age Data(Non-linear mixed model-III)</h2>
+<section aria-labelledby="slide-60-h">
+<h2 id="slide-60-h"><span id="slide-60"></span>Slide 60: Fitting Length and Age Data(Non-linear mixed model-III)</h2>
 <ul>
 <li>Nonlinear mixed-effects model fit by maximum likelihood</li>
 <li>Model: Length ~ Linf * (1 - exp(-1 * Kappa * (Age - Tzero)))</li>
@@ -659,8 +717,8 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li>Tzero -0.027  0.876</li>
 </ul>
 </section>
-<section aria-labelledby="slide-62-h">
-<h2 id="slide-62-h"><span id="slide-62"></span>Slide 62: Fitting Length and Age Data(Non-linear mixed model-IV)</h2>
+<section aria-labelledby="slide-61-h">
+<h2 id="slide-61-h"><span id="slide-61"></span>Slide 61: Fitting Length and Age Data(Non-linear mixed model-IV)</h2>
 <ul>
 <li>plot(LinfEst+lm2$coefficients$random$Subject,</li>
 <li>pch=16,csi=0.3)</li>
@@ -670,18 +728,18 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li>~ fitted(.) | Subject,</li>
 <li>abline = 0,pch=16)</li>
 </ul>
-<figure role="group"><figcaption><strong>Figure 62.1.</strong> Plot of subject-specific asymptotic size estimates (population Linf plus each subject&#x27;s random effect) as points; vector graphic could not be rendered for exact values.</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 62.2.</strong> Faceted plot of standardized residuals versus fitted values by Subject for the nonlinear mixed model, with a zero reference line; vector graphic could not be rendered for exact values.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 61.1.</strong> Plot of subject-specific asymptotic size estimates (population Linf plus each subject&#x27;s random effect) as points; vector graphic could not be rendered for exact values.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 61.2.</strong> Faceted plot of standardized residuals versus fitted values by Subject for the nonlinear mixed model, with a zero reference line; vector graphic could not be rendered for exact values.</figcaption></figure>
 </section>
-<section aria-labelledby="slide-63-h">
-<h2 id="slide-63-h"><span id="slide-63"></span>Slide 63: Fitting Length and Age Data(Non-linear mixed model-V)</h2>
+<section aria-labelledby="slide-62-h">
+<h2 id="slide-62-h"><span id="slide-62"></span>Slide 62: Fitting Length and Age Data(Non-linear mixed model-V)</h2>
 <p>plot(augPred(lm2),csi=0.3,pch=16,lwd=2)</p>
 <ul>
 <li>Plots the data and</li>
 <li>the model</li>
 <li>predictions</li>
 </ul>
-<figure role="group"><figcaption><strong>Figure 63.1.</strong> Faceted plot from augPred: observed length-at-age data with the fitted nonlinear mixed-model growth curves overlaid per subject; vector graphic could not be rendered for exact values.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 62.1.</strong> Faceted plot from augPred: observed length-at-age data with the fitted nonlinear mixed-model growth curves overlaid per subject; vector graphic could not be rendered for exact values.</figcaption></figure>
 </section>
 </main>
 

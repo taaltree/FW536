@@ -229,7 +229,10 @@ lm3 &lt;- <span class="fn">lme</span>(fixed = Density ~ <span class="nu">1</span
 
 <p><strong>(b)</strong> Residuals from <code>lm1</code> cluster strongly by stream — entire streams are shifted above or below zero. This violates the independence assumption of OLS. Standard errors from <code>lm1</code> are too small (anti-conservative).</p>
 
-<p><strong>(c)</strong> Streams 11 and 12 had the most extreme means (around 11 and 29 respectively) and have only 3 observations each. The partially-pooled estimates from <code>lm3</code> sit slightly closer to the grand mean. With only 3 observations per stream and a sizeable among-stream variance, the shrinkage is modest but visible — perhaps 5–10% of the deviation from the grand mean.</p>
+<p><strong>(c)</strong> Stream 11 has the lowest mean (8.9) and Stream 43 the highest (111.7); every stream has exactly 3 observations. The partially-pooled estimates from <code>lm3</code> sit slightly closer to the grand mean of 63.26 — Stream 11 moves 8.9 → 9.7, Stream 43 moves 111.7 → 111.0.</p>
+<p>Two things are worth noticing. First, the shrinkage is <em>identical</em> for every stream — 1.49% of its deviation from the grand mean — not larger for the extreme ones. That is a consequence of the balanced design: the weight depends only on $n_j$, and here every $n_j = 3$:</p>
+<div class="eq-block">$B = \dfrac{\sigma^2/n}{\tau^2 + \sigma^2/n} = \dfrac{20.8/3}{459.1 + 20.8/3} = 0.0149$</div>
+<p>Second, the pull is <em>small</em>, which the same formula explains: the among-stream variance (459) dwarfs the uncertainty in a 3-observation stream mean (20.8/3 ≈ 6.9). Each stream's own data are precise relative to how much streams genuinely differ, so the model trusts them and barely shrinks. Shrinkage is not a fixed penalty for small $n$ — it is a ratio, and it is only large when a group's own mean is imprecise <em>relative to</em> the spread among groups.</p>
 
 <p><strong>(d)</strong> Approximate output:</p>
 <pre><code>Random effects:
@@ -392,7 +395,7 @@ Fixed effects:
 (Intercept) -0.0009 0.569
 Z_Length 0.422 0.092
 </code></pre>
-<p>Most slope variation lives across species — different feeding ecologies. Lake mostly shifts intercepts, not slopes. Within-fish residual is small relative to species variation. <em>Note</em> the perfect-correlation warning: the slope-intercept correlation is essentially $-1$, a classic singular fit. With only 3 species this is not surprising. Note the slope&ndash;intercept correlation of <strong>+1.00</strong>: that is a degenerate (boundary) estimate &mdash; lmer has run out of data to identify the correlation and has pinned it at the edge of its range. Treat it as a warning that the random-slope structure is over-specified for this dataset, not as a real biological correlation.</p>
+<p>Most slope variation lives across species — different feeding ecologies. Lake mostly shifts intercepts, not slopes. Within-fish residual is small relative to species variation. <em>Note</em> the perfect-correlation warning: the slope&ndash;intercept correlation comes back as <strong>+1.00</strong>, a classic singular fit. That is a degenerate (boundary) estimate &mdash; lmer has run out of data to identify the correlation and has pinned it at the edge of its range. With only 3 species this is not surprising. Treat it as a warning that the random-slope structure is over-specified for this dataset, not as a real biological correlation.</p>
 
 <p><strong>(d)</strong> With few levels, the variance components are estimated with so little information that singular fits and unstable correlations are common — and the inferential machinery (Wald CIs, LRTs) is poorly calibrated. Switch to fixed effects for species when (i) you have ≤ 3–4 levels, (ii) you care about each level by name (Bluegill vs Walleye is biologically meaningful), or (iii) you cannot defend a "population of species" sampling story.</p>
 </div></details>

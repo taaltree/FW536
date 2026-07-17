@@ -54,10 +54,9 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li><a href="#slide-32">32. Dissecting Example 2-II</a></li>
 <li><a href="#slide-33">33. Hints for optimization</a></li>
 <li><a href="#slide-34">34. Question 3</a></li>
-<li><a href="#slide-35">35. Question 3</a></li>
-<li><a href="#slide-36">36. Example 3-I</a></li>
-<li><a href="#slide-37">37. Likelihood Profile</a></li>
-<li><a href="#slide-38">38. Confidence Interval</a></li>
+<li><a href="#slide-35">35. Example 3-I</a></li>
+<li><a href="#slide-36">36. Likelihood Profile</a></li>
+<li><a href="#slide-37">37. Confidence Interval</a></li>
 </ul></nav></aside>
 <main class="content" id="main-content" tabindex="-1">
 <header class="lab-header">
@@ -65,7 +64,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <h1>Maximum likelihood</h1>
 <p class="lede">A screen-reader-friendly transcript of the lecture slides: all slide text, tables, figure descriptions, and speaker notes.</p>
 </header>
-<div class="callout key"><p class="callout-label">About these notes</p>Each section is one slide. Figures carry text descriptions where available. For the concepts with worked examples, also read the <a href="plain_language_summary.html">plain-language summary</a> and <a href="lab.html">lab</a> for this session. You can also download the <a href="../../Day4_Likelihood_BayesI/FW536_Day4_Morning_maximum%20likelihod_accessible.pptx">alt-texted PowerPoint deck</a> (the same slides with image descriptions embedded).</div>
+<div class="callout key"><p class="callout-label">About these notes</p>Each section is one slide. Figures carry text descriptions where available. For the concepts with worked examples, also read the <a href="plain_language_summary.html">plain-language summary</a> and <a href="lab.html">lab</a> for this session.</div>
 <section aria-labelledby="slide-1-h">
 <h2 id="slide-1-h"><span id="slide-1"></span>Slide 1</h2>
 <ul>
@@ -101,6 +100,8 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <p>Parameter</p>
 <p>Error</p>
 <p>What are the data, parameters, and incorporation of error?</p>
+<p>La = ℓ∞(1 − e−κa) + ε</p>
+<p>ε ~ N(0, σ2)</p>
 </section>
 <section aria-labelledby="slide-5-h">
 <h2 id="slide-5-h"><span id="slide-5"></span>Slide 5: What is Maximum Likelihood-III?</h2>
@@ -119,10 +120,10 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <section aria-labelledby="slide-6-h">
 <h2 id="slide-6-h"><span id="slide-6"></span>Slide 6: Basics of Likelihood</h2>
 <p>The likelihood of the data is the product of the likelihoods of each data point</p>
-<figure role="group"><figcaption><strong>Figure 6.1.</strong> Equation: L-tilde(p | {X_i}) = product from i=1 to n of f(X_i | p). The likelihood is the product of the per-data-point densities.</figcaption></figure>
-<p>Notation often inconsistent, but IMO better  to put parameters conditional on data</p>
+<p>Notation often inconsistent, but better to put parameters conditional on data</p>
 <p>The set of data Xi</p>
 <p>Product of the PDF/Likelihood across all data points</p>
+<p>L˜(p | {Xi}) = ∏i=1n f(Xi | p)</p>
 </section>
 <section aria-labelledby="slide-7-h">
 <h2 id="slide-7-h"><span id="slide-7"></span>Slide 7: Further Likelihood Considerations-I</h2>
@@ -132,12 +133,11 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li>The probability model  for how the data pertain to the model prediction – in this case normal</li>
 </ul>
 <p>To compute the likelihood for a given set of parameters we need:</p>
-<ul>
-<li>Model prediction</li>
-<li>(Q: why here?)</li>
-</ul>
+<p>Model prediction</p>
 <p>Data</p>
-<figure role="group"><figcaption><strong>Figure 7.1.</strong> Equation: f(x) = 1 / (sigma times square root of 2 pi) times e to the negative one-half times ((x minus mu) over sigma) squared. Normal density.</figcaption></figure>
+<p>f(x) = 1 / (σ √(2π)) · exp( −½ ((x − μ)/σ)2 )</p>
+<p>L(a) = ℓ∞(1 − e−κa)</p>
+<p>L = 1 / (√(2π) σ) · exp( −(L(a) − La)2 / (2σ2) )</p>
 </section>
 <section aria-labelledby="slide-8-h">
 <h2 id="slide-8-h"><span id="slide-8"></span>Slide 8: Further Likelihood Considerations-II</h2>
@@ -148,6 +148,8 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <p>The full likelihood is the product over all the data points:</p>
 <p>prod(dnorm(observed_vector, expected_vector, sigma))</p>
 <p>Note: The function dnorm returns the value of the normal distribution PDF given x, μ, and σ.</p>
+<p>L = 1 / (√(2π) σ) · exp( −(L(a) − La)2 / (2σ2) )</p>
+<p>L = ∏a 1 / (√(2π) σ) · exp( −(L(a) − La)2 / (2σ2) )</p>
 </section>
 <section aria-labelledby="slide-9-h">
 <h2 id="slide-9-h"><span id="slide-9"></span>Slide 9: Back to our original problem</h2>
@@ -208,8 +210,9 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li>(assuming “runs” and “non-runs” are independent).</li>
 <li>This leads to the following likelihood function from the Binomial:</li>
 </ul>
-<p>We refer to the value for p that maximizes the likelihood function as the maximum likelihood estimate and denote it as     .</p>
+<p>We refer to the value for p that maximizes the likelihood function as the maximum likelihood estimate and denote it as p̂.</p>
 <p>Is something missing? Why is this ok?</p>
+<p>L(p) = p30 (1 − p)20</p>
 </section>
 <section aria-labelledby="slide-13-h">
 <h2 id="slide-13-h"><span id="slide-13"></span>Slide 13</h2>
@@ -231,8 +234,9 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <h2 id="slide-14-h"><span id="slide-14"></span>Slide 14: Negative log-likelihoods</h2>
 <p>Rather than working with likelihoods we often work with negative log-likelihoods. Therefore, rather than maximizing the likelihood, we minimize the negative log-likelihood – this leads to same point estimates.</p>
 <figure role="group"><figcaption><strong>Figure 14.1.</strong> Line plot, probability p (x, 0.2 to 0.8) versus Negative log-Likelihood (y, 0 to 120). A U-shaped valley with minimum near p = 0.6, the estimate.</figcaption></figure>
-<p>The estimate of p,    , is again 0.6.</p>
+<p>The estimate of p, p̂, is again 0.6.</p>
 <p>Logs help with the tiny number problem, and negative works for numerical optimizers</p>
+<p>−ln L = −30 ln p − 20 ln(1 − p)</p>
 </section>
 <section aria-labelledby="slide-15-h">
 <h2 id="slide-15-h"><span id="slide-15"></span>Slide 15: A Poisson mixture problem</h2>
@@ -250,19 +254,21 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <h2 id="slide-16-h"><span id="slide-16"></span>Slide 16</h2>
 <ul>
 <li>Now, an animal is either male or female and letting the</li>
-<li>mean blow rate for males be 1 and that for females be 2,</li>
+<li>mean blow rate for males be  λ1 and that for females be λ2,</li>
 <li>and assuming that the proportion of males is p:</li>
 </ul>
 <p>The Poisson distribution is:</p>
 <p>16</p>
 <figure role="group"><figcaption><strong>Figure 16.1.</strong> Histogram of whale blow counts, Blows (x, 0 to 50) versus density (y, 0.00 to 0.04), bimodal, suggesting two overlapping Poisson blow-rate distributions.</figcaption></figure>
 <p>How would you do this with linear models?</p>
+<p>P(x | λ) = λx exp(−λ) / x!</p>
+<p>P(x | p, λ1, λ2) = p λ1x exp(−λ1) / x! + (1 − p) λ2x exp(−λ2) / x!</p>
 </section>
 <section aria-labelledby="slide-17-h">
 <h2 id="slide-17-h"><span id="slide-17"></span>Slide 17</h2>
 <ul>
 <li>In English:</li>
-<li>An animal is selected at random; the probability it is male isp.</li>
+<li>An animal is selected at random; the probability it is male is p.</li>
 <li>A blow rate is generated given the appropriate Poisson distribution.</li>
 <li>This type of model is called a mixture model. In this case there are two mixture components.</li>
 </ul>
@@ -276,6 +282,8 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li>dpois(x,lambda)  =</li>
 </ul>
 <p>18</p>
+<p>P(x | p, λ1, λ2) = ∏i ( p λ1xᵢ exp(−λ1) / xi! + (1 − p) λ2xᵢ exp(−λ2) / xi! )</p>
+<p>P(x | λ) = λx exp(−λ) / x!</p>
 </section>
 <section aria-labelledby="slide-19-h">
 <h2 id="slide-19-h"><span id="slide-19"></span>Slide 19: Start by assuming we know Propn We now have a three dimensional likelihood surface</h2>
@@ -309,7 +317,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li>persp is producing a 3d plot, contour is similar.</li>
 <li>Ibest is now a vector and not a scalar.</li>
 <li>We are computing the negative log-likelihood.</li>
-<li>Function in grid search lab takes “propn” and returns the lowest value of the negative log-likelihood.</li>
+<li>takes “propn” and returns the lowest value of the negative log-likelihood.</li>
 </ul>
 <p>20</p>
 </section>
@@ -414,13 +422,16 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <h2 id="slide-28-h"><span id="slide-28"></span>Slide 28</h2>
 <ul>
 <li>Now, an animal is either male or female and letting the</li>
-<li>mean blow rate for males be 1 and that for females be 2,</li>
+<li>mean blow rate for males be  λ1 and that for females be λ2,</li>
 <li>and assuming that the proportion of males is p:</li>
 </ul>
 <p>The Poisson distribution is:</p>
 <p>28</p>
 <p>Example 2 - revisited</p>
 <p>The likelihood function is then:</p>
+<p>P(x | λ) = λx exp(−λ) / x!</p>
+<p>P(x | p, λ1, λ2) = p λ1x exp(−λ1) / x! + (1 − p) λ2x exp(−λ2) / x!</p>
+<p>P(x | p, λ1, λ2) = ∏i ( p λ1xᵢ exp(−λ1) / xi! + (1 − p) λ2xᵢ exp(−λ2) / xi! )</p>
 </section>
 <section aria-labelledby="slide-29-h">
 <h2 id="slide-29-h"><span id="slide-29"></span>Slide 29</h2>
@@ -428,6 +439,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <p>Example 2 - revisited</p>
 <p>The likelihood function is then:</p>
 <p>Question: What are we solving for here with optimization?</p>
+<p>P(x | p, λ1, λ2) = ∏i ( p λ1xᵢ exp(−λ1) / xi! + (1 − p) λ2xᵢ exp(−λ2) / xi! )</p>
 </section>
 <section aria-labelledby="slide-30-h">
 <h2 id="slide-30-h"><span id="slide-30"></span>Slide 30: Example 2 - revisited</h2>
@@ -498,7 +510,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <h2 id="slide-33-h"><span id="slide-33"></span>Slide 33: Hints for optimization</h2>
 <ul>
 <li>Consider different parameterizations (e.g. log(x) rather than x).</li>
-<li>Methods may work better if the variables are all scaled to approximately 1.</li>
+<li>Methods may work better if the variables are all scaled</li>
 <li>Never trust a non-linear minimizer!</li>
 <li style="margin-left:1.2em">Try different starting values.</li>
 <li style="margin-left:1.2em">Combine different methods</li>
@@ -517,21 +529,13 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li>Can we conclude that the asymptotic sizes for females and males</li>
 <li>are the same?</li>
 </ul>
+<p>La = ℓ∞(1 − e−κa) + ε</p>
+<p>ε ~ N(0, σ2)</p>
 </section>
 <section aria-labelledby="slide-35-h">
-<h2 id="slide-35-h"><span id="slide-35"></span>Slide 35: Question 3</h2>
+<h2 id="slide-35-h"><span id="slide-35"></span>Slide 35: Example 3-I</h2>
 <ul>
-<li>The length of a fish is related to its age according to the von Bertalanffy growth curve:</li>
-<li>Below find some data for random fish</li>
-</ul>
-<figure role="group"><figcaption><strong>Figure 35.1.</strong> Two scatter plots, Females and Males, each Age in years (x, 5 to 25) versus Length in cm (y, 0 to 100). Points rise with age then plateau.</figcaption></figure>
-<p>35</p>
-</section>
-<section aria-labelledby="slide-36-h">
-<h2 id="slide-36-h"><span id="slide-36"></span>Slide 36: Example 3-I</h2>
-<ul>
-<li>Estimate the values for    , , and  from the age and</li>
-<li>growth data.</li>
+<li>Estimate the values for ℓ∞, κ, and σ from the age and growth data.</li>
 <li>Create vectors with the age, sex, and length data.</li>
 <li style="margin-left:1.2em">Create a function that takes values for the</li>
 <li style="margin-left:1.2em">parameters as well as the data, and computes the</li>
@@ -541,23 +545,23 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li style="margin-left:1.2em">Bound the region of parameter space to reasonable values</li>
 <li style="margin-left:2.4em">E.g. Can the parameters be negative?</li>
 </ul>
-<p>36</p>
+<p>35</p>
 </section>
-<section aria-labelledby="slide-37-h">
-<h2 id="slide-37-h"><span id="slide-37"></span>Slide 37: Likelihood Profile</h2>
+<section aria-labelledby="slide-36-h">
+<h2 id="slide-36-h"><span id="slide-36"></span>Slide 36: Likelihood Profile</h2>
 <p>Parameter of Interest</p>
 <ul>
 <li>-log</li>
 <li>likelihood</li>
 </ul>
 <p>MLE</p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
+<p>•</p>
+<p>•</p>
+<p>•</p>
+<p>•</p>
+<p>•</p>
+<p>•</p>
+<p>•</p>
 <ul>
 <li>Alternative</li>
 <li>values for the</li>
@@ -568,17 +572,17 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li>parameter to each value in turn</li>
 <li>(minimize on the rest of the parameters)</li>
 </ul>
-<p>37</p>
+<p>36</p>
 </section>
-<section aria-labelledby="slide-38-h">
-<h2 id="slide-38-h"><span id="slide-38"></span>Slide 38: Confidence Interval</h2>
-<figure role="group"><figcaption><strong>Figure 38.1.</strong> Line plot, asymptotic length Linf (x, 75 to 90) versus Negative Log-likelihood (y, 0 to 8). U-shaped profile; a line 1.92 above the minimum marks the 95% confidence interval.</figcaption></figure>
+<section aria-labelledby="slide-37-h">
+<h2 id="slide-37-h"><span id="slide-37"></span>Slide 37: Confidence Interval</h2>
+<figure role="group"><figcaption><strong>Figure 37.1.</strong> Line plot, asymptotic length Linf (x, 75 to 90) versus Negative Log-likelihood (y, 0 to 8). U-shaped profile; a line 1.92 above the minimum marks the 95% confidence interval.</figcaption></figure>
 <ul>
 <li>95% confidence</li>
 <li>interval</li>
 </ul>
 <p>1.92</p>
-<p>38</p>
+<p>37</p>
 <p>The mle() function in R does this for you, but you can pretty easily do it by hand.</p>
 </section>
 </main>

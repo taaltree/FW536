@@ -74,7 +74,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <h1>Discrete distributions</h1>
 <p class="lede">A screen-reader-friendly transcript of the lecture slides: all slide text, tables, figure descriptions, and speaker notes.</p>
 </header>
-<div class="callout key"><p class="callout-label">About these notes</p>Each section is one slide. Figures carry text descriptions where available. For the concepts with worked examples, also read the <a href="plain_language_summary.html">plain-language summary</a> and <a href="lab.html">lab</a> for this session. You can also download the <a href="../../Day1_Probability/FW536_Day1_Afternoon%20Distributions%20I_accessible.pptx">alt-texted PowerPoint deck</a> (the same slides with image descriptions embedded).</div>
+<div class="callout key"><p class="callout-label">About these notes</p>Each section is one slide. Figures carry text descriptions where available. For the concepts with worked examples, also read the <a href="plain_language_summary.html">plain-language summary</a> and <a href="lab.html">lab</a> for this session.</div>
 <section aria-labelledby="slide-1-h">
 <h2 id="slide-1-h"><span id="slide-1"></span>Slide 1: Discrete Probability Distributions</h2>
 <p><em>(No text on this slide.)</em></p>
@@ -101,11 +101,11 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <section aria-labelledby="slide-4-h">
 <h2 id="slide-4-h"><span id="slide-4"></span>Slide 4: Binomial Experiments-II(Notation)</h2>
 <ul>
-<li>New</li>
-<li>terms</li>
+<li>N or n            The number of times a trial is repeated</li>
+<li>p = P(S)     The probability of a success in a single trial</li>
+<li>q = P(F)     The probability of a failure in a single trial, q = 1 − p</li>
+<li>x or k            The number of successes on n trials (x = 0, 1, .., n)</li>
 </ul>
-<p>Also k</p>
-<p>Also N</p>
 </section>
 <section aria-labelledby="slide-5-h">
 <h2 id="slide-5-h"><span id="slide-5"></span>Slide 5: Binomial Probabilities-I</h2>
@@ -119,6 +119,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li># ways you can have x out of n successes/</li>
 <li>E.g. HHT, HTH, THH</li>
 </ul>
+<p>P(x) = nCx px qn−x = n! / ((n − x)! x!) · px qn−x</p>
 </section>
 <section aria-labelledby="slide-6-h">
 <h2 id="slide-6-h"><span id="slide-6"></span>Slide 6: One Binomial Trial: The Bernoulli Distribution</h2>
@@ -127,22 +128,44 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li>With n = 1, the Binomial becomes the Bernoulli distribution</li>
 <li style="margin-left:1.2em">P(x) = px (1 - p)1 – x</li>
 <li style="margin-left:1.2em">Where x can take the values of 0 or 1</li>
-<li>Bernoulli  probability a single coin flip comes up heads</li>
-<li>Binomial  Probability that 10 coin flips yield 3 heads</li>
+<li>Bernoulli → probability a single coin flip comes up heads</li>
+<li>Binomial → Probability that 10 coin flips yield 3 heads</li>
 <li>So the Binomial is the distribution for the sum of independent Bernoulli trials</li>
 </ul>
+<p>P(x) = nCx px qn−x = n! / ((n − x)! x!) · px qn−x</p>
 </section>
 <section aria-labelledby="slide-7-h">
 <h2 id="slide-7-h"><span id="slide-7"></span>Slide 7</h2>
-<figure role="group"><figcaption><strong>Figure 7.1.</strong> Concept-question slide. Q1: if X~binom(n,p) and Y~binom(m,p) are independent, X+Y follows (a) binom(n+m,p), (b) binom(nm,p), (c) binom(n+m,2p), (d) other. Q2: X~binom(n,p) and Z~binom(n,q) independent, X+Z follows (a) binom(n,p+q), (b) binom(n,pq), (c) binom(2n,p+q), (d) other.</figcaption></figure>
+<p>Concept Question</p>
+<p>1. Let X ~ binom(n, p) and Y ~ binom(m, p) be independent. Then X + Y follows:</p>
+<ul>
+<li>(a) binom(n + m, p)        (b) binom(nm, p)</li>
+<li>(c) binom(n + m, 2p)      (d) other</li>
+</ul>
+<p>2. Let X ~ binom(n, p) and Z ~ binom(n, q) be independent. Then X + Z follows:</p>
+<ul>
+<li>(a) binom(n, p + q)        (b) binom(n, pq)</li>
+<li>(c) binom(2n, p + q)      (d) other</li>
+</ul>
 </section>
 <section aria-labelledby="slide-8-h">
 <h2 id="slide-8-h"><span id="slide-8"></span>Slide 8</h2>
-<figure role="group"><figcaption><strong>Figure 8.1.</strong> Same concept question with answers. Q1 answer: (a) binom(n+m,p), since each binomial is a sum of independent Bernoulli(p) variables. Q2 answer: (d) other, because combining Bernoulli(p) with Bernoulli(q) gives no named distribution.</figcaption></figure>
+<p>Concept Question</p>
+<p>1. Let X ~ binom(n, p) and Y ~ binom(m, p) be independent. Then X + Y follows:</p>
+<ul>
+<li>(a) binom(n + m, p)        (b) binom(nm, p)</li>
+<li>(c) binom(n + m, 2p)      (d) other</li>
+</ul>
+<p>2. Let X ~ binom(n, p) and Z ~ binom(n, q) be independent. Then X + Z follows:</p>
+<ul>
+<li>(a) binom(n, p + q)        (b) binom(n, pq)</li>
+<li>(c) binom(2n, p + q)      (d) other</li>
+</ul>
+<p>1. answer: (a). Each binomial random variable is a sum of independent Bernoulli(p) random variables, so their sum is also a sum of Bernoulli(p) r.v.&#x27;s.</p>
+<p>2. answer: (d) This is different from problem 1 because we are combining Bernoulli(p) r.v.&#x27;s with Bernoulli(q) r.v.&#x27;s. This is not one of the named random variables we know about.</p>
 </section>
 <section aria-labelledby="slide-9-h">
 <h2 id="slide-9-h"><span id="slide-9"></span>Slide 9</h2>
-<figure role="group"><figcaption><strong>Figure 9.1.</strong> Board questions. 1: Prove Var(X)=p(1-p) if X~Bernoulli(p). 2: Prove Var(X)=np(1-p) if X~bin(n,p). 3: X1..Xn independent with standard deviation sigma=2; find the standard deviation of their average X-bar. Solution on next slide.</figcaption></figure>
 <ul>
 <li>Hints:</li>
 <li>Make a table with X, p(x), and (X - µ )2. Remember µ = E[X]</li>
@@ -150,10 +173,22 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li style="margin-left:1.2em">Var(X + Y) = Var(X) + Var(Y)</li>
 </ul>
 <p>Group Work</p>
+<p>1. Prove: if X ~ Bernoulli(p)  then  Var(X) = p(1 − p).</p>
+<p>2. Prove: if X ~ bin(n, p)  then  Var(X) = n p(1 − p).</p>
 </section>
 <section aria-labelledby="slide-10-h">
 <h2 id="slide-10-h"><span id="slide-10"></span>Slide 10</h2>
-<figure role="group"><figcaption><strong>Figure 10.1.</strong> Worked solution. For Bernoulli(p), a table gives Var(X)=E[(X-mu)^2]=(1-p)p^2+p(1-p)^2=p(1-p). For bin(n,p), X is a sum of n independent Bernoulli(p), so variances add: Var(X)=Var(X1)+...+Var(Xn)=np(1-p).</figcaption></figure>
+<p>Solution</p>
+<p>1. For X ~ Bernoulli(p) we use a table. (We know E(X) = p.)</p>
+<table><thead><tr><th scope="col">X</th><th scope="col">0</th><th scope="col">1</th></tr></thead>
+<tbody>
+<tr><td>p(x)</td><td>1 − p</td><td>p</td></tr>
+<tr><td>(X − μ)2</td><td>p2</td><td>(1 − p)2</td></tr>
+</tbody>
+</table>
+<p>Var(X) = E((X − μ)2) = (1 − p)p2 + p(1 − p)2 = p(1 − p)</p>
+<p>2. X ~ bin(n, p) means X is the sum of n independent Bernoulli(p) random variables X1, X2, …, Xn. For independent variables, the variances add. Since Var(Xj) = p(1 − p) we have</p>
+<p>Var(X) = Var(X1) + Var(X2) + … + Var(Xn) = np(p − 1).</p>
 </section>
 <section aria-labelledby="slide-11-h">
 <h2 id="slide-11-h"><span id="slide-11"></span>Slide 11: Binomial Probabilities-II</h2>
@@ -163,6 +198,10 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li>Recall: q = 1 - p</li>
 </ul>
 <p>X ~ B(n,p); X ~ Bin(n,p); X ~ Binom(n,p)</p>
+<ul>
+<li>Mean : μ = n p</li>
+<li>Variance : σ2 = npq</li>
+</ul>
 </section>
 <section aria-labelledby="slide-12-h">
 <h2 id="slide-12-h"><span id="slide-12"></span>Slide 12: The Binomial Distribution</h2>
@@ -181,16 +220,29 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li style="margin-left:1.2em">We find 2 or more animals with the disease?</li>
 </ul>
 <p>Group Work</p>
+<p>P(x) = nCx px qn−x = n! / ((n − x)! x!) · px qn−x</p>
 </section>
 <section aria-labelledby="slide-14-h">
 <h2 id="slide-14-h"><span id="slide-14"></span>Slide 14: Examples of the Binomial Distribution-III</h2>
 <ul>
 <li>P[X=2]=</li>
 <li>P[X=0]=</li>
-<li>P[X2]=1-P[X=0]-P[X=1]=0.3410</li>
+<li>P[X≥2]=1-P[X=0]-P[X=1]=0.3410</li>
 </ul>
-<figure role="group"><figcaption><strong>Figure 14.1.</strong> R console: 1-pbinom(1,12,0.1) returns 0.3409977, the probability of 2 or more diseased animals out of 12 when p=0.1.</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 14.2.</strong> R console: dbinom(2,12,0.1)=0.2301278; dbinom(0,12,0.1)=0.2824295; 1-dbinom(1,12,0.1)-dbinom(0,12,0.1)=0.3409977, giving P(exactly 2), P(0), and P(2 or more).</figcaption></figure>
+<p>(12 choose 2) 0.12 0.910 = 0.2301</p>
+<p>(12 choose 0) 0.10 0.912 = 0.2824</p>
+<ul>
+<li>&gt; dbinom(2,12,0.1)</li>
+<li>[1] 0.2301278</li>
+<li>&gt; dbinom(0,12,0.1)</li>
+<li>[1] 0.2824295</li>
+<li>&gt; 1-dbinom(1,12,0.1)-dbinom(0,12,0.1)</li>
+<li>[1] 0.3409977</li>
+</ul>
+<ul>
+<li>&gt; 1-pbinom(1,12,0.1)</li>
+<li>[1] 0.3409977</li>
+</ul>
 </section>
 <section aria-labelledby="slide-15-h">
 <h2 id="slide-15-h"><span id="slide-15"></span>Slide 15: Sneak peak: Maximum likelihood is just doing this in reverse!!!</h2>
@@ -207,9 +259,9 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li>Instead of knowing N and p, we often collect data, k #successes, to determine p and/or N</li>
 <li>Let’s assume that N is known. Say we conduct N trials, observe k successes, and want to make inference about p, given k and N</li>
 </ul>
-<figure role="group"><figcaption><strong>Figure 16.1.</strong> Equation: L-tilde(p | k, N) = (N choose k) p^k (1-p)^(N-k). The binomial written as a likelihood function of p given observed k and N.</figcaption></figure>
 <p>This is among the easiest possible likelihood problems</p>
 <p>Sneak peak: Maximum likelihood is just doing this in reverse!!!</p>
+<p>ℒ(p | k, N) = (N choose k) pk (1 − p)N − k</p>
 </section>
 <section aria-labelledby="slide-17-h">
 <h2 id="slide-17-h"><span id="slide-17"></span>Slide 17: Sneak peak: Maximum Likelihood is just doing this in reverse!!!</h2>
@@ -220,17 +272,17 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li>The range of p must be 0 to 1, but there is no requirement that the integral of the likelihood from 0 to 1 = 1 (as would be the case for a probability)</li>
 <li>Why did I say “integral” and not “sum”</li>
 </ul>
-<figure role="group"><figcaption><strong>Figure 17.1.</strong> Equation: L-tilde(p | k, N) = (N choose k) p^k (1-p)^(N-k). The binomial written as a likelihood function of p given observed k and N.</figcaption></figure>
+<p>ℒ(p | k, N) = (N choose k) pk (1 − p)N − k</p>
 </section>
 <section aria-labelledby="slide-18-h">
 <h2 id="slide-18-h"><span id="slide-18"></span>Slide 18: Sneak peak: Maximum likelihood is just doing this in reverse!!!</h2>
 <ul>
 <li>This equation is exactly what we’ve been working with but the interpretation is very different</li>
-<li>We usually work with the log-likelihood. Can you find that?  log(a*b) = log(a) + log(b), log(ab)=b*log(a)</li>
+<li>We usually work with the log-likelihood. Can you find that? → log(a*b) = log(a) + log(b), log(ab)=b*log(a)</li>
 </ul>
-<figure role="group"><figcaption><strong>Figure 18.1.</strong> Equation: L-tilde(p | k, N) = (N choose k) p^k (1-p)^(N-k).</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 18.2.</strong> Equation: L(p | k, N) = log(N choose k) + k log(p) + (N-k) log(1-p). The binomial log-likelihood.</figcaption></figure>
 <p>Should I show you the derivation?</p>
+<p>ℒ(p | k, N) = (N choose k) pk (1 − p)N − k</p>
+<p>L(p | k, N) = log(N choose k) + k log(p) + (N − k) log(1 − p)</p>
 </section>
 <section aria-labelledby="slide-19-h">
 <h2 id="slide-19-h"><span id="slide-19"></span>Slide 19</h2>
@@ -239,8 +291,8 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li>Enter Calculus!</li>
 <li>Find the MLE for p</li>
 </ul>
-<figure role="group"><figcaption><strong>Figure 19.1.</strong> Equation: L(p | k, N) = log(N choose k) + k log(p) + (N-k) log(1-p). The binomial log-likelihood to be maximized for the MLE.</figcaption></figure>
 <p>Sneak peak: Maximum likelihood is just doing this in reverse!!!</p>
+<p>L(p | k, N) = log(N choose k) + k log(p) + (N − k) log(1 − p)</p>
 </section>
 <section aria-labelledby="slide-20-h">
 <h2 id="slide-20-h"><span id="slide-20"></span>Slide 20</h2>
@@ -260,9 +312,9 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 </section>
 <section aria-labelledby="slide-22-h">
 <h2 id="slide-22-h"><span id="slide-22"></span>Slide 22</h2>
-<figure role="group"><figcaption><strong>Figure 22.1.</strong> Multinomial distribution text and formula. Equation: Pr{k | N, p} = N! / (product over i of k_i!) times product over i=1 to n of p_i^(k_i). Extends the binomial to n outcome categories.</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 22.2.</strong> Equation: n! / (x_1! ... x_k!) times p_1^(x_1) ... p_k^(x_k). Multinomial probability written with x and k notation.</figcaption></figure>
-<p>Alternatively written</p>
+<p>The multinomial distribution: more than one kind of success</p>
+<p>The multinomial distribution is an extension of the binomial distribution to the case of more than two (we shall assume n) kinds of outcomes, in which a single trial has probability pi of ending in category i. In a total of N trials, we assume that ki of the outcomes end in category i.</p>
+<p>Pr{k | N, p} = N! / (∏i=1n ki!) · ∏i=1n pikᵢ</p>
 </section>
 <section aria-labelledby="slide-23-h">
 <h2 id="slide-23-h"><span id="slide-23"></span>Slide 23: The Poisson Distribution-I</h2>
@@ -293,12 +345,21 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li>Various notations:</li>
 <li>Note that x (or k) can be any non-negative integer.</li>
 </ul>
-<figure role="group"><figcaption><strong>Figure 25.1.</strong> Equation: p_k(t) = (lambda t)^k / k! times e^(-lambda t). The Poisson pmf with rate lambda over interval t.</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 25.2.</strong> Equation: P(k events in interval) = e^(-lambda) lambda^k / k!. The Poisson pmf with mean lambda.</figcaption></figure>
+<p>pk(t) = (λt)k / k! · e−λt</p>
+<p>P(k events in interval) = e−λ · λk / k!</p>
+<p>P(X = x) = μx e−μ / x!</p>
+<ul>
+<li>Mean : μ (rate per interval)</li>
+<li>Variance : μ</li>
+</ul>
 </section>
 <section aria-labelledby="slide-26-h">
 <h2 id="slide-26-h"><span id="slide-26"></span>Slide 26: Where does the Poisson distribution come from?</h2>
 <p>In a very small interval of time, either nothing happens or one event happens</p>
+<ul>
+<li>Pr{no event in the next dt} = 1 − λdt</li>
+<li>Pr{1 event in the next dt} = λdt</li>
+</ul>
 </section>
 <section aria-labelledby="slide-27-h">
 <h2 id="slide-27-h"><span id="slide-27"></span>Slide 27: Where does the Poisson distribution come from?</h2>
@@ -308,14 +369,15 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li>Use the definition of the derivative to show that this leads to</li>
 <li>Solve to find the zero term of the Poisson, Pr(no events)</li>
 </ul>
-<figure role="group"><figcaption><strong>Figure 27.1.</strong> Equation: dp_0/dt = -lambda p_0. Differential equation for the probability of no events.</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 27.2.</strong> Equation: p_0(t) = exp(-lambda t). Solution giving the probability of no events by time t.</figcaption></figure>
+<p>dp0 / dt = −λ p0</p>
+<p>p0(t) = exp(−λt)</p>
+<p>p0(t + dt) = p0(t)(1 − λdt)</p>
 </section>
 <section aria-labelledby="slide-28-h">
 <h2 id="slide-28-h"><span id="slide-28"></span>Slide 28: Zero term of the Poisson Distribution</h2>
-<figure role="group"><figcaption><strong>Figure 28.1.</strong> Equation: Pr{no event in 0 to t} = p_0(t) = e^(-lambda t). The zero term of the Poisson.</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 28.2.</strong> Equation: p_0(t) = exp(-lambda t). Probability of no events by time t.</figcaption></figure>
 <p>Probability Mass Function:</p>
+<p>pk(t) = (λt)k / k! · e−λt</p>
+<p>Pr{no event in 0 to t} = p0(t) = e−λt</p>
 </section>
 <section aria-labelledby="slide-29-h">
 <h2 id="slide-29-h"><span id="slide-29"></span>Slide 29: First term of the Poisson Distribution</h2>
@@ -333,14 +395,19 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li>Various notations:</li>
 <li>Note that x (or k) can be any non-negative integer.</li>
 </ul>
-<figure role="group"><figcaption><strong>Figure 30.1.</strong> Equation: p_k(t) = (lambda t)^k / k! times e^(-lambda t). The Poisson pmf with rate lambda over interval t.</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 30.2.</strong> Equation: P(k events in interval) = e^(-lambda) lambda^k / k!. The Poisson pmf with mean lambda.</figcaption></figure>
+<p>pk(t) = (λt)k / k! · e−λt</p>
+<p>P(k events in interval) = e−λ · λk / k!</p>
+<p>P(X = x) = μx e−μ / x!</p>
+<ul>
+<li>Mean : μ (rate per interval)</li>
+<li>Variance : μ</li>
+</ul>
 </section>
 <section aria-labelledby="slide-31-h">
 <h2 id="slide-31-h"><span id="slide-31"></span>Slide 31: The Poisson Distribution Graphically</h2>
-<p>=2</p>
-<p>=5</p>
-<p>=8</p>
+<p>μ=2</p>
+<p>μ=5</p>
+<p>μ=8</p>
 </section>
 <section aria-labelledby="slide-32-h">
 <h2 id="slide-32-h"><span id="slide-32"></span>Slide 32: An Example of the Poisson Distribution-I</h2>
@@ -352,6 +419,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 </ul>
 <p>Breakout groups: Try to find analytical solutions AND a solution using built in functions in R</p>
 <p>Group Work</p>
+<p>P(X = x) = μx e−μ / x!</p>
 </section>
 <section aria-labelledby="slide-33-h">
 <h2 id="slide-33-h"><span id="slide-33"></span>Slide 33: An Example of the Poisson Distribution-II</h2>
@@ -359,7 +427,11 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li>The mean catch of dolphins per month in the Eastern Tropical Pacific is 3.</li>
 <li style="margin-left:1.2em">What is the probability that the catch will be 4 in a given month?</li>
 </ul>
-<figure role="group"><figcaption><strong>Figure 33.1.</strong> R console: dpois(4,3) returns 0.1680314, the Poisson probability of exactly 4 events when the mean is 3.</figcaption></figure>
+<p>P[X = 4] = μx e−μ / x! = 34 e−3 / 4! = 0.168</p>
+<ul>
+<li>&gt; dpois(4,3)</li>
+<li>[1] 0.1680314</li>
+</ul>
 </section>
 <section aria-labelledby="slide-34-h">
 <h2 id="slide-34-h"><span id="slide-34"></span>Slide 34: An Example of the Poisson Distribution-III</h2>
@@ -367,9 +439,15 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li>The mean catch of dolphins per month in the Eastern Tropical Pacific is 3.</li>
 <li style="margin-left:1.2em">What is the probability that the catch will be 4 in a given month?</li>
 <li style="margin-left:1.2em">What is the probability that the catch will be 2 or fewer in a given month?</li>
-<li style="margin-left:1.2em">P[X2]=P[X=0]+P[X=1]+P[X=2]=</li>
+<li style="margin-left:1.2em">P[X≤2]=P[X=0]+P[X=1]+P[X=2]=</li>
 </ul>
-<figure role="group"><figcaption><strong>Figure 34.1.</strong> R console: dpois(0,3)+dpois(1,3)+dpois(2,3)=0.4231901 and ppois(2,3)=0.4231901, the Poisson probability of 2 or fewer events when the mean is 3.</figcaption></figure>
+<p>P[X ≤ 2] = e−3 [ 30/0! + 31/1! + 32/2! ] = 0.423</p>
+<ul>
+<li>&gt; dpois(0,3)+dpois(1,3)+dpois(2,3)</li>
+<li>[1] 0.4231901</li>
+<li>&gt; ppois(2,3)</li>
+<li>[1] 0.4231901</li>
+</ul>
 </section>
 <section aria-labelledby="slide-35-h">
 <h2 id="slide-35-h"><span id="slide-35"></span>Slide 35: An Example of the Poisson Distribution-III</h2>
@@ -379,14 +457,19 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li style="margin-left:1.2em">What is the probability that the catch will be 2 or fewer in a given month?</li>
 <li style="margin-left:1.2em">What is the probability that at least 1 dolphin is killed?</li>
 </ul>
-<figure role="group"><figcaption><strong>Figure 35.1.</strong> R console: dpois(0,3)=0.04978707 and 1-dpois(0,3)=0.9502129, the Poisson probability of at least one event when the mean is 3.</figcaption></figure>
 <p>e-3</p>
 <p>1 - e-3</p>
+<ul>
+<li>&gt; dpois(0,3)</li>
+<li>[1] 0.04978707</li>
+<li>&gt; 1-dpois(0,3)</li>
+<li>[1] 0.9502129</li>
+</ul>
 </section>
 <section aria-labelledby="slide-36-h">
 <h2 id="slide-36-h"><span id="slide-36"></span>Slide 36: Example of using Poisson Probabilistic Arguments in Research</h2>
-<figure role="group"><figcaption><strong>Figure 36.1.</strong> Journal excerpt: modeling observed attacks as a Poisson process, the probability of zero attacks being seen before 1990 is 0.006, given a rate constant over the 27-year period.</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 36.2.</strong> Journal article header: &#x27;Killer Whale Predation on Sea Otters Linking Oceanic and Nearshore Ecosystems&#x27; by Estes, Tinker, Williams and Doak, with abstract on sea otter decline from killer whale predation.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 36.1.</strong> Journal article header: &#x27;Killer Whale Predation on Sea Otters Linking Oceanic and Nearshore Ecosystems&#x27; by Estes, Tinker, Williams and Doak, with abstract on sea otter decline from killer whale predation.</figcaption></figure>
+<p>constant over the 27-year period. By modeling the expected number of observed attacks as a Poisson process, the probability of zero attacks being seen before 1990 is 0.006 (15).</p>
 </section>
 <section aria-labelledby="slide-37-h">
 <h2 id="slide-37-h"><span id="slide-37"></span>Slide 37: The Poisson Distribution - Caveat</h2>
@@ -394,7 +477,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li>The Poisson distribution would seem to be a good distribution to assume for catch data in fisheries. However, fish school. What does this imply regarding the assumptions of the Poisson distribution?</li>
 <li>Variance would be high relative to the mean</li>
 <li style="margin-left:1.2em">You catch zero or a shit ton!!!</li>
-<li style="margin-left:1.2em">This is called overdispersion  Onward to negative binomial!</li>
+<li style="margin-left:1.2em">This is called overdispersion → Onward to negative binomial!</li>
 </ul>
 </section>
 <section aria-labelledby="slide-38-h">
@@ -403,9 +486,9 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li>Let’s find the MLE of the Poisson distribution</li>
 <li>Let’s do it for a dataset of n Poisson distributed observations. (very common to assume that t =1 since counts per period is typically desired)</li>
 </ul>
-<figure role="group"><figcaption><strong>Figure 38.1.</strong> Equation: p_k(t) = (lambda t)^k / k! times e^(-lambda t). The Poisson pmf.</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 38.2.</strong> Equation: L(p | {X_i}) = sum from i=1 to n of log(f(X_i | p)). The log-likelihood for n observations.</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 38.3.</strong> Equation: L-tilde(p | {X_i}) = product from i=1 to n of f(X_i | p). The likelihood as a product over n observations.</figcaption></figure>
+<p>pk(t) = (λt)k / k! · e−λt</p>
+<p>L(p | {Xi}) = Σi=1n log( f(Xi | p) )</p>
+<p>ℒ(p | {Xi}) = ∏i=1n f(Xi | p)</p>
 </section>
 <section aria-labelledby="slide-39-h">
 <h2 id="slide-39-h"><span id="slide-39"></span>Slide 39: The Negative Binomial Distribution(1) # failures/trials before fixed number of successes</h2>
@@ -418,13 +501,13 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 </section>
 <section aria-labelledby="slide-40-h">
 <h2 id="slide-40-h"><span id="slide-40"></span>Slide 40</h2>
-<figure role="group"><figcaption><strong>Figure 40.1.</strong> Equation: Pr{N = n | k, p} = Probability that the kth success occurs on trial n. Sets up the negative binomial.</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 40.2.</strong> Text: for the kth success on trial n, we need k-1 successes in the first n-1 trials (binomial with parameters n-1 and p) and a success on trial n with probability p, independently.</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 40.3.</strong> Equation: Pr{N = n | k, p} = (n-1 choose k-1) p^(k-1) (1-p)^(n-k) p = (n-1 choose k-1) p^k (1-p)^(n-k). The negative binomial pmf.</figcaption></figure>
 <p>Try to derive it based on this argument</p>
-<p>How do we turn this into “failures”, X=k, until r successes?</p>
-<figure role="group"><figcaption><strong>Figure 40.4.</strong> Equation: f(k; r, p) = Pr(X = k) = (k+r-1 choose r-1) (1-p)^k p^r. Negative binomial for number of failures k before r successes.</figcaption></figure>
+<p>How do we turn this into “failures”, now k, until r successes? k-&gt;r; N-&gt; k+r;</p>
 <p>The Negative Binomial Distribution(1) # failures/trials before fixed number of successes</p>
+<p>Pr{N = n | k, p} = Probability that the kth success occurs on trial n</p>
+<p>Pr{N = n | k, p} = (n−1 choose k−1) pk−1 (1 − p)n − k p = (n−1 choose k−1) pk (1 − p)n − k</p>
+<p>f(k; r, p) ≡ Pr(X = k) = (k+r−1 choose r−1) (1 − p)k pr</p>
+<p>Now, for the kth success to occur on trial n, we must have k − 1 successes in the first n − 1 trials and a success on the nth trial. The probability of k − 1 successes in n − 1 trials has a binomial distribution with parameters n − 1 and p and the probability of success on the nth trial has probability p and these are independent of each other. We thus conclude</p>
 <details class="answer"><summary>Speaker notes for this slide</summary><div class="answer-body"><p>Examples? Number of foraging bouts before r successes. Number of surveys before r detections.</p></div></details>
 </section>
 <section aria-labelledby="slide-41-h">
@@ -433,10 +516,10 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li>Start with Poisson</li>
 <li>But let’s give lambda a continuous probability (continuous distributions come soon!) and then integrate over all possible values of lambda (this is called “marginalizing”)</li>
 </ul>
-<figure role="group"><figcaption><strong>Figure 41.1.</strong> Equation: Pr{k events in [0,t] | lambda} = (lambda t)^k / k! times e^(-lambda t). The Poisson before making lambda random.</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 41.2.</strong> Equation: Pr{k events in [0,t]} = integral from 0 to infinity of (lambda t)^k / k! times e^(-lambda t) f(lambda) d-lambda. Marginalizing the Poisson over a distribution of lambda.</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 41.3.</strong> Equation: p_X(x) = integral over y of p_{X,Y}(x,y) dy = integral over y of p_{X|Y}(x|y) p_Y(y) dy. The marginalization identity.</figcaption></figure>
 <p>Because:</p>
+<p>Pr{k events in [0, t] | λ} = (λt)k / k! · e−λt</p>
+<p>Pr{k events in [0, t]} = ∫0∞ (λt)k / k! · e−λt · f(λ) dλ</p>
+<p>pX(x) = ∫y pX,Y(x, y) dy = ∫y pX|Y(x | y) pY(y) dy</p>
 </section>
 <section aria-labelledby="slide-42-h">
 <h2 id="slide-42-h"><span id="slide-42"></span>Slide 42: Quick note on Gamma function</h2>
@@ -446,22 +529,25 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li>In general</li>
 <li>Defined (for z &gt; 0):</li>
 </ul>
-<figure role="group"><figcaption><strong>Figure 42.1.</strong> Equation: Gamma(z) = (z-1)!. The gamma function equals the factorial for integer z.</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 42.2.</strong> Equation: Gamma(z+1) = z Gamma(z). The recurrence relation of the gamma function.</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 42.3.</strong> Equation: Gamma(z) = integral from 0 to infinity of s^(z-1) e^(-s) ds. Integral definition of the gamma function for z&gt;0.</figcaption></figure>
+<p>Γ(z) = (z − 1)!</p>
+<p>Γ(z + 1) = z Γ(z)</p>
+<p>Γ(z) = ∫0∞ sz−1 e−s ds</p>
 </section>
 <section aria-labelledby="slide-43-h">
 <h2 id="slide-43-h"><span id="slide-43"></span>Slide 43: The Negative Binomial Distribution(2) Poisson with a variable rate parameter</h2>
 <p>Common parameterization in ecology with the mean as a parameter:</p>
-<figure role="group"><figcaption><strong>Figure 43.1.</strong> Equation: Pr{N = n} = p_n(m, k) = Gamma(k+n) / (n! Gamma(k)) times (k/(k+m))^k times (m/(k+m))^n. Negative binomial parameterized by mean m and dispersion k.</figcaption></figure>
-<p>We model N overdispersed counts as function of mean, m, and dispersion, k</p>
+<ul>
+<li>We model N overdispersed counts as function of mean, m, and dispersion, k</li>
+<li>(not to be confused with prior uses of k)</li>
+</ul>
+<p>Pr{N = n} ≡ pn(m, k) = Γ(k + n) / (n! Γ(k)) · (k / (k + m))k · (m / (k + m))n</p>
 </section>
 <section aria-labelledby="slide-44-h">
 <h2 id="slide-44-h"><span id="slide-44"></span>Slide 44: The Negative Binomial Distribution(2) Poisson with a variable rate parameter</h2>
-<figure role="group"><figcaption><strong>Figure 44.1.</strong> Equation: Pr{N = n} = p_n(m, k) = Gamma(k+n) / (n! Gamma(k)) times (k/(k+m))^k times (m/(k+m))^n. Negative binomial in mean-dispersion form.</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 44.2.</strong> Equation: p_0(m, k) = (k/(k+m))^k. Negative binomial probability of no events; large when k is small even if m is big.</figcaption></figure>
 <p>What is the probability of no events?</p>
 <p>This probability can be large if k is small even if m is big</p>
+<p>Pr{N = n} ≡ pn(m, k) = Γ(k + n) / (n! Γ(k)) · (k / (k + m))k · (m / (k + m))n</p>
+<p>p0(m, k) = (k / (k + m))k</p>
 </section>
 <section aria-labelledby="slide-45-h">
 <h2 id="slide-45-h"><span id="slide-45"></span>Slide 45: Poisson vs. Negative Binomial</h2>

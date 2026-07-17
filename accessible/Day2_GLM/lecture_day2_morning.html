@@ -73,7 +73,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <h1>Continuous distributions</h1>
 <p class="lede">A screen-reader-friendly transcript of the lecture slides: all slide text, tables, figure descriptions, and speaker notes.</p>
 </header>
-<div class="callout key"><p class="callout-label">About these notes</p>Each section is one slide. Figures carry text descriptions where available. For the concepts with worked examples, also read the <a href="plain_language_summary.html">plain-language summary</a> and <a href="lab.html">lab</a> for this session. You can also download the <a href="../../Day2_GLM/FW536_Day2_Morning_ContinuousDistributions_accessible.pptx">alt-texted PowerPoint deck</a> (the same slides with image descriptions embedded).</div>
+<div class="callout key"><p class="callout-label">About these notes</p>Each section is one slide. Figures carry text descriptions where available. For the concepts with worked examples, also read the <a href="plain_language_summary.html">plain-language summary</a> and <a href="lab.html">lab</a> for this session.</div>
 <section aria-labelledby="slide-1-h">
 <h2 id="slide-1-h"><span id="slide-1"></span>Slide 1: Continuous Probability Distributions</h2>
 <p><em>(No text on this slide.)</em></p>
@@ -85,12 +85,12 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <section aria-labelledby="slide-3-h">
 <h2 id="slide-3-h"><span id="slide-3"></span>Slide 3: Relationship between PDF and CDF</h2>
 <ul>
-<li>Recall that the CDF is P[ X  x]</li>
+<li>Recall that the CDF is P[ X ≤ x]</li>
 <li>CDF is integral of PDF. PDF is derivative of CDF</li>
 </ul>
 <figure role="group"><figcaption><strong>Figure 3.1.</strong> Line plot of normal CDFs Φ(x), x from -5 to 5, y from 0 to 1. Four S-shaped curves for different mean and variance; all rise from 0 to 1, showing CDFs are non-decreasing.</figcaption></figure>
 <figure role="group"><figcaption><strong>Figure 3.2.</strong> Line plot of normal PDFs φ(x), x from -5 to 5. Four bell curves: smaller variance gives taller narrower peaks; negative mean shifts the curve left.</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 3.3.</strong> Equation: F_X(x) = integral from minus infinity to x of f_X(t) dt. The CDF is the integral of the PDF.</figcaption></figure>
+<p>FX(x) = ∫−∞x fX(t) dt</p>
 </section>
 <section aria-labelledby="slide-4-h">
 <h2 id="slide-4-h"><span id="slide-4"></span>Slide 4</h2>
@@ -127,13 +127,13 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 </section>
 <section aria-labelledby="slide-10-h">
 <h2 id="slide-10-h"><span id="slide-10"></span>Slide 10: The Normal Distribution-I</h2>
-<p></p>
-<p>-</p>
-<p>-2</p>
-<p>-3</p>
-<p>+3</p>
-<p>+2</p>
-<p>+</p>
+<p>μ</p>
+<p>μ-σ</p>
+<p>μ-2σ</p>
+<p>μ-3σ</p>
+<p>μ+3σ</p>
+<p>μ+2σ</p>
+<p>μ+σ</p>
 <ul>
 <li>The graph of the normal distribution</li>
 <li>is called the normal (or bell) curve.</li>
@@ -157,25 +157,27 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <h2 id="slide-12-h"><span id="slide-12"></span>Slide 12: The Normal Distribution-III</h2>
 <ul>
 <li>Notation</li>
-<li>We say that the random variable X is normally distributed with mean  and standard deviation </li>
+<li>We say that the random variable X is normally distributed with mean μ and standard deviation σ</li>
 <li>The equation defining the normal curve is:</li>
 <li>f (x) is referred to as a probability density function (pdf).</li>
 </ul>
+<p>X ~ N(μ, σ2)</p>
+<p>f(x) = 1 / (√(2π) σ) · exp( −(x − μ)2 / (2σ2) )</p>
 </section>
 <section aria-labelledby="slide-13-h">
 <h2 id="slide-13-h"><span id="slide-13"></span>Slide 13: Normal Cumulative Distribution Function-Notice that all CDFs are non-decreasing</h2>
-<p>Recall that the CDF is P[ X  x]</p>
+<p>Recall that the CDF is P[ X ≤ x]</p>
 <figure role="group"><figcaption><strong>Figure 13.1.</strong> Line plot of normal CDFs Φ(x), x from -5 to 5, y from 0 to 1. Four S-shaped curves for different mean and variance, all non-decreasing from 0 to 1.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-14-h">
 <h2 id="slide-14-h"><span id="slide-14"></span>Slide 14: Relationship between PDF and CDF</h2>
 <ul>
-<li>Recall that the CDF is P[ X  x]</li>
+<li>Recall that the CDF is P[ X ≤ x]</li>
 <li>CDF is integral of PDF. PDF is derivative of CDF</li>
 </ul>
 <figure role="group"><figcaption><strong>Figure 14.1.</strong> Line plot of normal CDFs Φ(x), x from -5 to 5, y from 0 to 1. Four S-shaped curves for different mean and variance, all non-decreasing from 0 to 1.</figcaption></figure>
 <figure role="group"><figcaption><strong>Figure 14.2.</strong> Line plot of normal PDFs φ(x), x from -5 to 5. Four bell curves: smaller variance gives taller narrower peaks; negative mean shifts the curve left.</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 14.3.</strong> Equation: F_X(x) = integral from minus infinity to x of f_X(t) dt. The CDF is the integral of the PDF.</figcaption></figure>
+<p>FX(x) = ∫−∞x fX(t) dt</p>
 </section>
 <section aria-labelledby="slide-15-h">
 <h2 id="slide-15-h"><span id="slide-15"></span>Slide 15: Normal Distributions and Probability-II</h2>
@@ -186,9 +188,9 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <p>13.5%</p>
 <ul>
 <li>Of the total area under the curve about:</li>
-<li>68% lies between - and +</li>
-<li>95% lies between -2 and +2</li>
-<li>99.7% lies between -3 and +3</li>
+<li>68% lies between μ-σ and μ+σ</li>
+<li>95% lies between μ-2σ and μ+2σ</li>
+<li>99.7% lies between μ-3σ and μ+3σ</li>
 </ul>
 <p>μ</p>
 <p>2.5%</p>
@@ -222,16 +224,17 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <p>The normal distribution with a mean of 0 and a standard deviation of 1 is called the standard normal distribution</p>
 <ul>
 <li>We can make a normal RV Y with any mean and variance</li>
-<li>Y =  + z</li>
+<li>Y = μ + σz</li>
 </ul>
+<p>z = (value − mean) / (standard deviation) = (x − μ) / σ</p>
 </section>
 <section aria-labelledby="slide-19-h">
 <h2 id="slide-19-h"><span id="slide-19"></span>Slide 19: Further Examples</h2>
 <ul>
 <li>For standard normally distributed RV X, find the probability that:</li>
-<li style="margin-left:1.2em">X  -0.95</li>
-<li style="margin-left:1.2em">X   1</li>
-<li style="margin-left:1.2em">0.1  X  0.5 OR 1.5  X  2</li>
+<li style="margin-left:1.2em">X ≤ -0.95</li>
+<li style="margin-left:1.2em">X  ≥ 1</li>
+<li style="margin-left:1.2em">0.1 ≤ X ≤ 0.5 OR 1.5 ≤ X ≤ 2</li>
 </ul>
 <p>Group Work</p>
 </section>
@@ -260,14 +263,16 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <ul>
 <li>The mean of the sample means is equal to the population mean:</li>
 <li>The standard deviation of the sample means is equal to the population standard deviation divided by the square root of n.</li>
-<li>is often called the standard error!</li>
+<li>σx̄ is often called the standard error!</li>
 </ul>
+<p>μx̄ = μ</p>
+<p>σx̄ = σ / √n</p>
 </section>
 <section aria-labelledby="slide-24-h">
 <h2 id="slide-24-h"><span id="slide-24"></span>Slide 24: The Central Limit Theorem(Why we use the Normal distribution so much!)</h2>
 <ul>
 <li>The sum (and therefore mean) of random variables of any distribution tends toward a normal distribution as sample size increases</li>
-<li>If samples of size n (where n ~30) are drawn from any population with a mean  and a standard deviation , the distribution of the means approximates a normal distribution. The greater the sample size, the better the approximation.</li>
+<li>If samples of size n (where n ≥~30) are drawn from any population with a mean μ and a standard deviation σ, the distribution of the means approximates a normal distribution. The greater the sample size, the better the approximation.</li>
 <li>If the population is itself normally distributed, the sampling distribution of the sample means is normally distributed for any sample size.</li>
 </ul>
 <ul>
@@ -283,10 +288,11 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <h2 id="slide-26-h"><span id="slide-26"></span>Slide 26: Approximating a Binomial Distribution</h2>
 <ul>
 <li>It is possible to compute approximate probabilities for the binomial distribution using the normal distribution.</li>
-<li style="margin-left:1.2em">If np  5 and nq  5, the binomial random variable X ~B(n,p) is approximately normally distributed:</li>
+<li style="margin-left:1.2em">If np ≥ 5 and nq ≥ 5, the binomial random variable X ~B(n,p) is approximately normally distributed:</li>
 <li style="margin-left:1.2em">This approximation can be quite accurate even though the binomial distribution is discrete and the normal distribution is continuous.</li>
 </ul>
 <p>These are mean and stdev of a binomial random variable</p>
+<p>X ≈ N(np, √(npq))</p>
 </section>
 <section aria-labelledby="slide-27-h">
 <h2 id="slide-27-h"><span id="slide-27"></span>Slide 27: Approximating a Binomial Distribution-II</h2>
@@ -306,7 +312,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <h2 id="slide-29-h"><span id="slide-29"></span>Slide 29: Approximating a Poisson Distribution</h2>
 <ul>
 <li>It is possible to compute approximate probabilities for the Poisson distribution using the normal distribution.</li>
-<li style="margin-left:1.2em">If &gt;10, the Poisson random variable X ~P() is approximately normally distributed:</li>
+<li style="margin-left:1.2em">If μ&gt;10, the Poisson random variable X ~P(μ) is approximately normally distributed:</li>
 </ul>
 <ul>
 <li>In R, compare</li>
@@ -314,6 +320,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li>hist(rnorm(10000,50,sqrt(50)))</li>
 </ul>
 <p>These are mean and stdev of a Poisson random variable</p>
+<p>X ≈ N(μ, √μ)</p>
 </section>
 <section aria-labelledby="slide-30-h">
 <h2 id="slide-30-h"><span id="slide-30"></span>Slide 30: Small Samples and the t-Distribution</h2>
@@ -324,7 +331,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li>However, the standard error                    depends on the sample standard deviation s, which is not precisely known.</li>
 <li>When the population standard deviation is unknown and estimated (and n&lt;~30), the sample mean is t-distributed rather than Normally distributed.</li>
 </ul>
-<figure role="group"><figcaption><strong>Figure 30.1.</strong> Equation: standard error of the mean, sigma sub x-bar, approximately equals s divided by the square root of n.</figcaption></figure>
+<p>σx̄ ≈ s/√n</p>
 </section>
 <section aria-labelledby="slide-31-h">
 <h2 id="slide-31-h"><span id="slide-31"></span>Slide 31: Side Note – Stout and Statistics.</h2>
@@ -350,60 +357,99 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <p>df=5</p>
 <p>Taal, open R and show estimate and standard error produce t</p>
 <p>Estimate</p>
-<p>True Mean. Zero for hypothesis testing</p>
+<p>True Mean. Typically zero for hypothesis testing</p>
 <p>Standard error</p>
+<p>t = (x̄ − μ) / (s / √n)</p>
 </section>
 <section aria-labelledby="slide-34-h">
 <h2 id="slide-34-h"><span id="slide-34"></span>Slide 34: The Lognormal distribution</h2>
 <figure role="group"><figcaption><strong>Figure 34.1.</strong> Lognormal PDF plot, x from 0. Three right-skewed curves with mean 0 and sigma 0.25, 0.5, 1; smaller sigma gives a taller, narrower peak. All are zero at x=0 and positive only.</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 34.2.</strong> Equation table for Lognormal(mu, sigma squared): parameters mu real, sigma &gt; 0; support x in (0, infinity); PDF = 1/(x sigma sqrt(2 pi)) times exp(-(ln x - mu)^2 / (2 sigma^2)).</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 34.3.</strong> Equation table for the lognormal: Mean = exp(mu + sigma^2/2); Median = exp(mu); Mode = exp(mu - sigma^2); Variance = [exp(sigma^2) - 1] exp(2 mu + sigma^2).</figcaption></figure>
 <ul>
 <li>The log of a lognormal random variable is Normally distributed!</li>
-<li>If X~Normal(, σ2), then Y=eX ~ lognormal(, σ2)</li>
+<li>If X~Normal(μ, σ2), then Y=eX ~ lognormal(μ, σ2)</li>
+</ul>
+<ul>
+<li>Lognormal(μ, σ2)</li>
+<li>Parameters:  μ ∈ (−∞, +∞),  σ &gt; 0</li>
+<li>Support:  x ∈ (0, +∞)</li>
+<li>PDF:  f(x) = 1/(x σ √(2π)) · exp( −(ln x − μ)2 / (2σ2) )</li>
+</ul>
+<ul>
+<li>Mean:  exp(μ + σ2/2)</li>
+<li>Median:  exp(μ)</li>
+<li>Mode:  exp(μ − σ2)</li>
+<li>Variance:  [exp(σ2) − 1] · exp(2μ + σ2)</li>
 </ul>
 </section>
 <section aria-labelledby="slide-35-h">
 <h2 id="slide-35-h"><span id="slide-35"></span>Slide 35: Remember the Gamma distribution</h2>
 <figure role="group"><figcaption><strong>Figure 35.1.</strong> Gamma PDF plot, x from 0 to 20, for several shape k and scale theta values. Small k gives a decreasing curve; larger k gives right-skewed humps that shift right and flatten.</figcaption></figure>
 <p>Flexible distribution for positive data. VERY useful in statistical modelling</p>
-<figure role="group"><figcaption><strong>Figure 35.2.</strong> Equation: Gamma mean. Shape-scale form E[X] = k theta; shape-rate form E[X] = alpha / beta.</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 35.3.</strong> Equation table for the Gamma distribution in two parameterizations. Shape-scale: k&gt;0, theta&gt;0, support x&gt;0, PDF = 1/(Gamma(k) theta^k) x^(k-1) e^(-x/theta). Shape-rate: alpha&gt;0, beta&gt;0, PDF = beta^alpha/Gamma(alpha) x^(alpha-1) e^(-beta x).</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 35.4.</strong> Equation: Gamma variance. Shape-scale form Var(X) = k theta^2; shape-rate form Var(X) = alpha / beta^2.</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 35.5.</strong> Text: A gamma with shape alpha=1 is an exponential(beta) distribution. A gamma with alpha = v/2 and beta = 1/2 is a chi-squared random variable with v degrees of freedom.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 35.2.</strong> Text: A gamma with shape alpha=1 is an exponential(beta) distribution. A gamma with alpha = v/2 and beta = 1/2 is a chi-squared random variable with v degrees of freedom.</figcaption></figure>
 <p>Standard in R</p>
+<ul>
+<li>E[X] = kθ  (shape-scale)</li>
+<li>E[X] = α/β  (shape-rate)</li>
+</ul>
+<ul>
+<li>Params — shape-scale: k&gt;0, θ&gt;0; shape-rate: α&gt;0, β&gt;0 (std in R)</li>
+<li>Support:  x ∈ (0, ∞)</li>
+<li>PDF (shape-scale):  f(x) = 1/(Γ(k) θk) · xk−1 · e−x/θ</li>
+<li>PDF (shape-rate):  f(x) = βα/Γ(α) · xα−1 · e−βx</li>
+</ul>
+<ul>
+<li>Var(X) = kθ2  (shape-scale)</li>
+<li>Var(X) = α/β2  (shape-rate)</li>
+</ul>
 </section>
 <section aria-labelledby="slide-36-h">
 <h2 id="slide-36-h"><span id="slide-36"></span>Slide 36: The Beta distribution</h2>
 <p>Distribution for proportions</p>
 <figure role="group"><figcaption><strong>Figure 36.1.</strong> Beta PDF plot on x from 0 to 1 for several alpha, beta pairs. Shapes range from U-shaped (0.5,0.5) to J-shaped, to a symmetric hump (2,2), showing the Beta&#x27;s flexibility on [0,1].</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 36.2.</strong> Equation: Beta mean, E[X] = alpha / (alpha + beta).</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 36.3.</strong> Equation table for Beta(alpha, beta): parameters alpha&gt;0 and beta&gt;0 shape (real); support x in [0,1]; PDF = x^(alpha-1)(1-x)^(beta-1) / B(alpha,beta), where B(alpha,beta) = Gamma(alpha)Gamma(beta)/Gamma(alpha+beta).</figcaption></figure>
 <p>How might this relate to the binomial distribution?</p>
 <p>What does a Beta(1,1) become?</p>
+<p>E[X] = α / (α + β)</p>
+<ul>
+<li>Notation:  Beta(α, β)</li>
+<li>Parameters:  α &gt; 0 shape (real),  β &gt; 0 shape (real)</li>
+<li>Support:  x ∈ [0, 1]  or  x ∈ (0, 1)</li>
+<li>PDF:  f(x) = xα−1 (1−x)β−1 / B(α, β)</li>
+<li>where B(α, β) = Γ(α) Γ(β) / Γ(α + β)</li>
+</ul>
 </section>
 <section aria-labelledby="slide-37-h">
 <h2 id="slide-37-h"><span id="slide-37"></span>Slide 37: The Exponential DistributionDistribution for time between random events (e.g. survival)</h2>
 <figure role="group"><figcaption><strong>Figure 37.1.</strong> Exponential PDF plot P(x), x from 0 to 5, for rate lambda 0.5, 1, and 1.5. Each curve starts at lambda and decays exponentially; larger lambda starts higher and drops faster.</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 37.2.</strong> Equation table for the Exponential distribution: parameter lambda&gt;0 rate; support x≥0; PDF = lambda e^(-lambda x); CDF = 1 - e^(-lambda x); quantile -ln(1-p)/lambda; mean 1/lambda; median ln2/lambda; mode 0; variance 1/lambda^2.</figcaption></figure>
+<ul>
+<li>Parameters:  λ &gt; 0, rate (or inverse scale)</li>
+<li>Support:  x ∈ [0, ∞)</li>
+<li>PDF:  f(x) = λ e−λx</li>
+<li>CDF:  F(x) = 1 − e−λx</li>
+<li>Quantile:  −ln(1−p) / λ</li>
+<li>Mean:  1/λ</li>
+<li>Median:  ln 2 / λ</li>
+<li>Mode:  0</li>
+<li>Variance:  1/λ2</li>
+</ul>
 </section>
 <section aria-labelledby="slide-38-h">
 <h2 id="slide-38-h"><span id="slide-38"></span>Slide 38: The Exponential Distribution-I</h2>
 <ul>
 <li>The Poisson distribution arose when counting the number of random events in an interval. The exponential distribution considers the interval of time between random events.</li>
-<li>If events are occurring at random with average rate of  per interval, then the probability density function for the length of time between events is:</li>
+<li>If events are occurring at random with average rate of λ per interval, then the probability density function for the length of time between events is:</li>
 </ul>
 <p>SD and Mean =</p>
+<p>f(x) = λ e−λx</p>
 </section>
 <section aria-labelledby="slide-39-h">
 <h2 id="slide-39-h"><span id="slide-39"></span>Slide 39: This Poisson – Exponential relationship is basis for animal density estimation from camera trap data</h2>
 <figure role="group"><figcaption><strong>Figure 39.1.</strong> Journal masthead from Ecosphere (ESA): article title &quot;Three novel methods to estimate abundance of unmarked animals using remote cameras&quot; by Anna K. Moeller, Paul M. Lukacs, and Jon S. Horne.</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 39.2.</strong> Equation: T ~ Exp(lambda). Time between events is exponentially distributed.</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 39.3.</strong> Equation: D-hat = lambda-hat / a-bar. Estimated animal density equals the estimated rate divided by mean camera viewshed area.</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 39.4.</strong> Equation: N_ijk ~ Pois(lambda). Camera counts are Poisson distributed with rate lambda.</figcaption></figure>
 <p># animals seen by camera</p>
 <p>Time between Poisson observations</p>
 <p>Density is lambda divided by mean area in camera viewshed</p>
+<p>T ~ Exp(λ)</p>
+<p>D = λ / ā</p>
+<p>Nijk ~ Pois(λ)</p>
 </section>
 <section aria-labelledby="slide-40-h">
 <h2 id="slide-40-h"><span id="slide-40"></span>Slide 40: The Exponential Distribution-II(Example-I)</h2>
@@ -419,7 +465,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <h2 id="slide-41-h"><span id="slide-41"></span>Slide 41: The Exponential Distribution-II(Example-II)</h2>
 <ul>
 <li>Solution:</li>
-<li style="margin-left:1.2em">P[X&gt;2] = 1-P[X2]=0.0498</li>
+<li style="margin-left:1.2em">P[X&gt;2] = 1-P[X≤2]=0.0498</li>
 </ul>
 <figure role="group"><figcaption><strong>Figure 41.1.</strong> R console: &gt; 1 - pexp(2, rate = 1.5) returns 0.04978707. Probability an exponential(rate 1.5) time exceeds 2.</figcaption></figure>
 </section>
@@ -432,6 +478,8 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 </ul>
 <p>Can you verify that this is a proper PDF? Use calculus or geometry.</p>
 <p>Group Work</p>
+<p>X ~ U(a, b)</p>
+<p>f(x) = 1 / (b − a)</p>
 </section>
 <section aria-labelledby="slide-43-h">
 <h2 id="slide-43-h"><span id="slide-43"></span>Slide 43: The Uniform Distribution(Example)</h2>
@@ -440,6 +488,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <p>Can you verify that this is a proper PDF? Use calculus or geometry.</p>
 <p>1</p>
 <p>2</p>
+<p>f(x) = 1 / (b − a)</p>
 </section>
 <section aria-labelledby="slide-44-h">
 <h2 id="slide-44-h"><span id="slide-44"></span>Slide 44: Which distribution and why?</h2>

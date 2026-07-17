@@ -75,43 +75,36 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li><a href="#slide-53">53. Model output</a></li>
 <li><a href="#slide-54">54. How does this look? Concerns? What now? Are we done?</a></li>
 <li><a href="#slide-55">55. How does this look? Concerns? What now? Are we done?</a></li>
-<li><a href="#slide-56">56. We are not done!</a></li>
-<li><a href="#slide-57">57. 1. X vs. Y</a></li>
-<li><a href="#slide-58">58. 2. Good models make good predictions</a></li>
-<li><a href="#slide-59">59. What is being fit here exactly?</a></li>
-<li><a href="#slide-60">60. eDNA rate should be transformed from positive to the whole real line! How?</a></li>
-<li><a href="#slide-61">61. log(Y) = a + b*log(X)</a></li>
+<li><a href="#slide-56">56. 1. X vs. Y</a></li>
+<li><a href="#slide-57">57. 2. Good models make good predictions</a></li>
+<li><a href="#slide-58">58. What is being fit here exactly?</a></li>
+<li><a href="#slide-59">59. eDNA rate should be transformed from positive to the whole real line! How?</a></li>
+<li><a href="#slide-60">60. log(Y) = a + b*log(X)</a></li>
+<li><a href="#slide-61">61. New model output</a></li>
 <li><a href="#slide-62">62. New model output</a></li>
-<li><a href="#slide-63">63. New model output</a></li>
-<li><a href="#slide-64">64. Good models make good predictions</a></li>
+<li><a href="#slide-63">63. Good models make good predictions</a></li>
+<li><a href="#slide-64">64. Quasipoisson GLM</a></li>
 <li><a href="#slide-65">65. Quasipoisson GLM</a></li>
-<li><a href="#slide-66">66. Quasipoisson GLM</a></li>
-<li><a href="#slide-67">67. Quasipoisson GLM</a></li>
-<li><a href="#slide-68">68. Quasipoisson figures</a></li>
-<li><a href="#slide-69">69. Quasipoisson figures</a></li>
-<li><a href="#slide-70">70. This is great, but….</a></li>
+<li><a href="#slide-66">66. Quasipoisson figures</a></li>
+<li><a href="#slide-67">67. Quasipoisson figures</a></li>
+<li><a href="#slide-68">68. This is great, but….</a></li>
+<li><a href="#slide-69">69. Negative binomial</a></li>
+<li><a href="#slide-70">70. Negative binomial</a></li>
 <li><a href="#slide-71">71. Negative binomial</a></li>
 <li><a href="#slide-72">72. Negative binomial</a></li>
-<li><a href="#slide-73">73. Negative binomial</a></li>
-<li><a href="#slide-74">74. Negative binomial</a></li>
-<li><a href="#slide-75">75. Negative binomial</a></li>
-<li><a href="#slide-76">76. Anything else we’re ignoring?</a></li>
-<li><a href="#slide-77">77. There was a world before GLMs</a></li>
-<li><a href="#slide-78">78. There was a world before GLMs</a></li>
-<li><a href="#slide-79">79. There was a world before GLMs</a></li>
-<li><a href="#slide-80">80. Gamma</a></li>
-<li><a href="#slide-81">81. Gamma</a></li>
-<li><a href="#slide-82">82. Interaction Terms</a></li>
-<li><a href="#slide-83">83. Interpretation and Symmetry of Interactions</a></li>
-<li><a href="#slide-84">84. Interpretation and Symmetry of Interactions</a></li>
-<li><a href="#slide-85">85. Interpretation and Symmetry of Interactions</a></li>
-<li><a href="#slide-86">86. Dependence on scaling and transformation I</a></li>
-<li><a href="#slide-87">87. Dependence on scaling and transformation II</a></li>
-<li><a href="#slide-88">88. Additivity not preserved across nonlinear transformations!</a></li>
-<li><a href="#slide-89">89. Confusion in action with major policy implications!</a></li>
-<li><a href="#slide-90">90. What was the point made by Barnas et al.?</a></li>
-<li><a href="#slide-91">91. What was the point made by Barnas et al.?</a></li>
-<li><a href="#slide-92">92. Models, especially with interactions, require algebra and especially geometry. Interpret the predictions!</a></li>
+<li><a href="#slide-73">73. Gamma</a></li>
+<li><a href="#slide-74">74. Gamma</a></li>
+<li><a href="#slide-75">75. Interaction Terms</a></li>
+<li><a href="#slide-76">76. Interpretation and Symmetry of Interactions</a></li>
+<li><a href="#slide-77">77. Interpretation and Symmetry of Interactions</a></li>
+<li><a href="#slide-78">78. Interpretation and Symmetry of Interactions</a></li>
+<li><a href="#slide-79">79. Dependence on scaling and transformation I</a></li>
+<li><a href="#slide-80">80. Dependence on scaling and transformation II</a></li>
+<li><a href="#slide-81">81. Additivity not preserved across nonlinear transformations!</a></li>
+<li><a href="#slide-82">82. Confusion in action with major policy implications!</a></li>
+<li><a href="#slide-83">83. What was the point made by Barnas et al.?</a></li>
+<li><a href="#slide-84">84. What was the point made by Barnas et al.?</a></li>
+<li><a href="#slide-85">85. Models, especially with interactions, require algebra and especially geometry. Interpret the predictions!</a></li>
 </ul></nav></aside>
 <main class="content" id="main-content" tabindex="-1">
 <header class="lab-header">
@@ -119,7 +112,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <h1>Generalized linear models</h1>
 <p class="lede">A screen-reader-friendly transcript of the lecture slides: all slide text, tables, figure descriptions, and speaker notes.</p>
 </header>
-<div class="callout key"><p class="callout-label">About these notes</p>Each section is one slide. Figures carry text descriptions where available. For the concepts with worked examples, also read the <a href="plain_language_summary.html">plain-language summary</a> and <a href="lab.html">lab</a> for this session. You can also download the <a href="../../Day2_GLM/FW536_Day2_Afternoon_GeneralizedLinear%20Models_accessible.pptx">alt-texted PowerPoint deck</a> (the same slides with image descriptions embedded).</div>
+<div class="callout key"><p class="callout-label">About these notes</p>Each section is one slide. Figures carry text descriptions where available. For the concepts with worked examples, also read the <a href="plain_language_summary.html">plain-language summary</a> and <a href="lab.html">lab</a> for this session.</div>
 <section aria-labelledby="slide-1-h">
 <h2 id="slide-1-h"><span id="slide-1"></span>Slide 1: Generalized Linear Models</h2>
 <p>Some material from Olivier Gimenez 2020</p>
@@ -128,9 +121,12 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <h2 id="slide-2-h"><span id="slide-2"></span>Slide 2: General Linear Model</h2>
 <p>Often written as:</p>
 <p>But even clearer:</p>
-<figure role="group"><figcaption><strong>Figure 2.1.</strong> Equation: y ~ N(beta_0 + beta_1*x_1 + beta_2*x_2 + beta_3*x_3 + ..., sigma). General linear model written as a normal distribution.</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 2.2.</strong> Equation: y = beta_0 + beta_1*x_1 + beta_2*x_2 + beta_3*x_3 + ... + epsilon, with epsilon ~ N(0, sigma). Same model with an explicit error term.</figcaption></figure>
 <p>From this we can see assumption of constant variance</p>
+<p>y ~ N(β0 + β1x1 + β2x2 + β3x3 + …, σ)</p>
+<ul>
+<li>y = β0 + β1x1 + β2x2 + β3x3 + … + ε</li>
+<li>ε ~ N(0, σ)</li>
+</ul>
 </section>
 <section aria-labelledby="slide-3-h">
 <h2 id="slide-3-h"><span id="slide-3"></span>Slide 3</h2>
@@ -158,7 +154,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 </section>
 <section aria-labelledby="slide-8-h">
 <h2 id="slide-8-h"><span id="slide-8"></span>Slide 8: General Linear Model</h2>
-<figure role="group"><figcaption><strong>Figure 8.1.</strong> Equation: y ~ N(beta_0 + beta_1*x_1 + beta_2*x_2 + beta_3*x_3 + ..., sigma). General linear model as a normal distribution.</figcaption></figure>
+<p>y ~ N(β0 + β1x1 + β2x2 + β3x3 + …, σ)</p>
 </section>
 <section aria-labelledby="slide-9-h">
 <h2 id="slide-9-h"><span id="slide-9"></span>Slide 9: What influences partying in college?</h2>
@@ -348,8 +344,14 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 </section>
 <section aria-labelledby="slide-38-h">
 <h2 id="slide-38-h"><span id="slide-38"></span>Slide 38</h2>
-<figure role="group"><figcaption><strong>Figure 38.1.</strong> Equation slide &#x27;Bernoulli becomes a Binomial&#x27;: Y_i ~ Binomial(N_i, p_i); logit(p_i) = a + b*x_i; p_i = inverse-logit(a + b*x_i) = e^(a+b*x_i) / (1 + e^(a+b*x_i)).</figcaption></figure>
 <p>Not 1 anymore</p>
+<p>Bernoulli becomes a Binomial</p>
+<ul>
+<li>Response ~ Distribution(Mean Response)</li>
+<li>Yi ~ Binomial(Ni, pi)</li>
+<li>logit(pi) = a + b xi</li>
+<li>pi = logit−1(a + b xi) = exp(a + b xi) / (1 + exp(a + b xi))</li>
+</ul>
 </section>
 <section aria-labelledby="slide-39-h">
 <h2 id="slide-39-h"><span id="slide-39"></span>Slide 39</h2>
@@ -389,8 +391,8 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 </section>
 <section aria-labelledby="slide-43-h">
 <h2 id="slide-43-h"><span id="slide-43"></span>Slide 43</h2>
-<figure role="group"><figcaption><strong>Figure 43.1.</strong> Image</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 43.2.</strong> Image</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 43.1.</strong> Photo of a field crew in waders using dip nets inside the Auke Creek picket weir to capture and count migrating salmon.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 43.2.</strong> Photo of the Auke Creek weir field station in winter: a blue-roofed building among snow-covered evergreens, with a metal picket weir spanning the creek in the foreground.</figcaption></figure>
 <ul>
 <li>Validation data from Auke Creek Station in Juneau, Alaska</li>
 <li>Daily counts of</li>
@@ -419,10 +421,10 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <h2 id="slide-47-h"><span id="slide-47"></span>Slide 47</h2>
 <figure role="group"><figcaption><strong>Figure 47.1.</strong> Same 2015 and 2016 multi-panel time series (Counts, Flow x DNA, DNA, Flow, Temp) for sockeye returning adults; illustrates flux times concentration giving eDNA rate.</figcaption></figure>
 <p>Sockeye returning adults</p>
-<p class="sr-only">Figure 47.2: decorative image, no description needed.</p>
-<p class="sr-only">Figure 47.3: decorative image, no description needed.</p>
-<p class="sr-only">Figure 47.4: decorative image, no description needed.</p>
-<p class="sr-only">Figure 47.5: decorative image, no description needed.</p>
+<figure role="group"><figcaption><strong>Figure 47.2.</strong> Orange rectangular outline highlighting a peak in the eDNA and streamflow time-series panels.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 47.3.</strong> Orange rectangular outline highlighting a peak in the eDNA and streamflow time-series panels.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 47.4.</strong> Orange rectangular outline highlighting a peak in the eDNA and streamflow time-series panels.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 47.5.</strong> Orange rectangular outline highlighting a peak in the eDNA and streamflow time-series panels.</figcaption></figure>
 <p>Water flux (cubic_ft/sec) X DNA concentration (ng/ul) = ng/sec X cubic_ft/ul</p>
 </section>
 <section aria-labelledby="slide-48-h">
@@ -430,10 +432,10 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <figure role="group"><figcaption><strong>Figure 48.1.</strong> Same 2015 and 2016 multi-panel time series (Counts, Flow x DNA, DNA, Flow, Temp) for sockeye adults; Flow x DNA row is the eDNA rate in ng/sec.</figcaption></figure>
 <p>Sockeye returning adults</p>
 <p>eDNA rate:  ng/sec</p>
-<p class="sr-only">Figure 48.2: decorative image, no description needed.</p>
-<p class="sr-only">Figure 48.3: decorative image, no description needed.</p>
-<p class="sr-only">Figure 48.4: decorative image, no description needed.</p>
-<p class="sr-only">Figure 48.5: decorative image, no description needed.</p>
+<figure role="group"><figcaption><strong>Figure 48.2.</strong> Orange rectangular outline highlighting a peak in the eDNA and streamflow time-series panels.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 48.3.</strong> Orange rectangular outline highlighting a peak in the eDNA and streamflow time-series panels.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 48.4.</strong> Orange rectangular outline highlighting a peak in the eDNA and streamflow time-series panels.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 48.5.</strong> Orange rectangular outline highlighting a peak in the eDNA and streamflow time-series panels.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-49-h">
 <h2 id="slide-49-h"><span id="slide-49"></span>Slide 49</h2>
@@ -456,11 +458,45 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 </section>
 <section aria-labelledby="slide-52-h">
 <h2 id="slide-52-h"><span id="slide-52"></span>Slide 52: Model output</h2>
-<figure role="group"><figcaption><strong>Figure 52.1.</strong> R output: Poisson GLM, Count ~ Qcorr_qPCR, 2015. Intercept 4.290, Qcorr_qPCR 3.826 (p&lt;2e-16). Residual deviance 1470 on 14 df, AIC 1555.9 — severe overdispersion.</figcaption></figure>
+<ul>
+<li>glm(formula = Count ~ Qcorr_qPCR, family = &quot;poisson&quot;, data = sockeye.adult[sockeye.adult$Year ==</li>
+<li>&quot;2015&quot;, ])</li>
+<li>Deviance Residuals:</li>
+<li>Min       1Q   Median       3Q      Max</li>
+<li>-13.5661 -11.7512  -3.2418   3.5480  19.4317</li>
+<li>Coefficients:</li>
+<li>Estimate Std. Error z value Pr(&gt;|z|)</li>
+<li>(Intercept)  4.29048    0.03329  128.90   &lt;2e-16 ***</li>
+<li>Qcorr_qPCR   3.82647    0.10393   36.82   &lt;2e-16 ***</li>
+<li>---</li>
+<li>Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</li>
+<li>(Dispersion parameter for poisson family taken to be 1)</li>
+<li>Null deviance: 2666.3  on 15  degrees of freedom</li>
+<li>Residual deviance: 1470.1  on 14  degrees of freedom</li>
+<li>AIC: 1555.9</li>
+<li>Number of Fisher Scoring iterations: 5</li>
+</ul>
 </section>
 <section aria-labelledby="slide-53-h">
 <h2 id="slide-53-h"><span id="slide-53"></span>Slide 53: Model output</h2>
-<figure role="group"><figcaption><strong>Figure 53.1.</strong> R output: Poisson GLM, Count ~ Qcorr_qPCR, 2016. Intercept 3.047, Qcorr_qPCR 4.336 (p&lt;2e-16). Residual deviance 2918 on 37 df, AIC 3025 — severe overdispersion.</figcaption></figure>
+<ul>
+<li>glm(formula = Count ~ Qcorr_qPCR, family = &quot;poisson&quot;, data = sockeye.adult[sockeye.adult$Year ==</li>
+<li>&quot;2016&quot;, ])</li>
+<li>Deviance Residuals:</li>
+<li>Min       1Q   Median       3Q      Max</li>
+<li>-14.2212  -6.4894  -6.4878  -0.8424  36.7864</li>
+<li>Coefficients:</li>
+<li>Estimate Std. Error z value Pr(&gt;|z|)</li>
+<li>(Intercept)  3.04662    0.03573   85.27   &lt;2e-16 ***</li>
+<li>Qcorr_qPCR   4.33630    0.06636   65.34   &lt;2e-16 ***</li>
+<li>---</li>
+<li>Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</li>
+<li>(Dispersion parameter for poisson family taken to be 1)</li>
+<li>Null deviance: 6890.4  on 38  degrees of freedom</li>
+<li>Residual deviance: 2918.3  on 37  degrees of freedom</li>
+<li>AIC: 3025.1</li>
+<li>Number of Fisher Scoring iterations: 6</li>
+</ul>
 </section>
 <section aria-labelledby="slide-54-h">
 <h2 id="slide-54-h"><span id="slide-54"></span>Slide 54: How does this look? Concerns? What now? Are we done?</h2>
@@ -477,42 +513,34 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 </ul>
 </section>
 <section aria-labelledby="slide-56-h">
-<h2 id="slide-56-h"><span id="slide-56"></span>Slide 56: We are not done!</h2>
-<ul>
-<li>Let’s plot the response</li>
-<li>What are two ways we can do this? How?</li>
-<li style="margin-left:1.2em">Reminder: We have daily flow-corrected qPCR (eDNA rate) and counts</li>
-</ul>
-</section>
-<section aria-labelledby="slide-57-h">
-<h2 id="slide-57-h"><span id="slide-57"></span>Slide 57: 1. X vs. Y</h2>
+<h2 id="slide-56-h"><span id="slide-56"></span>Slide 56: 1. X vs. Y</h2>
 <ul>
 <li>Why isn’t this a line if we fit</li>
 <li style="margin-left:1.2em">glm(Count ~ Qcorr_qPCR , family = &quot;poisson&quot;)</li>
 <li>CI is far too narrow because of overdispersion (variance &gt; mean)</li>
 <li>Nothing else obvious</li>
 </ul>
-<figure role="group"><figcaption><strong>Figure 57.1.</strong> Two scatterplots (2015, 2016) of sockeye counts versus eDNA rate with a dashed blue Poisson fit and a very narrow gray confidence band; the curve bends upward, not a straight line.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 56.1.</strong> Two scatterplots (2015, 2016) of sockeye counts versus eDNA rate with a dashed blue Poisson fit and a very narrow gray confidence band; the curve bends upward, not a straight line.</figcaption></figure>
 </section>
-<section aria-labelledby="slide-58-h">
-<h2 id="slide-58-h"><span id="slide-58"></span>Slide 58: 2. Good models make good predictions</h2>
-<figure role="group"><figcaption><strong>Figure 58.1.</strong> Two panels (2015, 2016) of observed sockeye counts (black dots) versus fitted values (dashed blue) over date; the fit consistently overpredicts the low and zero counts.</figcaption></figure>
+<section aria-labelledby="slide-57-h">
+<h2 id="slide-57-h"><span id="slide-57"></span>Slide 57: 2. Good models make good predictions</h2>
+<figure role="group"><figcaption><strong>Figure 57.1.</strong> Two panels (2015, 2016) of observed sockeye counts (black dots) versus fitted values (dashed blue) over date; the fit consistently overpredicts the low and zero counts.</figcaption></figure>
 <ul>
 <li>Ah, look at that. We are consistently overpredicting the low/no counts!</li>
 <li>Why? Let’s think more carefully</li>
 <li>Is this model mispecified somehow?</li>
 </ul>
 </section>
-<section aria-labelledby="slide-59-h">
-<h2 id="slide-59-h"><span id="slide-59"></span>Slide 59: What is being fit here exactly?</h2>
-<figure role="group"><figcaption><strong>Figure 59.1.</strong> Two panels (2015, 2016) of sockeye count versus date, observed dots and dashed blue Poisson fit; the fitted line stays above zero even when observed counts are zero.</figcaption></figure>
+<section aria-labelledby="slide-58-h">
+<h2 id="slide-58-h"><span id="slide-58"></span>Slide 58: What is being fit here exactly?</h2>
+<figure role="group"><figcaption><strong>Figure 58.1.</strong> Two panels (2015, 2016) of sockeye count versus date, observed dots and dashed blue Poisson fit; the fitted line stays above zero even when observed counts are zero.</figcaption></figure>
 <ul>
 <li>What would eDNA rate have to be to match zero counts? Do you see it?</li>
 <li>Yeah, that’s a problem! How do we fix it?</li>
 </ul>
 </section>
-<section aria-labelledby="slide-60-h">
-<h2 id="slide-60-h"><span id="slide-60"></span>Slide 60: eDNA rate should be transformed from positive to the whole real line! How?</h2>
+<section aria-labelledby="slide-59-h">
+<h2 id="slide-59-h"><span id="slide-59"></span>Slide 59: eDNA rate should be transformed from positive to the whole real line! How?</h2>
 <ul>
 <li>Log(eDNA) &gt; 0 when eDNA &gt; 1</li>
 <li>Log(eDNA) = 0 when eDNA = 1</li>
@@ -524,21 +552,55 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li>But what functional form are we really fitting here?</li>
 </ul>
 </section>
-<section aria-labelledby="slide-61-h">
-<h2 id="slide-61-h"><span id="slide-61"></span>Slide 61: log(Y) = a + b*log(X)</h2>
+<section aria-labelledby="slide-60-h">
+<h2 id="slide-60-h"><span id="slide-60"></span>Slide 60: log(Y) = a + b*log(X)</h2>
 <p><em>(No text on this slide.)</em></p>
+</section>
+<section aria-labelledby="slide-61-h">
+<h2 id="slide-61-h"><span id="slide-61"></span>Slide 61: New model output</h2>
+<ul>
+<li>glm(formula = Count ~ log(Qcorr_qPCR), family = &quot;poisson&quot;, data = sockeye.adult[sockeye.adult$Year ==</li>
+<li>&quot;2015&quot;, ])</li>
+<li>Deviance Residuals:</li>
+<li>Min       1Q   Median       3Q      Max</li>
+<li>-14.5709  -6.1344  -1.5773   3.4050  17.3989</li>
+<li>Coefficients:</li>
+<li>Estimate Std. Error z value Pr(&gt;|z|)</li>
+<li>(Intercept)      6.42652    0.04458  144.16   &lt;2e-16 ***</li>
+<li>log(Qcorr_qPCR)  0.62802    0.02284   27.49   &lt;2e-16 ***</li>
+<li>---</li>
+<li>Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</li>
+<li>(Dispersion parameter for poisson family taken to be 1)</li>
+<li>Null deviance: 2666.3  on 15  degrees of freedom</li>
+<li>Residual deviance: 1088.8  on 14  degrees of freedom</li>
+<li>AIC: 1174.6</li>
+<li>Number of Fisher Scoring iterations: 6</li>
+</ul>
 </section>
 <section aria-labelledby="slide-62-h">
 <h2 id="slide-62-h"><span id="slide-62"></span>Slide 62: New model output</h2>
-<figure role="group"><figcaption><strong>Figure 62.1.</strong> R output: Poisson GLM, Count ~ log(Qcorr_qPCR), 2015. Intercept 6.427, log(Qcorr_qPCR) 0.628. Residual deviance 1089 on 14 df, AIC 1174.6.</figcaption></figure>
+<ul>
+<li>glm(formula = Count ~ log(Qcorr_qPCR), family = &quot;poisson&quot;, data = sockeye.adult[sockeye.adult$Year ==</li>
+<li>&quot;2016&quot;, ])</li>
+<li>Deviance Residuals:</li>
+<li>Min       1Q   Median       3Q      Max</li>
+<li>-12.2184  -2.6595  -0.9382  -0.4217  21.8418</li>
+<li>Coefficients:</li>
+<li>Estimate Std. Error z value Pr(&gt;|z|)</li>
+<li>(Intercept)      6.25952    0.02922  214.24   &lt;2e-16 ***</li>
+<li>log(Qcorr_qPCR)  0.78915    0.01716   45.99   &lt;2e-16 ***</li>
+<li>---</li>
+<li>Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</li>
+<li>(Dispersion parameter for poisson family taken to be 1)</li>
+<li>Null deviance: 6890.4  on 38  degrees of freedom</li>
+<li>Residual deviance: 1174.6  on 37  degrees of freedom</li>
+<li>AIC: 1281.4</li>
+<li>Number of Fisher Scoring iterations: 5</li>
+</ul>
 </section>
 <section aria-labelledby="slide-63-h">
-<h2 id="slide-63-h"><span id="slide-63"></span>Slide 63: New model output</h2>
-<figure role="group"><figcaption><strong>Figure 63.1.</strong> R output: Poisson GLM, Count ~ log(Qcorr_qPCR), 2016. Intercept 6.260, log(Qcorr_qPCR) 0.789. Residual deviance 1175 on 37 df, AIC 1281.4.</figcaption></figure>
-</section>
-<section aria-labelledby="slide-64-h">
-<h2 id="slide-64-h"><span id="slide-64"></span>Slide 64: Good models make good predictions</h2>
-<figure role="group"><figcaption><strong>Figure 64.1.</strong> Two panels (2015, 2016) of sockeye count versus date, observed dots and dashed blue log-link Poisson fit; the fit now drops to near zero where observed counts are zero.</figcaption></figure>
+<h2 id="slide-63-h"><span id="slide-63"></span>Slide 63: Good models make good predictions</h2>
+<figure role="group"><figcaption><strong>Figure 63.1.</strong> Two panels (2015, 2016) of sockeye count versus date, observed dots and dashed blue log-link Poisson fit; the fit now drops to near zero where observed counts are zero.</figcaption></figure>
 <ul>
 <li>Much better at predicting zeros now</li>
 <li>But still very narrow confidence intervals that don’t make sense</li>
@@ -546,8 +608,8 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li>Now let’s fix the overdispersion problem</li>
 </ul>
 </section>
-<section aria-labelledby="slide-65-h">
-<h2 id="slide-65-h"><span id="slide-65"></span>Slide 65: Quasipoisson GLM</h2>
+<section aria-labelledby="slide-64-h">
+<h2 id="slide-64-h"><span id="slide-64"></span>Slide 64: Quasipoisson GLM</h2>
 <ul>
 <li>The Normal distribution has the mean and variance as separate parameters, but this is unusual</li>
 <li>Poisson distribution has variance equal to the mean</li>
@@ -555,38 +617,45 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li>This ”dispersion parameter” is the constant of proportionality that defines how much larger or smaller the variance is than the mean</li>
 </ul>
 </section>
+<section aria-labelledby="slide-65-h">
+<h2 id="slide-65-h"><span id="slide-65"></span>Slide 65: Quasipoisson GLM</h2>
+<ul>
+<li>glm(formula = Count ~ log(Qcorr_qPCR), family = &quot;quasipoisson&quot;,</li>
+<li>data = sockeye.adult[sockeye.adult$Year == &quot;2015&quot;, ])</li>
+<li>Deviance Residuals:</li>
+<li>Min       1Q   Median       3Q      Max</li>
+<li>-14.5709  -6.1344  -1.5773   3.4050  17.3989</li>
+<li>Coefficients:</li>
+<li>Estimate Std. Error t value Pr(&gt;|t|)</li>
+<li>(Intercept)       6.4265     0.3940  16.310 1.67e-10 ***</li>
+<li>log(Qcorr_qPCR)   0.6280     0.2019   3.111  0.00767 **</li>
+<li>---</li>
+<li>Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</li>
+<li>(Dispersion parameter for quasipoisson family taken to be 78.1201)</li>
+<li>Null deviance: 2666.3  on 15  degrees of freedom</li>
+<li>Residual deviance: 1088.8  on 14  degrees of freedom</li>
+<li>AIC: NA</li>
+<li>Number of Fisher Scoring iterations: 6</li>
+</ul>
+</section>
 <section aria-labelledby="slide-66-h">
-<h2 id="slide-66-h"><span id="slide-66"></span>Slide 66: Quasipoisson GLM</h2>
-<figure role="group"><figcaption><strong>Figure 66.1.</strong> R output: quasipoisson GLM, Count ~ log(Qcorr_qPCR), 2015. Same estimates as Poisson (6.43, 0.628) but larger SEs; dispersion parameter 78.12, no AIC.</figcaption></figure>
-<p>Identical estimate</p>
-<p>Variance 78 times larger than the mean</p>
-<p>Larger p-value</p>
+<h2 id="slide-66-h"><span id="slide-66"></span>Slide 66: Quasipoisson figures</h2>
+<figure role="group"><figcaption><strong>Figure 66.1.</strong> Two scatterplots (2015, 2016) of sockeye counts versus eDNA rate, dashed blue quasipoisson fit with a wide gray confidence band that now spans most of the data.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-67-h">
-<h2 id="slide-67-h"><span id="slide-67"></span>Slide 67: Quasipoisson GLM</h2>
-<figure role="group"><figcaption><strong>Figure 67.1.</strong> R output: quasipoisson GLM, Count ~ log(Qcorr_qPCR), 2016. Estimates 6.26 and 0.789 unchanged; dispersion parameter 39.47, larger p-values, no AIC.</figcaption></figure>
-<p>Identical estimate</p>
-<p>Variance 39.5 times larger than the mean</p>
-<p>Larger p-value</p>
+<h2 id="slide-67-h"><span id="slide-67"></span>Slide 67: Quasipoisson figures</h2>
+<figure role="group"><figcaption><strong>Figure 67.1.</strong> Two panels (2015, 2016) of sockeye count versus date, dashed blue quasipoisson fit with a wide gray confidence band around the observed points.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-68-h">
-<h2 id="slide-68-h"><span id="slide-68"></span>Slide 68: Quasipoisson figures</h2>
-<figure role="group"><figcaption><strong>Figure 68.1.</strong> Two scatterplots (2015, 2016) of sockeye counts versus eDNA rate, dashed blue quasipoisson fit with a wide gray confidence band that now spans most of the data.</figcaption></figure>
-</section>
-<section aria-labelledby="slide-69-h">
-<h2 id="slide-69-h"><span id="slide-69"></span>Slide 69: Quasipoisson figures</h2>
-<figure role="group"><figcaption><strong>Figure 69.1.</strong> Two panels (2015, 2016) of sockeye count versus date, dashed blue quasipoisson fit with a wide gray confidence band around the observed points.</figcaption></figure>
-</section>
-<section aria-labelledby="slide-70-h">
-<h2 id="slide-70-h"><span id="slide-70"></span>Slide 70: This is great, but….</h2>
+<h2 id="slide-68-h"><span id="slide-68"></span>Slide 68: This is great, but….</h2>
 <ul>
 <li>No AIC.</li>
 <li>We’ll talk about AIC later, but if you need AIC then we need another distribution</li>
 <li>Which one?</li>
 </ul>
 </section>
-<section aria-labelledby="slide-71-h">
-<h2 id="slide-71-h"><span id="slide-71"></span>Slide 71: Negative binomial</h2>
+<section aria-labelledby="slide-69-h">
+<h2 id="slide-69-h"><span id="slide-69"></span>Slide 69: Negative binomial</h2>
 <p>Can’t use glm(). Need to use glm.nb() in the MASS package</p>
 <ul>
 <li>sockeye.adult.2015.reg.NB &lt;- glm.nb(Count ~ log(Qcorr_qPCR) ,</li>
@@ -599,86 +668,67 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li>Still use logarithm here</li>
 </ul>
 </section>
+<section aria-labelledby="slide-70-h">
+<h2 id="slide-70-h"><span id="slide-70"></span>Slide 70: Negative binomial</h2>
+<p>We now have AIC</p>
+<ul>
+<li>glm.nb(formula = Count ~ log(Qcorr_qPCR), data = sockeye.adult[sockeye.adult$Year ==</li>
+<li>&quot;2015&quot;, ], init.theta = 0.7864342616, link = log)</li>
+<li>Deviance Residuals:</li>
+<li>Min       1Q   Median       3Q      Max</li>
+<li>-2.7537  -0.6590  -0.4000   0.2669   1.3384</li>
+<li>Coefficients:</li>
+<li>Estimate Std. Error z value Pr(&gt;|z|)</li>
+<li>(Intercept)       6.8527     0.5032  13.619  &lt; 2e-16 ***</li>
+<li>log(Qcorr_qPCR)   0.8128     0.1518   5.355 8.55e-08 ***</li>
+<li>---</li>
+<li>Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</li>
+<li>(Dispersion parameter for Negative Binomial(0.7864) family taken to be 1)</li>
+<li>Null deviance: 40.432  on 15  degrees of freedom</li>
+<li>Residual deviance: 17.362  on 14  degrees of freedom</li>
+<li>AIC: 169.4</li>
+</ul>
+</section>
+<section aria-labelledby="slide-71-h">
+<h2 id="slide-71-h"><span id="slide-71"></span>Slide 71: Negative binomial</h2>
+<figure role="group"><figcaption><strong>Figure 71.1.</strong> Two scatterplots (2015, 2016) of sockeye counts versus eDNA rate with a dashed blue negative-binomial fit and a wide gray confidence band.</figcaption></figure>
+</section>
 <section aria-labelledby="slide-72-h">
 <h2 id="slide-72-h"><span id="slide-72"></span>Slide 72: Negative binomial</h2>
-<figure role="group"><figcaption><strong>Figure 72.1.</strong> R output: negative-binomial glm.nb, Count ~ log(Qcorr_qPCR), 2015, theta 0.786. Intercept 6.853, slope 0.813; residual deviance 17.4 on 14 df, AIC 169.4.</figcaption></figure>
-<p>We now have AIC</p>
+<figure role="group"><figcaption><strong>Figure 72.1.</strong> Two panels (2015, 2016) of sockeye count versus date, dashed blue negative-binomial fit with a gray confidence band around observed points.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-73-h">
-<h2 id="slide-73-h"><span id="slide-73"></span>Slide 73: Negative binomial</h2>
-<figure role="group"><figcaption><strong>Figure 73.1.</strong> R output: negative-binomial glm.nb, Count ~ log(Qcorr_qPCR), 2016, theta 0.689. Intercept 6.615, slope 0.913; residual deviance 30.7 on 37 df, AIC 220.5.</figcaption></figure>
-<p>We now have AIC</p>
+<h2 id="slide-73-h"><span id="slide-73"></span>Slide 73: Gamma</h2>
+<ul>
+<li>Another common GLM.</li>
+<li>Useful for positive and continuous data</li>
+<li>What is mean variance relationship?</li>
+</ul>
 </section>
 <section aria-labelledby="slide-74-h">
-<h2 id="slide-74-h"><span id="slide-74"></span>Slide 74: Negative binomial</h2>
-<figure role="group"><figcaption><strong>Figure 74.1.</strong> Two scatterplots (2015, 2016) of sockeye counts versus eDNA rate with a dashed blue negative-binomial fit and a wide gray confidence band.</figcaption></figure>
+<h2 id="slide-74-h"><span id="slide-74"></span>Slide 74: Gamma</h2>
+<ul>
+<li>Another common GLM.</li>
+<li>Useful for positive and continuous data</li>
+<li>What is mean variance relationship?</li>
+</ul>
+<ul>
+<li>Parameters, shape-scale: k &gt; 0 (shape), θ &gt; 0 (scale)</li>
+<li>Parameters, shape-rate: α &gt; 0 (shape), β &gt; 0 (rate)</li>
+<li>Support: x ∈ (0, ∞)</li>
+<li>PDF, shape-scale: (1 / (Γ(k) θk)) · xk−1 · exp(−x / θ)</li>
+<li>PDF, shape-rate: (βα / Γ(α)) · xα−1 · exp(−β x)</li>
+<li>Mean: E[X] = k θ (shape-scale) = α / β (shape-rate)</li>
+<li>Variance: Var(X) = k θ2 (shape-scale) = α / β2 (shape-rate)</li>
+</ul>
 </section>
 <section aria-labelledby="slide-75-h">
-<h2 id="slide-75-h"><span id="slide-75"></span>Slide 75: Negative binomial</h2>
-<figure role="group"><figcaption><strong>Figure 75.1.</strong> Two panels (2015, 2016) of sockeye count versus date, dashed blue negative-binomial fit with a gray confidence band around observed points.</figcaption></figure>
+<h2 id="slide-75-h"><span id="slide-75"></span>Slide 75: Interaction Terms</h2>
+<p>“Context dependence” – The effect of one predictor depends on the value of another predictor</p>
+<figure role="group"><figcaption><strong>Figure 75.1.</strong> Journal header image: Biological Reviews (2023) article &#x27;Understanding &quot;it depends&quot; in ecology: a guide to hypothesising, visualising and interpreting statistical interactions.&#x27;</figcaption></figure>
 </section>
 <section aria-labelledby="slide-76-h">
-<h2 id="slide-76-h"><span id="slide-76"></span>Slide 76: Anything else we’re ignoring?</h2>
-<ul>
-<li>A key assumption is that residuals are independent, and identically distributed (iid)</li>
-<li>What about this problem calls this into question?</li>
-</ul>
-</section>
-<section aria-labelledby="slide-77-h">
-<h2 id="slide-77-h"><span id="slide-77"></span>Slide 77: There was a world before GLMs</h2>
-<ul>
-<li>VERY recently people avoided this</li>
-<li>How did we deal with this type of data back then?</li>
-</ul>
-</section>
-<section aria-labelledby="slide-78-h">
-<h2 id="slide-78-h"><span id="slide-78"></span>Slide 78: There was a world before GLMs</h2>
-<ul>
-<li>Ordinary least squares with transformed data!</li>
-<li>How does that work here?</li>
-<li>Let’s start with untransformed data. What are the problems for OLS?</li>
-</ul>
-<figure role="group"><figcaption><strong>Figure 78.1.</strong> Two scatterplots of sockeye Count versus eDNA rate (2015, 2016), raw untransformed data; points fan out with increasing spread, showing non-constant variance.</figcaption></figure>
-</section>
-<section aria-labelledby="slide-79-h">
-<h2 id="slide-79-h"><span id="slide-79"></span>Slide 79: There was a world before GLMs</h2>
-<ul>
-<li>Does the variance look constant here?</li>
-<li>This is called “heteroskedasticity”</li>
-<li>Does this look linear?</li>
-</ul>
-<figure role="group"><figcaption><strong>Figure 79.1.</strong> Two scatterplots of sockeye Count versus eDNA rate (2015, 2016), untransformed; variance increases with the mean (heteroskedasticity) and the trend is not linear.</figcaption></figure>
-</section>
-<section aria-labelledby="slide-80-h">
-<h2 id="slide-80-h"><span id="slide-80"></span>Slide 80: Gamma</h2>
-<ul>
-<li>Another common GLM.</li>
-<li>Useful for positive and continuous data</li>
-<li>What is mean variance relationship?</li>
-</ul>
-</section>
-<section aria-labelledby="slide-81-h">
-<h2 id="slide-81-h"><span id="slide-81"></span>Slide 81: Gamma</h2>
-<ul>
-<li>Another common GLM.</li>
-<li>Useful for positive and continuous data</li>
-<li>What is mean variance relationship?</li>
-</ul>
-<figure role="group"><figcaption><strong>Figure 81.1.</strong> Equation: table row giving the Gamma mean two ways: E[X] = k*theta (shape-scale) and E[X] = alpha/beta (shape-rate).</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 81.2.</strong> Equation: Gamma parameters and PDF. Shape-scale (k, theta) and shape-rate (alpha, beta); support x in (0, infinity); PDF (1/(Gamma(k) theta^k)) x^(k-1) e^(-x/theta), and (beta^alpha/Gamma(alpha)) x^(alpha-1) e^(-beta x).</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 81.3.</strong> Equation: Gamma variance two ways: Var(X) = k*theta^2 (shape-scale) and Var(X) = alpha/beta^2 (shape-rate).</figcaption></figure>
-<ul>
-<li>Variance is proportional to the mean</li>
-<li>As theta gets big or beta smaller, the variance increases relative to the mean</li>
-</ul>
-</section>
-<section aria-labelledby="slide-82-h">
-<h2 id="slide-82-h"><span id="slide-82"></span>Slide 82: Interaction Terms</h2>
-<p>“Context dependence” – The effect of one predictor depends on the value of another predictor</p>
-<figure role="group"><figcaption><strong>Figure 82.1.</strong> Journal header image: Biological Reviews (2023) article &#x27;Understanding &quot;it depends&quot; in ecology: a guide to hypothesising, visualising and interpreting statistical interactions.&#x27;</figcaption></figure>
-</section>
-<section aria-labelledby="slide-83-h">
-<h2 id="slide-83-h"><span id="slide-83"></span>Slide 83: Interpretation and Symmetry of Interactions</h2>
+<h2 id="slide-76-h"><span id="slide-76"></span>Slide 76: Interpretation and Symmetry of Interactions</h2>
 <ul>
 <li>How does the effect of x1 on y change depending on the value of x2</li>
 <li>How does the effect of x2 on y change depending on the value of x1</li>
@@ -687,71 +737,74 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <p>Factor out x1</p>
 <p>Factor out x2</p>
 </section>
-<section aria-labelledby="slide-84-h">
-<h2 id="slide-84-h"><span id="slide-84"></span>Slide 84: Interpretation and Symmetry of Interactions</h2>
+<section aria-labelledby="slide-77-h">
+<h2 id="slide-77-h"><span id="slide-77"></span>Slide 77: Interpretation and Symmetry of Interactions</h2>
 <p>Vs.</p>
-<figure role="group"><figcaption><strong>Figure 84.1.</strong> 3D surface plot titled &#x27;y ~ x1 + x2&#x27;: a flat tilted plane over x1 and x2, showing an additive model with no interaction (color from dark low to yellow high).</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 84.2.</strong> 3D surface plot titled &#x27;y ~ x1 * x2&#x27;: a twisted saddle-shaped surface over x1 and x2, showing how an interaction term warps the response.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 77.1.</strong> 3D surface plot titled &#x27;y ~ x1 + x2&#x27;: a flat tilted plane over x1 and x2, showing an additive model with no interaction (color from dark low to yellow high).</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 77.2.</strong> 3D surface plot titled &#x27;y ~ x1 * x2&#x27;: a twisted saddle-shaped surface over x1 and x2, showing how an interaction term warps the response.</figcaption></figure>
 </section>
-<section aria-labelledby="slide-85-h">
-<h2 id="slide-85-h"><span id="slide-85"></span>Slide 85: Interpretation and Symmetry of Interactions</h2>
+<section aria-labelledby="slide-78-h">
+<h2 id="slide-78-h"><span id="slide-78"></span>Slide 78: Interpretation and Symmetry of Interactions</h2>
 <p>Vs.</p>
-<figure role="group"><figcaption><strong>Figure 85.1.</strong> Heatmap of predicted y with no true interaction: a smooth gradient increasing with x1 (dark at low x1 to yellow at high x1), roughly parallel bands.</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 85.2.</strong> Heatmap of predicted y with an interaction: the gradient bends diagonally, brightest at high x1/low x2 and at high x2/high x1, showing curved, non-parallel contours.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 78.1.</strong> Heatmap of predicted y with no true interaction: a smooth gradient increasing with x1 (dark at low x1 to yellow at high x1), roughly parallel bands.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 78.2.</strong> Heatmap of predicted y with an interaction: the gradient bends diagonally, brightest at high x1/low x2 and at high x2/high x1, showing curved, non-parallel contours.</figcaption></figure>
 </section>
-<section aria-labelledby="slide-86-h">
-<h2 id="slide-86-h"><span id="slide-86"></span>Slide 86: Dependence on scaling and transformation I</h2>
+<section aria-labelledby="slide-79-h">
+<h2 id="slide-79-h"><span id="slide-79"></span>Slide 79: Dependence on scaling and transformation I</h2>
 <ul>
 <li>Simulate data with no interaction</li>
 <li>Y = 200+3*x1 - 4*x2</li>
 </ul>
-<figure role="group"><figcaption><strong>Figure 86.1.</strong> R output for lm(y ~ x1*x2) on data simulated with no interaction: x1 3.0, x2 -4.0 highly significant, interaction x1:x2 -0.00055 (p=0.586, not significant).</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 79.1.</strong> R output for lm(y ~ x1*x2) on data simulated with no interaction: x1 3.0, x2 -4.0 highly significant, interaction x1:x2 -0.00055 (p=0.586, not significant).</figcaption></figure>
 <p>lm(y~x1*x2)</p>
-<figure role="group"><figcaption><strong>Figure 86.2.</strong> Two scatterplots: y versus x1 (positive trend) and y versus x2 (negative trend), each with scattered points, from data simulated with no true interaction.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 79.2.</strong> Two scatterplots: y versus x1 (positive trend) and y versus x2 (negative trend), each with scattered points, from data simulated with no true interaction.</figcaption></figure>
 </section>
-<section aria-labelledby="slide-87-h">
-<h2 id="slide-87-h"><span id="slide-87"></span>Slide 87: Dependence on scaling and transformation II</h2>
+<section aria-labelledby="slide-80-h">
+<h2 id="slide-80-h"><span id="slide-80"></span>Slide 80: Dependence on scaling and transformation II</h2>
 <p>Log transform dependent variable</p>
 <p>lm(log(y)~x1*x2)</p>
-<figure role="group"><figcaption><strong>Figure 87.1.</strong> Same two scatterplots of y versus x1 (positive) and y versus x2 (negative) from the no-interaction simulation, before log-transforming y.</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 87.2.</strong> R output for lm(log(y) ~ x1*x2): now the interaction x1:x2 0.00031 is highly significant (p=4.85e-08), a spurious interaction created by the log transform.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 80.1.</strong> Same two scatterplots of y versus x1 (positive) and y versus x2 (negative) from the no-interaction simulation, before log-transforming y.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 80.2.</strong> R output for lm(log(y) ~ x1*x2): now the interaction x1:x2 0.00031 is highly significant (p=4.85e-08), a spurious interaction created by the log transform.</figcaption></figure>
 <p>What is happening and why?!</p>
 </section>
-<section aria-labelledby="slide-88-h">
-<h2 id="slide-88-h"><span id="slide-88"></span>Slide 88: Additivity not preserved across nonlinear transformations!</h2>
+<section aria-labelledby="slide-81-h">
+<h2 id="slide-81-h"><span id="slide-81"></span>Slide 81: Additivity not preserved across nonlinear transformations!</h2>
 <p>If log(y) is a function of additive x1 and x2, will y generate an interaction?</p>
 <p>Equations for reference, work through on paper</p>
 </section>
-<section aria-labelledby="slide-89-h">
-<h2 id="slide-89-h"><span id="slide-89"></span>Slide 89: Confusion in action with major policy implications!</h2>
-<figure role="group"><figcaption><strong>Figure 89.1.</strong> Journal header: Global Change Biology research article &#x27;Habitat alteration or climate: What drives the densities of an invading ungulate?&#x27; by Dickie et al., 2024.</figcaption></figure>
+<section aria-labelledby="slide-82-h">
+<h2 id="slide-82-h"><span id="slide-82"></span>Slide 82: Confusion in action with major policy implications!</h2>
+<figure role="group"><figcaption><strong>Figure 82.1.</strong> Journal header: Global Change Biology research article &#x27;Habitat alteration or climate: What drives the densities of an invading ungulate?&#x27; by Dickie et al., 2024.</figcaption></figure>
 <p>Q: Deer are expanding, driving decline of caribou by supporting wolves. Is this due to logging or climate or both?</p>
-<figure role="group"><figcaption><strong>Figure 89.2.</strong> Journal header: Global Change Biology Letter to the Editor &#x27;The influence of habitat alteration on density of invading white-tailed deer should not be discounted.&#x27;</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 89.3.</strong> Journal header: Global Change Biology Response &#x27;The influence of habitat alteration is widespread, but the impact of climate cannot continue to be discounted,&#x27; by Dickie et al.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 82.2.</strong> Journal header: Global Change Biology Letter to the Editor &#x27;The influence of habitat alteration on density of invading white-tailed deer should not be discounted.&#x27;</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 82.3.</strong> Journal header: Global Change Biology Response &#x27;The influence of habitat alteration is widespread, but the impact of climate cannot continue to be discounted,&#x27; by Dickie et al.</figcaption></figure>
 <p>(1)</p>
 <p>(2)</p>
 <p>(3)</p>
-<figure role="group"><figcaption><strong>Figure 89.4.</strong> List of author names with ORCID icons: Barnas, Anholt, Burton, Carroll, Cote, Festa-Bianchet, Fryxell, St-Laurent, and Fisher.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 82.4.</strong> List of author names with ORCID icons: Barnas, Anholt, Burton, Carroll, Cote, Festa-Bianchet, Fryxell, St-Laurent, and Fisher.</figcaption></figure>
 </section>
-<section aria-labelledby="slide-90-h">
-<h2 id="slide-90-h"><span id="slide-90"></span>Slide 90: What was the point made by Barnas et al.?</h2>
-<figure role="group"><figcaption><strong>Figure 90.1.</strong> Journal text explaining min-max versus z-standardization of predictors, with Equation (1): x_i(min-max scaled) = (x_i - minimum(x)) / (maximum(x) - minimum(x)).</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 90.2.</strong> Journal text with Equation (2): z_i = (x_i - mu)/sigma. Explains that switching from min-max to z-scaling reversed the sign and significance of climate and habitat-alteration effects.</figcaption></figure>
+<section aria-labelledby="slide-83-h">
+<h2 id="slide-83-h"><span id="slide-83"></span>Slide 83: What was the point made by Barnas et al.?</h2>
+<figure role="group"><figcaption><strong>Figure 83.1.</strong> Journal text explaining min-max versus z-standardization of predictors, with Equation (1): x_i(min-max scaled) = (x_i - minimum(x)) / (maximum(x) - minimum(x)).</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 83.2.</strong> Journal text with Equation (2): z_i = (x_i - mu)/sigma. Explains that switching from min-max to z-scaling reversed the sign and significance of climate and habitat-alteration effects.</figcaption></figure>
 </section>
-<section aria-labelledby="slide-91-h">
-<h2 id="slide-91-h"><span id="slide-91"></span>Slide 91: What was the point made by Barnas et al.?</h2>
-<figure role="group"><figcaption><strong>Figure 91.1.</strong> Dot-and-error-bar plot of fixed-effect coefficients for deer density under two scalings (red min-max, blue z-standardize). Estimates differ in sign and magnitude across terms, especially Climate Dimension 1.</figcaption></figure>
+<section aria-labelledby="slide-84-h">
+<h2 id="slide-84-h"><span id="slide-84"></span>Slide 84: What was the point made by Barnas et al.?</h2>
+<figure role="group"><figcaption><strong>Figure 84.1.</strong> Dot-and-error-bar plot of fixed-effect coefficients for deer density under two scalings (red min-max, blue z-standardize). Estimates differ in sign and magnitude across terms, especially Climate Dimension 1.</figcaption></figure>
 <p>Weird. Why? Who is right?</p>
 </section>
-<section aria-labelledby="slide-92-h">
-<h2 id="slide-92-h"><span id="slide-92"></span>Slide 92: Models, especially with interactions, require algebra and especially geometry. Interpret the predictions!</h2>
-<figure role="group"><figcaption><strong>Figure 92.1.</strong> Six-panel figure of predicted deer density versus habitat alteration and climate, comparing z-standardized (top a-c) and min-max (bottom d-f) scalings; the two approaches give the same predicted-density curves.</figcaption></figure>
+<section aria-labelledby="slide-85-h">
+<h2 id="slide-85-h"><span id="slide-85"></span>Slide 85: Models, especially with interactions, require algebra and especially geometry. Interpret the predictions!</h2>
+<figure role="group"><figcaption><strong>Figure 85.1.</strong> Six-panel figure of predicted deer density versus habitat alteration and climate, comparing z-standardized (top a-c) and min-max (bottom d-f) scalings; the two approaches give the same predicted-density curves.</figcaption></figure>
 <ul>
 <li>As they SHOULD, the two approaches produce IDENTICAL predictions.</li>
 <li>-What are the predictions?</li>
 <li>-Was there a transformation?</li>
 </ul>
-<p>What lesson should we take from this?</p>
+<ul>
+<li>What lesson should we take from this?</li>
+<li>You cannot just interpret main effects. Let’s think about why they were different</li>
+</ul>
 </section>
 </main>
 

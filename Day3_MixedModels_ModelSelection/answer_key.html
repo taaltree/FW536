@@ -61,13 +61,16 @@
 <pre><code>boxplot(split(resid(lm1), Streams$Stream), ylab="Residual", xlab="Stream")
 abline(0, 0, lwd=3)</code></pre>
 
-<p><strong>(c) Shrinkage in action.</strong> Comparing <code>coef(lm2)</code> with <code>coef(lm3)</code> stream by stream, every <code>lm3</code> estimate is shifted slightly toward the grand mean (63.26). With only 3 observations per stream, the data have moderate leverage, so the shrinkage is modest — typically a few percent of the deviation. The most extreme stream (Stream 11 at ~12) gets pulled toward the grand mean by ~3–5%.</p>
+<p><strong>(c) Shrinkage in action.</strong> Comparing <code>coef(lm2)</code> with <code>coef(lm3)</code> stream by stream, every <code>lm3</code> estimate is shifted slightly toward the grand mean (63.26). The shift is <strong>1.49% of the deviation for every stream</strong> — the same percentage for all 100, not larger for the extreme ones. The design is balanced (exactly 3 observations per stream), and the shrinkage weight depends only on $n_j$:</p>
+<div class="eq-block">$B = \dfrac{\sigma^2/n}{\tau^2 + \sigma^2/n} = \dfrac{20.8/3}{459.1 + 20.8/3} = 0.0149$</div>
+<p>It is small because among-stream variance (459) dwarfs the uncertainty in a 3-observation mean (≈6.9): each stream's own data are precise <em>relative to</em> how much streams truly differ, so the model barely pulls them. Stream 11 (the lowest, 8.92) moves to 9.73; Stream 43 (the highest, 111.69) moves to 110.97.</p>
 
 <pre><code># Compare side by side
 data.frame(
- noPool = fixef(lm(Density ~ Stream - 1, data=Streams)),
- partPool = coef(lm3)$"(Intercept)"
+ noPool   = coef(lm(Density ~ factor(Stream) - 1, data=Streams)),
+ partPool = coef(lm3)$Stream[ , "(Intercept)"]
 )</code></pre>
+<div class="callout warn"><strong>Two traps in this code.</strong> <code>Stream</code> is stored as an integer, so <code>lm(Density ~ Stream - 1)</code> silently fits a single <em>slope</em> and recycles it down the column — you must write <code>factor(Stream)</code> to get per-stream means. And <code>coef()</code> on an <code>lmer</code> fit returns a list by grouping factor, so the intercepts are <code>coef(lm3)$Stream[ , "(Intercept)"]</code>. (<code>fixef()</code> does not work on an <code>lm</code> at all — it errors with "no applicable method".)</div>
 
 <p><strong>(d) Variance components.</strong> Approximate output:</p>
 <pre><code>Random effects:
@@ -160,7 +163,7 @@ Fixed effects:
  Estimate Std.Error
 (Intercept) -0.0009 0.569
 Z_Length 0.422 0.092</code></pre>
-<p>Almost all the slope variability lives across species (different feeding ecologies → different length-TP slopes). Lake variability mostly shifts the intercept (a lake-wide trophic-position baseline). Within-fish residual is small. <strong>Note the correlation of −0.99</strong> for the species (intercept, slope) — a singular fit, unsurprising given only 3 species. Note the slope&ndash;intercept correlation of <strong>+1.00</strong>: that is a degenerate (boundary) estimate &mdash; lmer has run out of data to identify the correlation and has pinned it at the edge of its range. Treat it as a warning that the random-slope structure is over-specified for this dataset, not as a real biological correlation.</p>
+<p>Almost all the slope variability lives across species (different feeding ecologies → different length-TP slopes). Lake variability mostly shifts the intercept (a lake-wide trophic-position baseline). Within-fish residual is small. <strong>Note the slope&ndash;intercept correlation of +1.00</strong> for the species (intercept, slope) — a singular fit, unsurprising given only 3 species. That is a degenerate (boundary) estimate &mdash; lmer has run out of data to identify the correlation and has pinned it at the edge of its range. Treat it as a warning that the random-slope structure is over-specified for this dataset, not as a real biological correlation.</p>
 
 <p><strong>(d) Practical risk with few levels.</strong> Variance components are essentially unidentifiable, singular fits are common, and any inference about the variance (CIs, LRTs) is poorly calibrated. Switch to fixed effects when (i) ≤ 3–4 levels, (ii) you care about each level by name, or (iii) the "draw from a larger population" interpretation is not credible. In this dataset, a model with fixed effects for Species and an interaction Length × Species — with Lake either fixed or random depending on the science question — would be very defensible.</p>
 

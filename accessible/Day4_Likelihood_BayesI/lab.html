@@ -1017,7 +1017,15 @@ best &lt;- <span class="fn">min</span>(prof)
 <li>How would your answer change if the prior had been Beta(1, 1) (flat)?</li>
 </ol>
 <details class="answer"><summary>Reveal</summary><div class="answer-body">
-<p>(a) Posterior is Beta(3 + 22, 7 + 40 - 22) = Beta(25, 25).</p>
+<p><strong>(a) Where Beta(25, 25) comes from — derive it, don't memorize it.</strong> Start from what the two lines of the model literally say. The prior is a Beta density, which as a function of $p$ (dropping the constant $1/B(\alpha,\beta)$) is</p>
+<div class="eq-block">$p(p) \;\propto\; p^{\alpha-1}(1-p)^{\beta-1} \;=\; p^{2}(1-p)^{6} \qquad (\alpha=3,\ \beta=7),$</div>
+<p>and the binomial likelihood, dropping the $\binom{n}{y}$ that doesn't contain $p$, is</p>
+<div class="eq-block">$L(p) \;\propto\; p^{y}(1-p)^{n-y} \;=\; p^{22}(1-p)^{18}.$</div>
+<p>Bayes' rule multiplies prior by likelihood, and multiplying powers of the same base just <em>adds the exponents</em>:</p>
+<div class="eq-block">$p(p\mid y) \;\propto\; p^{\alpha-1}(1-p)^{\beta-1}\cdot p^{y}(1-p)^{n-y} \;=\; p^{\,\alpha+y-1}(1-p)^{\,\beta+n-y-1}.$</div>
+<p>That last line is exactly the kernel of a Beta$(\alpha+y,\ \beta+n-y)$ — same functional form as the prior, which is what makes the Beta prior <strong>conjugate</strong> to the binomial likelihood. The move generalizes to <em>every</em> Beta–Binomial update, and it is the rule worth keeping: <strong>the $y$ successes land on the first parameter and the $n-y$ failures on the second</strong>. Plug in $\alpha=3,\ \beta=7,\ y=22,\ n-y=18$:</p>
+<div class="eq-block">$p(p\mid y) = \text{Beta}(3+22,\; 7+18) = \text{Beta}(25,\,25).$</div>
+<p>Sanity-check the pull: the prior mean was $3/10=0.30$ and the data proportion is $22/40=0.55$; the posterior mean is $25/50=0.50$ — parked between the two, exactly where a compromise between a skeptical prior and the data should sit.</p>
 <pre><code><span class="kw">library</span>(HDInterval)
 post &lt;- <span class="fn">rbeta</span>(<span class="nu">1e5</span>, <span class="nu">25</span>, <span class="nu">25</span>)
 <span class="fn">c</span>(mean = <span class="fn">mean</span>(post), median = <span class="fn">median</span>(post),
@@ -1039,6 +1047,9 @@ post &lt;- <span class="fn">rbeta</span>(<span class="nu">1e5</span>, <span clas
 </ol>
 <details class="answer"><summary>Reveal</summary><div class="answer-body">
 <p>(a) Working in $\log\lambda$ makes the proposal Normal symmetric in the unconstrained space and automatically respects $\lambda > 0$; otherwise you need a rejection step for proposals $\le 0$.</p>
+<p>There is one bookkeeping price for that reparameterization, and it is the <code>+ log_lam</code> line in the log-posterior — the <strong>Jacobian</strong>. When you sample $u=\log\lambda$ rather than $\lambda$, the change of variables stretches the density by the factor $\left|\dfrac{d\lambda}{du}\right| = \dfrac{d\,e^{u}}{du} = e^{u} = \lambda$, so the target density expressed in $u$ is $p(\lambda)\,L(\lambda)\cdot\lambda$. Take logs and that trailing factor becomes an additive term:</p>
+<div class="eq-block">$\log \tilde p(u) \;=\; \log p(\lambda) + \log L(\lambda) + \log\lambda, \qquad \lambda = e^{u}.$</div>
+<p>Drop the $+\log\lambda$ and the chain converges to $p(\lambda)L(\lambda)/\lambda$ — the wrong distribution. It survives into the acceptance ratio while the proposal density does not: because the random-walk proposal is <em>symmetric</em> in $u$ (a Normal step is as likely up as down), the proposal terms cancel in $\alpha = \min(1,\, \tilde p(u^\star)/\tilde p(u_{\text{current}}))$, leaving the Jacobian as the only correction you owe for the switch to log-space.</p>
 <pre><code>y &lt;- <span class="kw">c</span>(<span class="nu">3</span>,<span class="nu">1</span>,<span class="nu">4</span>,<span class="nu">2</span>,<span class="nu">0</span>,<span class="nu">5</span>,<span class="nu">2</span>,<span class="nu">3</span>,<span class="nu">1</span>,<span class="nu">4</span>)
 log_post &lt;- <span class="kw">function</span>(log_lam) {
  lam &lt;- <span class="fn">exp</span>(log_lam)
@@ -1096,12 +1107,17 @@ acc / <span class="fn">length</span>(ll)</code></pre>
 <li>Write one sentence explaining how the prior "tug" trades off with the data — i.e. how the effective sample size of the prior compares to $n=25$.</li>
 </ol>
 <details class="answer"><summary>Reveal</summary><div class="answer-body">
-<p>With $y=18$ successes in $n=25$, the data alone give $18/25 = 0.72$. Each prior pulls that toward its own mean, by an amount set by its pseudo-sample size $\alpha+\beta$ relative to $n$:</p>
+<p>With $y=18$ successes in $n=25$, the data alone give $18/25 = 0.72$. Each prior pulls that toward its own mean — and "pulls" is not a metaphor here, it is arithmetic you can derive once and reuse.</p>
+<p><strong>Why the pull is a weighted average.</strong> Beta–Binomial conjugacy makes the posterior Beta$(\alpha+y,\ \beta+n-y)$ (successes onto $\alpha$, failures onto $\beta$), and a Beta$(a,b)$ has mean $a/(a+b)$. So the posterior mean is</p>
+<div class="eq-block">$\mathbb{E}[\phi\mid y] = \dfrac{\alpha+y}{\alpha+\beta+n}.$</div>
+<p>Split that one fraction into the part the prior contributes and the part the data contribute:</p>
+<div class="eq-block">$\dfrac{\alpha+y}{\alpha+\beta+n} \;=\; \underbrace{\dfrac{\alpha+\beta}{\alpha+\beta+n}}_{w}\cdot\underbrace{\dfrac{\alpha}{\alpha+\beta}}_{\text{prior mean}} \;+\; \underbrace{\dfrac{n}{\alpha+\beta+n}}_{1-w}\cdot\underbrace{\dfrac{y}{n}}_{\text{data mean}}.$</div>
+<p>The posterior mean is a <strong>weighted average of the prior mean and the data proportion, weighted by their sample sizes</strong> — the prior's pseudo-count $\alpha+\beta$ against the real $n$, with weight $w=(\alpha+\beta)/(\alpha+\beta+n)$ on the prior. That single identity produces every row below; compute $w$, and the number falls out with no further work:</p>
 <ul>
-<li><strong>Beta(1,1)</strong> (flat, pseudo-$n=2$) &rarr; Beta(19,&nbsp;8), mean <strong>0.704</strong> &mdash; barely moved; the data dominate.</li>
-<li><strong>Beta(9,11)</strong> (mean 0.45, pseudo-$n=20$) &rarr; Beta(27,&nbsp;18), mean <strong>0.600</strong> &mdash; pulled about halfway, because pseudo-$n \approx n$.</li>
-<li><strong>Beta(50,50)</strong> (mean 0.50, pseudo-$n=100$) &rarr; Beta(68,&nbsp;57), mean <strong>0.544</strong> &mdash; yanked most of the way to 0.50: the prior is worth four times the data.</li>
-<li><strong>Beta(50,100)</strong> (mean 0.33, pseudo-$n=150$) &rarr; Beta(68,&nbsp;107), mean <strong>0.389</strong> &mdash; the posterior now sits closer to the prior than to the data.</li>
+<li><strong>Beta(1,1)</strong> (flat, pseudo-$n=2$, $w=2/27=0.07$) &rarr; Beta(19,&nbsp;8), mean $0.07(0.5)+0.93(0.72)=$ <strong>0.704</strong> &mdash; barely moved; the data dominate.</li>
+<li><strong>Beta(9,11)</strong> (mean 0.45, pseudo-$n=20$, $w=20/45=0.44$) &rarr; Beta(27,&nbsp;18), mean $0.44(0.45)+0.56(0.72)=$ <strong>0.600</strong> &mdash; pulled about halfway, because pseudo-$n \approx n$.</li>
+<li><strong>Beta(50,50)</strong> (mean 0.50, pseudo-$n=100$, $w=100/125=0.80$) &rarr; Beta(68,&nbsp;57), mean $0.80(0.50)+0.20(0.72)=$ <strong>0.544</strong> &mdash; yanked most of the way to 0.50: the prior is worth four times the data.</li>
+<li><strong>Beta(50,100)</strong> (mean 0.33, pseudo-$n=150$, $w=150/175=0.86$) &rarr; Beta(68,&nbsp;107), mean $0.86(0.33)+0.14(0.72)=$ <strong>0.389</strong> &mdash; the posterior now sits closer to the prior than to the data.</li>
 </ul>
 <p>The lesson: the prior matters most when its pseudo-sample size is large relative to $n$. Beta(50,50) is not a "weak" prior just because it is centred at one half &mdash; with $n=25$ it overwhelms the data.</p>
 </div></details>

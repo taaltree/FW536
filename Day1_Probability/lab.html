@@ -222,6 +222,9 @@ mean(fams[,1]=="G" &amp; fams[,2]=="G") /
 <p>Bayes:</p>
 <div class="eq">$P(B \mid W_B) = \dfrac{0.99 \cdot 0.01}{0.0594} \approx 0.167$</div>
 <p>So <strong>only ~17%</strong> — even though the witness is "99% reliable" on blue taxis.</p>
+<p><strong>Where the small answer really comes from — the odds form.</strong> Don't stop at the plug-in; the same problem read in <em>odds</em> shows exactly why a "99% reliable" witness still loses. Divide Bayes' rule for $B$ by Bayes' rule for $\bar B$ — the shared denominator $P(W_B)$ cancels — and you are left with a rule worth memorizing:</p>
+<div class="eq-block">$\underbrace{\dfrac{P(B \mid W_B)}{P(\bar B \mid W_B)}}_{\text{posterior odds}} = \underbrace{\dfrac{P(B)}{P(\bar B)}}_{\text{prior odds}} \times \underbrace{\dfrac{P(W_B \mid B)}{P(W_B \mid \bar B)}}_{\text{likelihood ratio}}.$</div>
+<p>Posterior odds = prior odds &times; likelihood ratio: the evidence only ever <em>multiplies</em> the odds you started with. Here the prior odds are $1:99$ and the likelihood ratio is $0.99/0.05 = 19.8$, so the posterior odds are $19.8/99 = 0.2$, i.e. $1:5$, which is $P = \tfrac{1}{1+5} = \tfrac{1}{6} \approx 0.167$ — the same answer, now with the mechanism exposed. To reach even money (odds $1:1$) the test would need a likelihood ratio near <strong>99</strong> — it would have to be about five times sharper than it is — just to overcome a base rate that starts you 99-to-1 in the hole. That is the general lesson: against a rare event, the base rate sets the odds you must climb out of, and even a very accurate test barely dents it.</p>
 <pre><code>p_B &lt;- 0.01; p_W_B &lt;- 0.99; p_W_notB &lt;- 0.05
 (p_W_B * p_B) / (p_W_B * p_B + p_W_notB * (1 - p_B)) <span class="cm"># 0.1667</span></code></pre>
 </div></details>
@@ -321,7 +324,16 @@ sims |&gt; <span class="fn">pivot_longer</span>(<span class="fn">everything</spa
 <tr><td>NB(μ=10, k=1)</td><td>10.0</td><td>110</td><td>0.091</td><td>0.135</td></tr>
 <tr><td>NB(μ=10, k=0.5)</td><td>10.0</td><td>210</td><td>0.218</td><td>0.155</td></tr>
 </table>
-<p>(d) The dataset described (many zeros, a few huge counts) matches NB with small $k$ — most ecological count data are like this.</p>
+<p>Those numbers are the theoretical values the simulation fluctuates around, and none of them is arbitrary — each column is one formula evaluated, so you can predict the table before you run a single draw.</p>
+<p><strong>The variance column.</strong> Every row has mean 10 by construction; the story is entirely in the variance. Start from what the NB literally is — a Poisson whose rate is itself random (gamma-distributed) across transects, the mathematical version of "animals clump." That mixing gives the mean-variance law</p>
+<div class="eq-block">$\mathrm{Var}(Y) = \mu + \dfrac{\mu^2}{k}.$</div>
+<p>Read it as two pieces: the $\mu$ is the irreducible Poisson noise, and the $\mu^2/k$ is the <em>extra</em> variance clumping adds. That second term is the whole point — it is what a plain Poisson cannot produce. The general move is to see $k$ as a clumping dial: as $k \to \infty$ the extra term vanishes and you recover $\mathrm{Var}=\mu$ (the Poisson is just NB with the clumping turned off), and as $k$ shrinks the extra term explodes. Only now plug in, with $\mu=10$:</p>
+<div class="eq-block">$k=5:\ 10+\tfrac{100}{5}=30, \qquad k=1:\ 10+\tfrac{100}{1}=110, \qquad k=0.5:\ 10+\tfrac{100}{0.5}=210.$</div>
+<p>Halving $k$ from 1 to 0.5 <em>doubles</em> the excess term (100 → 200) — clumping bites hardest at small $k$.</p>
+<p><strong>The $P(Y=0)$ column.</strong> A zero transect means "not one whale," and the NB pmf evaluated at zero collapses to a clean closed form,</p>
+<div class="eq-block">$P(Y=0) = \left(\dfrac{k}{k+\mu}\right)^{k},$</div>
+<p>so the same clumping dial controls how common empty transects are. Plug in $\mu=10$: $k=5$ gives $(5/15)^5=(1/3)^5=1/243\approx 0.004$; $k=1$ gives $(1/11)^1\approx 0.091$; $k=0.5$ gives $(0.5/10.5)^{0.5}=\sqrt{1/21}\approx 0.218$. The Poisson is the limit again — $(k/(k+\mu))^k \to e^{-\mu}$ as $k\to\infty$, and $e^{-10}\approx 0.0000454$, which rounds to the $0.000$ in the table. So a Poisson essentially never gives an empty transect, while NB($k=0.5$) gives one more than a fifth of the time.</p>
+<p>(d) Small $k$ inflates <em>both</em> tails at once — the $P(Y=0)$ and $P(Y&gt;20)$ columns rise together — which is exactly the "many zeros, a few huge counts" signature. The dataset described matches NB with small $k$; most ecological count data are like this.</p>
 <p><strong>Conceptual takeaway:</strong> the Poisson is a one-parameter distribution and is <em>forced</em> to have variance equal to its mean. Real ecological counts almost never satisfy that. Use the negative binomial unless you have a specific reason not to.</p>
 </div></details>
 </div>
@@ -343,7 +355,11 @@ probs &lt;- <span class="fn">dbinom</span>(k, size=<span class="nu">5</span>, pr
 <span class="fn">round</span>(probs, <span class="nu">3</span>)
 <span class="cm"># 0.002 0.028 0.132 0.309 0.360 0.168</span>
 <span class="fn">barplot</span>(probs, names.arg=k, ylab=<span class="st">"P(survivors)"</span>)</code></pre>
-<p>This is the <strong>Binomial</strong> distribution, $X \sim \text{Bin}(n=5, p=0.7)$. Note the peak is at $k=4$, which equals $\lfloor (n+1)p \rfloor$.</p>
+<p>This is the <strong>Binomial</strong> distribution, $X \sim \text{Bin}(n=5, p=0.7)$. <code>dbinom</code> is not a black box — it evaluates the binomial pmf, and it is worth seeing where one entry comes from so you could reproduce any of them by hand:</p>
+<div class="eq-block">$P(X=k) = \binom{n}{k}\,p^{k}(1-p)^{n-k}.$</div>
+<p>Two factors, pulling in opposite directions. The $p^{k}(1-p)^{n-k}$ is the probability of <em>one</em> specific survivor/casualty pattern; the $\binom{n}{k}$ counts how many distinct patterns give exactly $k$ survivors. Take the peak value, $k=4$:</p>
+<div class="eq-block">$P(X=4) = \binom{5}{4}\,(0.7)^{4}(0.3)^{1} = 5 \times 0.2401 \times 0.3 = 0.360.$</div>
+<p>Now the mode makes sense. Each extra survivor multiplies the probability by $\tfrac{p}{1-p}=\tfrac{0.7}{0.3}=2.33$ but by a shrinking combinatorial factor; the two forces balance and the pmf turns over at $k=\lfloor(n+1)p\rfloor=\lfloor 6\times0.7\rfloor=\lfloor 4.2\rfloor=\mathbf{4}$ — so even though each marten is more likely to live than die, "all five survive" ($p=0.168$) is less likely than "four of five" ($p=0.360$).</p>
 </div></details>
 </div>
 
@@ -364,7 +380,12 @@ probs &lt;- <span class="fn">dbinom</span>(k, size=<span class="nu">5</span>, pr
 <pre><code><span class="fn">dbinom</span>(<span class="nu">3</span>, <span class="nu">24</span>, <span class="nu">0.12</span>) <span class="cm"># P(Y=3) = 0.2387</span>
 <span class="fn">pbinom</span>(<span class="nu">4</span>, <span class="nu">24</span>, <span class="nu">0.12</span>) <span class="cm"># P(Y<=4) = 0.8471</span>
 <span class="fn">dbinom</span>(<span class="nu">0</span>, <span class="nu">24</span>, <span class="nu">0.12</span>) <span class="cm"># P(Y=0) = 0.0465</span></code></pre>
-<p>(d) Even with 12% prevalence, there is roughly a 5% chance of seeing zero cases in $n=24$. Surveillance programs need to think explicitly about the binomial probability of detecting at least one case — this is the basis of "freedom from disease" sample-size calculations.</p>
+<p>(b) Same pmf as Exercise 6, just bigger numbers — $P(Y=3)=\binom{24}{3}(0.12)^3(0.88)^{21}=2024\times0.001728\times0.0683=0.239$.</p>
+<p>(d) The zero-case probability is the one you can do in your head, because at $k=0$ the combinatorial factor is $\binom{24}{0}=1$ and the whole pmf collapses to "every single deer must dodge infection":</p>
+<div class="eq-block">$P(Y=0) = (1-p)^{n} = (0.88)^{24} = 0.0465.$</div>
+<p>That is the load-bearing quantity for surveillance, so make it general. The chance of <em>catching at least one</em> case in $n$ samples is its complement,</p>
+<div class="eq-block">$P(Y \ge 1) = 1 - (1-p)^{n},$</div>
+<p>and flipping it around tells a program how many deer to sample: to be $95\%$ sure of detecting disease at prevalence $p$, solve $1-(1-p)^n \ge 0.95$ for $n$. Here, with $p=0.12$ and $n=24$, $P(Y\ge1)=1-0.0465=0.95$ — so $n=24$ is almost exactly the sample size that buys you 95% detection power at 12% prevalence. Even at that prevalence, a smaller sample would leave a real chance of a clean-but-wrong "no cases found." This is precisely the arithmetic behind "freedom from disease" sample-size calculations.</p>
 </div></details>
 </div>
 
@@ -386,7 +407,12 @@ probs &lt;- <span class="fn">dbinom</span>(k, size=<span class="nu">5</span>, pr
 set.seed(1)
 flights &lt;- <span class="fn">rmultinom</span>(<span class="nu">5000</span>, size=<span class="nu">80</span>, prob=p)
 <span class="fn">hist</span>(flights[<span class="nu">3</span>,], main=<span class="st">"Calves out of 80"</span>, xlab=<span class="st">"count"</span>)</code></pre>
-<p>Any single category of a Multinomial is itself <strong>Binomial</strong>: calves ~ Bin(80, 0.25), with mean 20 and variance $80 \cdot 0.25 \cdot 0.75 = 15$.</p>
+<p><strong>(a) Where the 0.0011 comes from.</strong> The multinomial pmf is the binomial's "many boxes" generalization: one multinomial coefficient counting the orderings, times each category's probability raised to its observed count,</p>
+<div class="eq-block">$P(\mathbf{x}) = \dfrac{n!}{x_1!\,x_2!\,x_3!\,x_4!}\;p_1^{x_1}p_2^{x_2}p_3^{x_3}p_4^{x_4}.$</div>
+<p>With $\mathbf{x}=(18,38,18,6)$, $n=80$, that is $\dfrac{80!}{18!\,38!\,18!\,6!}\,(0.20)^{18}(0.45)^{38}(0.25)^{18}(0.10)^{6}\approx 0.0011$. It reads small, but every specific outcome is small — there are thousands of plausible flights, and even the single most likely one carries only about 1% of the probability.</p>
+<p><strong>(c) Why each margin is Binomial — the collapse trick.</strong> Don't take it on faith; derive it, because it is the move that lets you reason about one category at a time. Fix your attention on calves and lump the other three classes into a single "not-calf" box. Each of the 80 elk is now just calf (prob $0.25$) or not-calf (prob $0.20+0.45+0.10=0.75$), independently — and "count of successes in $n$ independent yes/no trials with fixed $p$" is the definition of the Binomial. So</p>
+<div class="eq-block">$\text{calves} \sim \text{Bin}(80,\,0.25),\qquad E=np=20,\qquad \mathrm{Var}=np(1-p)=80\cdot0.25\cdot0.75=15.$</div>
+<p>The general rule: <strong>any single category of a Multinomial$(n,\mathbf{p})$ is Binomial$(n,p_i)$</strong> — collapse the rest into "other" and the multi-box problem becomes the two-box problem you already know. (Note $\mathrm{Var}=15$ is below the mean 20: unlike the whales, a multinomial margin is <em>under</em>-dispersed, because a fixed total $n$ caps how large any one category can run.)</p>
 </div></details>
 </div>
 
@@ -405,7 +431,7 @@ flights &lt;- <span class="fn">rmultinom</span>(<span class="nu">5000</span>, si
 <span class="fn">rmultinom</span>(<span class="nu">1</span>, <span class="nu">80</span>, p)
 sims &lt;- <span class="fn">rmultinom</span>(<span class="nu">500</span>, <span class="nu">80</span>, p)
 <span class="fn">summary</span>(sims[<span class="nu">5</span>,])</code></pre>
-<p>The marginal "strongly support" is Bin(80, 0.15). The sample-to-sample range is large compared to the point estimate — useful for thinking about how informative a single survey actually is.</p>
+<p>Same collapse trick as the elk (Exercise 8): lump the other four responses into "not strongly-support" and the marginal is $\text{Bin}(80, 0.15)$, with $E=np=12$ and $\mathrm{Var}=np(1-p)=80\cdot0.15\cdot0.85=10.2$, so $\mathrm{SD}=\sqrt{10.2}\approx 3.2$. That is the punchline made concrete: a typical single survey lands anywhere from about 6 to 18 "strongly support" votes (12 $\pm$ two SDs) even though the underlying rate never moved — the sample-to-sample range is large compared to the point estimate, which is exactly why one survey is weak evidence.</p>
 </div></details>
 </div>
 
@@ -425,7 +451,12 @@ sims &lt;- <span class="fn">rmultinom</span>(<span class="nu">500</span>, <span 
 <pre><code><span class="nu">1</span> - <span class="fn">dbinom</span>(<span class="nu">0</span>, <span class="nu">5</span>, <span class="nu">0.25</span>) <span class="cm"># 0.7627</span>
 <span class="cm"># smallest n with P(>=1) >= 0.5</span>
 which(<span class="nu">1</span> - <span class="fn">dbinom</span>(<span class="nu">0</span>, <span class="nu">1</span>:<span class="nu">10</span>, <span class="nu">0.25</span>) &gt;= <span class="nu">0.5</span>)[<span class="nu">1</span>] <span class="cm"># 3</span></code></pre>
-<p>With probability of being affected = 0.25 per child, you only need <strong>3 children</strong> for the chance of seeing at least one affected to exceed 50% — illustrates how <em>P(at least one)</em> grows quickly under independence.</p>
+<p><strong>(b) The "at least one" complement.</strong> Never sum $P(1)+P(2)+\dots+P(5)$ — go through the one outcome that's a single term. "At least one affected" is the complement of "none affected," and "none affected" needs every child to independently escape, so the messy sum collapses to</p>
+<div class="eq-block">$P(K \ge 1) = 1 - P(K=0) = 1 - (1-0.25)^{n} = 1 - (0.75)^{n}.$</div>
+<p>At $n=5$ that is $1-(0.75)^5 = 1-0.2373 = 0.763$.</p>
+<p><strong>(c) Where 3 comes from — solve it, don't scan it.</strong> The <code>which()</code> above brute-forces a list, but the threshold has a closed form. You want the smallest $n$ with $1-(0.75)^n \ge 0.5$, i.e. $(0.75)^n \le 0.5$. Take logs (the log is negative, so the inequality flips):</p>
+<div class="eq-block">$n \ge \dfrac{\ln 0.5}{\ln 0.75} = \dfrac{-0.693}{-0.288} = 2.41 \;\Rightarrow\; n = 3.$</div>
+<p>You can see the crossing by hand: $(0.75)^2 = 0.5625$ (still more than half a chance of <em>no</em> affected child) but $(0.75)^3 = 0.422$ (now under half), so the coin flips between the second and third child — <strong>3 children</strong>. The same $\ln 0.5 / \ln(1-p)$ formula gives the "how many trials until an even chance of at least one hit" threshold for any $p$: rare detections need many trials, common ones only a few.</p>
 </div></details>
 </div>
 
@@ -458,7 +489,19 @@ which(<span class="nu">1</span> - <span class="fn">dbinom</span>(<span class="nu
 <p>Then use simulation to demonstrate this with $\lambda = 4$: draw 10,000 values from each of Bin(20, 0.2), Bin(100, 0.04), Bin(1000, 0.004), and Pois(4). Compare histograms and means/variances.</p>
 
 <details class="answer"><summary>Reveal sketch</summary><div class="answer-body">
-<p><strong>Math.</strong> Write $P(X=k) = \binom{n}{k} p^k (1-p)^{n-k}$. Substitute $p = \lambda/n$. The combinatorial part $\binom{n}{k}/n^k \to 1/k!$, the $(1-\lambda/n)^{n-k} \to e^{-\lambda}$, and $\lambda^k$ comes from $(np)^k$. Combining gives the Poisson pmf.</p>
+<p><strong>Math.</strong> Start from the binomial pmf and substitute $p=\lambda/n$ (this is what "$np\to\lambda$" means — hold the rate fixed while $n$ grows):</p>
+<div class="eq-block">$P(X=k) = \binom{n}{k}\left(\dfrac{\lambda}{n}\right)^{k}\left(1-\dfrac{\lambda}{n}\right)^{n-k}.$</div>
+<p>The trick is to regroup into a $\lambda^k/k!$ that will survive, times three pieces that each have a clean limit. Expand $\binom{n}{k}=\dfrac{n!}{k!\,(n-k)!}=\dfrac{n(n-1)\cdots(n-k+1)}{k!}$ and split the last factor's exponent:</p>
+<div class="eq-block">$P(X=k) = \dfrac{\lambda^{k}}{k!}\;\underbrace{\dfrac{n(n-1)\cdots(n-k+1)}{n^{k}}}_{(1)}\;\underbrace{\left(1-\dfrac{\lambda}{n}\right)^{n}}_{(2)}\;\underbrace{\left(1-\dfrac{\lambda}{n}\right)^{-k}}_{(3)}.$</div>
+<p>Now send $n\to\infty$ with $k$ and $\lambda$ fixed, and take the three pieces in turn:</p>
+<ul>
+<li><strong>(1)</strong> is a product of $k$ fixed factors $\tfrac{n}{n}\cdot\tfrac{n-1}{n}\cdots\tfrac{n-k+1}{n} = 1\cdot(1-\tfrac1n)\cdots(1-\tfrac{k-1}{n})$, each $\to 1$, so the whole thing $\to 1$.</li>
+<li><strong>(2)</strong> is the definition of the exponential: $\left(1-\tfrac{\lambda}{n}\right)^{n}\to e^{-\lambda}$.</li>
+<li><strong>(3)</strong> has a fixed exponent $-k$ and a base $\to 1$, so it $\to 1^{-k}=1$.</li>
+</ul>
+<p>The three pieces collapse to $1\cdot e^{-\lambda}\cdot 1$, leaving</p>
+<div class="eq-block">$P(X=k) \longrightarrow \dfrac{\lambda^{k}e^{-\lambda}}{k!},$</div>
+<p>the Poisson pmf. Each piece carried one idea: (1) says "with $n$ huge, choosing $k$ of them barely dents the pool," (2) manufactures the $e^{-\lambda}$, and (3) is the correction that vanishes. Notice the mean-variance signature falls out for free: the binomial variance $np(1-p)=\lambda(1-\lambda/n)\to\lambda$, matching its mean — the equidispersion the Poisson is famous for is just the $p\to0$ limit of $np(1-p)$.</p>
 <p><strong>Conceptual takeaway.</strong> Poisson is the natural distribution for many independent <em>rare</em> events occurring in a fixed window of time/space, whose rate aggregates to $\lambda$. Whale sightings per transect, salmon redds per km, parasites per host (if independent) — all natural Poisson stories.</p>
 <pre><code><span class="kw">for</span>(<span class="kw">params</span> <span class="kw">in</span> <span class="kw">list</span>(<span class="kw">c</span>(<span class="nu">20</span>,<span class="nu">0.2</span>), <span class="kw">c</span>(<span class="nu">100</span>,<span class="nu">0.04</span>), <span class="kw">c</span>(<span class="nu">1000</span>,<span class="nu">0.004</span>))) {
  x &lt;- <span class="fn">rbinom</span>(<span class="nu">1e4</span>, params[<span class="nu">1</span>], params[<span class="nu">2</span>])
@@ -478,7 +521,17 @@ y &lt;- <span class="fn">rpois</span>(<span class="nu">1e4</span>, <span class="
 </ol>
 
 <details class="answer"><summary>Reveal solution</summary><div class="answer-body">
-<p><strong>Switch.</strong> The unconditional probability your initial guess (A) was right is 1/3. The technician's reveal of C does not change the probability your initial guess was right — but it does collapse the remaining 2/3 probability mass onto B. So P(B has the marten | reveal C) = 2/3.</p>
+<p><strong>Switch.</strong> The intuition is that your initial guess (A) was right with probability 1/3, and opening C collapses the remaining 2/3 onto B — but "collapses" is doing a lot of work, so derive the 2/3 with Bayes instead of asserting it. Let the marten's true camera be $A$, $B$, or $C$ (prior 1/3 each), and condition on the event "technician opens C." The whole subtlety lives in the likelihoods — how the technician behaves given each truth:</p>
+<ul>
+<li>$P(\text{opens C}\mid \text{marten at A}) = \tfrac12$ — your guess A is safe and the marten's A is safe, so the technician is free to open B or C, and picks C half the time.</li>
+<li>$P(\text{opens C}\mid \text{marten at B}) = 1$ — he cannot open A (your guess) or B (the marten), so he is <em>forced</em> to open C.</li>
+<li>$P(\text{opens C}\mid \text{marten at C}) = 0$ — he never opens the marten's own camera.</li>
+</ul>
+<p>Total probability of the reveal:</p>
+<div class="eq-block">$P(\text{opens C}) = \tfrac12\cdot\tfrac13 + 1\cdot\tfrac13 + 0\cdot\tfrac13 = \tfrac16+\tfrac13 = \tfrac12.$</div>
+<p>Now Bayes for the two cameras still in play:</p>
+<div class="eq-block">$P(A\mid \text{opens C}) = \dfrac{\tfrac12\cdot\tfrac13}{\tfrac12} = \tfrac13, \qquad P(B\mid \text{opens C}) = \dfrac{1\cdot\tfrac13}{\tfrac12} = \tfrac23.$</div>
+<p>There is the 2/3, and now you can see exactly where it comes from: B's likelihood is <strong>twice</strong> A's ($1$ vs $\tfrac12$), because the technician's forced move when the marten is at B pumps evidence toward B that your own guess A never receives. Switching doubles your odds.</p>
 <p>To <em>verify</em> that by simulation you have to model the technician and the switch explicitly — draw the truth and your guess, have the technician open a camera that is neither, then move to whatever remains:</p>
 <pre><code>set.seed(1)
 trials &lt;- <span class="nu">1e5</span>

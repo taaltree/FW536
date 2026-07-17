@@ -255,8 +255,15 @@ MathJax = {
 <h3>Salmon redds along a stream gradient</h3>
 <p>You fit <code>glm(redds ~ km_upstream, family=poisson(link="log"))</code> and get $\hat\beta_1 = -0.05$. What does this mean biologically?</p>
 <details class="answer"><summary>Interpret</summary><div class="answer-body">
-<p>$e^{-0.05} = 0.951$. So for each additional km upstream, expected redd counts <strong>fall by ~4.9%</strong>. After 14 km, the expected count is $e^{-0.05 \cdot 14} = e^{-0.70} = 0.50$ of the count at the stream mouth — half as many redds.</p>
-<p>A useful rule: $-0.05$ per km translates to a half-life of ${\sim}\ln(2)/0.05 = 13.9$ km. This "half-life" language is intuitive for biologists who think about exponential decay.</p>
+<p><strong>Where the multiplier comes from.</strong> Don't memorize "exponentiate the coefficient" — derive it once, because the same move reads <em>every</em> log-link slope. Start from what the model literally says:</p>
+<div class="eq-block">$\log \mathbb{E}[\text{redds}] = \beta_0 + \beta_1\,\text{km},$</div>
+<p>and exponentiate both sides to get onto the count scale:</p>
+<div class="eq-block">$\mathbb{E}[\text{redds}] = e^{\beta_0}\,e^{\beta_1\,\text{km}}.$</div>
+<p>Now ask the actual question: what happens to the expected count when you move one km further upstream, $\text{km} \to \text{km}+1$? Take the ratio of the new mean to the old so the intercept cancels:</p>
+<div class="eq-block">$\dfrac{\mathbb{E}[\text{redds}\mid \text{km}+1]}{\mathbb{E}[\text{redds}\mid \text{km}]} = \dfrac{e^{\beta_0}\,e^{\beta_1(\text{km}+1)}}{e^{\beta_0}\,e^{\beta_1\,\text{km}}} = e^{\beta_1}.$</div>
+<p>The baseline location drops out — only $e^{\beta_1}$ survives. That is the general rule worth keeping: <strong>each one-unit step in a raw predictor multiplies the mean by $e^{\beta_1}$, and a step of $d$ units multiplies it by $e^{\beta_1 d} = (e^{\beta_1})^d$.</strong> Additive on the log scale ($\beta_1$ per km), multiplicative on the count scale ($e^{\beta_1}$ per km).</p>
+<p>Only now do the numbers enter. With $\hat\beta_1 = -0.05$, $e^{-0.05} = 0.951$, so each additional km upstream drops expected redd counts by <strong>~4.9%</strong>. Over 14 km the factor compounds to $(e^{-0.05})^{14} = e^{-0.70} = 0.50$ — half as many redds as at the stream mouth.</p>
+<p>The half-distance follows from the same rule: set $e^{\beta_1 d} = \tfrac12$ and solve, $d = \ln(2)/|\beta_1| = \ln(2)/0.05 = 13.9$ km. This "half-life" language is intuitive for biologists who already think in exponential decay.</p>
 </div></details>
 </div>
 
@@ -265,7 +272,10 @@ MathJax = {
 <h3>Marine megafauna detections vs. sea state</h3>
 <p>Cetacean detections per 100 km of transect, modeled as Poisson with predictor <em>Beaufort sea state</em>. $\hat\beta = -0.41$ per unit sea state. What does this mean?</p>
 <details class="answer"><summary>Interpret</summary><div class="answer-body">
-<p>$e^{-0.41} = 0.664$. Each Beaufort unit reduces expected detection rate by ~34%. Going from sea state 1 to 4 multiplies the expected count by $0.664^3 = 0.293$, a 71% drop. This is a strong "detection-availability" effect — useful for surveying logistics.</p>
+<p>Same log link as Example 1, so the same rule applies: one Beaufort unit multiplies the expected detection rate by $e^{\hat\beta} = e^{-0.41} = 0.664$ — a ~34% drop per unit. The new twist is a jump of more than one unit, and here the $(e^\beta)^d$ half of the rule earns its keep.</p>
+<p>Going from sea state 1 to sea state 4 is a step of $d = 3$ units. Compounding the per-unit factor three times:</p>
+<div class="eq-block">$\dfrac{\mathbb{E}[\text{count}\mid \text{Beaufort }4]}{\mathbb{E}[\text{count}\mid \text{Beaufort }1]} = (e^{\beta})^{3} = e^{3\beta} = e^{-1.23} = 0.293.$</div>
+<p>The two routes are the same arithmetic: multiply the per-unit factor three times, $0.664^3 = 0.293$, or add $3\beta = -1.23$ on the log scale and exponentiate once, $e^{-1.23} = 0.293$. Either way it's a <strong>71% drop</strong> in detections across those three sea-state units — a strong "detection-availability" effect that dominates survey logistics: a slightly rougher sea, and most of your animals stop being detectable.</p>
 </div></details>
 </div>
 
@@ -274,7 +284,11 @@ MathJax = {
 <h3>Log-link Poisson with a categorical predictor (treatment)</h3>
 <p>You fit <code>glm(caterpillars ~ treatment, family=poisson)</code> where <code>treatment</code> is a factor with levels <em>control</em> and <em>fertilizer</em>. The fertilizer coefficient is $+0.85$. What does this say?</p>
 <details class="answer"><summary>Interpret</summary><div class="answer-body">
-<p>$e^{0.85} = 2.34$. The fertilizer treatment more than <strong>doubles</strong> the expected caterpillar count compared to control. This is the kind of "fold change" language ecologists already speak in — but they have to remember to exponentiate.</p>
+<p>With a factor predictor R codes the level as a 0/1 dummy, so there is no "per unit" to compound — the coefficient jumps you straight from one group to the other. Write the two group means the model implies:</p>
+<div class="eq-block">$\log \mathbb{E}[\text{control}] = \beta_0, \qquad \log \mathbb{E}[\text{fertilizer}] = \beta_0 + \beta_1,$</div>
+<p>because the dummy is $0$ for control and $1$ for fertilizer. Exponentiate and take the ratio, and the intercept (the control level) cancels:</p>
+<div class="eq-block">$\dfrac{\mathbb{E}[\text{fertilizer}]}{\mathbb{E}[\text{control}]} = \dfrac{e^{\beta_0 + \beta_1}}{e^{\beta_0}} = e^{\beta_1}.$</div>
+<p>So the general rule for a categorical log-link coefficient: <strong>$e^{\beta}$ is exactly the ratio of that level's mean to the reference level's mean</strong> — the fold change itself, no compounding involved. Plug in $\hat\beta_1 = 0.85$: $e^{0.85} = 2.34$. The fertilizer treatment more than <strong>doubles</strong> the expected caterpillar count relative to control. This is the "fold change" language ecologists already speak — they just have to remember that the raw coefficient is its logarithm.</p>
 </div></details>
 </div>
 
@@ -287,9 +301,13 @@ MathJax = {
 <li>What is the temperature effect on the trawl gear?</li>
 </ol>
 <details class="answer"><summary>Interpret</summary><div class="answer-body">
-<p>(a) For gillnet: slope is $-0.05$ per degree, i.e., $e^{-0.05} = 0.951$ → 4.9% drop per degree warming.</p>
-<p>(b) For trawl: combined slope is $-0.05 + 0.08 = +0.03$ per degree, i.e., $e^{0.03} = 1.030$ → 3% increase per degree warming.</p>
-<p>So the gears respond <em>oppositely</em> to temperature — a finding you can't extract from a single coefficient.</p>
+<p>The interaction changes the <em>slope</em> in temp, so the trick is to collect the temp terms before exponentiating. Write the linear predictor with the trawl dummy set to its two values. For gillnet (reference, dummy $= 0$) only the main effect survives; for trawl (dummy $= 1$) the interaction term switches on:</p>
+<div class="eq-block">$\log \mathbb{E}[\text{catch}] = \beta_0 + \beta_{\text{temp}}\,\text{temp} + \beta_{\text{gear}}\,\text{trawl} + \beta_{\text{int}}\,(\text{temp}\cdot\text{trawl}).$</div>
+<p>Group the coefficients that multiply <code>temp</code>: for gillnet that is just $\beta_{\text{temp}}$; for trawl it is $\beta_{\text{temp}} + \beta_{\text{int}}$. That grouped quantity <em>is</em> the log-scale slope, and the per-degree multiplier is its exponential — the general rule being <strong>the temperature effect for any gear is $e^{(\text{sum of every coefficient attached to temp for that gear})}$.</strong></p>
+<p>Now the numbers:</p>
+<p>(a) Gillnet slope $= \beta_{\text{temp}} = -0.05$, so $e^{-0.05} = 0.951$ → a 4.9% drop in catch per degree of warming.</p>
+<p>(b) Trawl slope $= \beta_{\text{temp}} + \beta_{\text{int}} = -0.05 + 0.08 = +0.03$, so $e^{0.03} = 1.030$ → a 3% increase per degree.</p>
+<p>The signs are opposite: warming thins the gillnet catch but lifts the trawl catch. That reversal lives entirely in the interaction term — it is invisible in either main effect alone.</p>
 </div></details>
 </div>
 
@@ -322,8 +340,14 @@ MathJax = {
 <h3>Marten occupancy vs. canopy cover</h3>
 <p>You fit <code>glm(occupied ~ canopy, family=binomial)</code> with canopy on a 0–100 scale and $\hat\beta_1 = +0.06$ per percent canopy. Interpret.</p>
 <details class="answer"><summary>Interpret</summary><div class="answer-body">
-<p>$e^{0.06} = 1.062$. Each additional percentage point of canopy <em>multiplies the odds</em> of occupancy by 1.062. A 10-point increase multiplies odds by $e^{0.6} = 1.82$.</p>
-<p>For a site that is currently occupied with $p = 0.3$ (odds = 0.43), a 10-point increase in canopy moves odds to $0.43 \cdot 1.82 = 0.78$, i.e., $p = 0.78 / 1.78 = 0.44$. That's a 14 percentage-point increase — sizable.</p>
+<p><strong>Why $e^\beta$ is an odds ratio.</strong> The logit link says the model is linear not in $p$ but in the log-odds. Start from what it literally states:</p>
+<div class="eq-block">$\log\!\dfrac{p}{1-p} = \beta_0 + \beta_1\,\text{canopy}.$</div>
+<p>Exponentiate both sides — the left side is now the odds itself:</p>
+<div class="eq-block">$\dfrac{p}{1-p} = e^{\beta_0}\,e^{\beta_1\,\text{canopy}}.$</div>
+<p>Ask the same ratio question we used for the log link, but now it lands on the <em>odds</em>. Bump canopy by one point and divide new odds by old:</p>
+<div class="eq-block">$\dfrac{\text{odds}(\text{canopy}+1)}{\text{odds}(\text{canopy})} = \dfrac{e^{\beta_0}\,e^{\beta_1(\text{canopy}+1)}}{e^{\beta_0}\,e^{\beta_1\,\text{canopy}}} = e^{\beta_1}.$</div>
+<p>The baseline odds cancel — so the general rule is <strong>each one-unit step in $x$ multiplies the odds by $e^{\beta_1}$, and a $d$-unit step multiplies them by $(e^{\beta_1})^d = e^{\beta_1 d}$.</strong> Identical structure to the log link, except the thing being multiplied is odds, not the mean. Plug in $\hat\beta_1 = 0.06$: $e^{0.06} = 1.062$, so each canopy point multiplies occupancy odds by 1.062; a 10-point rise multiplies them by $e^{0.6} = 1.82$.</p>
+<p><strong>Connecting the scales: why the probability jump is not constant.</strong> The odds ratio $e^{\beta_1}$ is the <em>same</em> everywhere on the curve, but the probability change it buys depends on where you start, because you have to convert odds back to $p$ via $p = \text{odds}/(1+\text{odds})$. Take a site at $p = 0.3$, i.e. odds $= 0.3/0.7 = 0.43$. A 10-point canopy increase moves the odds to $0.43 \cdot 1.82 = 0.78$, which is $p = 0.78/1.78 = 0.44$ — a 14 percentage-point jump. The same $\times 1.82$ applied to a site already at $p = 0.95$ would barely move it. A constant odds ratio, a baseline-dependent probability change: that is the logit link's signature, and the reason you must state the baseline when you report an effect.</p>
 </div></details>
 </div>
 
@@ -332,11 +356,15 @@ MathJax = {
 <h3>Survival of fledgling sage grouse — categorical predictor</h3>
 <p>You fit <code>glm(fledge ~ sex, family=binomial)</code>. Coefficient for males vs. females is $-0.4$. Interpret in three ways.</p>
 <details class="answer"><summary>Interpret on three scales</summary><div class="answer-body">
+<p>As in Example 3 the predictor is a factor, so the coefficient carries you between two groups rather than per unit. The three "scales" are just three stops as you undo the logit link — read them left to right, each one algebra away from the last. Write the two group means the model implies:</p>
+<div class="eq-block">$\log\!\dfrac{p_f}{1-p_f} = \beta_0, \qquad \log\!\dfrac{p_m}{1-p_m} = \beta_0 + \beta,$</div>
+<p>with females the reference (dummy $= 0$) and males the dummy $= 1$.</p>
 <ul>
-<li><strong>Log-odds:</strong> males have log-odds 0.4 lower than females.</li>
-<li><strong>Odds ratio:</strong> $e^{-0.4} = 0.67$. Males' odds of fledging are 67% of females' odds.</li>
-<li><strong>Probability:</strong> if females fledge with p = 0.6 (odds = 1.5), males have odds $0.67 \cdot 1.5 = 1.0$, so $p = 0.5$. A 10-percentage-point difference.</li>
+<li><strong>Log-odds (subtract):</strong> the two equations differ by exactly $\beta$, so males have log-odds $0.4$ lower than females. This is the raw coefficient.</li>
+<li><strong>Odds ratio (exponentiate):</strong> subtracting then exponentiating gives $\dfrac{\text{odds}_m}{\text{odds}_f} = e^{\beta} = e^{-0.4} = 0.67$ — exactly the categorical-coefficient rule from Example 3, now on the odds scale. Males' odds of fledging are 67% of females'.</li>
+<li><strong>Probability (convert):</strong> the odds ratio alone doesn't give a probability — you need a baseline. If females fledge with $p_f = 0.6$, their odds are $0.6/0.4 = 1.5$, so males' odds are $0.67 \cdot 1.5 = 1.0$, i.e. $p_m = 1.0/(1+1.0) = 0.5$. A 10-percentage-point gap.</li>
 </ul>
+<p>Same effect, three views: a fixed log-odds difference and a fixed odds ratio, but a probability gap that only exists once you name where the females sit.</p>
 </div></details>
 </div>
 
@@ -345,7 +373,10 @@ MathJax = {
 <h3>Nonlinear shape of the logistic curve</h3>
 <p>Why does a fixed $\beta$ translate to <em>different</em> probability changes depending on where you are on the curve?</p>
 <details class="answer"><summary>Reveal</summary><div class="answer-body">
-<p>The logistic function $p(\eta) = e^\eta/(1+e^\eta)$ is steepest at $\eta = 0$ (where $p = 0.5$) and flattens out near $p = 0$ and $p = 1$. So one unit of $x$ moves $p$ a lot in the middle and only a little at the ends. This is biologically realistic — a 10-degree warming moves survival a lot when survival is near 50%, but barely changes it if survival is already 99%.</p>
+<p>Make "steepness" precise by differentiating the curve. The linear predictor is $\eta = \beta_0 + \beta_1 x$, and $p(\eta) = e^\eta/(1+e^\eta)$. The probability change per unit $x$ is, by the chain rule,</p>
+<div class="eq-block">$\dfrac{dp}{dx} = \dfrac{dp}{d\eta}\cdot\dfrac{d\eta}{dx} = p(1-p)\,\cdot\,\beta_1.$</div>
+<p>(The middle factor is the tidy fact that the logistic curve's slope is $\dfrac{dp}{d\eta} = p(1-p)$.) So a <em>fixed</em> coefficient $\beta_1$ produces a probability change that is scaled by $p(1-p)$ — and that factor is not constant: it peaks at $p = 0.5$, where $p(1-p) = 0.25$, and collapses toward $0$ as $p \to 0$ or $p \to 1$. That is exactly why one unit of $x$ moves $p$ a lot in the middle and barely at the ends.</p>
+<p>The peak value $0.25$ is also where the <strong>divide-by-4 rule</strong> comes from: at the steepest point the probability change per unit $x$ is $\beta_1 \cdot 0.25 = \beta_1/4$, an upper bound on how fast the curve can move. Biologically this is the right shape — a 10-degree warming shifts survival sharply when survival is near 50%, but hardly touches it when survival is already 99% and the curve has gone flat.</p>
 </div></details>
 </div>
 
@@ -362,7 +393,12 @@ MathJax = {
 <h3>Orangutan line transects</h3>
 <p>The detection function for orangutans on a line transect is roughly exponential, with rate $\lambda = 0.02$ per meter of perpendicular distance. Derive the survival function (probability of not yet detecting at distance $x$) and use it to compute the probability of missing an orangutan at 50 m.</p>
 <details class="answer"><summary>Reveal</summary><div class="answer-body">
-<p>For an Exponential$(\lambda)$, $S(x) = P(X \ge x) = e^{-\lambda x}$. At $x = 50$, $S = e^{-1.0} = 0.368$. So a 50-m-distant orangutan has a 37% chance of being missed.</p>
+<p><strong>Derive the survival function.</strong> The Exponential$(\lambda)$ density is $f(t) = \lambda e^{-\lambda t}$ for $t \ge 0$. "Not yet detected at distance $x$" means the detection distance $X$ exceeds $x$, so integrate the density from $x$ outward:</p>
+<div class="eq-block">$S(x) = P(X \ge x) = \int_x^\infty \lambda e^{-\lambda t}\,dt = \big[-e^{-\lambda t}\big]_x^\infty = e^{-\lambda x}.$</div>
+<p>The general rule to carry away: <strong>for any exponential process the survival function is a pure exponential decay $e^{-\lambda x}$,</strong> so the fraction still undetected drops by the constant factor $e^{-\lambda}$ per meter — and, exactly as in the log-link redd example, there is a "detection half-distance" $\ln(2)/\lambda$ at which half the animals remain undetected. Here $\ln(2)/0.02 = 34.7$ m.</p>
+<p>Now plug in $\lambda = 0.02$ per meter and $x = 50$ m, so $\lambda x = 1$:</p>
+<div class="eq-block">$S(50) = e^{-\lambda x} = e^{-1.0} = 0.368.$</div>
+<p>A 50-m-distant orangutan has about a <strong>37% chance of being missed</strong> — just past the half-distance, so a bit more than half are still detectable.</p>
 </div></details>
 </div>
 
@@ -465,7 +501,16 @@ f_nb$deviance / f_nb$df.residual             # 48.8 / 52 = 0.94  (theta = 0.73)
 <tr><td>4. Negative binomial</td><td>0.897</td><td>0.081</td><td>resid.dev/df = 48.8/52 = <strong>0.94</strong>, $\theta = 0.73$</td></tr>
 </table>
 <p><strong>Overdispersion.</strong> The Poisson residual deviance is 44&times; its df — massive overdispersion, so its SE on <code>logED</code> (0.013) is far too small. The quasipoisson rescales that SE by $\sqrt{51}\approx 7.1$ to 0.095; the negative binomial (a proper likelihood, $\theta = 0.73$) gives 0.081 and a residual-deviance ratio near 1 (0.94) — a well-calibrated fit. Trust fits 3 and 4, not the naive Poisson.</p>
-<p><strong>Back-transform.</strong> Using the NB slope $\hat\beta = 0.897$ on $\log(\text{eDNA})$, a <em>doubling</em> of the flow-corrected eDNA signal <em>adds</em> $0.897\times\ln 2 = 0.622$ to the linear predictor; because the link is the log, that additive shift <em>multiplies</em> the expected count by $2^{0.897} = e^{0.897\cdot\ln 2} = 1.86$. So <strong>a doubling of the flow-corrected eDNA signal is associated with roughly an 86% increase (×1.86) in the expected daily adult sockeye count</strong> — matching the graded Problem 5. Additive on the link scale, multiplicative on the response scale: that is the log link in one sentence.</p>
+<p><strong>Back-transform — where the ×1.86 comes from.</strong> Don't memorize the recipe; derive it, because the same three steps turn <em>any</em> log-link slope into a sentence about biology. Start from what the model literally says. With a log link and a log-transformed predictor,</p>
+<div class="eq-block">$\log \mathbb{E}[\text{Count}] = \beta_0 + \beta_1\,\log(\text{eDNA}) + (\text{Year}),$</div>
+<p>and exponentiating both sides puts it on the count scale:</p>
+<div class="eq-block">$\mathbb{E}[\text{Count}] = e^{\beta_0}\,\cdot\,(\text{eDNA})^{\beta_1}\,\cdot\,e^{(\text{Year})}.$</div>
+<p>Because we logged the predictor, eDNA enters as a <strong>power law</strong> with exponent $\beta_1$ — and that is what makes the effect multiplicative. Now ask the actual question: what happens to the expected count when the eDNA signal <em>doubles</em>, $\text{eDNA} \to 2\,\text{eDNA}$, with Year held fixed? Take the ratio of the new expected count to the old, so everything that didn't change cancels:</p>
+<div class="eq-block">$\dfrac{\mathbb{E}[\text{Count}\mid 2\,\text{eDNA}]}{\mathbb{E}[\text{Count}\mid \text{eDNA}]} = \dfrac{e^{\beta_0}\,(2\,\text{eDNA})^{\beta_1}\,e^{(\text{Year})}}{e^{\beta_0}\,(\text{eDNA})^{\beta_1}\,e^{(\text{Year})}} = \dfrac{(2\,\text{eDNA})^{\beta_1}}{(\text{eDNA})^{\beta_1}} = 2^{\beta_1}.$</div>
+<p>The intercept, the Year term, and even the baseline eDNA level all cancel — only the factor you multiplied the predictor by survives, raised to $\beta_1$. That is the general result, and it is worth keeping: <strong>multiply a log-transformed predictor by any factor $c$, and the expected response multiplies by $c^{\beta_1}$</strong> (doubling is just $c = 2$; a 50% rise is $c = 1.5$, giving $1.5^{0.897}=1.44$, a 44% increase). It is the same fact seen from the link scale — doubling adds $\log 2$ to $\log(\text{eDNA})$, hence adds $\beta_1\log 2$ to the linear predictor, and $e^{\beta_1\log 2}=2^{\beta_1}$ back on the response scale. Additive on the link, multiplicative on the response.</p>
+<p>Only now do the numbers enter. Plug in the NB estimate $\hat\beta_1 = 0.897$:</p>
+<div class="eq-block">$2^{0.897} = e^{0.897\,\times\,\ln 2} = e^{0.897\,\times\,0.693} = e^{0.622} = 1.86.$</div>
+<p>So <strong>a doubling of the flow-corrected eDNA signal is associated with roughly an 86% increase (×1.86) in the expected daily adult sockeye count</strong> — matching the graded Problem 5. "The slope was 0.90 (SE 0.08)" is not a finding; "doubling the eDNA signal is associated with 86% more sockeye" is the sentence that goes in the paper.</p>
 </div></details>
 
 <div class="callout bio"><p class="callout-label">Biological intuition</p>

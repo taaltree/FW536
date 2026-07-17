@@ -214,7 +214,7 @@ Streams$Stream &lt;- <span class="fn">factor</span>(Streams$Stream)
 
 <span class="cm"># Three models</span>
 lm1 &lt;- <span class="fn">lm</span>(Density ~ <span class="nu">1</span>, data=Streams) <span class="cm"># complete pooling</span>
-lm2 &lt;- <span class="fn">lm</span>(Density ~ Stream - <span class="nu">1</span>, data=Streams) <span class="cm"># no pooling</span>
+lm2 &lt;- <span class="fn">lm</span>(Density ~ <span class="fn">factor</span>(Stream) - <span class="nu">1</span>, data=Streams) <span class="cm"># no pooling (factor() -&gt; one mean per stream)</span>
 lm3 &lt;- <span class="fn">lme</span>(fixed = Density ~ <span class="nu">1</span>, random = ~ <span class="nu">1</span> | Stream, data=Streams) <span class="cm"># partial pooling</span></code></pre>
 
 <ol type="a">
@@ -225,14 +225,18 @@ lm3 &lt;- <span class="fn">lme</span>(fixed = Density ~ <span class="nu">1</span
 </ol>
 
 <details class="answer"><summary>Reveal worked solution</summary><div class="answer-body">
-<p><strong>(a)</strong> Let $y_{ij}$ be density measurement $i$ in stream $j$. <code>lm1</code>: $y_{ij} = \beta_0 + \varepsilon_{ij}$ — two parameters ($\beta_0, \sigma^2$). <code>lm2</code>: $y_{ij} = \alpha_j + \varepsilon_{ij}$ with $j=1,\dots,18$ — 19 parameters. <code>lm3</code>: $y_{ij} = \beta_0 + b_{0,j} + \varepsilon_{ij}$, $b_{0,j} \sim \mathcal{N}(0,\sigma_\text{stream}^2)$ — only 3 parameters ($\beta_0, \sigma_\text{stream}^2, \sigma^2$), regardless of how many streams there are.</p>
+<p><strong>(a)</strong> Let $y_{ij}$ be density measurement $i$ in stream $j$. <code>lm1</code>: $y_{ij} = \beta_0 + \varepsilon_{ij}$ — two parameters ($\beta_0, \sigma^2$). <code>lm2</code>: $y_{ij} = \alpha_j + \varepsilon_{ij}$ with a free mean $\alpha_j$ for each of the $j=1,\dots,100$ streams — 101 parameters (100 means $+\ \sigma^2$). <code>lm3</code>: $y_{ij} = \beta_0 + b_{0,j} + \varepsilon_{ij}$, $b_{0,j} \sim \mathcal{N}(0,\sigma_\text{stream}^2)$ — only 3 parameters ($\beta_0, \sigma_\text{stream}^2, \sigma^2$), regardless of how many streams there are.</p>
 
 <p><strong>(b)</strong> Residuals from <code>lm1</code> cluster strongly by stream — entire streams are shifted above or below zero. This violates the independence assumption of OLS. Standard errors from <code>lm1</code> are too small (anti-conservative).</p>
 
 <p><strong>(c)</strong> Stream 11 has the lowest mean (8.9) and Stream 43 the highest (111.7); every stream has exactly 3 observations. The partially-pooled estimates from <code>lm3</code> sit slightly closer to the grand mean of 63.26 — Stream 11 moves 8.9 → 9.7, Stream 43 moves 111.7 → 111.0.</p>
-<p>Two things are worth noticing. First, the shrinkage is <em>identical</em> for every stream — 1.49% of its deviation from the grand mean — not larger for the extreme ones. That is a consequence of the balanced design: the weight depends only on $n_j$, and here every $n_j = 3$:</p>
-<div class="eq-block">$B = \dfrac{\sigma^2/n}{\tau^2 + \sigma^2/n} = \dfrac{20.8/3}{459.1 + 20.8/3} = 0.0149$</div>
-<p>Second, the pull is <em>small</em>, which the same formula explains: the among-stream variance (459) dwarfs the uncertainty in a 3-observation stream mean (20.8/3 ≈ 6.9). Each stream's own data are precise relative to how much streams genuinely differ, so the model trusts them and barely shrinks. Shrinkage is not a fixed penalty for small $n$ — it is a ratio, and it is only large when a group's own mean is imprecise <em>relative to</em> the spread among groups.</p>
+<p>Two things are worth noticing. First, the shrinkage is <em>identical</em> for every stream — 1.49% of its deviation from the grand mean — not larger for the extreme ones. To see why, derive the partially-pooled estimate instead of quoting the weight. The model hands each stream two independent readings on its true mean $\mu_j$: the stream's own average $\bar y_j$, which scatters around $\mu_j$ with variance $\sigma^2/n_j$, and the population, which says $\mu_j$ lies near the grand mean $\beta_0$ with variance $\tau^2$. The optimal combination weights each reading by its <strong>precision</strong> (precision $= 1/\text{variance}$):</p>
+<div class="eq-block">$\hat\mu_j = \dfrac{\dfrac{n_j}{\sigma^2}\,\bar y_j + \dfrac{1}{\tau^2}\,\beta_0}{\dfrac{n_j}{\sigma^2} + \dfrac{1}{\tau^2}} = (1 - B_j)\,\bar y_j + B_j\,\beta_0,$</div>
+<p>so the fraction pulled toward the grand mean is just the prior's share of the total precision:</p>
+<div class="eq-block">$B_j = \dfrac{1/\tau^2}{\,n_j/\sigma^2 + 1/\tau^2\,} = \dfrac{\sigma^2/n_j}{\tau^2 + \sigma^2/n_j}.$</div>
+<p>That is the reusable rule, and it is the one to carry away: <strong>a group shrinks toward the grand mean by the share of total precision that the population contributes</strong> — large when the group's own mean is noisy ($\sigma^2/n_j$ big) or when groups barely differ ($\tau^2$ small), and negligible in the reverse case. The formula touches the group only through $n_j$, so in this balanced design (every $n_j = 3$ across all 100 streams) every stream shrinks by the same amount. Now plug in the two variance components <code>lme</code> reports ($\hat\tau^2 = 459.1$, $\hat\sigma^2 = 20.8$):</p>
+<div class="eq-block">$B = \dfrac{\sigma^2/n}{\tau^2 + \sigma^2/n} = \dfrac{20.8/3}{459.1 + 20.8/3} = \dfrac{6.9}{466.0} = 0.0149.$</div>
+<p>Each stream therefore keeps 98.5% of its own deviation from the grand mean — exactly the $8.9 \to 9.7$ and $111.7 \to 111.0$ nudges noted above. Second, the pull is <em>small</em>, which the same formula explains: the among-stream variance (459) dwarfs the uncertainty in a 3-observation stream mean (20.8/3 ≈ 6.9). Each stream's own data are precise relative to how much streams genuinely differ, so the model trusts them and barely shrinks. Shrinkage is not a fixed penalty for small $n$ — it is a ratio, and it is only large when a group's own mean is imprecise <em>relative to</em> the spread among groups.</p>
 
 <p><strong>(d)</strong> Approximate output:</p>
 <pre><code>Random effects:
@@ -421,7 +425,9 @@ fit_with_x &lt;- <span class="fn">lmer</span>(Z_TP ~ Z_Length + (<span class="nu
 <details class="answer"><summary>Reveal worked solution</summary><div class="answer-body">
 <p><strong>(a)</strong> We're comparing models that differ in their <em>fixed-effect</em> structure. REML log-likelihoods are not comparable across different fixed-effect specifications. <code>anova()</code> on two REML <code>lmer</code> fits will (by default) refit them with ML before computing the LRT, but it's better practice to fit them with <code>REML = FALSE</code> from the start so you can see what you're comparing.</p>
 
-<p><strong>(b)</strong> Expect $\chi^2 \approx 6$–$8$ on 1 df, $p \approx 0.005$–$0.01$. Body length is supported.</p>
+<p><strong>(b)</strong> The LRT statistic is twice the gain in maximized log-likelihood from adding the one fixed slope: $\Lambda = 2(\ell_\text{alt} - \ell_\text{null})$. Here the ML log-likelihoods are $\ell_\text{null} = -146.4$ and $\ell_\text{alt} = -33.5$, so</p>
+<div class="eq-block">$\Lambda = 2\big(-33.5 - (-146.4)\big) = 225.9 \quad\text{on 1 df},\qquad p \approx 5\times10^{-51}.$</div>
+<p>Body length is overwhelmingly supported — this is not a marginal effect. You can sanity-check the magnitude against the Wald view: the slope is $\hat\beta = 0.420$ with SE $0.019$, so $t = 22$ and $t^2 \approx 467$; the LRT and Wald statistics are the same test asymptotically and both are astronomically far into the tail (they differ here only because $t^2$ uses the curvature at the estimate while $\Lambda$ uses the actual likelihood drop). With $n = 180$ observations spanning the length range, a standardized-length slope of 0.42 SD of trophic position per 1 SD of length is a strong, well-estimated signal, not a whisper.</p>
 
 <p><strong>(c)</strong> REML gives less-biased variance components. The point estimates of the fixed effects barely change, but the standard errors are more honest under REML.</p>
 </div></details>
@@ -534,7 +540,9 @@ within2 &lt;- <span class="fn">replicate</span>(reps, {
 <span class="fn">mean</span>(within2) <span class="cm"># essentially 1.0 &mdash; it is always within 2</span></code></pre>
 
 <details class="answer"><summary>Reveal solution &amp; discussion</summary><div class="answer-body">
-<p>The nonsense-variable model is within 2 AIC units of the correct model <em>essentially 100% of the time &mdash; it always is</em>. Here is why. Adding one parameter changes the AIC by $\Delta\text{AIC} = 2 - \chi^2_1$, where $\chi^2_1$ is the likelihood-ratio statistic for the extra term (twice the gain in log-likelihood). Because that statistic is always positive, $\Delta\text{AIC}$ is always below 2. In fact, about 16% of the time $\chi^2_1 &gt; 2$, so the junk model actually has the <em>lower</em> AIC and "wins" outright. The $\Delta\text{AIC} &lt; 2$ rule does not screen out useless variables at all.</p>
+<p>The nonsense-variable model is within 2 AIC units of the correct model <em>essentially 100% of the time &mdash; it always is</em>. This is not luck; it falls straight out of the definition of AIC. Write $\text{AIC} = -2\ell + 2k$ for each model and subtract the simpler ($k$ parameters) from the more complex ($k+1$ parameters):</p>
+<div class="eq-block">$\Delta\text{AIC} = \text{AIC}_{\text{big}} - \text{AIC}_{\text{small}} = -2\big(\ell_{\text{big}} - \ell_{\text{small}}\big) + 2\big[(k+1) - k\big] = 2 - \chi^2_1,$</div>
+<p>because $2(\ell_{\text{big}} - \ell_{\text{small}})$ is exactly the likelihood-ratio statistic $\chi^2_1$ for the extra term (twice the gain in maximized log-likelihood). This is the general identity worth keeping — <strong>adding one parameter moves AIC by $2 - \chi^2_1$</strong>: the penalty for a parameter is a flat $+2$, while the reward is a random $\chi^2_1$. Two consequences follow at once. Since $\chi^2_1 \ge 0$ always, $\Delta\text{AIC} \le 2$ always — a nested one-extra-parameter model is <em>within 2 by construction</em>, whatever the data say. And the junk model wins outright ($\Delta\text{AIC} &lt; 0$) exactly when $\chi^2_1 &gt; 2$, which for a true null happens with probability $P(\chi^2_1 &gt; 2) = 0.157$ — about 16% of the time. The $\Delta\text{AIC} &lt; 2$ rule does not screen out useless variables at all.</p>
 <p><strong>The lesson:</strong> the $\Delta\text{AIC} &lt; 2$ rule is structurally biased toward including junk. Anderson &amp; Burnham's own writing has been used selectively here; many authors (Arnold 2010 is the standard reference) push back on the "include any model within 2" practice and emphasize that the included variable's <em>coefficient and CI</em> have to do real work.</p>
 </div></details>
 </div>
@@ -585,7 +593,9 @@ pstor &lt;- AICstor &lt;- AICcstor &lt;- BICstor &lt;- <span class="fn">rep</spa
 <tr><td>AICc</td><td>~0.39</td></tr>
 <tr><td>BIC</td><td>~0.16</td></tr>
 </table>
-<p>AIC and AICc retain a noise predictor in the top model about 40&ndash;45% of the time. Selecting variables by $p &lt; 0.05$ and by BIC are both far more conservative here (both ≈ 0.16): the family-wise p-value rate is $1 - 0.95^3 \approx 0.14$, and BIC's heavier $\ln n$ penalty (≈ 3.9 for $n = 50$, versus AIC's fixed 2) makes it about as strict. AIC's penalty of 2 is simply too small to keep junk out.</p>
+<p>AIC and AICc retain a noise predictor in the top model about 40&ndash;45% of the time. You can <em>predict</em> that rate rather than only reporting it, using the $\Delta\text{AIC} = 2 - \chi^2_1$ identity from Exercise 7: a single noise predictor enters the AIC-best model exactly when it clears $\chi^2_1 &gt; 2$ — probability $0.157$ each. With three near-independent noise predictors, the chance that <em>at least one</em> slips in is</p>
+<div class="eq-block">$1 - (1 - 0.157)^3 = 1 - 0.843^3 = 0.40,$</div>
+<p>in line with the simulated 40&ndash;45% (the small excess is joint selection and the mild correlation among the fitted predictors). The same reusable move explains the two conservative criteria — each just raises the bar the extra variable must clear. The family-wise p-value rate is $1 - 0.95^3 \approx 0.14$. BIC replaces AIC's flat penalty of 2 with $\ln n \approx 3.9$ for $n = 50$, so a junk predictor now needs $\chi^2_1 &gt; 3.9$ (probability $P(\chi^2_1 &gt; 3.9) \approx 0.048$ each, hence $1 - (1 - 0.048)^3 \approx 0.14$ overall) — about as strict as the p-value screen, and matching the observed $\approx 0.16$. AIC's penalty of 2 is simply too small to keep junk out.</p>
 <p><strong>When would BIC backfire?</strong> When true effects are <em>weak</em>. BIC's heavier penalty buys Type-I safety at the cost of Type-II error — see the next exercise.</p>
 </div></details>
 </div>

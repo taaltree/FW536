@@ -384,8 +384,12 @@
 <h3>Orangutan line transects</h3>
 <p>The detection function for orangutans on a line transect is roughly exponential, with rate $\lambda = 0.02$ per meter of perpendicular distance. Derive the survival function (probability of not yet detecting at distance $x$) and use it to compute the probability of missing an orangutan at 50 m.</p>
 <details class="answer"><summary>Reveal</summary><div class="answer-body">
-<p><strong>Derive the survival function.</strong> The Exponential$(\lambda)$ density is $f(t) = \lambda e^{-\lambda t}$ for $t \ge 0$. "Not yet detected at distance $x$" means the detection distance $X$ exceeds $x$, so integrate the density from $x$ outward:</p>
+<p><strong>Derive the survival function — two ways.</strong> "Not yet detected at distance $x$" means the detection distance $X$ exceeds $x$, so we want the survival function $S(x) = P(X \ge x)$. There are two routes to it, and it is worth seeing both.</p>
+<p><em>Way 1 — from first principles (integrate the density).</em> The Exponential$(\lambda)$ density is $f(t) = \lambda e^{-\lambda t}$ for $t \ge 0$. Accumulate all the probability beyond $x$ by integrating from $x$ outward:</p>
 <div class="eq-block">$S(x) = P(X \ge x) = \int_x^\infty \lambda e^{-\lambda t}\,dt = \big[-e^{-\lambda t}\big]_x^\infty = e^{-\lambda x}.$</div>
+<p><em>Way 2 — from the CDF you already know (no integral).</em> Once you recognize that a "distance to first detection under a constant per-meter detection hazard" is an Exponential random variable, you can skip the calculus. The Exponential CDF is a standard result, $F(x) = P(X \le x) = 1 - e^{-\lambda x}$, and the survival function is simply its complement:</p>
+<div class="eq-block">$S(x) = P(X \ge x) = 1 - F(x) = 1 - \big(1 - e^{-\lambda x}\big) = e^{-\lambda x}.$</div>
+<p>Same answer, and Way 2 takes one line — the payoff for naming the distribution instead of re-integrating. (Way 1 is really just the on-the-spot derivation of that CDF; the two are the same calculation, done from different starting points.)</p>
 <p>The general rule to carry away: <strong>for any exponential process the survival function is a pure exponential decay $e^{-\lambda x}$,</strong> so the fraction still undetected drops by the constant factor $e^{-\lambda}$ per meter — and, exactly as in the log-link redd example, there is a "detection half-distance" $\ln(2)/\lambda$ at which half the animals remain undetected. Here $\ln(2)/0.02 = 34.7$ m.</p>
 <p>Now plug in $\lambda = 0.02$ per meter and $x = 50$ m, so $\lambda x = 1$:</p>
 <div class="eq-block">$S(50) = e^{-\lambda x} = e^{-1.0} = 0.368.$</div>

@@ -27,8 +27,8 @@ _tools/__pycache__/
 *_KEY.html
 
 # Instructor-only pre-publication review — contains answer-key defects and
-# grading gaps. Never publish. (RECOMMENDATIONS.* is tracked and currently DOES
-# publish despite saying otherwise — see PREPUB_REVIEW.md B19.)
+# grading gaps. Never publish.
 # NB: something in this repo auto-renders .md -> .html (pandoc). Ignore BOTH forms --
 # ignoring only the .md is how RECOMMENDATIONS.html ended up published.
 PREPUB_*
+RECOMMENDATIONS.*

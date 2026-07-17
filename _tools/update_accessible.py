@@ -35,7 +35,20 @@ ACCESSIBLE_MATHJAX = (
  '<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script"></script>')
 MATHJAX_RE = re.compile(r'<script>\s*MathJax\s*=\s*\{.*?</script>\s*<script[^>]*tex-chtml\.js[^>]*></script>', re.S)
 
+# Standard-site slide links -> this site's own screen-reader notes. The standard site now
+# points at the *_accessible.pptx decks, so match those names; the bare .pptx names are kept
+# so the mapping still fires on any page that has not been retargeted yet. Note that .pptx
+# is deliberately never copied into accessible/, so an unmapped slide link would 404.
 PPTX_TO_NOTES = {
+ "FW536_Day1_Morning_intro%20to%20probability_accessible.pptx":"lecture_day1_morning.html",
+ "FW536_Day1_Afternoon%20Distributions%20I_accessible.pptx":"lecture_day1_afternoon.html",
+ "FW536_Day2_Morning_ContinuousDistributions_accessible.pptx":"lecture_day2_morning.html",
+ "FW536_Day2_Afternoon_GeneralizedLinear%20Models_accessible.pptx":"lecture_day2_afternoon.html",
+ "FW536_Day3_Morning_mixed%20effects_accessible.pptx":"lecture_day3_morning.html",
+ "FW536_Day3_Afternoon_hypothesis%20test%20and%20model%20selection_accessible.pptx":"lecture_day3_afternoon.html",
+ "FW536_Day4_Morning_maximum%20likelihod_accessible.pptx":"lecture_day4_morning.html",
+ "FW536_Day4_Afternoon_BayesI_accessible.pptx":"lecture_day4_afternoon.html",
+ "FW536_Day5_BayesII_accessible.pptx":"lecture_day5.html",
  "FW536_Day1_Morning_intro%20to%20probability.pptx":"lecture_day1_morning.html",
  "FW536_Day1_Afternoon%20Distributions%20I.pptx":"lecture_day1_afternoon.html",
  "FW536_Day2_Morning_ContinuousDistributions.pptx":"lecture_day2_morning.html",

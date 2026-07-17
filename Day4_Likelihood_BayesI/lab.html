@@ -864,20 +864,31 @@ reg_samps &lt;- <span class="fn">nimbleMCMC</span>(
 <pre><code>mu_post  &lt;- <span class="fn">MCMCchains</span>(reg_samps, <span class="st">"mu"</span>)        <span class="cm"># fitted mass for each salamander</span>
 rep_post &lt;- <span class="fn">MCMCchains</span>(reg_samps, <span class="st">"mass_rep"</span>)  <span class="cm"># a fake dataset, one per draw</span>
 
-<span class="cm"># Our summary is "the biggest miss": how far is the worst salamander from the line?</span>
-<span class="cm"># Compute it once for the real data and once for the fake data, at every draw.</span>
+<span class="cm"># Two ways to summarise "how far are the points from the line?":</span>
+<span class="cm">#   SSR          = the total squared distance</span>
+<span class="cm">#   biggest miss = the single worst salamander</span>
+<span class="cm"># Compute each on the real data and on the fake data, at every posterior draw.</span>
 S &lt;- <span class="fn">nrow</span>(mu_post)
+obs_ssr &lt;- <span class="fn">numeric</span>(S)
+rep_ssr &lt;- <span class="fn">numeric</span>(S)
 obs_miss &lt;- <span class="fn">numeric</span>(S)
 rep_miss &lt;- <span class="fn">numeric</span>(S)
 
 <span class="kw">for</span> (s in <span class="nu">1</span>:S) {
- obs_miss[s] &lt;- <span class="fn">max</span>(<span class="fn">abs</span>(mass_g - mu_post[s, ])) <span class="cm"># worst miss, real data</span>
- rep_miss[s] &lt;- <span class="fn">max</span>(<span class="fn">abs</span>(rep_post[s, ] - mu_post[s, ])) <span class="cm"># worst miss, fake data</span>
+ e_obs &lt;- mass_g - mu_post[s, ] <span class="cm"># residuals, real data</span>
+ e_rep &lt;- rep_post[s, ] - mu_post[s, ] <span class="cm"># residuals, fake data</span>
+
+ obs_ssr[s] &lt;- <span class="fn">sum</span>(e_obs^<span class="nu">2</span>)
+ rep_ssr[s] &lt;- <span class="fn">sum</span>(e_rep^<span class="nu">2</span>)
+ obs_miss[s] &lt;- <span class="fn">max</span>(<span class="fn">abs</span>(e_obs))
+ rep_miss[s] &lt;- <span class="fn">max</span>(<span class="fn">abs</span>(e_rep))
 }
 
-<span class="cm"># Bayesian p-value: how often does fake data miss as badly as the real data?</span>
-<span class="fn">mean</span>(rep_miss &gt;= obs_miss)
+<span class="cm"># Bayesian p-value: how often is the fake data as bad as the real data?</span>
+<span class="fn">mean</span>(rep_ssr &gt;= obs_ssr) <span class="cm"># sum of squared residuals</span>
+<span class="fn">mean</span>(rep_miss &gt;= obs_miss) <span class="cm"># biggest miss</span>
 
+<span class="cm"># Where does the real dataset sit among the fake ones?</span>
 <span class="fn">hist</span>(rep_miss, xlab = <span class="st">"biggest miss in a fake dataset (g)"</span>, main = <span class="st">""</span>)
 <span class="fn">abline</span>(v = <span class="fn">mean</span>(obs_miss), col = <span class="st">"red"</span>, lwd = <span class="nu">2</span>) <span class="cm"># real data: inside the pile, or off in the tail?</span>
 
@@ -890,7 +901,7 @@ mass_rep_chain &lt;- <span class="fn">MCMCchains</span>(reg_samps, <span class="
 <span class="fn">points</span>(length_mm, mass_g, pch = <span class="nu">19</span>, col = <span class="st">"red"</span>)</code></pre>
 
 <div class="callout key">
-The recipe is always the same three steps: <strong>(1)</strong> simulate fake datasets from the posterior, <strong>(2)</strong> compute the same summary on the fake data and the real data, <strong>(3)</strong> ask how often the fake beats the real. That fraction is the Bayesian p-value. Near 0.5 means the real data look like something your model would produce. Near 0 or 1 is a red flag. Look at the plot as well as the number — they can tell you different things.
+The recipe is always the same three steps: <strong>(1)</strong> simulate fake datasets from the posterior, <strong>(2)</strong> compute the same summary on the fake data and the real data, <strong>(3)</strong> ask how often the fake beats the real. That fraction is the Bayesian p-value. Near 0.5 means the real data look like something your model would produce. Near 0 or 1 is a red flag. Two different summaries of the same fit can give you two different p-values, so the summary you pick is part of the check — and look at the plot as well as the number.
 </div>
 </section>
 

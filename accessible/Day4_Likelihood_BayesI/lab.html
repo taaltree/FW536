@@ -114,7 +114,7 @@ MathJax = {
     Other docs for this day: <a href="plain_language_summary.html">plain-language summary</a> &middot;
     <a href="answer_key.html">practice answer key</a>.
   </p>
-<p style="font-size:13px; color:var(--bad); margin: 12px 0 0 0; padding: 10px; background: #FBE3DD; border-radius: 6px;"><strong>Day 4 topic split:</strong> the morning problem set (problems 1&ndash;3) uses <strong>maximum likelihood only</strong>. The afternoon problem set (problems 4&ndash;10) uses <strong>Bayesian methods</strong>, introduced in the afternoon lecture.</p>
+<p style="font-size:13px; color:var(--bad); margin: 12px 0 0 0; padding: 10px; background: #FBE3DD; border-radius: 6px;"><strong>Day 4 topic split:</strong> the morning problem set (problems 1&ndash;4) uses <strong>maximum likelihood only</strong>. The afternoon problem set (problems 5&ndash;10) uses <strong>Bayesian methods</strong>, introduced in the afternoon lecture.</p>
 </div>
 
 <section class="data-card" id="data-files">
@@ -1091,7 +1091,14 @@ acc / <span class="fn">length</span>(ll)</code></pre>
 <li>Write one sentence explaining how the prior "tug" trades off with the data — i.e. how the effective sample size of the prior compares to $n=25$.</li>
 </ol>
 <details class="answer"><summary>Reveal</summary><div class="answer-body">
-<p>Beta(1,1): posterior $\approx$ Beta(19, 8), mean $\approx 0.70$. Beta(9,11): mean $\approx 0.60$ (shrunk). Beta(50,50): mean $\approx 0.59$ → wait, that doesn't shrink as much as you'd think because both prior and data center near 0.6. Replace with Beta(50, 100) (mean 0.33) and you'd see massive shrinkage to ~0.49 — illustrating that the prior matters most when prior pseudo-sample size $\gg n$.</p>
+<p>With $y=18$ successes in $n=25$, the data alone give $18/25 = 0.72$. Each prior pulls that toward its own mean, by an amount set by its pseudo-sample size $\alpha+\beta$ relative to $n$:</p>
+<ul>
+<li><strong>Beta(1,1)</strong> (flat, pseudo-$n=2$) &rarr; Beta(19,&nbsp;8), mean <strong>0.704</strong> &mdash; barely moved; the data dominate.</li>
+<li><strong>Beta(9,11)</strong> (mean 0.45, pseudo-$n=20$) &rarr; Beta(27,&nbsp;18), mean <strong>0.600</strong> &mdash; pulled about halfway, because pseudo-$n \approx n$.</li>
+<li><strong>Beta(50,50)</strong> (mean 0.50, pseudo-$n=100$) &rarr; Beta(68,&nbsp;57), mean <strong>0.544</strong> &mdash; yanked most of the way to 0.50: the prior is worth four times the data.</li>
+<li><strong>Beta(50,100)</strong> (mean 0.33, pseudo-$n=150$) &rarr; Beta(68,&nbsp;107), mean <strong>0.389</strong> &mdash; the posterior now sits closer to the prior than to the data.</li>
+</ul>
+<p>The lesson: the prior matters most when its pseudo-sample size is large relative to $n$. Beta(50,50) is not a "weak" prior just because it is centred at one half &mdash; with $n=25$ it overwhelms the data.</p>
 </div></details>
 </div>
 

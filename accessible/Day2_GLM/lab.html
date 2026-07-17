@@ -391,17 +391,25 @@ MathJax = {
 <p>200 trail cameras are deployed. Plain assumption: per-camera detection probability $p = 0.03$ each night. But cameras vary: $p_i \sim \text{Beta}(0.03 \cdot \phi, 0.97 \cdot \phi)$ with $\phi = 1$ (so beta is very spread out).</p>
 <ol type="a">
 <li>What is the mean of this Beta?</li>
-<li>Simulate 5000 deployments under plain Binomial(200, 0.03) and the Beta-Binomial. Compare P(all-zero) and mean/SD of the detection count.</li>
-<li>Why does the Beta-Binomial put much more mass on "all-zero"?</li>
+<li>Each of <strong>20 cameras</strong> runs for <strong>10 nights</strong>, and a camera's detectability $p_i$ is drawn once and reused for all 10 of its nights. Simulate 5000 deployments under a plain Binomial(200, 0.03) and under this Beta-Binomial. Compare P(all-zero) and the mean/SD.</li>
+<li>Why does the Beta-Binomial put much more mass on "all-zero"? What would happen if each camera-night drew its <em>own</em> independent $p$?</li>
 </ol>
 <details class="answer"><summary>Reveal</summary><div class="answer-body">
 <pre><code>set.seed(1); reps &lt;- 5000
-bin &lt;- rbinom(reps, 200, 0.03)
-betbin &lt;- replicate(reps, sum(rbinom(200, 1, rbeta(200, 0.03, 0.97))))
-mean(bin==0); mean(betbin==0) # ~ 0 vs ~ 0.04
-mean(bin); mean(betbin) # ~ 6 vs ~ 6
-sd(bin); sd(betbin) # ~ 2.4 vs ~ 14</code></pre>
-<p>(c) In the Beta-Binomial, the detection probability is concentrated near 0 or 1 with this $\phi$, so most cameras get nearly 0 chance, a few get nearly 1. The mass at all-zero is the case where every camera drew a tiny $p_i$.</p>
+K &lt;- 20; J &lt;- 10 # 20 cameras x 10 nights = 200 camera-nights
+
+bin &lt;- rbinom(reps, K*J, 0.03)
+betbin &lt;- replicate(reps, {
+ p &lt;- rbeta(K, 0.03, 0.97) # ONE p per camera...
+ sum(rbinom(K, J, p)) # ...reused across its 10 nights
+})
+mean(bin==0); mean(betbin==0) # 0.003 vs 0.166
+mean(bin); mean(betbin) # 6.0 vs 6.0 — same mean
+sd(bin); sd(betbin) # 2.5 vs 5.6 — about 5x the variance</code></pre>
+<p><strong>(c)</strong> With $\phi$ this small the Beta piles $p_i$ up near 0 or 1, so most cameras are near-blind while a few are hot. A camera that draws a tiny $p_i$ contributes zero on <em>all ten</em> of its nights, so all-zero deployments become common (0.166 vs 0.003) &mdash; even though the mean is unchanged at ~6. That is overdispersion: same mean, fatter tails.</p>
+<div class="callout warn"><p class="callout-label">Watch out</p>
+<p><strong>The clustering is the whole point.</strong> If each camera-<em>night</em> drew its own independent $p$, the heterogeneity would integrate straight out: marginally each night is Bernoulli($E[p] = 0.03$) and the nights are independent, so the total would be <em>exactly</em> Binomial(200, 0.03) &mdash; same mean, same SD, no overdispersion at all. Try it: swap the two lines above for <code>sum(rbinom(200, 1, rbeta(200, 0.03, 0.97)))</code> and you get SD 2.4, indistinguishable from the plain binomial. Overdispersion needs a $p$ that is <em>shared</em> across several observations &mdash; which is exactly why the Titanic and sockeye data overdisperse: repeated observations share a group.</p>
+</div>
 </div></details>
 </div>
 </section>

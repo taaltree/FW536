@@ -61,7 +61,7 @@ MathJax = {
 </header>
 
 <section><div class="callout key"><p class="callout-label">Key idea</p>
-<strong>How to use this document.</strong> Walk through each exercise in order. When a student produces a numeric answer, check whether they can also state the <em>biological</em> interpretation in one sentence. Day 2's pedagogical goal is not "fit the GLM"; it is "read the GLM as biology." Reward the student who says "a doubling of eDNA is associated with a 62% increase in expected adult sockeye." Push back on the student who says "the slope is 0.7 (SE 0.04)."
+<strong>How to use this document.</strong> Walk through each exercise in order. When a student produces a numeric answer, check whether they can also state the <em>biological</em> interpretation in one sentence. Day 2's pedagogical goal is not "fit the GLM"; it is "read the GLM as biology." Reward the student who says "a doubling of eDNA is associated with a 87% increase in expected adult sockeye." Push back on the student who says "the slope is 0.90 (SE 0.08)."
 </div></section>
 
 <!-- ============================================================ -->
@@ -76,7 +76,7 @@ MathJax = {
 <pre><code>lambda &lt;- 0.02
 exp(-lambda * 50) # 0.3679</code></pre>
 <p><strong>Biological interpretation.</strong> A 37% probability of missing an orangutan that is 50 m off the trackline is huge. This is exactly why distance-sampling analyses must <em>correct</em> raw counts by a fitted detection function instead of treating raw counts as abundance estimates. The "effective strip half-width" — the integral of $S(x)$ — gives you a single number to multiply transect length by to get the area effectively searched. For $\lambda = 0.02$, that effective half-width is $1/\lambda = 50$ m, even though the truncation distance might be 100 m or more.</p>
-<div class="callout key"><p class="callout-label">Key idea</p><strong>What to look for:</strong> students should derive $S(x)$ from $f(x)$ (or recall it directly) and explain why ignoring the detection function inflates apparent declines in abundance with distance — a classic source of bias in transect work.</div>
+<div class="callout key"><p class="callout-label">Key idea</p><strong>What to look for:</strong> students should connect the U-shaped prior to the excess of all-zero deployments and &mdash; the real test &mdash; say <em>why the clustering matters</em>: a $p$ drawn afresh for every single trial washes out entirely and leaves a plain binomial. A student who says "heterogeneity in $p$ causes overdispersion" without the shared-cluster condition has only half the idea. Link it forward: this is why the sockeye counts (repeated days within a year) and the Titanic rows (many passengers per class) overdisperse.</div>
 </section>
 
 <section id="m2">
@@ -104,14 +104,19 @@ hist(y, breaks=80) # symmetric bell</code></pre>
 <section id="m3">
 <h2>Exercise M3 — Beta-Binomial trail cameras</h2>
 <p><strong>(a) Mean of Beta$(0.03, 0.97)$:</strong> $\alpha/(\alpha + \beta) = 0.03/1 = 0.03$. Same expected detection probability as the plain binomial.</p>
-<p><strong>(b) Simulation.</strong></p>
+<p><strong>(b) Simulation.</strong> Note the structure: one $p_i$ per <em>camera</em>, reused across that camera's 10 nights. The clustering is what creates the overdispersion.</p>
 <pre><code>set.seed(1); reps &lt;- 5000
-bin &lt;- rbinom(reps, 200, 0.03)
-betbin &lt;- replicate(reps, sum(rbinom(200, 1, rbeta(200, 0.03, 0.97))))
-mean(bin == 0); mean(betbin == 0) # ~ 0.0024 vs ~ 0.045
-mean(bin); mean(betbin) # ~ 6.0 vs ~ 6.0
-sd(bin); sd(betbin) # ~ 2.4 vs ~ 14</code></pre>
-<p><strong>(c) Why so much "all-zero" mass?</strong> With $\alpha + \beta = 1$ the Beta is U-shaped: most cameras draw either a tiny $p_i$ (essentially 0) or a huge $p_i$ (essentially 1). On a given night, if every camera happened to land near zero, you get an all-zero deployment. That outcome is essentially impossible under a plain Bin(200, 0.03) where every camera has the same modest probability and the law of large numbers smooths things out. The variance jumps from $\approx 5.8$ (binomial) to $\approx 200$ (beta-binomial) — a 35-fold inflation, all driven by individual heterogeneity.</p>
+K &lt;- 20; J &lt;- 10 # 20 cameras x 10 nights = 200 camera-nights
+
+bin &lt;- rbinom(reps, K*J, 0.03)
+betbin &lt;- replicate(reps, {
+ p &lt;- rbeta(K, 0.03, 0.97) # ONE p per camera...
+ sum(rbinom(K, J, p)) # ...reused across its 10 nights
+})
+mean(bin == 0); mean(betbin == 0) # 0.003 vs 0.166
+mean(bin); mean(betbin) # 6.0 vs 6.0
+sd(bin); sd(betbin) # 2.5 vs 5.6</code></pre>
+<p><strong>(c) Why so much "all-zero" mass?</strong> With $\alpha + \beta = 1$ the Beta is U-shaped: most cameras draw a $p_i$ near 0, a few near 1. A near-blind camera returns zero on <em>all ten</em> of its nights, so whole deployments come back empty far more often (0.166 vs 0.003) while the mean is unchanged at ~6. <strong>The reuse of $p_i$ within a camera is essential.</strong> If every camera-night drew its own independent $p$, the mixture would integrate out &mdash; each night marginally Bernoulli(0.03) and independent, giving <em>exactly</em> Binomial(200, 0.03), SD 2.4, no overdispersion at all. Heterogeneity alone does not overdisperse; heterogeneity <em>shared across repeated observations</em> does.</p>
 <p><strong>Biological interpretation.</strong> This is the camera-trap version of what Day 1 taught with mixtures of Poissons: heterogeneity among sampling units inflates variance even when the marginal mean is correct. If your wildlife survey is "we deployed 200 cameras for one night each," the right model is almost never a plain binomial — cameras differ in placement, lure, weather, and species behaviour near each unit. Beta-binomial (or random-effect logistic) corrects the SEs that a plain binomial would underestimate.</p>
 <div class="callout key"><p class="callout-label">Key idea</p><strong>What to look for:</strong> students should connect the U-shaped Beta to "lots of bad cameras + a few great cameras," and to the broader Day-1 lesson that heterogeneity → overdispersion. Bonus if they note that the mean is preserved but the SE is not.</div>
 </section>

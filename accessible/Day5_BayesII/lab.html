@@ -507,6 +507,16 @@ samples &lt;- <span class="fn">nimbleMCMC</span>(lizardCode, constants=constants
 
 <div class="callout key"><p class="callout-label">Key idea</p>
 <p>Partial pooling produces <strong>shrinkage</strong>: each site's estimated $\alpha_j$ is pulled toward the global $\mu_\alpha$ by an amount inversely proportional to that site's data quantity and quality. Sites with one noisy observation get shrunk a lot; sites with 50 clean observations barely move. This is exactly the inference an expert ecologist would do by hand.</p>
+<div class="callout key"><p class="callout-label">Key idea</p>
+<p><strong>Shrinkage by hand.</strong> The posterior mean of a random intercept is a precision-weighted average of the site's own data and the global mean:</p>
+<p>$$\hat\alpha_j = \frac{n_j\bar y_j/\sigma^2 + \mu_\alpha/\sigma_\alpha^2}{n_j/\sigma^2 + 1/\sigma_\alpha^2}$$</p>
+<p>Take $\sigma=2$, $\mu_\alpha=0$, $\sigma_\alpha=3$, and two sites with the <em>same</em> observed mean $\bar y = 5$:</p>
+<ul>
+<li><strong>Site A</strong> ($n=100$): $\hat\alpha_A = \dfrac{100/4 \cdot 5 + 1/9 \cdot 0}{100/4 + 1/9} = \dfrac{125}{25.11} \approx 4.98$ &mdash; pulled almost none.</li>
+<li><strong>Site B</strong> ($n=4$): $\hat\alpha_B = \dfrac{4/4 \cdot 5 + 1/9 \cdot 0}{4/4 + 1/9} = \dfrac{5}{1.111} \approx 4.50$ &mdash; pulled 0.5 toward 0.</li>
+</ul>
+<p>Same observed mean, different estimates &mdash; because Site B's $\bar y$ is less precise. That is the entire mechanism of hierarchical models, and the formula generalises to almost every random-intercept model you will fit.</p>
+</div>
 </div>
 
 <h3>NIMBLE template: partial-pooling random intercept</h3>

@@ -324,10 +324,10 @@ sims |&gt; <span class="fn">pivot_longer</span>(<span class="fn">everything</spa
 <p>Approximate values (one seed) — yours will be close:</p>
 <table>
 <tr><th scope="col">Distribution</th><th scope="col">Mean</th><th scope="col">Variance</th><th scope="col">P(Y=0)</th><th scope="col">P(Y&gt;20)</th></tr>
-<tr><td>Pois(10)</td><td>~10.0</td><td>~10.0</td><td>~0.000</td><td>~0.003</td></tr>
-<tr><td>NB(μ=10, k=5)</td><td>~10.0</td><td>~30</td><td>~0.02</td><td>~0.06</td></tr>
-<tr><td>NB(μ=10, k=1)</td><td>~10.0</td><td>~110</td><td>~0.09</td><td>~0.16</td></tr>
-<tr><td>NB(μ=10, k=0.5)</td><td>~10.0</td><td>~210</td><td>~0.18</td><td>~0.21</td></tr>
+<tr><td>Pois(10)</td><td>10.0</td><td>10</td><td>0.000</td><td>0.002</td></tr>
+<tr><td>NB(μ=10, k=5)</td><td>10.0</td><td>30</td><td>0.004</td><td>0.046</td></tr>
+<tr><td>NB(μ=10, k=1)</td><td>10.0</td><td>110</td><td>0.091</td><td>0.135</td></tr>
+<tr><td>NB(μ=10, k=0.5)</td><td>10.0</td><td>210</td><td>0.218</td><td>0.155</td></tr>
 </table>
 <p>(d) The dataset described (many zeros, a few huge counts) matches NB with small $k$ — most ecological count data are like this.</p>
 <p><strong>Conceptual takeaway:</strong> the Poisson is a one-parameter distribution and is <em>forced</em> to have variance equal to its mean. Real ecological counts almost never satisfy that. Use the negative binomial unless you have a specific reason not to.</p>
@@ -369,9 +369,9 @@ probs &lt;- <span class="fn">dbinom</span>(k, size=<span class="nu">5</span>, pr
 
 <details class="answer"><summary>Reveal worked solution</summary><div class="answer-body">
 <p>(a) $Y \sim \text{Bin}(n=24, p=0.12)$.</p>
-<pre><code><span class="fn">dbinom</span>(<span class="nu">3</span>, <span class="nu">24</span>, <span class="nu">0.12</span>) <span class="cm"># P(Y=3) = 0.243</span>
-<span class="fn">pbinom</span>(<span class="nu">4</span>, <span class="nu">24</span>, <span class="nu">0.12</span>) <span class="cm"># P(Y<=4) = 0.872</span>
-<span class="fn">dbinom</span>(<span class="nu">0</span>, <span class="nu">24</span>, <span class="nu">0.12</span>) <span class="cm"># P(Y=0) = 0.048</span></code></pre>
+<pre><code><span class="fn">dbinom</span>(<span class="nu">3</span>, <span class="nu">24</span>, <span class="nu">0.12</span>) <span class="cm"># P(Y=3) = 0.2387</span>
+<span class="fn">pbinom</span>(<span class="nu">4</span>, <span class="nu">24</span>, <span class="nu">0.12</span>) <span class="cm"># P(Y<=4) = 0.8471</span>
+<span class="fn">dbinom</span>(<span class="nu">0</span>, <span class="nu">24</span>, <span class="nu">0.12</span>) <span class="cm"># P(Y=0) = 0.0465</span></code></pre>
 <p>(d) Even with 12% prevalence, there is roughly a 5% chance of seeing zero cases in $n=24$. Surveillance programs need to think explicitly about the binomial probability of detecting at least one case — this is the basis of "freedom from disease" sample-size calculations.</p>
 </div></details>
 </div>

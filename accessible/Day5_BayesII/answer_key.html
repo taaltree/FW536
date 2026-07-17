@@ -30,11 +30,10 @@ MathJax = {
  <li><a href="#a2">Exercise 2 — ant fits</a></li>
  <li><a href="#a3">Exercise 3 — lizards diagnostics</a></li>
  <li><a href="#a4">Exercise 4 — all 5 N2O models</a></li>
- <li><a href="#a5">Exercise 5 — shrinkage by hand</a></li>
- <li><a href="#a6">Exercise 6 — Beverton-Holt fit</a></li>
- <li><a href="#a7">Exercise 7 — dynamic occupancy</a></li>
- <li><a href="#a8">Exercise 8 — N-mixture build-up</a></li>
- <li><a href="#a9">Exercise 9 — Poisson-lognormal N-mix</a></li>
+ <li><a href="#a5">Exercise 5 — Beverton-Holt fit</a></li>
+ <li><a href="#a6">Exercise 6 — dynamic occupancy</a></li>
+ <li><a href="#a7">Exercise 7 — N-mixture build-up</a></li>
+ <li><a href="#a8">Exercise 8 — Poisson-lognormal N-mix</a></li>
  </ul>
  <div class="section">Day 5 docs</div>
  <ul>
@@ -164,20 +163,9 @@ b.post &lt;- <span class="fn">as.matrix</span>(samples)[, <span class="st">"b"</
 <p><em>Instructor note.</em> In this run the random-slope model converged fine at niter=10000 (all R-hat $\le$ 1.01, including $\sigma_\beta$). If a student's hyperparameters $\sigma_\alpha, \sigma_\beta$ show R-hat &gt; 1.05, lengthening <code>niter</code> and thinning fixes it.</p>
 </section>
 
-<section id="a5">
-<h2>Exercise 5 — Shrinkage by hand</h2>
-<p>Using $\hat\alpha_j = (n_j\bar y_j/\sigma^2 + \mu_\alpha/\sigma_\alpha^2)/(n_j/\sigma^2 + 1/\sigma_\alpha^2)$ with $\sigma=2$, $\mu_\alpha=0$, $\sigma_\alpha=3$.</p>
-<p><strong>Site A</strong> ($n=100, \bar y=5$):</p>
-<div class="eq-block">$\hat\alpha_A = \dfrac{100/4 \cdot 5 + 1/9 \cdot 0}{100/4 + 1/9} = \dfrac{125}{25.11} \approx 4.98$</div>
-<p>Pulled almost none.</p>
-<p><strong>Site B</strong> ($n=4, \bar y=5$):</p>
-<div class="eq-block">$\hat\alpha_B = \dfrac{4/4 \cdot 5 + 1/9 \cdot 0}{4/4 + 1/9} = \dfrac{5}{1.111} \approx 4.50$</div>
-<p>Pulled 0.5 units toward 0.</p>
-<p><strong>Punchline.</strong> Same observed mean, very different posterior estimates &mdash; because Site B's $\bar y$ is less precise. This is the entire mechanism of hierarchical models. Memorise this formula; it generalises to almost every random-intercept model you'll ever fit.</p>
-</section>
 
-<section id="a6">
-<h2>Exercise 6 — Beverton-Holt: fit, predict, derive</h2>
+<section id="a5">
+<h2>Exercise 5 — Beverton-Holt: fit, predict, derive</h2>
 <p>Run <code>SpawnerRecruit_Nimble.R</code> top to bottom.</p>
 <p><strong>(a) Posterior summaries</strong> (<code>set.seed(2025)</code>, 3 chains, niter=10000, nburnin=1000; Nyears=20). Every 95% CI contains the truth (R-hat = 1.00&ndash;1.01):</p>
 <table>
@@ -194,8 +182,8 @@ b.post &lt;- <span class="fn">as.matrix</span>(samples)[, <span class="st">"b"</
 <p><em>Instructor note.</em> Some students will get NaN <code>log()</code> values on iteration 1 if the random initial $a$ leads to a negative argument inside <code>log(1 + a/b * S[t])</code>. The prior bounds <code>dunif(1, 10)</code> and <code>dunif(1000, 10000)</code> usually prevent this; if not, supply explicit <code>inits</code>.</p>
 </section>
 
-<section id="a7">
-<h2>Exercise 7 — Dynamic occupancy</h2>
+<section id="a6">
+<h2>Exercise 6 — Dynamic occupancy</h2>
 <p>Run <code>DynamicOccupancy_Nimble.R</code>.</p>
 <p><strong>(a-c)</strong> From an actual run (<code>set.seed(2025)</code>; 3 chains, 20000 iter, 10000 burn-in, thin 5; every parameter R-hat = 1.00): the quantities informed by all the data are recovered well &mdash; detection $p$ = 0.63 [0.55, 0.70] (truth 0.60) and baseline occupancy $\psi$ = 0.33 [0.18, 0.51] (truth 0.37). Posterior medians for $\phi_t, \gamma_t, \psi_t$ plotted vs truth scatter around the 1:1 line but with large per-parameter uncertainty (e.g. $\phi_3$ = 0.52 [0.16, 0.89], $\gamma_1$ = 0.47 [0.26, 0.70]) due to the small sample size (30 sites, 3 reps, 7 transitions). This is honest small-sample uncertainty, not a convergence failure.</p>
 <p><strong>(d) Without z-init trick.</strong> Try:</p>
@@ -209,8 +197,8 @@ inits.bad &lt;- <span class="fn">list</span>(<span class="fn">list</span>(z=bad.
 <p><strong>(e) Why CIs are wide.</strong> Each transition $t \to t+1$ has only 30 sites of evidence. A standard fix is to give $\phi, \gamma$ themselves a hierarchical prior (e.g. logit$(\phi_t) \sim \mathcal{N}(\mu_\phi, \sigma_\phi^2)$), which lets years borrow strength from each other and shrinks year-specific estimates. You can also add covariates like temperature or land-use change to explain year-to-year variation.</p>
 </section>
 
-<section id="a8">
-<h2>Exercise 8 — N-mixture build-up</h2>
+<section id="a7">
+<h2>Exercise 7 — N-mixture build-up</h2>
 <p><em>Actual run: <code>set.seed(2025)</code>, 3 chains, niter=10000, nburnin=1000, thin 5; all R-hat = 1.00&ndash;1.02.</em></p>
 <p><strong>(a) Basic.</strong> Posterior medians $\lambda$ = 6.24 [5.06, 7.78], $p$ = 0.80 [0.67, 0.87] (truth $\lambda=6, p=0.8$) &mdash; both cover truth, intervals wide with only 20 sites.</p>
 <p><strong>(b) Covariate on abundance.</strong> $\beta_1$ = 1.00 [0.94, 1.07], credibly positive and matching the simulation truth ($\beta_1 = 1$); $\beta_0$ = 2.99 [2.91, 3.07].</p>
@@ -218,8 +206,8 @@ inits.bad &lt;- <span class="fn">list</span>(<span class="fn">list</span>(z=bad.
 <p><strong>(d) Overdispersion + Bayesian p-value.</strong> Data simulated from a negative binomial, fit with Poisson: Bayesian p-value = 0.008 ($T(\text{data})$ median 367 vs $T(y^\text{rep})$ median 332), far from 0.5 &mdash; clear evidence the Poisson model can't capture the variance. The discrepancy test catches a model that still returns a confident-looking $\lambda$ = 5.81 [5.46, 6.17].</p>
 </section>
 
-<section id="a9">
-<h2>Exercise 9 — Add a Poisson-lognormal random effect to fix overdispersion</h2>
+<section id="a8">
+<h2>Exercise 8 — Add a Poisson-lognormal random effect to fix overdispersion</h2>
 <pre><code>Nmix5Code &lt;- <span class="fn">nimbleCode</span>({
  <span class="kw">for</span> (i <span class="kw">in</span> <span class="nu">1</span>:Nsites) {
  eps[i] ~ <span class="fn">dnorm</span>(<span class="nu">0</span>, tau.eps)

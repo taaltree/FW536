@@ -458,7 +458,7 @@ F1 &lt;- <span class="fn">fitted</span>(M8)
 <h3>1. The likelihood ratio test (LRT) for nested models</h3>
 <p>If model $M_0$ is a special case of $M_1$ (e.g., one coefficient set to zero), then under the null hypothesis that $M_0$ is true,</p>
 <div class="eq-block">$2\left[\ell(M_1) - \ell(M_0)\right] \;\sim\; \chi^2_{\,k_1 - k_0}$</div>
-<p>where $\ell$ is the maximized log-likelihood and $k$ is the parameter count. The test is exact only asymptotically; for variance components on the boundary (testing whether a random-effect SD = 0) the standard $\chi^2$ is conservative — the right null is a 50:50 mixture of $\chi^2_0$ and $\chi^2_1$, often dealt with by dividing the LRT $p$-value by 2.</p>
+<p>where $\ell$ is the maximized log-likelihood and $k$ is the parameter count. The test is exact only asymptotically; for variance components on the boundary (testing whether a random-effect SD = 0) the standard $\chi^2$ is conservative. <strong>When you add exactly one variance component and no correlation term</strong> (e.g. <code>lm</code> vs <code>(1|g)</code>), the right null is a 50:50 mixture of $\chi^2_0$ and $\chi^2_1$, which amounts to halving the reported $p$-value. That shortcut does <em>not</em> generalise: adding a random <em>slope</em> adds a variance <em>and</em> a correlation, so the reference becomes $\tfrac{1}{2}\chi^2_1 + \tfrac{1}{2}\chi^2_2$ and halving is wrong. Beyond the one-component case use <code>RLRsim::exactRLRT()</code> or a parametric bootstrap.</p>
 
 <h3>2. AIC, AICc, BIC</h3>
 <table>
@@ -477,8 +477,9 @@ F1 &lt;- <span class="fn">fitted</span>(M8)
 </ul>
 </div>
 
-<h3>3. Cross-validation — the gold standard for prediction</h3>
+<h3>3. Cross-validation — the direct way to estimate prediction error</h3>
 <p>If the goal is predictive performance, the most honest evaluation is to hold out data, fit on the rest, and measure prediction error on the held-out set. Leave-one-out cross-validation (LOOCV) does this $n$ times, $k$-fold CV does it $k$ times. <code>boot::cv.glm()</code> gives you LOOCV (and $k$-fold) for a GLM.</p>
+<p>Be careful about what this does and does not buy you. CV gives you a direct <em>estimate</em> of out-of-sample error, which is exactly what you want when the question is "how well does this model predict?" It is <strong>not</strong> an independent safeguard against picking the wrong model: for a Gaussian linear model, LOOCV is asymptotically equivalent to AIC (Stone 1977), so the two agree far more often than intuition suggests — and are fooled by the same noise. Exercise 10 makes you measure this yourself rather than take it on faith.</p>
 
 <div class="eq-block">$\text{MSE}_\text{CV} = \dfrac{1}{n}\sum_{i=1}^n \big(y_i - \hat{f}_{-i}(\mathbf{x}_i)\big)^2$</div>
 <p>where $\hat{f}_{-i}$ is the model fit with the $i$-th observation withheld. Models that overfit will perform well on the training data but poorly on the held-out fold; CV exposes this directly.</p>
@@ -631,7 +632,7 @@ pstor &lt;- AICstor &lt;- AICcstor &lt;- BICstor &lt;- <span class="fn">rep</spa
 <div class="exercise" id="ex-10">
 <span class="ex-tag">Exercise 10</span><span class="difficulty medium"> · 20 min · cross-validation</span>
 <h3>LOOCV vs AIC for the noise-only case</h3>
-<p>Same setup as Exercise 8 ($y$ unrelated to predictors). For one realization, fit all 8 models and compute LOOCV MSE for each.</p>
+<p>Same setup as Exercise 8 ($y$ unrelated to predictors). It is tempting to assume that cross-validation, because it actually holds data out, is the more trustworthy criterion. Test that assumption rather than accepting it. Fit all 8 models to one realization and rank them by both LOOCV MSE and AIC.</p>
 
 <div class="code-label">Code</div>
 <pre><code><span class="kw">library</span>(boot)
@@ -646,18 +647,39 @@ forms &lt;- <span class="kw">list</span>(
  m1 = y ~ x1, m2 = y ~ x2, m3 = y ~ x3,
  m12 = y ~ x1+x2, m13 = y ~ x1+x3, m23 = y ~ x2+x3,
  m123 = y ~ x1+x2+x3)
-<span class="fn">sapply</span>(forms, cvmse) |&gt; <span class="fn">sort</span>()</code></pre>
+
+cv &lt;- <span class="fn">sapply</span>(forms, cvmse)
+aic &lt;- <span class="fn">sapply</span>(forms, <span class="kw">function</span>(f) <span class="fn">AIC</span>(<span class="fn">glm</span>(f, data=d)))
+<span class="fn">round</span>(<span class="fn">data.frame</span>(LOOCV=cv, AIC=aic, dAIC=aic-<span class="fn">min</span>(aic))[<span class="fn">order</span>(cv), ], <span class="nu">3</span>)</code></pre>
 
 <ol type="a">
-<li>Which model has the smallest LOOCV MSE? Compare to which model AIC picks.</li>
-<li>Repeat 100 times. What fraction of the time does the intercept-only model (truth!) win on LOOCV vs on AIC?</li>
-<li>Why is LOOCV better behaved here for the question "what predicts $y$ out of sample"?</li>
+<li>Which model has the smallest LOOCV MSE? Which does AIC pick? Is either one the true model?</li>
+<li>By how much does the winner beat the intercept-only model — in AIC units, and as a percentage of the CV MSE? The winner is just the intercept-only model plus one junk predictor, so the $\Delta\text{AIC} = 2 - \chi^2_1$ identity from the core-concepts section applies. Use it to work out what that margin actually tells you.</li>
+<li>Repeat over many simulated datasets. What fraction of the time does the intercept-only model (truth!) win on LOOCV, and what fraction on AIC? Do the two criteria disagree as often as you expected?</li>
+<li>Neither criterion recovers the truth reliably here. Is that a defect in the criteria, and would a better criterion fix it?</li>
 </ol>
 
 <details class="answer"><summary>Reveal solution &amp; discussion</summary><div class="answer-body">
-<p>Approximate result for the single seed: the intercept-only model has CV MSE around 8–9. The fuller models have slightly higher CV MSE — CV penalizes overfitting directly by holding data out. AIC will often pick a one- or two-predictor model in this same realization, despite the truth being noise.</p>
-<p>In 100 replications, intercept-only wins on LOOCV roughly 55–65% of the time and on AIC closer to 30–40%. LOOCV is not infallible (with $n=50$ it has its own variance) but it is the most direct way to answer "which model predicts best on data it didn't see."</p>
-<p><strong>Caveat:</strong> CV is for prediction questions. If your question is "is variable X causally important," CV alone is not the right answer — you need a causal frame and (often) a designed experiment.</p>
+<p><strong>(a)</strong> Both criteria pick <code>m3</code> — a pure-noise predictor. They agree, and they are both wrong:</p>
+<pre><code>     LOOCV     AIC  dAIC
+m3   5.995 233.059 0.000
+m0   6.031 233.717 0.658
+m13  6.052 233.392 0.333
+m1   6.078 233.948 0.889
+m23  6.205 235.059 2.000
+m2   6.239 235.715 2.655
+m123 6.286 235.389 2.330
+m12  6.309 235.939 2.880</code></pre>
+<p>The two orderings are nearly identical (Spearman correlation 0.95). This is the first hint that CV is not an independent check on AIC.</p>
+<p><strong>(b)</strong> <code>m3</code> beats the truth by $\Delta$AIC = 0.658 and by 0.036 in CV MSE — six tenths of one percent. But the interesting part is <em>why</em> the margin has that value. <code>m3</code> is <code>m0</code> with one extra junk predictor, so the identity from the core-concepts section applies exactly:</p>
+<div class="eq-block">$\Delta\text{AIC} = 2 - \chi^2_1 = 2 - 2.658 = -0.658$</div>
+<p>The entire margin is just the likelihood-ratio statistic for <code>x3</code>, which is $\chi^2_1 = 2.658$ ($p = 0.103$ — not close to significant). <code>x3</code> wins for one reason and one reason only: its $\chi^2$ landed above 2. That is exactly the event you already met when the $\Delta\text{AIC} &lt; 2$ rule was picked apart — $P(\chi^2_1 &gt; 2) = 15.7\%$, the rate at which a junk variable takes the top spot outright. Exercise 10 is not a new phenomenon; it is that same 16% event, caught in the act.</p>
+<p>So do <em>not</em> read this table by asking which models fall within 2 AIC of the winner. As you saw earlier, a nested junk model is within 2 by construction, so that question has a guaranteed answer and tells you nothing. Ask instead what <code>x3</code>'s coefficient does: $-1.914$ with a 95% CI of $[-4.232,\ 0.403]$, spanning zero. The variable that "won" cannot even sign its own effect.</p>
+<p><strong>(c)</strong> Over 2000 simulated datasets the intercept-only model wins <strong>58.4%</strong> of the time on LOOCV and <strong>57.6%</strong> on AIC. That gap of 0.8 points is smaller than the Monte Carlo error on either estimate (±2.2), so the honest reading is that the two criteria perform <em>identically</em>. They select the same model 90% of the time. Both are fooled by noise in roughly 42% of datasets.</p>
+<p>This is not a coincidence of this simulation. For a Gaussian linear model, leave-one-out CV and AIC are <strong>asymptotically equivalent</strong> — Stone (1977) proved they are the same criterion in the limit, and at $n=50$ they have already nearly converged. Holding data out does not buy you protection AIC lacks; it is a different route to the same number.</p>
+<p><strong>(d)</strong> Not a defect, and no. With eight candidate models and $n=50$, three noise predictors will produce spurious in-sample fit some of the time, and <em>any</em> criterion that ranks models on fit to this one dataset will sometimes rank noise first. The criteria are answering the question they were asked — "which of these eight predicts best?" — and dutifully returning an answer even though the honest answer is "none of them, and they are all the same." Selection returns a winner whether or not one deserves to win.</p>
+<p>What helps is not a cleverer criterion but a different question. Once a table is in front of you, the rank is the least informative thing in it — make the winning variable justify itself with its coefficient and interval, as in (b), where <code>x3</code>'s CI comfortably contains zero (this is Arnold's 2010 point). And upstream of that, keep the candidate set small and tied to hypotheses you held before seeing the data: the 42% failure rate is a direct consequence of dredging eight models out of pure noise. Fewer, better-motivated models is the only move here that changes the failure rate rather than relabeling it.</p>
+<p><strong>Caveat:</strong> both criteria are about prediction. If your question is "is variable X causally important," neither AIC nor CV answers it — you need a causal frame and (often) a designed experiment.</p>
 </div></details>
 </div>
 
@@ -683,7 +705,7 @@ m_slop &lt;- <span class="fn">lmer</span>(Z_TP ~ Z_Length + (<span class="nu">1<
 <details class="answer"><summary>Reveal solution</summary><div class="answer-body">
 <p><strong>(a)</strong> The two models share fixed effects but differ in random structure. We compare REML log-likelihoods because they are unbiased for variance components. Setting <code>refit = FALSE</code> prevents <code>anova</code> from refitting them under ML.</p>
 <p><strong>(b)</strong> LRT asks "is the larger model significantly better at maximizing likelihood?" AICc asks "is the larger model expected to predict better?" The two questions are not identical. For an inference question (does the random slope matter biologically), the LRT and the variance-component confidence interval together are the cleanest evidence. For a prediction question, trust AICc and cross-validation.</p>
-<p><strong>(c)</strong> Testing $\sigma_\text{slope}^2 = 0$ puts the parameter on the boundary of its allowed space. The classical $\chi^2_1$ reference is conservative; the right reference is a 50:50 mixture $\tfrac{1}{2}\chi^2_0 + \tfrac{1}{2}\chi^2_1$, which means the correct $p$-value is roughly half the reported one.</p>
+<p><strong>(c)</strong> Testing $\sigma_\text{slope}^2 = 0$ puts the parameter on the boundary of its allowed space, so the usual $\chi^2$ reference is conservative. But look at what <code>anova()</code> actually reports: <strong>Df = 2</strong>, not 1 — a random slope adds a slope variance <em>and</em> an intercept–slope correlation. So the familiar "halve the $p$-value" shortcut (the $\tfrac{1}{2}\chi^2_0 + \tfrac{1}{2}\chi^2_1$ mixture, which is for a <em>single</em> component) does not apply here. The right reference is $\tfrac{1}{2}\chi^2_1 + \tfrac{1}{2}\chi^2_2$. On the Exercise 2 model ($\chi^2 = 0.078$, Df 2): R prints $p = 0.962$, halving would give $0.481$, and the correct mixture gives $p = 0.871$. All three agree the slope is unsupported here, but halving is off by nearly a factor of two — in a borderline case it would flip your conclusion. Use <code>RLRsim::exactRLRT()</code> or a parametric bootstrap when it matters.</p>
 </div></details>
 </div>
 

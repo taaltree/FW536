@@ -280,12 +280,25 @@ mean(within2) # typically 0.85 - 0.90</code></pre>
 <h2>Exercise 10 — LOOCV vs AIC for noise data</h2>
 
 <p><strong>(a) Single seed (set.seed(126), n=50, y unrelated to x1, x2, x3).</strong></p>
-<pre><code>sort(sapply(forms, cvmse))
-# m0 m3 m1 m2 m13 m23 m12 m123
-# 8.5 8.8 9.0 9.2 9.3 9.4 9.5 9.7</code></pre>
-<p>Intercept-only (m0) wins on LOOCV. AIC on the same data often picks a one- or two-predictor model — illustrating the same "junk slips in" behavior as Exercise 8.</p>
+<pre><code>cv &lt;- sapply(forms, cvmse)
+aic &lt;- sapply(forms, function(f) AIC(glm(f, data=d)))
+round(data.frame(LOOCV=cv, AIC=aic, dAIC=aic-min(aic))[order(cv), ], 3)
 
-<p><strong>(b) 100-replication summary.</strong></p>
+     LOOCV     AIC  dAIC
+m3   5.995 233.059 0.000
+m0   6.031 233.717 0.658
+m13  6.052 233.392 0.333
+m1   6.078 233.948 0.889
+m23  6.205 235.059 2.000
+m2   6.239 235.715 2.655
+m123 6.286 235.389 2.330
+m12  6.309 235.939 2.880</code></pre>
+<p><strong>Both criteria pick m3 — a pure-noise predictor.</strong> They do not disagree; they fail together, and their orderings correlate at 0.95 (Spearman). Students expecting CV to rescue them from AIC's mistake will find that CV made the same mistake.</p>
+<p>Note the scale: the intercept-only CV MSE is <strong>6.031</strong>, not the $\sigma^2 = 9$ you might predict from <code>rnorm(n, 5, 3)</code>. This particular sample drew <code>var(y) = 5.910</code>, well below the population value — a useful incidental reminder that at $n=50$ the realized variance wanders.</p>
+<p><strong>(b) is where the real lesson lives.</strong> m3 is m0 plus one junk predictor, so the identity from the core-concepts section pins the margin exactly: $\Delta\text{AIC} = 2 - \chi^2_1 = 2 - 2.658 = -0.658$. The whole "win" is the likelihood-ratio statistic for x3 ($\chi^2_1 = 2.658$, $p = 0.103$) happening to exceed 2 — the $P(\chi^2_1 &gt; 2) = 15.7\%$ event already dissected in the $\Delta\text{AIC} &lt; 2$ discussion. x3's coefficient is $-1.914$, 95% CI $[-4.232, 0.403]$, spanning zero.</p>
+<p>Do not accept an answer that reads this table via "models within 2 AIC are competitive" — the lab has already shown that a nested junk model is within 2 by construction.</p>
+
+<p><strong>(c) 100-replication summary.</strong></p>
 <pre><code>set.seed(1)
 res &lt;- replicate(100, {
  y &lt;- rnorm(50, 5, 3); x1 &lt;- runif(50); x2 &lt;- runif(50); x3 &lt;- runif(50)
@@ -294,16 +307,22 @@ res &lt;- replicate(100, {
  m12=y~x1+x2, m13=y~x1+x3, m23=y~x2+x3, m123=y~x1+x2+x3)
  cv &lt;- sapply(forms, function(f) cv.glm(d, glm(f, data=d))$delta[1])
  aic &lt;- sapply(forms, function(f) AIC(glm(f, data=d)))
- c(cv_intercept_best = which.min(cv) == 1,
- aic_intercept_best = which.min(aic) == 1)
+ c(cv_picks_truth = <span class="fn">unname</span>(which.min(cv) == 1),
+ aic_picks_truth = <span class="fn">unname</span>(which.min(aic) == 1),
+ both_agree = <span class="fn">unname</span>(which.min(cv) == which.min(aic)))
 })
-rowMeans(res)
-# cv_intercept_best aic_intercept_best
-# ~0.60 ~0.35</code></pre>
+round(rowMeans(res), 2)
 
-<p><strong>(c) Why LOOCV is better behaved here.</strong> CV measures out-of-sample prediction error directly. AIC is an approximation to CV under regularity conditions; the approximation underweights the penalty so AIC tilts toward including extra predictors. For prediction questions, CV is the gold standard.</p>
+ cv_picks_truth aic_picks_truth      both_agree
+           0.58            0.57            0.92</code></pre>
+<p><strong>LOOCV 0.58, AIC 0.57.</strong> Over 2000 replications these settle to 58.4% and 57.6% — a gap of 0.8 points against a Monte Carlo error of ±2.2, i.e. no detectable difference. The two criteria pick the same model in over 90% of datasets, and each is fooled by noise about 42% of the time.</p>
+<p>(The <code>unname()</code> calls only stop <code>which.min</code>'s labels leaking into the row names; without them the output reads <code>cv_picks_truth.m1</code>, which looks like a result but is just the first replicate's winner.)</p>
 
-<div class="callout key"><strong>What to look for:</strong> students noting that CV is not infallible (the within-100-replicate variance is real, and CV itself can pick a wrong model in any given run), and that CV vs AIC alignment depends on the true effect sizes and sample size. The honest message: <em>use both, and report both, especially when they disagree.</em></div>
+<p><strong>(d) Is this a defect in the criteria?</strong> No — and no better criterion fixes it. For a Gaussian linear model, leave-one-out CV and AIC are <strong>asymptotically equivalent</strong> (Stone 1977): they are the same criterion in the limit, and by $n=50$ they have essentially converged. Holding data out is not an independent safeguard against AIC's errors; it is a longer road to the same number. Checked from $n=30$ to $n=1000$, the two track each other within half a percentage point at every sample size.</p>
+<p>With eight candidates and $n=50$, three noise predictors sometimes produce spurious in-sample fit, and any criterion that ranks models by fit to a single dataset will sometimes rank noise first. The criteria answer the question asked — "which of these eight predicts best?" — and return a winner even when the honest answer is "none, and they are indistinguishable."</p>
+
+<div class="callout key"><strong>What to look for:</strong> students noticing that CV and AIC <em>agree</em> here rather than disagreeing, and resisting the intuition that holding data out must be safer. Full credit for connecting the 0.658 margin to $2 - \chi^2_1$ and recognizing it as the same ~16% event from the $\Delta\text{AIC} &lt; 2$ discussion. The honest message: <em>the fix is a smaller, hypothesis-driven candidate set and a hard look at the winning coefficient's interval — not a better selection criterion.</em></div>
+<div class="callout warn"><strong>Note for instructors:</strong> earlier versions of this key claimed intercept-only wins ~60% on CV vs ~35% on AIC, and that "AIC underweights the penalty." Both are wrong — see the measured numbers above. If a student reports CV ≈ AIC, they are right.</div>
 </section>
 
 <!-- =========================== EX 11 =========================== -->
@@ -319,7 +338,7 @@ rowMeans(res)
 </ul>
 <p>For an inference question about whether the random slope matters biologically, the LRT plus the CI on the slope variance is the cleanest evidence. For a prediction question, prefer AICc (and ideally cross-validation).</p>
 
-<p><strong>(c) Boundary-test conservatism.</strong> Testing whether a variance component is zero puts the null on the boundary of the parameter space (variances cannot be negative). The classical $\chi^2_1$ null distribution overstates uncertainty in that case. The correct asymptotic null is a 50:50 mixture $\tfrac{1}{2}\chi^2_0 + \tfrac{1}{2}\chi^2_1$. Practical fix: divide the reported $p$-value by 2, or use simulation-based tests (e.g., <code>RLRsim::exactRLRT</code>).</p>
+<p><strong>(c) Boundary-test conservatism.</strong> Testing whether a variance component is zero puts the null on the boundary of the parameter space (variances cannot be negative), so the classical $\chi^2$ null overstates uncertainty. <strong>The correction depends on how many parameters you added.</strong> Adding one variance component with no correlation term: the null is $\tfrac{1}{2}\chi^2_0 + \tfrac{1}{2}\chi^2_1$, and halving the reported $p$-value is right. Adding a random <em>slope</em>: you add a variance <em>and</em> a correlation, <code>anova()</code> reports <strong>Df = 2</strong>, and the null is $\tfrac{1}{2}\chi^2_1 + \tfrac{1}{2}\chi^2_2$ — halving is then wrong. Worked on the Exercise 2 / P2 model ($\chi^2 = 0.078$, Df 2): R gives $p = 0.962$, halving gives $0.481$, correct mixture gives $0.871$. <em>Grading note:</em> a student who reaches for "divide by 2" on the random-slope test has learned the rule without its condition. Practical fix: <code>RLRsim::exactRLRT()</code> or a parametric bootstrap.</p>
 
 <div class="callout key"><strong>What to look for:</strong> students articulating the difference between "inference" and "prediction" claims; students aware of the boundary-test issue and at least mentioning the halve-the-p-value heuristic.</div>
 </section>

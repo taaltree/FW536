@@ -31,4 +31,4 @@ _tools/__pycache__/
 # publish despite saying otherwise — see PREPUB_REVIEW.md B19.)
 # NB: something in this repo auto-renders .md -> .html (pandoc). Ignore BOTH forms --
 # ignoring only the .md is how RECOMMENDATIONS.html ended up published.
-PREPUB_REVIEW.*
+PREPUB_*

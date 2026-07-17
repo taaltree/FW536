@@ -13,7 +13,7 @@
 <div class="shell">
 
 <aside class="sidebar">
- <h1><a href="../index.html" title="Back to course home">FW 536 · Day 2</a></h1>
+ <p class="brand"><a href="../index.html" title="Back to course home">FW 536 · Day 2</a></p>
  <div class="subtitle">Linear Models & GLMs</div>
  <nav>
  <div class="section">Lab</div>
@@ -305,7 +305,7 @@
 <tr><td>Log-odds $\log(p/(1-p))$</td><td>logit; what the linear predictor outputs</td><td>$-\infty$ to $\infty$</td><td>the model machinery</td></tr>
 </table>
 
-<h3>The "1.5 rule": coefficient size to probability change</h3>
+<h3>The "divide-by-4" rule: coefficient size to probability change</h3>
 <p>For values of $p$ near 0.5, a log-odds coefficient of $\beta$ translates roughly to a $\beta/4$ change in probability per unit $x$. (E.g., $\beta = 1$ → about a 25-percentage-point increase at the inflection.) Use this rule for back-of-envelope reasoning; use <code>predict(fit, type="response")</code> for actual values.</p>
 
 <div class="exercise">
@@ -414,7 +414,7 @@ sd(bin); sd(betbin) # 2.5 vs 5.6 — about 5x the variance</code></pre>
 <div class="exercise" id="a1">
 <span class="ex-tag">Exercise A1</span><span class="difficulty medium"> · Normal vs Poisson vs NB on eDNA counts</span>
 <h3>Sockeye eDNA — find the right distribution</h3>
-<p>Load <code>sockeye_adult.csv</code> from this Day's <code>data/</code> folder. It is in <strong>long format</strong> (one row per <code>Sockeyetype</code> per day), so first subset to adult sockeye. The response is the daily <code>Count</code> of adult sockeye; the predictor is <code>Qcorr_qPCR</code>, the <strong>flow-corrected eDNA concentration</strong> &mdash; the raw qPCR eDNA concentration multiplied by stream discharge (flow). Multiplying by flow converts a concentration into a quantity proportional to the total amount of eDNA transported past the sampler, which tracks fish abundance better than concentration alone. Build a <code>Year</code> factor from <code>Date</code> and a log-transformed eDNA predictor:</p>
+<p>Load <code>sockeye_adult.csv</code> from this Day's <code>data/</code> folder. It is in <strong>long format</strong> (one row per <code>Sockeyetype</code> per day), so first subset to adult sockeye. The response is the daily <code>Count</code> of adult sockeye; the predictor is <code>Qcorr_qPCR</code>, the <strong>flow-corrected eDNA signal</strong> &mdash; the raw qPCR eDNA concentration multiplied by stream discharge (flow). Multiplying by flow converts a concentration into a quantity proportional to the total amount of eDNA transported past the sampler, which tracks fish abundance better than concentration alone. Build a <code>Year</code> factor from <code>Date</code> and a log-transformed eDNA predictor:</p>
 <pre><code>library(MASS)
 sock &lt;- read.csv("data/sockeye_adult.csv", stringsAsFactors = FALSE)
 table(sock$Sockeyetype)                            # confirm the adult level name
@@ -425,7 +425,7 @@ min_pos &lt;- min(d$Qcorr_qPCR[d$Qcorr_qPCR &gt; 0])      # small constant so lo
 d$logED &lt;- log(d$Qcorr_qPCR + min_pos)</code></pre>
 <p>Fit, in sequence:</p>
 <ol>
-<li><code>lm(log(Count + 1) ~ logED, data = d)</code> — the old-school log-transform approach.</li>
+<li><code>lm(log(Count + 1) ~ logED + Year, data = d)</code> — the old-school log-transform approach.</li>
 <li><code>glm(Count ~ logED + Year, family = poisson, data = d)</code>.</li>
 <li><code>glm(Count ~ logED + Year, family = quasipoisson, data = d)</code>.</li>
 <li><code>MASS::glm.nb(Count ~ logED + Year, data = d)</code>.</li>
@@ -434,11 +434,11 @@ d$logED &lt;- log(d$Qcorr_qPCR + min_pos)</code></pre>
 <ul>
 <li>Examine residual deviance / df. Is overdispersion present?</li>
 <li>Look at SEs for the eDNA coefficient. Which models give realistically wide vs. unrealistically narrow CIs?</li>
-<li>Back-transform the log-link slope to a multiplicative effect: "a doubling of eDNA concentration is associated with a ×__ change in expected daily count."</li>
+<li>Back-transform the log-link slope to a multiplicative effect: "a doubling of the flow-corrected eDNA signal is associated with a ×__ change in expected daily count."</li>
 </ul>
 
 <details class="answer"><summary>Reveal worked solution</summary><div class="answer-body">
-<pre><code>f_lm &lt;- lm(log(Count + 1) ~ logED, data = d)
+<pre><code>f_lm &lt;- lm(log(Count + 1) ~ logED + Year, data = d)
 f_p  &lt;- glm(Count ~ logED + Year, family = poisson,      data = d)
 f_qp &lt;- glm(Count ~ logED + Year, family = quasipoisson, data = d)
 f_nb &lt;- MASS::glm.nb(Count ~ logED + Year, data = d)
@@ -450,17 +450,17 @@ f_nb$deviance / f_nb$df.residual             # 48.8 / 52 = 0.94  (theta = 0.73)
 2^coef(f_nb)["logED"]                         # 1.86</code></pre>
 <table>
 <tr><th>Fit</th><th><code>logED</code> slope</th><th>SE(<code>logED</code>)</th><th>dispersion / (resid. dev ÷ df)</th></tr>
-<tr><td>1. lm(log(Count+1))</td><td>0.589</td><td>0.045</td><td>&mdash;</td></tr>
+<tr><td>1. lm(log(Count+1))</td><td>0.570</td><td>0.047</td><td>&mdash;</td></tr>
 <tr><td>2. Poisson</td><td>0.737</td><td>0.013</td><td>resid.dev/df = 2296.6/52 = <strong>44.2</strong></td></tr>
 <tr><td>3. Quasipoisson</td><td>0.737</td><td>0.095</td><td>dispersion = <strong>51.0</strong></td></tr>
 <tr><td>4. Negative binomial</td><td>0.897</td><td>0.081</td><td>resid.dev/df = 48.8/52 = <strong>0.94</strong>, $\theta = 0.73$</td></tr>
 </table>
 <p><strong>Overdispersion.</strong> The Poisson residual deviance is 44&times; its df — massive overdispersion, so its SE on <code>logED</code> (0.013) is far too small. The quasipoisson rescales that SE by $\sqrt{51}\approx 7.1$ to 0.095; the negative binomial (a proper likelihood, $\theta = 0.73$) gives 0.081 and a residual-deviance ratio near 1 (0.94) — a well-calibrated fit. Trust fits 3 and 4, not the naive Poisson.</p>
-<p><strong>Back-transform.</strong> Using the NB slope $\hat\beta = 0.897$ on $\log(\text{eDNA})$, a <em>doubling</em> of eDNA multiplies the linear predictor by $0.897\times\ln 2$, hence multiplies the expected count by $2^{0.897} = e^{0.897\cdot\ln 2} = 1.86$. So <strong>a doubling of eDNA concentration is associated with roughly an 87% increase (×1.86) in the expected daily adult sockeye count</strong> — matching the graded Problem 5.</p>
+<p><strong>Back-transform.</strong> Using the NB slope $\hat\beta = 0.897$ on $\log(\text{eDNA})$, a <em>doubling</em> of the flow-corrected eDNA signal <em>adds</em> $0.897\times\ln 2 = 0.622$ to the linear predictor; because the link is the log, that additive shift <em>multiplies</em> the expected count by $2^{0.897} = e^{0.897\cdot\ln 2} = 1.86$. So <strong>a doubling of the flow-corrected eDNA signal is associated with roughly an 86% increase (×1.86) in the expected daily adult sockeye count</strong> — matching the graded Problem 5. Additive on the link scale, multiplicative on the response scale: that is the log link in one sentence.</p>
 </div></details>
 
 <div class="callout bio">
-<strong>Where the biology lives.</strong> The NB log-link slope here is $\hat\beta = 0.897$, so $e^{0.897 \cdot \ln 2} = 2^{0.897} = 1.86$. A doubling of eDNA is associated with an ~87% increase in expected daily sockeye. That sentence is what you put in your paper — not "the slope was 0.90 (SE 0.08)."
+<strong>Where the biology lives.</strong> The NB log-link slope here is $\hat\beta = 0.897$, so $e^{0.897 \cdot \ln 2} = 2^{0.897} = 1.86$. A doubling of the flow-corrected eDNA signal is associated with an ~86% increase in expected daily sockeye. That sentence is what you put in your paper — not "the slope was 0.90 (SE 0.08)."
 </div>
 </div>
 
@@ -489,7 +489,12 @@ tapply(prop$Yes, prop$Class, sum) / tapply(prop$Yes + prop$No, prop$Class, sum)<
 <p><strong>(c) Why the two forms agree.</strong> Write $y_i\in\{0,1\}$ for each passenger and group them by class. For a group with $n$ passengers and $y=\sum y_i$ survivors, the two likelihoods are</p>
 <div class="eq-block">$\underbrace{\prod_{i=1}^{n} p^{y_i}(1-p)^{1-y_i}}_{\text{Bernoulli, one row per person}} \;=\; p^{y}(1-p)^{n-y}$ &nbsp; vs. &nbsp; $\underbrace{\binom{n}{y}\,p^{y}(1-p)^{n-y}}_{\text{Binomial, aggregated counts}}$</div>
 <p>They differ only by the factor $\binom{n}{y}$ — the number of ways to arrange $y$ survivors among $n$ people. Taking logs, the two log-likelihoods differ by the additive constant $\log\binom{n}{y}$, which <em>does not contain $p$</em>. Because the MLE and its standard errors depend only on how the log-likelihood changes with $p$ (its derivatives in $p$), a term free of $p$ drops out: the estimated coefficients, fitted probabilities, and SEs are identical. (The coefficient <em>tables</em> can still look different if the two data frames sort their factor levels differently and thus pick different reference classes — align the references and the numbers match exactly.)</p>
-<p>What the constant <em>does</em> shift is the absolute log-likelihood, and therefore the residual deviance and AIC, by the fixed amount $\sum_{\text{groups}}\log\binom{n}{y}$. So never compare the deviance/AIC of a Bernoulli (one-row-per-individual) fit against an aggregated Binomial fit — the gap is bookkeeping, not model fit.</p>
+<p>What the constant <em>does</em> shift is the absolute log-likelihood, and therefore the AIC. Aggregating the Titanic passengers into the class×sex×age cells of <code>titanic_prop.csv</code> gives $\sum_{\text{groups}}\log\binom{n}{y} = 1025.44$, so the Binomial log-likelihood sits exactly that far above the Bernoulli one ($-268.84$ vs $-1294.28$) and the AICs differ by $2 \times 1025.44 = 2050.87$.</p>
+<p>The <strong>residual deviance is a different story</strong>, and it is worth getting right. Deviance is $2(\ell_{\text{saturated}} - \ell_{\text{model}})$, and $\log\binom{n}{y}$ sits in <em>both</em> terms — so it cancels, and the deviance does <em>not</em> shift by that constant. The two deviances still differ (Bernoulli 2588.56 vs Binomial 491.06, a gap of 2097.49 — which is neither 1025.44 nor 2050.87), but for another reason entirely: <strong>the saturated reference model changes</strong>. The Bernoulli form's saturated model gets one parameter per <em>passenger</em> and so fits every row perfectly; the Binomial form's gets only one per <em>cell</em>. The gap is exactly the Bernoulli deviance of that cell-saturated model — the individual-level noise that aggregation simply stops measuring.</p>
+<pre><code>deviance(f1)                                                             # 2588.555  Bernoulli
+deviance(f2)                                                             #  491.061  Binomial
+deviance(glm(survived ~ class*sex*age, family = binomial, data = long))  # 2097.495  <- the gap</code></pre>
+<p>So never compare the deviance or AIC of a Bernoulli (one-row-per-individual) fit against an aggregated Binomial fit. The AIC gap is bookkeeping; the deviance gap is a change of yardstick. Neither is evidence about model fit. Within one data form, both are still perfectly good for comparing nested models.</p>
 </div></details>
 </div>
 
@@ -524,6 +529,11 @@ emmeans(fit, pairwise ~ class | sex, type = "response")  # class contrasts withi
 #     1st        3rd
 #  0.972      0.419</code></pre>
 <p>An adult first-class woman is modeled at $p = 0.972$ versus $p = 0.419$ for an adult third-class woman — a probability difference of about <strong>0.55</strong> (55 percentage points). On the link scale that is a log-odds gap of $3.56 - (-0.33) = 3.89$, i.e. an odds ratio of $e^{3.89} \approx 49$, matching part (a). The odds ratio and the probability difference describe the <em>same</em> effect on two scales; report both, because a huge odds ratio near the probability ceiling still corresponds to a bounded (though here still large) probability gap.</p>
+<div class="callout warn">
+<p><strong>Careful: <code>emmeans</code> and <code>predict</code> answer different questions here.</strong> Ask for the fitted probabilities with <code>emmeans(fit, ~ class | sex, type = "response")</code> instead and the same two cells come back as 0.983 and 0.550 — a difference of 0.433, not 0.55. (The graded <a href="problem_set.html#afternoon">Problem 7</a> takes that route, so expect to see both numbers today.) Neither is wrong.</p>
+<p><code>emmeans</code> <em>marginalises over</em> <code>age</code>: it averages the adult and child linear predictors <strong>on the logit scale</strong> and back-transforms once (for third-class females, $\tfrac{1}{2}(-0.33 + 0.73) = 0.20$, and $\text{plogis}(0.20) = 0.550$). <code>predict(..., age = "adult")</code> <strong>pins</strong> <code>age</code> at <code>adult</code> and reports a real, specific kind of passenger ($\text{plogis}(-0.33) = 0.419$). Since <code>agechild</code> is a big positive coefficient ($+1.05$), age-averaging pushes both probabilities up — and shrinks the gap, because first class is already pressed against the ceiling while third class still has room to move.</p>
+<p>This is the same lesson as the log link: <em>averaging on the link scale and then back-transforming is not the same as back-transforming and then averaging.</em> Say which one you did. The odds ratio (~49×) is identical either way, because it is a link-scale contrast in which the <code>age</code> term cancels.</p>
+</div>
 </div></details>
 </div>
 </section>

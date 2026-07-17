@@ -67,7 +67,7 @@ MathJax = {
 <p>The analysis problems read these files from this Day's <code>data/</code> folder. All paths below are relative to the folder your <code>.Rmd</code> lives in.</p>
 <div class="data-section">
   <h3 class="data-h">Datasets</h3>
-  <div class="data-row"><a href="data/sockeye_adult.csv"><code>sockeye_adult.csv</code></a><span class="data-desc">Daily sockeye salmon counts and flow-corrected qPCR eDNA concentrations, 2015&ndash;2016 (Levi et al. 2019). Long format; filter to <code>Sockeyetype == "Sockeye_Adults"</code>. Used in Problems 4 and 5.</span></div>
+  <div class="data-row"><a href="data/sockeye_adult.csv"><code>sockeye_adult.csv</code></a><span class="data-desc">Daily sockeye salmon counts and the flow-corrected qPCR eDNA signal (qPCR eDNA concentration &times; stream flow), 2015&ndash;2016 (Levi et al. 2019). Long format; filter to <code>Sockeyetype == "Sockeye_Adults"</code>. Used in Problems 4 and 5.</span></div>
   <div class="data-row"><a href="data/titanic_long.csv"><code>titanic_long.csv</code></a><span class="data-desc">One row per Titanic passenger: <code>class</code>, <code>age</code>, <code>sex</code>, binary <code>survived</code>. Used in Problems 6 and 7.</span></div>
   <div class="data-row"><a href="data/titanic_prop.csv"><code>titanic_prop.csv</code></a><span class="data-desc">Titanic survival aggregated to (<code>Yes</code>, <code>No</code>) counts per Class/Sex/Age for binomial-form GLM. Used in Problem 6.</span></div>
 </div>
@@ -182,10 +182,10 @@ d$logED &lt;- log(d$Qcorr_qPCR + min_pos)</code></pre>
 <ol type="a">
 <li>For the Poisson fit, report residual deviance / residual df. Is overdispersion present? What does the quasipoisson dispersion estimate tell you, and how does the NB residual-deviance ratio compare?</li>
 <li>Compare the standard error on the <code>logED</code> coefficient across the four fits. Which models give realistically wide confidence intervals and which give unrealistically narrow ones? Why?</li>
-<li>Take the log-link slope on <code>logED</code> from your preferred model. Because the predictor is $\log(\text{eDNA})$, a <em>doubling</em> of eDNA multiplies the linear predictor by $\hat\beta \cdot \ln 2$, so it multiplies the expected count by $2^{\hat\beta}$. Compute that multiplier and finish the sentence: "a doubling of eDNA concentration is associated with a &times;___ change in the expected daily adult count."</li>
+<li>Take the log-link slope on <code>logED</code> from your preferred model. Because the predictor is $\log(\text{eDNA})$, a <em>doubling</em> of the flow-corrected eDNA signal <em>adds</em> $\hat\beta \cdot \ln 2$ to the linear predictor, and because the link is the log, that additive shift <em>multiplies</em> the expected count by $2^{\hat\beta}$. Compute that multiplier and finish the sentence: "a doubling of the flow-corrected eDNA signal is associated with a &times;___ change in the expected daily adult count."</li>
 </ol>
 <div class="callout bio"><p class="callout-label">Biological intuition</p>
-<strong>Where the biology lives.</strong> If your log-link slope is around 0.9, then $2^{0.9} \approx 1.87$ &mdash; a doubling of eDNA is associated with roughly an 87% increase in the expected daily count. <em>That</em> sentence is what goes in the paper, not "the slope was 0.90 (SE 0.08)."
+<strong>Where the biology lives.</strong> With the fitted log-link slope $\hat\beta \approx 0.897$, $2^{0.897} \approx 1.86$ &mdash; a doubling of the flow-corrected eDNA signal is associated with roughly an 86% increase in the expected daily count. <em>That</em> sentence is what goes in the paper, not "the slope was 0.90 (SE 0.08)."
 </div>
 <div class="callout try"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Report the overdispersion diagnostics, the SE comparison, your chosen model, and the doubling-of-eDNA multiplier as a biology sentence.</div>
 </div>

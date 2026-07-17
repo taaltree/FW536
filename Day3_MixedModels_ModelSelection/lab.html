@@ -13,7 +13,7 @@
 <div class="shell">
 
 <aside class="sidebar">
- <h1><a href="../index.html" title="Back to course home">FW 536 · Day 3</a></h1>
+ <p class="brand"><a href="../index.html" title="Back to course home">FW 536 · Day 3</a></p>
  <div class="subtitle">Mixed Models &amp; Model Selection</div>
  <nav>
  <div class="section">Lab</div>
@@ -276,7 +276,7 @@ m1b &lt;- <span class="fn">lmer</span>(Weight ~ Length + (<span class="nu">1</sp
 <ol type="a">
 <li>Write out the equation the model is fitting. What does each parameter mean biologically?</li>
 <li>What is the group-mean relationship between length and weight? (i.e., the fixed-effect slope and intercept.)</li>
-<li>What is the among-subject standard deviation of the intercept? Translate that into "subjects of the same length differ by ± X grams in expected weight."</li>
+<li>What is the among-subject standard deviation of the intercept? Translate that into "subjects of the same length differ by ± X in expected weight." (Note the <code>Length</code>/<code>Weight</code> columns are on a transformed/index scale, so answer in those units, not grams.)</li>
 <li>What is the within-subject residual standard deviation? What is the ICC?</li>
 <li>Fit a random-slope model <code>Weight ~ Length + (1 + Length | Subject)</code>. Use <code>anova(m1b, m_slope, refit = FALSE)</code> (REML LRT) to decide whether the random slope is supported. Why <em>refit = FALSE</em>?</li>
 </ol>
@@ -284,9 +284,9 @@ m1b &lt;- <span class="fn">lmer</span>(Weight ~ Length + (<span class="nu">1</sp
 <details class="answer"><summary>Reveal worked solution</summary><div class="answer-body">
 <p><strong>(a)</strong> $W_{ij} = \beta_0 + b_{0,j} + \beta_1 L_{ij} + \varepsilon_{ij}$, with $b_{0,j}\sim\mathcal{N}(0,\sigma_S^2)$ and $\varepsilon_{ij}\sim\mathcal{N}(0,\sigma^2)$. $\beta_1$ is the population-average slope of weight on length, shared across subjects. $b_{0,j}$ is the subject's intercept deviation from the population mean.</p>
 
-<p><strong>(b)</strong> Approximate output: $\hat\beta_0 \approx -0.03$, $\hat\beta_1 \approx 3.02$ — i.e., a one-unit increase in length corresponds to ~0.96 grams of weight on average across subjects. CIs from <code>intervals(m1)</code> exclude zero comfortably.</p>
+<p><strong>(b)</strong> Approximate output: $\hat\beta_0 \approx -0.03$, $\hat\beta_1 \approx 3.02$ — i.e., a one-unit increase in the length variable corresponds to about 3.0 units of weight on average across subjects. This file's <code>Length</code> and <code>Weight</code> columns are on a transformed/index scale (ranges $\approx 0.7$–3.0 and 1.4–9.4), <em>not</em> raw centimetres and grams, so read the slope in those units rather than attaching a gram figure to it. CIs from <code>intervals(m1)</code> exclude zero comfortably.</p>
 
-<p><strong>(c)</strong> Among-subject SD on the intercept is around 0.21; so subjects of the same length differ in expected weight by roughly $\pm 1.6$ g (1 SD) or $\pm 3.2$ g (2 SD) from one another, even after accounting for the length effect.</p>
+<p><strong>(c)</strong> Among-subject SD on the intercept is around 0.211; so subjects of the same length differ in expected weight by roughly $\pm 0.21$ (1 SD) or $\pm 0.42$ (2 SD) on the weight scale, even after accounting for the length effect.</p>
 
 <p><strong>(d)</strong> Within-subject residual SD around 0.21. ICC = $0.211^2 / (0.211^2 + 0.206^2) \approx 0.045 / 0.087 \approx 0.51$. Even after the length covariate, about half the remaining variation is between subjects: individual fish are persistently heavier or lighter than the population line predicts, so repeated measurements on one fish are far from independent. That is exactly why the random intercept is needed here.</p>
 
@@ -343,7 +343,7 @@ m_fixed &lt;- <span class="fn">nls</span>(Length ~ Linf*(<span class="nu">1</spa
 <div class="exercise" id="ex-4">
 <span class="ex-tag">Exercise 4</span><span class="difficulty hard"> · 40 min · crossed random effects + model selection preview</span>
 <h3>Fish trophic position — crossed random effects, slopes &amp; intercepts</h3>
-<p>The QCBS dataset <code>qcbs_w6_data.csv</code> has trophic position vs body length for three fish species (Bluegill, Walleye, Yellow Perch) sampled across six lakes. The biological question: does trophic position increase with body length, and does that relationship differ by species and by lake?</p>
+<p>The QCBS dataset <code>qcbs_w6_data.csv</code> has trophic position vs body length for three fish species (coded <code>S1</code>, <code>S2</code>, <code>S3</code> in the file) sampled across six lakes (<code>L1</code>–<code>L6</code>). The biological question: does trophic position increase with body length, and does that relationship differ by species and by lake?</p>
 
 <div class="code-label">Setup &amp; z-scoring</div>
 <pre><code>dat &lt;- <span class="fn">read.csv</span>(<span class="st">"data/qcbs_w6_data.csv"</span>)
@@ -372,7 +372,7 @@ M8 &lt;- <span class="fn">lmer</span>(Z_TP ~ Z_Length + (<span class="nu">1</spa
 <ol type="a">
 <li>Why are <em>both</em> Lake and Fish_Species candidates for random effects (rather than fixed)? What argument might push you the other way?</li>
 <li>What does the term <code>(1 + Z_Length | Fish_Species)</code> assume about the population of slopes across species? Spell out the implied bivariate Normal.</li>
-<li>Which model has the lowest AICc? Interpret its variance components from <code>summary()</code> and <code>VarCorr()</code> — does most variation in slopes live across species, across lakes, or within?</li>
+<li>Which model has the lowest AICc? Interpret its variance components from <code>summary()</code> and <code>VarCorr()</code>. Note which random slopes the winning model carries and which it does <em>not</em> — what does that omission, plus the rank of the models that do carry a lake slope, tell you about where slope variation lives?</li>
 <li>The original lab notes that only 3 species and 6 lakes is on the edge of what we should treat as random. What is the practical risk? When would you switch to a fixed effect for species?</li>
 </ol>
 
@@ -395,9 +395,10 @@ Fixed effects:
 (Intercept) -0.0009 0.569
 Z_Length 0.422 0.092
 </code></pre>
-<p>Most slope variation lives across species — different feeding ecologies. Lake mostly shifts intercepts, not slopes. Within-fish residual is small relative to species variation. <em>Note</em> the perfect-correlation warning: the slope&ndash;intercept correlation comes back as <strong>+1.00</strong>, a classic singular fit. That is a degenerate (boundary) estimate &mdash; lmer has run out of data to identify the correlation and has pinned it at the edge of its range. With only 3 species this is not surprising. Treat it as a warning that the random-slope structure is over-specified for this dataset, not as a real biological correlation.</p>
+<p>Most slope variation lives across species — different feeding ecologies. <strong>The answer to "or across lakes?" is in what M8 does not contain:</strong> the winning model has a random slope on species but only a random <em>intercept</em> on lake, so there is no lake slope term in the <code>VarCorr</code> block to interpret. That absence is the result, not an oversight. Two things confirm it. First, the ranking: M2 is M8 plus a lake slope, and it is 3.31 AICc <em>worse</em> — the extra slope does not pay for its parameters. Second, if you fit M2 anyway and look, its lake slope SD is 0.024, against a species slope SD of 0.157 — nearly an order of magnitude smaller, and next to the lake intercept SD of 0.45. So lake shifts the trophic-position baseline up or down but barely bends the length–TP relationship, while species changes both. Within-fish residual (0.22) is small relative to species variation. <em>Note</em> the perfect-correlation warning: the slope&ndash;intercept correlation comes back as <strong>+1.00</strong>, a classic singular fit. That is a degenerate (boundary) estimate &mdash; lmer has run out of data to identify the correlation and has pinned it at the edge of its range. With only 3 species this is not surprising. Treat it as a warning that the random-slope structure is over-specified for this dataset, not as a real biological correlation.</p>
+<p><em>Caveat on the AICc table:</em> <code>aictab()</code> warns that ranking models with different fixed effects needs ML, not REML. Here the fixed part (<code>Z_Length</code>) is identical across M1–M8 and only the <em>random</em> structure differs, so the REML comparison is exactly the case REML is for — the warning can be noted and set aside.</p>
 
-<p><strong>(d)</strong> With few levels, the variance components are estimated with so little information that singular fits and unstable correlations are common — and the inferential machinery (Wald CIs, LRTs) is poorly calibrated. Switch to fixed effects for species when (i) you have ≤ 3–4 levels, (ii) you care about each level by name (Bluegill vs Walleye is biologically meaningful), or (iii) you cannot defend a "population of species" sampling story.</p>
+<p><strong>(d)</strong> With few levels, the variance components are estimated with so little information that singular fits and unstable correlations are common — and the inferential machinery (Wald CIs, LRTs) is poorly calibrated. Switch to fixed effects for species when (i) you have ≤ 3–4 levels, (ii) you care about each level by name (S1 vs S2 vs S3 is biologically meaningful), or (iii) you cannot defend a "population of species" sampling story.</p>
 </div></details>
 </div>
 
@@ -722,7 +723,7 @@ m_slop &lt;- <span class="fn">lmer</span>(Z_TP ~ Z_Length + (<span class="nu">1<
 <p>By the end of today, you should be skeptical of three habits:</p>
 <ol>
 <li><strong>Dredging</strong>: fitting every subset of predictors with <code>dredge()</code> or stepwise selection, then reporting the "best" model as if its coefficients were honest. The simulations above show how this manufactures false discoveries.</li>
-<li><strong>Reporting only p-values or $\Delta\text{AIC}$ instead of the effect size.</strong> A coefficient with a tight CI bounded well away from zero is a meaningful effect; a coefficient with a wide CI is uncertain no matter what any criterion says. (A 95% CI that overlaps zero <em>is</em> the $p &gt; 0.05$ case — they are the same statement, so they cannot disagree.) The science lives in the <em>magnitude and direction</em> of the effect and how sure you are of it, not in whether it cleared a $p = 0.05$ or $\Delta\text{AIC} = 2$ threshold.</li>
+<li><strong>Reporting only p-values or $\Delta\text{AIC}$ instead of the effect size.</strong> A coefficient with a tight CI bounded well away from zero is a meaningful effect; a coefficient with a wide CI is uncertain no matter what any criterion says. (For a <em>Wald</em> CI and a Wald test built from the same SE, "the 95% CI overlaps zero" and "$p &gt; 0.05$" are the same statement, so they cannot disagree. That equivalence is not general: a profile-likelihood or bootstrap CI is built differently and can perfectly well sit off zero while an LRT returns $p &gt; 0.05$, or vice versa — which is exactly why, in the singular-fit and boundary cases above, we prefer the profile/bootstrap interval to the Wald one.) The science lives in the <em>magnitude and direction</em> of the effect and how sure you are of it, not in whether it cleared a $p = 0.05$ or $\Delta\text{AIC} = 2$ threshold.</li>
 <li><strong>Confusing prediction quality with effect support.</strong> Two different questions, two different criteria. Cross-validation tells you about prediction; coefficient CIs (and study design) tell you about effects.</li>
 </ol>
 </div>

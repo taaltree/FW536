@@ -17,7 +17,7 @@
 # Data: IslandsLizards.csv (columns: presence {0,1}, perimeterAreaRatio).
 # The CSV should be co-located with this script.
 #
-# Author: FW599 Enhanced (Day 5 — Bayes II), Oregon State University.
+# Author: FW 536 (Day 5 — Bayes II), Oregon State University.
 # =============================================================================
 
 # ----- Packages -------------------------------------------------------------

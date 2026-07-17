@@ -1,13 +1,19 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-a11y="done">
 <head>
 <meta charset="UTF-8" />
 <title>Interactive: MCMC samplers (2D) | FW 536</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="stylesheet" href="../_Shared/css/lab.css" />
-<script defer src="../_Shared/js/lab.js"></script>
-<script>MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] } };</script>
-<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<link rel="stylesheet" href="../_Shared/css/accessible.css" />
+<script defer src="../_Shared/js/accessible.js"></script>
+<script>
+MathJax = {
+  tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
+  options: { menuOptions: { settings: { assistiveMml: true, explorer: true } } },
+  loader: { load: ['a11y/assistive-mml', 'a11y/explorer'] }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script"></script>
 <style>
   .widget { background:#fff; border:1px solid var(--border); border-radius:10px; padding:20px 24px; margin:24px 0; box-shadow:0 2px 10px rgba(0,0,0,.05); }
   .pick { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px; }
@@ -30,11 +36,14 @@
 </style>
 </head>
 <body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<div class="a11y-bar" role="region" aria-label="Accessibility">Accessible version &middot; <a href="../accessibility.html">How to use this site with a screen reader</a> &middot; <a href="../index.html">Course home</a></div>
+
 <div class="shell">
 <aside class="sidebar">
   <p class="brand"><a href="../index.html" title="Back to course home">FW 536 · Day 4</a></p>
   <div class="subtitle">MCMC samplers in 2D</div>
-  <nav>
+  <nav aria-label="On this page and related documents">
     <div class="section">This page</div>
     <ul>
       <li><a href="#what">What MCMC is doing</a></li>
@@ -52,7 +61,7 @@
   </nav>
 </aside>
 
-<main class="content">
+<main class="content" id="main-content" tabindex="-1">
 <header class="lab-header">
   <div class="eyebrow">Day 4 · Interactive</div>
   <h1>How MCMC samplers explore a posterior</h1>
@@ -61,7 +70,7 @@
 
 <section id="what">
 <h2>What is actually happening</h2>
-<div class="callout key">
+<div class="callout key"><p class="callout-label">Key idea</p>
 <p>You want the posterior $p(\theta \mid y)$ but you cannot compute its normalizing constant (the integral in the denominator of Bayes' rule). MCMC sidesteps that: it builds a <strong>random walk through parameter space whose long-run visiting frequency equals the posterior</strong>. You never compute the integral — you just take steps according to a simple rule, and the histogram of where the chain has been <em>is</em> the posterior.</p>
 <p>Every sampler below only ever needs the posterior <em>up to a constant</em> — i.e., prior × likelihood — because the unknown constant cancels in every accept/reject ratio. That is the whole trick.</p>
 </div>
@@ -103,7 +112,7 @@
 <section id="compare">
 <h2>Metropolis vs Gibbs vs HMC — pros and cons</h2>
 <table class="cmp">
-<tr><th>Sampler</th><th>How it proposes a move</th><th>Strengths</th><th>Weaknesses</th></tr>
+<tr><th scope="col">Sampler</th><th scope="col">How it proposes a move</th><th scope="col">Strengths</th><th scope="col">Weaknesses</th></tr>
 <tr>
   <td><strong>Random-walk Metropolis</strong></td>
   <td>Jump a random step from the current point; accept with probability $\min(1, \text{posterior ratio})$.</td>
@@ -128,7 +137,7 @@
 
 <section id="try">
 <h2>Things to try</h2>
-<div class="callout key">
+<div class="callout key"><p class="callout-label">Key idea</p>
 <ol>
 <li><strong>Crank up the correlation.</strong> Slide the correlation toward $\pm 0.95$. Watch random-walk Metropolis and Gibbs both bog down, crawling along the diagonal ridge, while HMC still slides along it in big strokes.</li>
 <li><strong>Mis-tune Metropolis.</strong> Set its step size very small (chain barely moves, acceptance near 100% but useless) then very large (almost every proposal rejected). Find the middle where acceptance is ~20–40%.</li>

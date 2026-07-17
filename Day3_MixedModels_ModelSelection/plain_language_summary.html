@@ -13,7 +13,7 @@
 <div class="shell">
 
 <aside class="sidebar">
- <h1><a href="../index.html" title="Back to course home">FW 536 · Day 3</a></h1>
+ <p class="brand"><a href="../index.html" title="Back to course home">FW 536 · Day 3</a></p>
  <div class="subtitle">Plain-language summary</div>
  <nav>
  <ul>
@@ -137,7 +137,7 @@ The trap that has wrecked many graduate theses is to run all subsets of predicto
 <ul>
 <li>Not a p-value. There is no null hypothesis being tested.</li>
 <li>Not a measure of effect size or biological importance.</li>
-<li>Not a hard cutoff. The famous "$\Delta\text{AIC} &lt; 2$" rule of thumb is actually quite weak — adding a pure noise predictor to a model raises AIC by ~2 by construction, so noise variables routinely look "competitive."</li>
+<li>Not a hard cutoff. The famous "$\Delta\text{AIC} &lt; 2$" rule of thumb is actually quite weak — adding a pure noise predictor costs a penalty of exactly 2 but buys back some fit, so the net change is $\Delta\text{AIC} = 2 - \chi^2_1$ — always under 2, and about 1 on average. Noise variables are therefore "competitive" by construction.</li>
 <li>Not magic. AIC's variance is large in small samples (use AICc), and it tends to retain more complex models than necessary in noise simulations.</li>
 </ul>
 </div>
@@ -188,7 +188,7 @@ For any modeling project whose goal is "predict X for new units", cross-validati
 <section id="tomorrow">
 <h2>Looking ahead</h2>
 <p>Tomorrow (Day 4) we'll formalize what we've been quietly doing with <em>maximum likelihood</em>: the engine inside <code>lm</code>, <code>glm</code>, <code>lmer</code>, <code>nls</code>, and <code>nlme</code>. Once you see how MLE works, you'll see that almost everything in this course is the same idea applied to different distributions and link functions. We'll also start Bayesian inference, which gives a much more direct answer to many of the questions today's frequentist tools handle awkwardly — "what is the probability my effect is positive?", "what is the posterior on $\sigma_\text{stream}$?", and so on.</p>
-<p>If today's mixed-model material didn't fully click, work the alternate problem sets (<a href="problem_set.html">v2 — terrestrial wildlife</a>, <a href="problem_set.html">v3 — aquatic / fisheries</a>) before tomorrow morning. They use the same concepts in different ecological contexts.</p>
+<p>If today's mixed-model material didn't fully click, re-work the <a href="lab.html">lab</a> exercises and the <a href="problem_set.html">problem set</a> before tomorrow morning.</p>
 </section>
 
 </main>

@@ -17,7 +17,7 @@
 # This is THE classic Bayesian sales pitch for fisheries: uncertainty in
 # (a, b) flows naturally into uncertainty in Smsy and Hmsy.
 #
-# Author: FW599 Enhanced (Day 5 — Bayes II), Oregon State University.
+# Author: FW 536 (Day 5 — Bayes II), Oregon State University.
 # =============================================================================
 
 # ----- Packages -------------------------------------------------------------

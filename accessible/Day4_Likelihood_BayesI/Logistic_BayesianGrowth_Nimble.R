@@ -1,7 +1,7 @@
 # ==============================================================================
 # Logistic_BayesianGrowth_Nimble.R
 # ------------------------------------------------------------------------------
-# FW599 - Day 4 (Bayesian I, Afternoon)
+# FW 536 - Day 4 (Bayesian I, Afternoon)
 #
 # Bayesian fit of the logistic growth model
 #
@@ -18,7 +18,9 @@
 #     y[i] ~ Normal( r - (r/K) * x[i], sigma )
 #
 # We translate the original JAGS code (Jags_logistic_rK_Lab1.R) into NIMBLE.
-# The biological model is IDENTICAL. What changes is:
+# The biological model - the per-capita logistic mean structure and the normal
+# observation model - is the same in both files, as are the priors on K and r.
+# What changes is:
 #
 #   * the model is defined inside `nimbleCode({...})` instead of being written
 #     to a text file and read back by `jags.model()`,
@@ -59,9 +61,9 @@ N_grid <- seq(0, 1500, by = 10)
 N_grid[1] <- 1   # avoid plotting at exactly zero
 
 # ---- 2. The Nimble model code ------------------------------------------------
-# `nimbleCode({ ... })` returns an unevaluated BUGS-style model. The body is
-# IDENTICAL to the JAGS version - same distribution names, same precision
-# parameterization (dnorm uses tau = 1/sigma^2), same loops.
+# `nimbleCode({ ... })` returns an unevaluated BUGS-style model. The body mirrors
+# the JAGS version - same distribution names, same precision parameterization
+# (dnorm uses tau = 1/sigma^2), same loops, same priors on K and r.
 logistic_code <- nimbleCode({
 
   # ---- priors --------------------------------------------------------------

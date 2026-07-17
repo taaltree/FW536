@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-a11y="done">
 <head>
 <meta charset="UTF-8" />
 <title>Interactive: likelihood &amp; MCMC | FW 536 Day 4</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="stylesheet" href="../_Shared/css/lab.css" />
-<script defer src="../_Shared/js/lab.js"></script>
+<link rel="stylesheet" href="../_Shared/css/accessible.css" />
+<script defer src="../_Shared/js/accessible.js"></script>
 <style>
   .widget { background:#fff; border:1px solid var(--border); border-radius:10px; padding:20px 24px; margin:24px 0; box-shadow:0 2px 10px rgba(0,0,0,.05); }
   .controls { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:14px 24px; margin-bottom:14px; }
@@ -21,11 +21,14 @@
 </style>
 </head>
 <body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<div class="a11y-bar" role="region" aria-label="Accessibility">Accessible version &middot; <a href="../accessibility.html">How to use this site with a screen reader</a> &middot; <a href="../index.html">Course home</a></div>
+
 <div class="shell">
 <aside class="sidebar">
   <p class="brand"><a href="../index.html" title="Back to course home">FW 536 · Day 4</a></p>
   <div class="subtitle">Likelihood &amp; MCMC</div>
-  <nav>
+  <nav aria-label="On this page and related documents">
     <div class="section">This page</div>
     <ul><li><a href="#like">1. Likelihood &amp; the MLE</a></li><li><a href="#mcmc">2. Metropolis MCMC</a></li><li><a href="#try">Things to try</a></li></ul>
     <div class="section">Day 4</div>
@@ -37,7 +40,7 @@
   </nav>
 </aside>
 
-<main class="content">
+<main class="content" id="main-content" tabindex="-1">
 <header class="lab-header">
   <div class="eyebrow">Day 4 · Interactive</div>
   <h1>From likelihood to posterior to MCMC</h1>
@@ -70,7 +73,7 @@
 
 <section id="mcmc">
 <h2>2. A Metropolis sampler builds the posterior</h2>
-<div class="callout key">
+<div class="callout key"><p class="callout-label">Key idea</p>
 <p><strong>What the sampler does, one step at a time.</strong> It wanders over values of $p$, and the values it visits pile up into the posterior. Each step:</p>
 <ol>
 <li><strong>Propose.</strong> From the current $p$, jump to a nearby candidate $p' = p + \text{(a random nudge of size "step")}$.</li>
@@ -101,7 +104,7 @@
 
 <section id="try">
 <h2>Things to try</h2>
-<div class="callout key">
+<div class="callout key"><p class="callout-label">Key idea</p>
 <ol>
 <li><strong>The peak is the MLE.</strong> Drag p in panel 1 to the top of the likelihood curve — it lands on k/n.</li>
 <li><strong>MCMC recovers the posterior.</strong> Hit Run and watch the orange histogram in panel 2 fill in the dashed black posterior curve. The MCMC never computes that curve — it just wanders and the samples pile up in the right shape.</li>
@@ -109,7 +112,7 @@
 <li><strong>More data → tighter posterior.</strong> Raise n (keeping k/n fixed) and both the likelihood and the posterior get narrower.</li>
 </ol>
 </div>
-<div class="callout try"><strong>Go further:</strong> the <a href="explore_mcmc.html">2D MCMC sampler playground</a> shows this same idea in two parameters and lets you compare random-walk Metropolis, Gibbs, and Hamiltonian Monte Carlo (HMC) on a correlated posterior, with a discussion of each sampler's pros and cons.</div>
+<div class="callout try"><p class="callout-label">Try it yourself</p><strong>Go further:</strong> the <a href="explore_mcmc.html">2D MCMC sampler playground</a> shows this same idea in two parameters and lets you compare random-walk Metropolis, Gibbs, and Hamiltonian Monte Carlo (HMC) on a correlated posterior, with a discussion of each sampler's pros and cons.</div>
 <p><a href="lab.html">← Back to the Day 4 lab</a></p>
 </section>
 </main>

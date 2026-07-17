@@ -13,7 +13,7 @@
 <div class="shell">
 
 <aside class="sidebar">
- <h1><a href="../index.html" title="Back to course home">FW 536 · Day 2</a></h1>
+ <p class="brand"><a href="../index.html" title="Back to course home">FW 536 · Day 2</a></p>
  <div class="subtitle">Log & logit intuition guide</div>
  <nav>
  <ul>
@@ -161,7 +161,7 @@
 <h3>Time-to-detection on cameras (lognormal regression)</h3>
 <p>$\log(\text{time}) = \beta_0 + \beta_1 \cdot \text{prey availability}$. $\hat\beta_1 = -0.30$ per standardized prey index.</p>
 <details class="answer" open><summary>Read it</summary><div class="answer-body">
-<p>Each SD of prey availability cuts expected time-to-detection by $1 - e^{-0.30} = 26%$. Two SDs of prey doubles the rate of detection (cuts time in half).</p>
+<p>Each SD of prey availability cuts expected time-to-detection by $1 - e^{-0.30} = 26\%$. Two SDs cut it by $1 - e^{-0.60} = 45\%$ &mdash; a $\times 1.82$ rise in the detection rate, <em>not</em> a doubling. Halving the time takes $\ln 2 / 0.30 = 2.31$ SDs of prey. The trap here is arithmetic instinct: effects that add on the log scale <em>multiply</em> on the response scale, so doubling the predictor change does not double the effect.</p>
 </div></details>
 </div>
 

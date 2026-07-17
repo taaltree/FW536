@@ -1,4 +1,4 @@
-// FW599 Enhanced Lab – tiny helper script
+// FW 536 Lab – tiny helper script
 // Provides: tab switching, quiz checking, smooth ToC active highlight.
 
 document.addEventListener('DOMContentLoaded', () => {

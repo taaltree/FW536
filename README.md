@@ -32,11 +32,11 @@ Students complete two setup steps first, linked from the landing page:
 DayN_Topic/
   lab.html                       — in-class practice lab (answers reveal-able)
   problem_set.html               — the single graded problem set (morning + afternoon)
-  morning_lab_template.Rmd        — R Markdown hand-in template (morning)
-  afternoon_lab_template.Rmd      — R Markdown hand-in template (afternoon)
+  morning_lab_template.Rmd       — R Markdown hand-in template (morning)
+  afternoon_lab_template.Rmd     — R Markdown hand-in template (afternoon; Days 1–4)
   plain_language_summary.html    — non-technical companion
   answer_key.html                — practice-lab answer key (public by design)
-  explore_*.html                 — interactive visualization for the day
+  explore_*.html                 — interactive visualization (Days 1–4)
   data/                          — datasets the problems analyze
   *.R                            — supporting R / Nimble scripts (Days 2, 4, 5)
   FW536_DayN_*.pptx              — lecture slides (+ *_accessible.pptx with alt text)
@@ -45,14 +45,21 @@ DayN_Topic/
 The practice lab and the graded problem set both use anchored `#morning` and
 `#afternoon` sections so the two sessions stay clearly separated.
 
+**Day 5 is the exception.** Its afternoon is open lab time rather than a new
+topic, so `Day5_BayesII/` has only a `#morning` section — no
+`afternoon_lab_template.Rmd` and no `explore_*.html` of its own.
+
 ## Interactive visualizations
 
-Each day links a self-contained browser widget (no install needed):
+Days 1–4 each link a self-contained browser widget (no install needed):
 
 - Day 1 — discrete distribution explorer (Binomial / Poisson / Negative Binomial).
 - Day 2 — link-function & logit visualizer (identity / log / logit).
 - Day 3 — shrinkage / partial-pooling demo.
 - Day 4 — likelihood curve + live Metropolis MCMC sampler.
+
+Day 5 has no widget of its own; its lab reuses the Day 4 MCMC and conjugate
+explorers.
 
 ## Answer keys (instructor-only)
 

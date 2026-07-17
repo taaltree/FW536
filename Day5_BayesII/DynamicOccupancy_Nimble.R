@@ -15,10 +15,14 @@
 # Observation model:
 #   y[i, j, t] ~ Bernoulli(z[i, t] * p)
 #
-# Derived ecology:
-#   psi.t[t] = expected occupancy in year t
-#   tau[t-1] = turnover (fraction of occupied sites that are NEW colonisers)
-#   eq[t]    = colonization-extinction equilibrium occupancy
+# Derived ecology (all indexed by TRANSITION t-1, i.e. 1..Nyears-1):
+#   psi.t[t]      = expected occupancy in year t
+#   lambda[t-1]   = finite rate of change, psi.t[t] / psi.t[t-1]
+#   turn[t-1]     = turnover (fraction of occupied sites that are NEW colonisers)
+#   eq[t-1]       = colonization-extinction equilibrium occupancy
+# Note: `turn` is deliberately NOT called `tau` -- in NIMBLE/JAGS `tau`
+# conventionally means a precision (1/sigma^2), and reusing it for turnover
+# is a reliable way to confuse yourself later.
 #
 # What this script teaches:
 #   1. Simulating data from a dynamic occupancy model.
@@ -29,7 +33,7 @@
 #   4. Using `monitors` to track latent occupancy across years.
 #   5. Comparing recovered (phi, gamma) to truth.
 #
-# Author: FW599 Enhanced (Day 5 — Bayes II), Oregon State University.
+# Author: FW 536 (Day 5 — Bayes II), Oregon State University.
 # =============================================================================
 
 # ----- Packages -------------------------------------------------------------
@@ -98,10 +102,11 @@ DynOccCode <- nimbleCode({
   for (t in 2:Nyears) {
     psi.t[t] <- psi.t[t - 1] * phi[t - 1] +
                 (1 - psi.t[t - 1]) * gamma[t - 1]
-    tau[t - 1] <- (gamma[t - 1] * (1 - psi.t[t - 1])) /
-                  (gamma[t - 1] * (1 - psi.t[t - 1]) +
-                     phi[t - 1] * psi.t[t - 1])
-    eq[t]      <- gamma[t - 1] / (gamma[t - 1] + (1 - phi[t - 1]))
+    lambda[t - 1] <- psi.t[t] / psi.t[t - 1]
+    turn[t - 1]   <- (gamma[t - 1] * (1 - psi.t[t - 1])) /
+                     (gamma[t - 1] * (1 - psi.t[t - 1]) +
+                        phi[t - 1] * psi.t[t - 1])
+    eq[t - 1]     <- gamma[t - 1] / (gamma[t - 1] + (1 - phi[t - 1]))
   }
 
   # ----- Priors ---------------------------------------------------------
@@ -157,7 +162,8 @@ samples <- nimbleMCMC(
   constants = constants,
   data      = data,
   inits     = inits,
-  monitors  = c("phi", "gamma", "p", "psi", "psi.t", "tau", "eq"),
+  monitors  = c("phi", "gamma", "p", "psi", "psi.t",
+                "lambda", "turn", "eq"),
   nchains   = 3,
   niter     = 20000,
   nburnin   = 10000,

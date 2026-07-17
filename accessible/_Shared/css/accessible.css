@@ -348,3 +348,59 @@ footer { border-top: 2px solid var(--border-soft); padding: 1.5rem 1.25rem; colo
   color: var(--link);
   text-decoration: underline;
 }
+
+/* ============================================================
+   Interactive explorers (explore_*.html)
+   These pages carry their own inline <style> written against the
+   standard site's --osu-* custom properties. Alias them onto the
+   accessible palette so the widgets keep their meaning (e.g. the
+   selected mode button stays legible) instead of losing colour.
+   ============================================================ */
+:root {
+  --osu-orange: #B33107;
+  --osu-orange-dark: #8F2705;
+  --osu-stone: #2E2E2E;
+  --text: #161616;
+  --muted: #4A4A4A;
+}
+
+/* .sr-readout is announced by screen readers (role=status / aria-live=polite)
+ * AND kept visible: low-vision and sighted users benefit from the same
+ * plain-text statement of the current parameters and derived quantities. */
+.sr-readout {
+  font-family: inherit;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  background: var(--panel-alt);
+  border: 2px solid var(--border);
+  border-left: 6px solid var(--orange);
+  border-radius: 0 8px 8px 0;
+  padding: 0.6rem 0.9rem;
+  margin: 0.9rem 0;
+  color: var(--ink);
+}
+.data-table-details { margin: 0.9rem 0; }
+.data-table-details > summary {
+  font-weight: 700;
+  color: var(--link);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+  padding: 0.3rem 0;
+}
+.data-table-wrap { max-height: 24em; overflow: auto; border: 2px solid var(--border); }
+.data-table-wrap table { border-collapse: collapse; width: 100%; font-size: 0.95rem; }
+.data-table-wrap caption {
+  caption-side: top;
+  text-align: left;
+  padding: 0.4rem 0.5rem;
+  color: var(--ink-soft);
+  font-size: 0.95rem;
+}
+.data-table-wrap th, .data-table-wrap td {
+  border: 1px solid var(--border-soft);
+  padding: 0.2rem 0.5rem;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.data-table-wrap th { background: var(--panel-alt); }

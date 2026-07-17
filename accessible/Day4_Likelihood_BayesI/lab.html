@@ -59,6 +59,9 @@ MathJax = {
  <li><a class="featured" href="plain_language_summary.html">Plain-language summary</a></li>
  <li><a href="answer_key.html">Answer key</a></li>
  <li><a href="problem_set.html">Graded problem set</a></li>
+ <li><a href="explore_likelihood_mcmc.html">Interactive likelihood &amp; MCMC</a></li>
+ <li><a href="explore_conjugate.html">Interactive conjugate prior/posterior</a></li>
+ <li><a href="explore_mcmc.html">2D MCMC sampler playground</a></li>
  </ul>
  <div class="section">Course</div>
  <ul>
@@ -151,7 +154,7 @@ MathJax = {
   <span class="pb-cta">Open the summary &rarr;</span>
 </a>
 
-<div class="callout try"><p class="callout-label">Try it yourself</p><strong>Helpful companions for today.</strong> Two interactive tools pair with this lab: the likelihood &amp; MCMC explorer and the conjugate prior/posterior explorer.</div>
+<div class="callout try"><p class="callout-label">Try it yourself</p><strong>Helpful companions for today.</strong> Three interactive tools pair with this lab: the <a href="explore_likelihood_mcmc.html">likelihood &amp; MCMC explorer</a>, the <a href="explore_conjugate.html">conjugate prior/posterior explorer</a>, and the <a href="explore_mcmc.html">2D MCMC sampler playground</a>.</div>
 
 <section id="orient">
 <h2>Morning · Why we care about likelihood</h2>
@@ -524,10 +527,10 @@ posterior &lt;- <span class="fn">dbeta</span>(theta, <span class="nu">8</span>, 
 
 <p>The posterior just adds <em>successes</em> to $\alpha$ and <em>failures</em> to $\beta$.</p>
 
-<div class="callout try"><p class="callout-label">Try it yourself</p><strong>Play with it.</strong> The interactive conjugate prior/posterior explorer lets you drag a Beta prior and binomial data (or a Gamma&ndash;Poisson rate, or a Normal&ndash;Normal mean) and watch the prior × likelihood → posterior update live.</div>
+<div class="callout try"><p class="callout-label">Try it yourself</p><strong>Play with it.</strong> The <a href="explore_conjugate.html">interactive conjugate prior/posterior explorer</a> lets you drag a Beta prior and binomial data (or a Gamma&ndash;Poisson rate, or a Normal&ndash;Normal mean) and watch the prior × likelihood → posterior update live.</div>
 
 <div class="callout key"><p class="callout-label">Key idea</p>
-<strong>Prior as pseudo-observations.</strong> A Beta($\alpha,\beta$) prior is exactly equivalent to having previously seen $\alpha$ "successes" and $\beta$ "failures" in an imaginary pre-experiment. Beta(1,1) means "I've seen no one before." Beta(50,50) means "I've already seen 100 trials with $p=0.5$." That is the prior's information content — measurable in trials.
+<strong>Prior as pseudo-observations.</strong> A Beta($\alpha,\beta$) prior is exactly equivalent to having previously seen $\alpha$ "successes" and $\beta$ "failures" in an imaginary pre-experiment, so its strength — its <em>pseudo-sample size</em> — is $\alpha+\beta$ trials. Beta(1,1) is worth $1+1=2$ pseudo-trials, which is next to nothing beside any real dataset. Beta(50,50) means "I've already seen 100 trials with $p=0.5$." That is the prior's information content — measurable in trials.
 </div>
 
 <p>Worked example: spotted-owl nest survival. You monitored 12 nests; 9 fledged. Choose three priors and see how each posterior moves.</p>
@@ -559,7 +562,7 @@ priors &lt;- <span class="kw">list</span>(
 <p>For $y_1, \dots, y_n \mid \lambda \sim \text{Pois}(\lambda)$ and $\lambda \sim \text{Gamma}(\alpha, \beta)$ (shape-rate),</p>
 <div class="eq-block">$p(\lambda \mid y) = \text{Gamma}\!\left(\alpha + \sum y_i,\; \beta + n\right).$</div>
 
-<p>Again, the prior plays the role of pseudo-observations: $\alpha$ events accumulated over $\beta$ units of effort. After observing $n$ new units and $\sum y_i$ events, you just add them in.</p>
+<p>Again, the prior plays the role of pseudo-observations: $\alpha$ events accumulated over $\beta$ units of effort. After observing $n$ new units and $\sum y_i$ events, you just add them in. Note that the bookkeeping differs from the Beta&ndash;Binomial case: here the prior's weight is carried by $\beta$ alone — the pseudo-<em>effort</em> that your $n$ new units are added to — not by $\alpha+\beta$. Each conjugate family has its own currency for prior strength; read it off the update rule rather than assuming one formula covers them all.</p>
 
 <p>Worked example: a parasitologist counts $y = (3, 1, 4, 2, 0, 5, 2, 3, 1, 4)$ ticks on 10 birds (total 25 in 10 birds). Prior $\lambda \sim \text{Gamma}(2, 1)$ (weakly informative around mean 2 per bird).</p>
 
@@ -620,7 +623,7 @@ log_post &lt;- <span class="kw">function</span>(p) {
 }
 
 niter &lt;- <span class="nu">20000</span>; chain &lt;- <span class="fn">numeric</span>(niter); chain[<span class="nu">1</span>] &lt;- <span class="nu">0.5</span>
-accept &lt;- <span class="nu">0</span>; s &lt;- <span class="nu">0.10</span> <span class="cm"># proposal SD</span>
+accept &lt;- <span class="nu">0</span>; s &lt;- <span class="nu">0.35</span> <span class="cm"># proposal SD</span>
 <span class="fn">set.seed</span>(<span class="nu">2</span>)
 <span class="kw">for</span> (i in <span class="nu">2</span>:niter) {
  prop &lt;- <span class="fn">rnorm</span>(<span class="nu">1</span>, mean = chain[i - <span class="nu">1</span>], sd = s)
@@ -639,6 +642,8 @@ burn &lt;- <span class="nu">2000</span>
 <div class="callout key"><p class="callout-label">Key idea</p>
 Tuning: acceptance rate of about 25–40% is healthy for random-walk Metropolis in moderate dimensions. Too high → tiny proposals, slow mixing. Too low → wasted iterations. Real samplers (Nimble's default) adapt the proposal scale during burn-in for you.
 </div>
+
+<div class="callout try"><p class="callout-label">Try it yourself</p><strong>Play with it.</strong> The <a href="explore_mcmc.html">2D MCMC sampler playground</a> runs this same random-walk Metropolis on a correlated two-parameter posterior and lets you compare it against Gibbs and Hamiltonian Monte Carlo — a good place to watch what the proposal SD does to the acceptance rate and to mixing.</div>
 </section>
 
 <!-- ================ NIMBLE LOGISTIC ================================ -->
@@ -908,7 +913,7 @@ mass_rep_chain &lt;- <span class="fn">MCMCchains</span>(reg_samps, <span class="
 <span class="fn">points</span>(length_mm, mass_g, pch = <span class="nu">19</span>, col = <span class="st">"red"</span>)</code></pre>
 
 <div class="callout key"><p class="callout-label">Key idea</p>
-The recipe is always the same three steps: <strong>(1)</strong> simulate fake datasets from the posterior, <strong>(2)</strong> compute the same summary on the fake data and the real data, <strong>(3)</strong> ask how often the fake beats the real. That fraction is the Bayesian p-value. Near 0.5 means the real data look like something your model would produce. Near 0 or 1 is a red flag. Two different summaries of the same fit can give you two different p-values, so the summary you pick is part of the check — and look at the plot as well as the number.
+The recipe is always the same three steps: <strong>(1)</strong> simulate fake datasets from the posterior, <strong>(2)</strong> compute the same summary on the fake data and the real data, <strong>(3)</strong> ask how often the fake is at least as extreme as the real. That fraction is the Bayesian p-value. Near 0.5 means the real data look like something your model would produce. Near 0 or 1 is a red flag. Two different summaries of the same fit can give you two different p-values, so the summary you pick is part of the check — and look at the plot as well as the number.
 </div>
 </section>
 
@@ -934,7 +939,7 @@ The recipe is always the same three steps: <strong>(1)</strong> simulate fake da
 <details class="answer"><summary>Reveal solution</summary><div class="answer-body">
 <p>(a) $L(p) = p^s(1-p)^{n-s}$. (b) $\ell'(p) = s/p - (n-s)/(1-p) = 0 \Rightarrow \hat p = s/n$.</p>
 <p>(c) $\ell''(p) = -s/p^2 - (n-s)/(1-p)^2$, so $-\ell''(\hat p) = n/[\hat p(1-\hat p)]$.</p>
-<p>(d) $\hat p = 0.6$, Wald SE $= \sqrt{0.6 \cdot 0.4/50} \approx 0.069$. Profile CI from <code>confint(mle(...))</code> ≈ (0.461, 0.726).</p>
+<p>(d) $\hat p = 0.6$, Wald SE $= \sqrt{0.6 \cdot 0.4/50} \approx 0.069$. Profile CI from <code>confint(mle(...))</code> ≈ (0.462, 0.728).</p>
 <pre><code><span class="kw">library</span>(stats4)
 nll &lt;- <span class="kw">function</span>(p) -(<span class="nu">30</span> * <span class="fn">log</span>(p) + <span class="nu">20</span> * <span class="fn">log</span>(<span class="nu">1</span> - p))
 fit &lt;- <span class="fn">mle</span>(nll, start = <span class="kw">list</span>(p = <span class="nu">0.5</span>),

@@ -1,5 +1,5 @@
-/* FW599 Enhanced Lab Stylesheet
- * Used by all lab pages in Fall2025_Enhanced.
+/* FW 536 Lab Stylesheet
+ * Used by all lab pages on the standard course site.
  */
 
 :root {
@@ -53,14 +53,18 @@ body {
   overflow-y: auto;
   border-right: 6px solid var(--osu-orange);
 }
-.sidebar h1 {
+/* Sidebar brand. The sidebar uses <p class="brand"> so the only <h1> on the
+   page is the page title. */
+.sidebar .brand {
   font-family: 'Helvetica Neue', Arial, sans-serif;
   font-size: 18px;
+  /* <p> is not bold by default; <h1> was. Restore the weight explicitly. */
+  font-weight: 700;
   margin: 0 0 4px 0;
   color: #fff;
   letter-spacing: 0.5px;
 }
-.sidebar h1 a {
+.sidebar .brand a {
   color: #fff;
   text-decoration: none;
   display: flex;
@@ -71,17 +75,17 @@ body {
   border-left: 3px solid var(--osu-orange);
   background: rgba(215,63,9,0.10);
 }
-.sidebar h1 a::before {
+.sidebar .brand a::before {
   content: "\2190";
   font-size: 14px;
   color: var(--osu-orange);
   font-weight: bold;
 }
-.sidebar h1 a:hover {
+.sidebar .brand a:hover {
   background: var(--osu-orange);
   color: #fff;
 }
-.sidebar h1 a:hover::before { color: #fff; }
+.sidebar .brand a:hover::before { color: #fff; }
 .sidebar .subtitle { color: #c8c8c8; font-size: 12px; margin: 6px 0 24px 0; padding: 0 10px; }
 .sidebar nav ul { list-style: none; padding: 0; margin: 0; }
 .sidebar nav li { margin: 6px 0; }
@@ -690,3 +694,48 @@ footer {
 .data-card .data-row a:hover { color: var(--osu-orange); text-decoration: underline; }
 .data-card .data-row a code { background: #F0EAD2; padding: 2px 6px; border-radius: 3px; font-size: 13px; }
 .data-card .data-row .data-desc { color: var(--osu-stone); font-size: 13px; }
+
+/* ---- Interactive explorer: spoken readout + data tables ----
+ * .sr-readout is announced by screen readers (role=status / aria-live=polite)
+ * AND kept visible: low-vision and sighted users benefit from the same
+ * plain-text statement of the current parameters and derived quantities.
+ */
+.sr-readout {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.55;
+  background: var(--panel-alt);
+  border: 1px solid var(--border);
+  border-left: 5px solid var(--osu-orange);
+  border-radius: 0 8px 8px 0;
+  padding: 10px 14px;
+  margin: 12px 0;
+  color: var(--text);
+}
+.data-table-details { margin: 12px 0; }
+.data-table-details > summary {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--osu-orange-dark);
+  cursor: pointer;
+  padding: 6px 0;
+}
+.data-table-details > summary:focus-visible { outline: 3px solid var(--osu-orange); outline-offset: 2px; }
+.data-table-wrap { max-height: 22em; overflow: auto; border: 1px solid var(--border); }
+.data-table-wrap table { border-collapse: collapse; width: 100%; font-size: 13px; }
+.data-table-wrap caption {
+  caption-side: top;
+  text-align: left;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 13px;
+  color: var(--muted);
+  padding: 6px 8px;
+}
+.data-table-wrap th, .data-table-wrap td {
+  border: 1px solid var(--border);
+  padding: 3px 8px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.data-table-wrap th { background: var(--panel-alt); position: sticky; top: 0; }

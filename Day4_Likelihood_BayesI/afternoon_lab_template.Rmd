@@ -125,12 +125,18 @@ library(HDInterval)  # hdi() for highest-posterior-density intervals
 
 # Problem 10 — Identifiability and label switching in a Bayesian mixture
 
-> Refit the whale-blow mixture (morning Problem 3) in Nimble with no ordering constraint. Explain why $\hat R$ explodes despite convergence; propose three fixes with limitations; discuss the bias of post hoc relabeling. (Conceptual; a short Nimble demonstration is optional.)
+> Refit the whale-blow mixture (morning Problem 3) in Nimble. (a) Explain geometrically why $\hat R$ explodes even though each chain has converged. (b) Reproduce the pathology: run the unconstrained model with chain 2 started from the mirrored labeling, and record $\hat R$ for `lam[1]`. (c) Add the ordering constraint $\lambda_1 < \lambda_2$, rerun, and confirm the fix. (d) Discuss the bias of post hoc relabeling and when it is justified. **Both runs are required — report $\hat R$ for $\lambda_1$ before and after the constraint.**
 
 **My work:**
 
 ```{r}
-# Your R code here (optional demonstration)
+# (b) Unconstrained "before" run — Rhat for lam[1] should be enormous
+
+```
+
+```{r}
+# (c) Constrained "after" run (lam1 < lam2 by construction) — Rhat should drop to ~1
+
 ```
 
 **Answer / biological interpretation:**

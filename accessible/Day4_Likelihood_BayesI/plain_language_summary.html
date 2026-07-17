@@ -147,7 +147,7 @@ Priors are a feature, not a bug. They let you encode <em>real prior knowledge</e
 <ul>
 <li>build the computational graph,</li>
 <li>pick a sensible sampler for each parameter,</li>
-<li>run many chains in parallel,</li>
+<li>run several independent chains from different starting values (<code>nimbleMCMC()</code> runs them one after another by default — true parallel execution takes extra setup),</li>
 <li>return posterior samples for whatever quantities you ask to monitor.</li>
 </ul>
 
@@ -187,7 +187,7 @@ Priors are a feature, not a bug. They let you encode <em>real prior knowledge</e
 <section id="tomorrow">
 <h2>Looking ahead to Day 5</h2>
 
-<p>Tomorrow we take the Bayesian machinery you just learned and apply it to harder, more realistic models: hierarchical (random-effects) models, occupancy models, capture-recapture, and state-space models. Same <span class="pill nimble">Nimble</span> syntax, deeper biology. The morning conjugacy and the afternoon logistic-growth fit you did today are the building blocks; everything tomorrow plugs together pieces you already understand.</p>
+<p>Tomorrow we take the Bayesian machinery you just learned and apply it to harder, more realistic models: hierarchical (random-effects) models, occupancy models, capture-recapture, and state-space models. Same <span class="pill nimble">Nimble</span> syntax, deeper biology. The morning's maximum likelihood and the afternoon's conjugacy and logistic-growth fit you did today are the building blocks; everything tomorrow plugs together pieces you already understand.</p>
 
 <p>Things to keep in your back pocket going into Day 5:</p>
 <ul>

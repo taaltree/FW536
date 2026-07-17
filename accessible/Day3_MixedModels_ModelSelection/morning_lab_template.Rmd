@@ -130,11 +130,11 @@ dat$Z_TP         <- scale(dat$Trophic_Pos)[, 1]
 
 ---
 
-# Problem 5 — Detection probability: binomial GLMM (variance partitioning)
+# Problem 5 — Detection probability: binomial GLMM
 
-> Given the `VarCorr` output in the problem, partition variance (remember the
-> $\pi^2/3$ residual), compute the detection probability at mean conditions, and
-> translate the covariate slope into an odds ratio.
+> Given the `VarCorr` output in the problem, interpret the covariate slope and
+> compare the two random-effect SDs, compute the detection probability at mean
+> conditions, and translate the covariate slope into an odds ratio.
 
 **My work:**
 

@@ -52,7 +52,7 @@ model {
 
   K ~ dunif(0, 4000)
   r ~ dunif (0, 2)
-  sigma ~ dunif(0, .5) 
+  sigma ~ dunif(0, 2)
   tau <- 1/sigma^2
   
   # likelihood

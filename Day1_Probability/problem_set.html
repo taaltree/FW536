@@ -13,7 +13,7 @@
 <div class="shell">
 
 <aside class="sidebar">
- <h1><a href="../index.html" title="Back to course home">FW 536 · Day 1</a></h1>
+ <p class="brand"><a href="../index.html" title="Back to course home">FW 536 · Day 1</a></p>
  <div class="subtitle">Assessed problem set — Probability &amp; discrete distributions</div>
  <nav>
  <div class="section">Morning · probability</div>
@@ -209,7 +209,7 @@ v   &lt;- <span class="fn">var</span>(coyote$scats)
 <span class="ex-tag">Problem 10</span><span class="difficulty easy"> · Multinomial</span>
 <h3>Owl pellet contents</h3>
 <p>Barn owl pellets from a regional diet study are composed of voles $0.65$, shrews $0.20$, mice $0.10$, and birds $0.05$.</p>
-<div class="callout warn"><strong>Simplifying assumption.</strong> Real pellets contain different numbers of items, but for this problem <em>assume every pellet contains exactly 15 identifiable prey items</em>. That fixes the total $n = 15$, so a pellet's contents follow a Multinomial$(n = 15,\ \mathbf{p})$. Parts (c) and (d) below hold this assumption; part (c) in particular treats all 50 pellets as having 15 items each.</p>
+<div class="callout warn"><strong>Simplifying assumption.</strong> Real pellets contain different numbers of items, but for this problem <em>assume every pellet contains exactly 15 identifiable prey items</em>. That fixes the total $n = 15$, so a pellet's contents follow a Multinomial$(n = 15,\ \mathbf{p})$. Parts (c) and (d) below hold this assumption; part (c) in particular treats all 50 pellets as having 15 items each.</div>
 <ol type="a">
 <li>For a pellet with 15 items, what is the probability of the exact composition $(10, 3, 1, 1)$ &mdash; 10 voles, 3 shrews, 1 mouse, 1 bird?</li>
 <li>What is the marginal distribution of the number of shrews in a single 15-item pellet? Give its name, mean, and variance.</li>
@@ -227,13 +227,8 @@ v   &lt;- <span class="fn">var</span>(coyote$scats)
 <ol type="a">
 <li>If you (incorrectly) treat the pooled sample as one Poisson sample, what mean and variance would you estimate? Will the pooled distribution actually be Poisson? Explain why or why not.</li>
 <li>Show by simulation that the pooled distribution is over-dispersed (variance noticeably greater than mean).</li>
-<li><strong>Now derive the pooled mean and variance exactly, step by step</strong> &mdash; you only need the definitions of mean and variance from this morning, no new theorem. A randomly chosen mussel from the pooled sample came from site A (rate $\lambda = 2$) or site B (rate $\lambda = 8$), each with probability $\tfrac12$.
-<ol type="i">
-<li><em>Mean.</em> Average the two site means: $E[Y] = \tfrac12(2) + \tfrac12(8) = 5$.</li>
-<li><em>Second moment.</em> For a single Poisson$(\lambda)$, $\mathrm{Var} = E[Y^2] - (E[Y])^2 = \lambda$, so rearranging, $E[Y^2 \mid \lambda] = \lambda + \lambda^2$. Average this over the two sites: $E[Y^2] = \tfrac12(2 + 2^2) + \tfrac12(8 + 8^2) = \tfrac12(6) + \tfrac12(72) = 39$.</li>
-<li><em>Variance.</em> $\mathrm{Var}(Y) = E[Y^2] - (E[Y])^2 = 39 - 5^2 = 14$.</li>
-</ol>
-So the pooled mean is $5$ but the pooled variance is $14$ &mdash; almost three times larger. Confirm these two numbers match your simulation from (b), and note that a real Poisson would have required variance $= 5$.</li>
+<li><strong>Now derive the pooled mean and variance exactly, step by step</strong> &mdash; you only need the definitions of mean and variance from this morning, no new theorem. A randomly chosen mussel from the pooled sample came from site A (rate $\lambda = 2$) or site B (rate $\lambda = 8$), each with probability $\tfrac12$. Work out $E[Y]$ and $\mathrm{Var}(Y)$ for that randomly chosen mussel, then check your two numbers against your simulation from (b) and compare the variance to what a real Poisson with the same mean would have required.
+<div class="callout plain" style="margin-top:10px;"><strong>Scaffolding, if you need it.</strong> Average each quantity over the two sites. The mean is a direct average of the two site means. For the variance, you cannot average the two site variances &mdash; go through the second moment instead: for a single Poisson$(\lambda)$, $\mathrm{Var} = E[Y^2] - (E[Y])^2 = \lambda$, so $E[Y^2 \mid \lambda] = \lambda + \lambda^2$. Average <em>that</em> over the two sites to get $E[Y^2]$, then use $\mathrm{Var}(Y) = E[Y^2] - (E[Y])^2$.</div></li>
 <li>In one or two sentences: what does this exercise tell you about why <em>real</em> count data are over-dispersed even when the process is Poisson within each homogeneous unit?</li>
 </ol>
 <div class="callout bio">This is the mechanism behind the Negative Binomial itself: a Poisson whose rate varies (here across two sites; in the NB, continuously via a gamma distribution). Unmodeled heterogeneity in the rate is the single most common source of over-dispersion in ecological counts.</div>

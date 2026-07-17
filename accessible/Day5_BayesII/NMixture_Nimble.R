@@ -17,7 +17,7 @@
 #   3. Stepping up complexity by adding covariates one at a time.
 #   4. Posterior-predictive Bayesian p-value as a goodness-of-fit check.
 #
-# Author: FW599 Enhanced (Day 5 -- Bayes II), Oregon State University.
+# Author: FW 536 (Day 5 -- Bayes II), Oregon State University.
 # =============================================================================
 
 library(nimble)
@@ -48,6 +48,21 @@ Nmix1Code <- nimbleCode({
     }
   }
   p      ~ dbeta(1, 1)
+  # CAVEAT (see the lab's section A): dgamma(0.001, 0.001) is the classic
+  # "vague" prior for a Poisson mean, but it is not innocent. It piles
+  # enormous density just above 0 -- pgamma(1e-3, 0.001, 0.001) = 0.987, so
+  # 98.7% of the prior mass sits below 0.001, and the prior median is about
+  # 5e-299 -- while at the same time being extremely heavy-tailed:
+  # qgamma(0.999, 0.001, 0.001) = 265. (Its mean is finite and equals 1, and
+  # its variance is 1000; the pathology is the shape, not a missing moment.)
+  # It is also improper in the limit as both parameters go to 0. So it is
+  # "vague" only on the natural scale -- on the log scale it is a very
+  # opinionated prior. With plenty of counts (as here) the likelihood swamps
+  # it and it does no harm; with
+  # sparse counts, or on a variance/precision parameter, it is notorious
+  # for dragging the posterior toward 0 and for miserable mixing. Kept
+  # here because it is what you will meet in the literature -- but it is
+  # exactly the kind of prior today's lab is warning you about.
   lambda ~ dgamma(0.001, 0.001)
 })
 
@@ -200,6 +215,21 @@ Nmix4Code <- nimbleCode({
   fit.pred <- sum(resid.pred[1:Nsites, 1:Nreps])
 
   p      ~ dbeta(1, 1)
+  # CAVEAT (see the lab's section A): dgamma(0.001, 0.001) is the classic
+  # "vague" prior for a Poisson mean, but it is not innocent. It piles
+  # enormous density just above 0 -- pgamma(1e-3, 0.001, 0.001) = 0.987, so
+  # 98.7% of the prior mass sits below 0.001, and the prior median is about
+  # 5e-299 -- while at the same time being extremely heavy-tailed:
+  # qgamma(0.999, 0.001, 0.001) = 265. (Its mean is finite and equals 1, and
+  # its variance is 1000; the pathology is the shape, not a missing moment.)
+  # It is also improper in the limit as both parameters go to 0. So it is
+  # "vague" only on the natural scale -- on the log scale it is a very
+  # opinionated prior. With plenty of counts (as here) the likelihood swamps
+  # it and it does no harm; with
+  # sparse counts, or on a variance/precision parameter, it is notorious
+  # for dragging the posterior toward 0 and for miserable mixing. Kept
+  # here because it is what you will meet in the literature -- but it is
+  # exactly the kind of prior today's lab is warning you about.
   lambda ~ dgamma(0.001, 0.001)
 })
 

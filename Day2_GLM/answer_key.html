@@ -13,7 +13,7 @@
 <div class="shell">
 
 <aside class="sidebar">
- <h1><a href="../index.html" title="Back to course home">FW 536 · Day 2</a></h1>
+ <p class="brand"><a href="../index.html" title="Back to course home">FW 536 · Day 2</a></p>
  <div class="subtitle">Answer key</div>
  <nav>
  <div class="section">Morning lab</div>
@@ -52,7 +52,7 @@
 </header>
 
 <section><div class="callout key">
-<strong>How to use this document.</strong> Walk through each exercise in order. When a student produces a numeric answer, check whether they can also state the <em>biological</em> interpretation in one sentence. Day 2's pedagogical goal is not "fit the GLM"; it is "read the GLM as biology." Reward the student who says "a doubling of eDNA is associated with a 87% increase in expected adult sockeye." Push back on the student who says "the slope is 0.90 (SE 0.08)."
+<strong>How to use this document.</strong> Walk through each exercise in order. When a student produces a numeric answer, check whether they can also state the <em>biological</em> interpretation in one sentence. Day 2's pedagogical goal is not "fit the GLM"; it is "read the GLM as biology." Reward the student who says "a doubling of the flow-corrected eDNA signal is associated with an 86% increase in expected adult sockeye." Push back on the student who says "the slope is 0.90 (SE 0.08)."
 </div></section>
 
 <!-- ============================================================ -->
@@ -128,8 +128,8 @@ min_pos &lt;- min(d$Qcorr_qPCR[d$Qcorr_qPCR &gt; 0])    # 1e-05
 d$logED &lt;- log(d$Qcorr_qPCR + min_pos)
 
 # 1. Log-normal regression on log(count+1)
-f_lm &lt;- lm(log(Count + 1) ~ logED, data = d)
-summary(f_lm)                                    # logED slope 0.589 (SE 0.045)
+f_lm &lt;- lm(log(Count + 1) ~ logED + Year, data = d)
+summary(f_lm)                                    # logED slope 0.570 (SE 0.047)
 
 # 2. Plain Poisson
 f_p &lt;- glm(Count ~ logED + Year, family = poisson, data = d)
@@ -146,7 +146,7 @@ f_nb$deviance / f_nb$df.residual                  # 48.8 / 52 = 0.94  (theta = 0
 
 <table>
 <tr><th>Fit</th><th><code>logED</code> slope</th><th>SE(<code>logED</code>)</th><th>dispersion / (resid. dev ÷ df)</th></tr>
-<tr><td>1. lm(log(Count+1))</td><td>0.589</td><td>0.045</td><td>&mdash;</td></tr>
+<tr><td>1. lm(log(Count+1))</td><td>0.570</td><td>0.047</td><td>&mdash;</td></tr>
 <tr><td>2. Poisson</td><td>0.737</td><td>0.013</td><td>resid.dev/df = 2296.6/52 = <strong>44.2</strong></td></tr>
 <tr><td>3. Quasipoisson</td><td>0.737</td><td>0.095</td><td>dispersion = <strong>51.0</strong></td></tr>
 <tr><td>4. Negative binomial</td><td>0.897</td><td>0.081</td><td>resid.dev/df = 48.8/52 = <strong>0.94</strong>, $\theta = 0.73$</td></tr>
@@ -154,13 +154,13 @@ f_nb$deviance / f_nb$df.residual                  # 48.8 / 52 = 0.94  (theta = 0
 
 <p><strong>Diagnostic check.</strong> The plain Poisson is grossly overdispersed: residual deviance / df $\approx 44$ (any value $\gg 1$ signals overdispersion), so its SE on <code>logED</code> (0.013) is far too small. The quasipoisson keeps the same point estimate but rescales the SEs by $\sqrt{\hat\phi} = \sqrt{51}\approx 7.1$, giving 0.095. The negative binomial provides a proper likelihood (so you can compare via AIC) and a dispersion parameter $\theta = 0.73$; its residual-deviance ratio (0.94) is near 1, a well-calibrated fit. Trust fits 3 and 4, not the naive Poisson.</p>
 
-<p><strong>Coefficient back-transform.</strong> The eDNA slope from the NB fit is $\hat\beta = 0.897$ on the $\log(\text{eDNA})$ predictor. A "doubling of eDNA" corresponds to a one-unit change on the $\log_2$ scale, i.e. $\ln 2 = 0.693$ on the natural-log scale. So the multiplicative effect of a doubling is</p>
+<p><strong>Coefficient back-transform.</strong> The eDNA slope from the NB fit is $\hat\beta = 0.897$ on the $\log(\text{eDNA})$ predictor. A "doubling of the flow-corrected eDNA signal" corresponds to a one-unit change on the $\log_2$ scale, i.e. $\ln 2 = 0.693$ on the natural-log scale. That doubling <em>adds</em> $0.897 \times 0.693 = 0.622$ to the linear predictor; because the link is the log, the additive shift becomes a <em>multiplicative</em> effect on the expected count:</p>
 <div class="eq-block">$\exp(0.693 \cdot 0.897) = \exp(0.622) = 2^{0.897} = 1.86$</div>
-<p>A doubling of eDNA concentration is associated with roughly an 87% increase (×1.86) in expected daily adult sockeye count — the same value the graded Problem 5 reports.</p>
+<p>A doubling of the flow-corrected eDNA signal is associated with roughly an 86% increase (×1.86) in expected daily adult sockeye count — the same value the graded Problem 5 reports. Additive on the link scale, multiplicative on the response scale: that is the whole point of the log link, and it is the sentence students should be able to produce unprompted.</p>
 
 <p><strong>Biological interpretation.</strong> eDNA is shed proportionally to biomass (per unit volume of water). The fitted slope $\hat\beta = 0.897$ is a little below 1 on the $\log(\text{eDNA})$ scale, indicating a slightly <em>sublinear</em> eDNA-to-count relationship — possibly because fish in dense schools shed less per fish (boundary-layer effects), or because qPCR saturates at high concentrations. A slope above 1 would suggest the opposite — eDNA "amplifying" the count signal, perhaps because larger fish (which dominate the run-timing tails) shed disproportionately more eDNA per individual. The ×1.86 number is what goes in your abstract; the SE matters only insofar as it tells you whether the slope is distinguishable from 0 or from 1.</p>
 
-<div class="callout bio"><strong>The pedagogical moment.</strong> The overdispersed Poisson gives an SE that is too small by a factor of $\sqrt{51} \approx 7.1$ (0.013 vs the NB's 0.081). The qualitative story (positive eDNA–count association) is correct, but the naive-Poisson confidence statement is wrong by an order of magnitude. The afternoon exercise is meant to make students <em>feel</em> that gap.</div>
+<div class="callout bio"><strong>The pedagogical moment.</strong> The overdispersed Poisson gives an SE roughly <strong>6&times;</strong> too small (0.013 vs the NB's 0.081). Keep the two rescalings straight: $\sqrt{\hat\phi} = \sqrt{51} \approx 7.1$ is the <em>quasipoisson's</em> correction factor, which takes 0.013 to 0.095 while leaving the slope at 0.737; the NB is a different likelihood, and it lands at SE 0.081 <em>and</em> a slope of 0.897. The qualitative story (positive eDNA–count association) survives either way, but the naive-Poisson confidence statement is wrong by nearly an order of magnitude. The afternoon exercise is meant to make students <em>feel</em> that gap.</div>
 
 <div class="callout key"><strong>What to look for:</strong> students must (a) diagnose overdispersion, (b) refit with quasipoisson or NB, (c) back-transform the slope to a fold-change interpretation, and (d) name the biological mechanism the slope encodes.</div>
 </section>
@@ -192,7 +192,23 @@ tapply(prop$Yes, prop$Class, sum) / tapply(prop$Yes + prop$No, prop$Class, sum)<
 
 <p><strong>Why the two fits agree (part c).</strong> Group the passengers by class. For one group of $n$ passengers with $y=\sum_i y_i$ survivors, the one-row-per-person (Bernoulli) likelihood and the aggregated (Binomial) likelihood are</p>
 <div class="eq-block">$\displaystyle\prod_{i=1}^{n} p^{y_i}(1-p)^{1-y_i} = p^{y}(1-p)^{n-y}$ &nbsp;vs.&nbsp; $\displaystyle\binom{n}{y}\,p^{y}(1-p)^{n-y}.$</div>
-<p>They differ only by the binomial coefficient $\binom{n}{y}$ — the number of orderings of $y$ survivors among $n$ people (e.g. the 285 second-class passengers had $y=118$ survivors). On the log scale that is an <em>additive constant</em> $\log\binom{n}{y}$ that contains no $p$. Since the MLE, its SEs, and every likelihood-ratio test depend only on how the log-likelihood varies with $p$, this constant cancels: the coefficients, fitted probabilities, and SEs are identical. What it <em>does</em> change is the absolute log-likelihood — hence the residual deviance and AIC shift by the fixed amount $\sum_{\text{groups}}\log\binom{n}{y}$. So the deviance/AIC of a Bernoulli fit and a Binomial fit are not comparable, even though the models are the same. (The coefficient <em>tables</em> can also look different simply because <code>long</code> and <code>prop</code> sort their factor levels differently and pick different reference classes; align the references and the estimates match exactly.)</p>
+<p>They differ only by the binomial coefficient $\binom{n}{y}$ — the number of orderings of $y$ survivors among $n$ people (e.g. the 285 second-class passengers had $y=118$ survivors). On the log scale that is an <em>additive constant</em> $\log\binom{n}{y}$ that contains no $p$. Since the MLE, its SEs, and every likelihood-ratio test depend only on how the log-likelihood varies with $p$, this constant cancels: the coefficients, fitted probabilities, and SEs are identical. (The coefficient <em>tables</em> can also look different simply because <code>long</code> and <code>prop</code> sort their factor levels differently and pick different reference classes; align the references and the estimates match exactly.)</p>
+
+<p><strong>What the constant shifts — and what it doesn't.</strong> This is the step most people garble, so be precise with students. The constant shifts the <em>log-likelihood</em> and the <em>AIC</em>. For these data $\sum_{\text{groups}}\log\binom{n}{y} = 1025.44$ over the class×sex×age cells of <code>titanic_prop.csv</code>, and the Binomial log-likelihood sits exactly that far above the Bernoulli one ($-268.84$ vs $-1294.28$), so the AICs differ by $2 \times 1025.44 = 2050.87$.</p>
+
+<p>It does <strong>not</strong> shift the residual deviance. Deviance is $2(\ell_{\text{saturated}} - \ell_{\text{model}})$, and $\log\binom{n}{y}$ appears in <em>both</em> terms, so it cancels out entirely. The two deviances do differ — Bernoulli 2588.56 vs Binomial 491.06 — but that gap is 2097.49, which is <em>neither</em> 1025.44 nor 2050.87. Its real source is the <strong>change of saturated reference</strong>: the Bernoulli form's saturated model has one parameter per <em>passenger</em> and fits every row perfectly ($\ell_{\text{sat}} = 0$), while the Binomial form's has one per <em>cell</em>. The gap is exactly the Bernoulli deviance of the cell-saturated model — the individual-level variation that aggregation stops trying to explain.</p>
+
+<pre><code>n &lt;- prop$Yes + prop$No
+sum(lchoose(n, prop$Yes))                 # 1025.437  the constant
+
+logLik(f1); logLik(f2)                    # -1294.278  vs  -268.841   (shifted by 1025.437)
+AIC(f1);    AIC(f2)                       #  2596.555  vs   545.682   (shifted by 2050.873)
+deviance(f1); deviance(f2)                #  2588.555  vs   491.061   (gap 2097.495 -- neither!)
+
+# the deviance gap is the change of saturated reference:
+deviance(glm(survived ~ class*sex*age, family = binomial, data = long))   # 2097.495</code></pre>
+
+<p>The moral is unchanged and worth stating flatly: never compare the deviance or AIC of a Bernoulli fit against an aggregated Binomial fit. The AIC gap is bookkeeping; the deviance gap is a change of yardstick. Neither carries information about model quality. Within a single data form, both remain valid for comparing nested models.</p>
 
 <p><strong>Biological interpretation.</strong> The class coefficients trace a steep social gradient: 1st-class odds of survival are about 5× those of 3rd class ($1.66/0.34 \approx 4.9$), or equivalently a log-odds gap of about 1.60 ($+0.51 - (-1.09)$). Translating to probabilities, 1st-class passengers survived at 62.5% vs 25.2% in 3rd — a 37 percentage-point gap. The model recovers the raw proportions exactly because with a single categorical predictor and no other constraints, the MLE just <em>is</em> the empirical proportion in each group. This is a useful sanity check: any time your saturated logistic model disagrees with the empirical fractions, something is wrong with your code.</p>
 
@@ -219,6 +235,12 @@ emmeans(f3, pairwise ~ class | sex, type = "response")</code></pre>
 #  first  third
 #  0.972  0.419</code></pre>
 <p>An adult first-class woman was modeled at $p = 0.972$ versus $p = 0.419$ for an adult third-class woman — about <strong>55 percentage points</strong> higher. On the link scale that is a log-odds gap of $3.56 - (-0.33) = 3.89$, i.e. $e^{3.89}\approx 49$, reconciling with the odds ratio in part (a): the OR and the probability difference are the same effect read on two scales.</p>
+
+<div class="callout key">
+<p><strong>Head off the obvious question: why 0.972/0.419 here but 0.98/0.55 in part (a)?</strong> Students <em>will</em> notice, and the graded <a href="problem_set.html#afternoon">Problem 7</a> reports the <code>emmeans</code> pair (0.983 / 0.550, difference 0.433) while this part reports the <code>predict</code> pair (0.972 / 0.419, difference ~0.55). Both are correct; they answer different questions, and neither is a typo.</p>
+<p><code>emmeans(fit, ~ class | sex)</code> <strong>marginalises over</strong> the <code>age</code> factor: it averages the adult and child linear predictors <em>on the logit scale</em> and back-transforms once. For third-class females that is $\tfrac{1}{2}(-0.33 + 0.73) = 0.20$, and $\text{plogis}(0.20) = 0.550$. <code>predict(..., age = "adult")</code> instead <strong>pins</strong> <code>age</code> at <code>adult</code>: $\text{plogis}(-0.33) = 0.419$. Because <code>agechild</code> $= +1.05$ is large and positive, age-averaging raises both probabilities, and it compresses the first-vs-third gap because first class is already near the probability ceiling while third class is not.</p>
+<p>Teach this as the logit-scale twin of the log-link lesson: <em>averaging on the link scale and back-transforming ≠ back-transforming and then averaging.</em> The reporting rule is to say which one you did — "for an adult third-class woman" (pin it) or "for a third-class woman, averaged over the model's age composition" (marginalise). Note the odds ratio is ~49 either way: it is a link-scale contrast in which the <code>age</code> term cancels, which is exactly why part (a) and part (c) agree on the OR while differing on the probabilities.</p>
+</div>
 
 <p><strong>Biological interpretation.</strong> The interaction encodes the famous "women and children first" effect being <em>selectively</em> applied. The protective effect of being female (the main sex coefficient) is amplified for higher-class passengers and partially erased for 3rd-class — because the structural barriers (gates, distance to boats, language) overwhelmed the sex-prioritized evacuation in 3rd class. Reading the model on the odds-ratio scale tells you the social pattern; reading it on the probability scale tells you the human cost.</p>
 

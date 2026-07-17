@@ -11,7 +11,7 @@
 <div class="shell">
 
 <aside class="sidebar">
-  <h1><a href="index.html" title="Back to course home">FW 536 · Setup</a></h1>
+  <p class="brand"><a href="index.html" title="Back to course home">FW 536 · Setup</a></p>
   <div class="subtitle">Install R, JAGS &amp; Nimble</div>
   <nav>
     <div class="section">Before you arrive</div>
@@ -188,7 +188,7 @@ clang --version        <span class="cm"># prints the compiler version</span></co
 <div class="code-label">R console</div>
 <pre><code><span class="kw">library</span>(rjags)
 <span class="fn">cat</span>(<span class="st">"model { p ~ dbeta(1,1); y ~ dbin(p, 10) }"</span>, file = <span class="st">"m.bug"</span>)
-m &lt;- <span class="fn">jags.model</span>(<span class="st">"m.bug"</span>, data = <span class="kw">list</span>(y = <span class="nu">7</span>), quiet = <span class="kw">TRUE</span>)
+m &lt;- <span class="fn">jags.model</span>(<span class="st">"m.bug"</span>, data = <span class="kw">list</span>(y = <span class="nu">7</span>), n.chains = <span class="nu">3</span>, quiet = <span class="kw">TRUE</span>)
 s &lt;- <span class="fn">coda.samples</span>(m, <span class="st">"p"</span>, n.iter = <span class="nu">2000</span>)
 <span class="fn">summary</span>(s)$statistics       <span class="cm"># posterior mean of p should be near 0.67</span></code></pre>
 
@@ -208,6 +208,10 @@ fit &lt;- <span class="fn">nimbleMCMC</span>(code = code, data = <span class="kw
 <div class="code-label">R console</div>
 <pre><code><span class="kw">library</span>(MCMCvis)
 <span class="fn">MCMCsummary</span>(s)             <span class="cm"># tidy table with mean, sd, 95% CI, Rhat, n.eff</span></code></pre>
+<div class="code-label">Output</div>
+<pre><code>       mean        sd      2.5%       50%     97.5% Rhat n.eff
+p 0.6691019 0.1272098 0.4078615 0.6802727 0.8862891    1  4003</code></pre>
+<p>Your digits will differ slightly &mdash; the samplers are stochastic and the blocks above set no seed. What matters is that the table prints: the mean sits near 0.67 and <code>Rhat</code> is about 1.00. The three chains in block (a) are what make <code>Rhat</code> computable; with a single chain it comes back <code>NA</code> and MCMCvis warns.</p>
 
 <div class="callout key">
 <p>If block (b) prints a posterior mean without errors, your C++ toolchain is correctly installed &mdash; that is the step most likely to fail, so this is the one that matters most.</p>

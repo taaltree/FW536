@@ -1,13 +1,19 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-a11y="done">
 <head>
 <meta charset="UTF-8" />
 <title>Interactive: conjugate priors &amp; posteriors | FW 536</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="stylesheet" href="../_Shared/css/lab.css" />
-<script defer src="../_Shared/js/lab.js"></script>
-<script>MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] } };</script>
-<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<link rel="stylesheet" href="../_Shared/css/accessible.css" />
+<script defer src="../_Shared/js/accessible.js"></script>
+<script>
+MathJax = {
+  tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
+  options: { menuOptions: { settings: { assistiveMml: true, explorer: true } } },
+  loader: { load: ['a11y/assistive-mml', 'a11y/explorer'] }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script"></script>
 <style>
   .widget { background:#fff; border:1px solid var(--border); border-radius:10px; padding:20px 24px; margin:24px 0; box-shadow:0 2px 10px rgba(0,0,0,.05); }
   .pick { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
@@ -27,11 +33,14 @@
 </style>
 </head>
 <body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<div class="a11y-bar" role="region" aria-label="Accessibility">Accessible version &middot; <a href="../accessibility.html">How to use this site with a screen reader</a> &middot; <a href="../index.html">Course home</a></div>
+
 <div class="shell">
 <aside class="sidebar">
   <p class="brand"><a href="../index.html" title="Back to course home">FW 536 · Day 4</a></p>
   <div class="subtitle">Conjugate priors &amp; posteriors</div>
-  <nav>
+  <nav aria-label="On this page and related documents">
     <div class="section">This page</div>
     <ul><li><a href="#explorer">The explorer</a></li><li><a href="#try">Things to try</a></li></ul>
     <div class="section">Bayesian labs</div>
@@ -44,7 +53,7 @@
   </nav>
 </aside>
 
-<main class="content">
+<main class="content" id="main-content" tabindex="-1">
 <header class="lab-header">
   <div class="eyebrow">Day 4 · Interactive</div>
   <h1>Conjugate priors: how data reshapes belief</h1>
@@ -84,7 +93,7 @@
 
 <section id="try">
 <h2>Things to try</h2>
-<div class="callout key">
+<div class="callout key"><p class="callout-label">Key idea</p>
 <ol>
 <li><strong>The prior is pseudo-data.</strong> In Beta&ndash;Binomial, a $\text{Beta}(\alpha,\beta)$ prior acts like $\alpha$ prior "successes" and $\beta$ prior "failures." Add real data and the posterior is $\text{Beta}(\alpha + y,\, \beta + n - y)$ — literally add the counts.</li>
 <li><strong>Flat prior = the likelihood.</strong> Set the Beta prior to $\text{Beta}(1,1)$ (the Uniform). The posterior lands right on the scaled likelihood, and its mode is the MLE $y/n$.</li>

@@ -57,42 +57,52 @@ MathJax = {
 <pre><code>set.seed(<span class="nu">1</span>)
 beta &lt;- <span class="fn">rnorm</span>(<span class="nu">1e5</span>, <span class="nu">0</span>, <span class="nu">100</span>)
 eff_raw &lt;- <span class="fn">exp</span>(beta * <span class="nu">3</span>) <span class="cm"># 3-degree latitudinal change</span>
-<span class="fn">mean</span>(<span class="fn">abs</span>(<span class="fn">log10</span>(eff_raw)) &gt; <span class="nu">6</span>) <span class="cm"># ~ 0.98</span>
+<span class="fn">mean</span>(<span class="fn">abs</span>(<span class="fn">log10</span>(eff_raw)) &gt; <span class="nu">6</span>) <span class="cm"># 0.963</span>
 eff_sc &lt;- <span class="fn">exp</span>(beta * <span class="nu">1</span>) <span class="cm"># 1 SD on scaled x</span>
-<span class="fn">mean</span>(<span class="fn">abs</span>(<span class="fn">log10</span>(eff_sc)) &gt; <span class="nu">6</span>) <span class="cm"># ~ 0.94</span></code></pre>
-<p><strong>Interpretation.</strong> ~98% of the prior on the raw-scale model puts the implied effect outside a million-fold range &mdash; far beyond anything physically possible. Scaling reduces this slightly but not enough; you also need a tighter prior on $\beta$ itself. The fix that works in practice is <em>both</em>: scale predictors AND use $\mathcal{N}(0, \sigma \approx 2)$ priors.</p>
+<span class="fn">mean</span>(<span class="fn">abs</span>(<span class="fn">log10</span>(eff_sc)) &gt; <span class="nu">6</span>) <span class="cm"># 0.890</span></code></pre>
+<p><strong>Interpretation.</strong> With this seed, <strong>96.3%</strong> of the prior on the raw-scale model puts the implied effect outside a million-fold range (the exact analytic value is $2[1-\Phi(\log(10^6)/300)] = 0.9633$) &mdash; far beyond anything physically possible. Scaling reduces this only to <strong>89.0%</strong> (analytic 0.8901), which is nowhere near enough; you also need a tighter prior on $\beta$ itself. The fix that works in practice is <em>both</em>: scale predictors AND use $\mathcal{N}(0, \sigma \approx 2)$ priors.</p>
 <p><em>Common mistake:</em> Students who use a tighter prior but keep raw predictors often still see chains stall, because $\beta \cdot x$ can still get large when $|x|$ is large. The point is the <em>product</em>, not either piece alone.</p>
 </section>
 
 <section id="a2">
 <h2>Exercise 2 — Fit the ant model two ways</h2>
 <pre><code><span class="kw">library</span>(nimble); <span class="kw">library</span>(MCMCvis); <span class="kw">library</span>(coda)
-ants &lt;- <span class="fn">read.csv</span>(<span class="st">"ants.csv"</span>)
+ants &lt;- <span class="fn">read.csv</span>(<span class="st">"data/ants.csv"</span>)
 
 antCode &lt;- <span class="fn">nimbleCode</span>({
  <span class="kw">for</span> (i <span class="kw">in</span> <span class="nu">1</span>:n) {
- ants[i,<span class="nu">1</span>] ~ <span class="fn">dpois</span>(lam[i])
- <span class="fn">log</span>(lam[i]) &lt;- b0 + b1*ants[i,<span class="nu">2</span>] + b2*ants[i,<span class="nu">3</span>] + b3*ants[i,<span class="nu">4</span>]
+ y[i] ~ <span class="fn">dpois</span>(lam[i])
+ <span class="fn">log</span>(lam[i]) &lt;- b0 + b1*forest[i] + b2*lat[i] + b3*elev[i]
  }
  b0 ~ <span class="fn">dnorm</span>(<span class="nu">0</span>, tau); b1 ~ <span class="fn">dnorm</span>(<span class="nu">0</span>, tau)
  b2 ~ <span class="fn">dnorm</span>(<span class="nu">0</span>, tau); b3 ~ <span class="fn">dnorm</span>(<span class="nu">0</span>, tau)
 })
 
 <span class="cm">## (a) Raw predictors with very vague prior -- chains crawl</span>
-constsA &lt;- <span class="kw">list</span>(ants=<span class="fn">as.matrix</span>(ants), n=<span class="fn">nrow</span>(ants), tau=<span class="nu">1</span>/<span class="nu">10000</span>)
-out_a &lt;- <span class="fn">nimbleMCMC</span>(antCode, constants=constsA,
+<span class="cm">## constants= holds only things that never appear on the LHS of a `~`;</span>
+<span class="cm">## the observed counts y are the one and only data= entry.</span>
+constsA &lt;- <span class="kw">list</span>(n=<span class="fn">nrow</span>(ants), forest=ants$forest, lat=ants$latitude,
+ elev=ants$elevation, tau=<span class="nu">1</span>/<span class="nu">10000</span>)
+dataA &lt;- <span class="kw">list</span>(y=ants$richness)
+out_a &lt;- <span class="fn">nimbleMCMC</span>(antCode, constants=constsA, data=dataA,
  monitors=<span class="fn">c</span>(<span class="st">"b0"</span>,<span class="st">"b1"</span>,<span class="st">"b2"</span>,<span class="st">"b3"</span>),
  nchains=<span class="nu">3</span>, niter=<span class="nu">10000</span>, nburnin=<span class="nu">500</span>,
  samplesAsCodaMCMC=<span class="kw">TRUE</span>)
-<span class="fn">gelman.diag</span>(out_a) <span class="cm"># often R-hat &gt; 1.2</span>
+<span class="cm"># multivariate=FALSE: the default multivariate psrf needs a positive-definite</span>
+<span class="cm"># covariance and errors out when these chains are this badly stuck.</span>
+<span class="cm"># With these default inits the raw chains stall outright: NaN log densities,</span>
+<span class="cm"># R-hat returns NaN. (See the instructor note for what happens with good inits.)</span>
+<span class="fn">gelman.diag</span>(out_a, multivariate=<span class="kw">FALSE</span>)
 
 <span class="cm">## (b) Scaled predictors, same prior -- chains converge instantly</span>
 ants$forest &lt;- <span class="fn">as.numeric</span>(<span class="fn">scale</span>(ants$forest))
 ants$latitude &lt;- <span class="fn">as.numeric</span>(<span class="fn">scale</span>(ants$latitude))
 ants$elevation &lt;- <span class="fn">as.numeric</span>(<span class="fn">scale</span>(ants$elevation))
 
-constsB &lt;- <span class="kw">list</span>(ants=<span class="fn">as.matrix</span>(ants), n=<span class="fn">nrow</span>(ants), tau=<span class="nu">1</span>/<span class="nu">10000</span>)
-out_b &lt;- <span class="fn">nimbleMCMC</span>(antCode, constants=constsB,
+constsB &lt;- <span class="kw">list</span>(n=<span class="fn">nrow</span>(ants), forest=ants$forest, lat=ants$latitude,
+ elev=ants$elevation, tau=<span class="nu">1</span>/<span class="nu">10000</span>)
+dataB &lt;- <span class="kw">list</span>(y=ants$richness)
+out_b &lt;- <span class="fn">nimbleMCMC</span>(antCode, constants=constsB, data=dataB,
  monitors=<span class="fn">c</span>(<span class="st">"b0"</span>,<span class="st">"b1"</span>,<span class="st">"b2"</span>,<span class="st">"b3"</span>),
  nchains=<span class="nu">3</span>, niter=<span class="nu">10000</span>, nburnin=<span class="nu">500</span>,
  samplesAsCodaMCMC=<span class="kw">TRUE</span>)
@@ -100,20 +110,21 @@ out_b &lt;- <span class="fn">nimbleMCMC</span>(antCode, constants=constsB,
 <span class="fn">glm</span>(richness ~ ., data=ants, family=poisson)$coef <span class="cm"># compare</span>
 
 <span class="cm">## (c) Tighter prior</span>
-constsC &lt;- <span class="kw">list</span>(ants=<span class="fn">as.matrix</span>(ants), n=<span class="fn">nrow</span>(ants), tau=<span class="nu">1</span>/<span class="nu">4</span>)
-out_c &lt;- <span class="fn">nimbleMCMC</span>(antCode, constants=constsC,
+constsC &lt;- <span class="kw">list</span>(n=<span class="fn">nrow</span>(ants), forest=ants$forest, lat=ants$latitude,
+ elev=ants$elevation, tau=<span class="nu">1</span>/<span class="nu">4</span>)
+out_c &lt;- <span class="fn">nimbleMCMC</span>(antCode, constants=constsC, data=dataB,
  monitors=<span class="fn">c</span>(<span class="st">"b0"</span>,<span class="st">"b1"</span>,<span class="st">"b2"</span>,<span class="st">"b3"</span>),
  nchains=<span class="nu">3</span>, niter=<span class="nu">10000</span>, nburnin=<span class="nu">500</span>,
  samplesAsCodaMCMC=<span class="kw">TRUE</span>)
 <span class="fn">MCMCsummary</span>(out_c) <span class="cm"># nearly identical to (b)</span></code></pre>
-<p><strong>Posterior means from an actual run</strong> (scaled predictors, <code>set.seed(10)</code>, 3 chains &times; 10000 iter, 500 burn-in): $b_1$ (forest) &asymp; 0.32 [0.21, 0.45], $b_2$ (latitude) &asymp; &minus;0.25 [&minus;0.39, &minus;0.13], $b_3$ (elevation) &asymp; &minus;0.18 [&minus;0.30, &minus;0.07], all with R-hat = 1.00 and n.eff &asymp; 5000&ndash;6000. These match the scaled <code>glm()</code> coefficients (0.32, &minus;0.25, &minus;0.18) to two decimals. The intercept is $b_0$ &asymp; 1.84 [1.71, 1.96] (glm 1.85).</p>
-<p><em>Instructor note.</em> With RAW predictors and the same vague prior, the intercept and latitude coefficient fail to converge &mdash; in an actual run <code>b0</code> = 6.26 and <code>b2</code> = &minus;0.10 come back with <strong>R-hat = 1.13 and n.eff &asymp; 6</strong>, nowhere near the <code>glm()</code> values (intercept 11.94, latitude &minus;0.24), because un-centred latitude ($\approx$ 42) is nearly collinear with the intercept. With poor inits you instead get NaN log densities and a stalled chain outright. Either way the lesson is the same &mdash; scale first. Show it live.</p>
+<p><strong>Posterior means from a representative run</strong> (scaled predictors, 3 chains &times; 10000 iter, 500 burn-in): $b_1$ (forest) &asymp; 0.32 [0.21, 0.44], $b_2$ (latitude) &asymp; &minus;0.25 [&minus;0.39, &minus;0.13], $b_3$ (elevation) &asymp; &minus;0.18 [&minus;0.30, &minus;0.07], all with R-hat = 1.00 and n.eff &asymp; 4700&ndash;5500. These match the scaled <code>glm()</code> coefficients (0.32, &minus;0.25, &minus;0.18) to two decimals. The intercept is $b_0$ &asymp; 1.84 [1.71, 1.96] (glm 1.85). Because the scaled model converges cleanly, these summaries are essentially seed-independent.</p>
+<p><em>Instructor note.</em> With RAW predictors and the same vague prior the intercept and latitude coefficient fail to converge, and &mdash; this is the point worth showing &mdash; <strong>even starting all three chains at the frequentist MLE does not rescue them.</strong> Using the dispersed <code>glm()</code>-based inits from <code>ant.priors.R</code> (<code>list(as.list(freq_glm), as.list(freq_glm + runif(4,-1,1)), ...)</code>), the raw fit still returns <strong>R-hat in the tens for <code>b0</code> and <code>b2</code></strong> (7&ndash;30 depending on the seed) with <strong>n.eff &asymp; 12&ndash;17</strong>, while forest (<code>b1</code>) mixes fine. With the default inits instead you get NaN log densities and a stalled chain outright. The cause is geometric, not a bad starting point: un-centred latitude ($\approx 42$) is nearly collinear with the intercept, so the posterior is a long narrow ridge the sampler cannot traverse. Scaling the predictors (part b), with the <em>same</em> inits and the <em>same</em> vague prior, gives R-hat = 1.00 across the board &mdash; the one thing that changed was the parameterisation. Scale first; show it live.</p>
 </section>
 
 <section id="a3">
 <h2>Exercise 3 — Lizards: convergence, prediction, and prior sensitivity</h2>
 <pre><code><span class="kw">library</span>(nimble); <span class="kw">library</span>(MCMCvis); <span class="kw">library</span>(coda)
-liz &lt;- <span class="fn">read.csv</span>(<span class="st">"IslandsLizards.csv"</span>)
+liz &lt;- <span class="fn">read.csv</span>(<span class="st">"data/IslandsLizards.csv"</span>)
 x.scaled &lt;- <span class="fn">as.numeric</span>(<span class="fn">scale</span>(liz$perimeterAreaRatio))
 
 lizCode &lt;- <span class="fn">nimbleCode</span>({
@@ -179,13 +190,21 @@ b.post &lt;- <span class="fn">as.matrix</span>(samples)[, <span class="st">"b"</
 </table>
 <p><strong>(b) Conservative management value.</strong> 5th percentile of $H_\text{msy}$ = 0.46 (median is 0.57). That is the "if I want to be 95% confident I'm not over-fishing" harvest rate &mdash; noticeably below the point estimate.</p>
 <p><strong>(c) More data, tighter posteriors.</strong> Refitting with $N=100$ years shrinks the $H_\text{msy}$ 95% CI from width 0.228 (20 yr: [0.44, 0.67]) to 0.069 (100 yr: [0.53, 0.60]), a factor of 3.3&times;. That is a bit <em>more</em> than the $\sqrt{5}\approx2.24$ the pure $\sqrt{N}$ rule predicts: at 20 years the BH curvature is weakly identified ($a$'s posterior runs to 9.25, near its prior ceiling), inflating the small-sample interval; 100 years both add data and pull the posterior into its well-identified regime. The lesson still holds &mdash; more data buy tighter management quantities, on the order of $\sqrt{N}$.</p>
-<p><em>Instructor note.</em> Some students will get NaN <code>log()</code> values on iteration 1 if the random initial $a$ leads to a negative argument inside <code>log(1 + a/b * S[t])</code>. The prior bounds <code>dunif(1, 10)</code> and <code>dunif(1000, 10000)</code> usually prevent this; if not, supply explicit <code>inits</code>.</p>
+<div class="callout warn"><p class="callout-label">Watch out</p>
+<p><strong>(Teach this.) The <code>a ~ dunif(1, 10)</code> prior is secretly informative, and the numbers above show it.</strong> Both bounds constrain the management answer directly:</p>
+<ul>
+ <li><strong>$a > 1$ makes stock collapse a priori impossible.</strong> Solving $R(S)=S$ for the Beverton-Holt curve gives $N_\text{eq} = b(a-1)/a$, which is $>0$ for every $a>1$ and $=0$ only at $a=1$. The prior puts zero density below 1, so the model literally cannot represent a stock that fails to replace itself &mdash; the question "is it collapsing?" is answered by the prior, not the data.</li>
+ <li><strong>$a &lt; 10$ caps the harvest rate at $H_\text{msy} = 1 - \sqrt{1/10} = 0.684$</strong>, because $H_\text{msy}=1-\sqrt{1/a}$ is strictly increasing in $a$.</li>
+</ul>
+<p>And the posterior <em>is</em> pressed against that ceiling &mdash; point at the table above: $a$'s 97.5th percentile is <strong>9.25</strong> against a bound of 10, and the $H_\text{msy}$ 95% CI upper limit of <strong>0.671</strong> is <strong>98.1%</strong> of the 0.684 cap. Part (c) already notices this in passing ("$a$'s posterior runs to 9.25, near its prior ceiling"); make it explicit rather than an aside. This is the day's own thesis &mdash; <em>vague-looking priors are secretly informative</em> &mdash; showing up in the model students find most convincing. The fix in a real assessment is either to justify the bounds from biology and cite them, or to use a prior without a cliff edge (e.g. $\log a \sim \mathcal{N}(0,1)$).</p>
+</div>
+<p><em>Instructor note.</em> The <code>log()</code> calls in this model cannot produce <code>NaN</code>: with $a \in [1,10]$, $b \in [1000,10000]$ and $S_t > 0$, the argument $1 + (a/b)S_t$ is always strictly greater than 1, so <code>log(1 + a/b * S[t])</code> is always well-defined and positive. (And the script supplies fixed <code>inits</code> &mdash; $a$ = 3, 5, 7 across the three chains &mdash; so there is no "random initial $a$" to worry about either.) The failure modes that <em>do</em> show up: a student who deletes <code>inits</code> entirely and lets NIMBLE draw from the priors will still run, just with a slower burn-in; and a student who changes the simulation truth to $\sigma > 1$ will silently hit the <code>sigma ~ dunif(0, 1)</code> ceiling and wonder why $\sigma$'s posterior stacks up at 1 &mdash; the same prior-bound lesson as the callout above.</p>
 </section>
 
 <section id="a6">
 <h2>Exercise 6 — Dynamic occupancy</h2>
 <p>Run <code>DynamicOccupancy_Nimble.R</code>.</p>
-<p><strong>(a-c)</strong> From an actual run (<code>set.seed(2025)</code>; 3 chains, 20000 iter, 10000 burn-in, thin 5; every parameter R-hat = 1.00): the quantities informed by all the data are recovered well &mdash; detection $p$ = 0.63 [0.55, 0.70] (truth 0.60) and baseline occupancy $\psi$ = 0.33 [0.18, 0.51] (truth 0.37). Posterior medians for $\phi_t, \gamma_t, \psi_t$ plotted vs truth scatter around the 1:1 line but with large per-parameter uncertainty (e.g. $\phi_3$ = 0.52 [0.16, 0.89], $\gamma_1$ = 0.47 [0.26, 0.70]) due to the small sample size (30 sites, 3 reps, 7 transitions). This is honest small-sample uncertainty, not a convergence failure.</p>
+<p><strong>(a-c)</strong> From an actual run (<code>set.seed(2025)</code>; 3 chains, 20000 iter, 10000 burn-in, thin 5; of the 45 monitored parameters, R-hat = 1.00 for all but the derived $\lambda_3$, which is 1.01): the quantities informed by all the data are recovered well &mdash; detection $p$ = 0.63 [0.55, 0.70] (truth 0.60) and baseline occupancy $\psi$ = 0.33 [0.18, 0.51] (truth 0.37). Posterior medians for $\phi_t, \gamma_t, \psi_t$ plotted vs truth scatter around the 1:1 line but with large per-parameter uncertainty (e.g. $\phi_3$ = 0.52 [0.16, 0.89], $\gamma_1$ = 0.47 [0.26, 0.70]) due to the small sample size (30 sites, 3 reps, 7 transitions). This is honest small-sample uncertainty, not a convergence failure.</p>
 <p><strong>(d) Without z-init trick.</strong> Try:</p>
 <pre><code>bad.z &lt;- <span class="fn">matrix</span>(<span class="fn">rbinom</span>(Nsites*Nyears, <span class="nu">1</span>, <span class="nu">0.3</span>), Nsites, Nyears)
 inits.bad &lt;- <span class="fn">list</span>(<span class="fn">list</span>(z=bad.z, phi=<span class="fn">runif</span>(Nyears-<span class="nu">1</span>,.<span class="nu">1</span>,.<span class="nu">9</span>),

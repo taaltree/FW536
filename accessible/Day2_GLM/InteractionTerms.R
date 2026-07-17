@@ -27,22 +27,22 @@ summary(m2)
 grid2 <- expand.grid(x1 = seq(-2, 2, length=50),
                      x2 = seq(-2, 2, length=50))
 grid2$yhat <- predict(m2, newdata=grid2)
-zmat <- matrix(grid2$yhat, nrow = 50, ncol = 50)
+zmat_noint <- matrix(grid2$yhat, nrow = 50, ncol = 50)
 
-p3 <- ggplot(grid2, aes(x1, x2, fill=yhat)) +
+p1 <- ggplot(grid2, aes(x1, x2, fill=yhat)) +
   geom_tile() +
   scale_fill_viridis_c() +
   labs(title="Heatmap of Predicted y (no true interaction)")
 
-p3
+p1
 
 
 
 # 3D interactive surface plot
-p4 <- plot_ly(
+p2 <- plot_ly(
   x = seq(-2, 2, length = 50),
   y = seq(-2, 2, length = 50),
-  z = zmat,
+  z = zmat_noint,
   type = "surface"
 ) %>%
   layout(
@@ -54,7 +54,7 @@ p4 <- plot_ly(
     )
   )
 
-p4
+p2
 
 
 #Question 1 - what is the algebra and geometry of this model?
@@ -80,18 +80,18 @@ summary(m1)
 grid1 <- expand.grid(x1 = seq(-2, 2, length=50),
                      x2 = seq(-2, 2, length=50))
 grid1$yhat <- predict(m1, newdata=grid1)
-zmat <- matrix(grid1$yhat, nrow = 50, ncol = 50)
+zmat_int <- matrix(grid1$yhat, nrow = 50, ncol = 50)
 
-p1 <- ggplot(grid1, aes(x1, x2, fill=yhat)) +
+p3 <- ggplot(grid1, aes(x1, x2, fill=yhat)) +
   geom_tile() +
   scale_fill_viridis_c() +
   labs(title="Heatmap of Predicted y with Interaction")
 
 # 3D interactive surface plot
-p2 <- plot_ly(
+p4 <- plot_ly(
   x = seq(-2, 2, length = 50),
   y = seq(-2, 2, length = 50),
-  z = zmat,
+  z = zmat_int,
   type = "surface"
 ) %>%
   layout(
@@ -104,9 +104,9 @@ p2 <- plot_ly(
   )
 
 
-p1
-p2
-  
+p3
+p4
+
 #Question 3 - what is the algebra and geometry of this model?
 
 
@@ -128,12 +128,12 @@ summary(m_glm)
 grid_glm <- grid1
 grid_glm$phat <- predict(m_glm, newdata=grid_glm, type="response")
 
-p4 <- ggplot(grid_glm, aes(x1, x2, fill=phat)) +
+p5 <- ggplot(grid_glm, aes(x1, x2, fill=phat)) +
   geom_tile() +
   scale_fill_viridis_c() +
   labs(title="Predicted Probability (GLM with interaction)")
 
-p4
+p5
 
 
 #Question 5 - what is the algebra and geometry of this model?

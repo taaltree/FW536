@@ -21,64 +21,52 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <div class="subtitle">Lecture notes: Hypothesis tests and model selection</div>
 <nav aria-label="Slides in this lecture"><div class="section">Slides</div><ul>
 <li><a href="#slide-1">1. Slide 1</a></li>
-<li><a href="#slide-2">2. Hypothesis Tests to Compare Models (not parameters)</a></li>
-<li><a href="#slide-3">3. Nested Models</a></li>
-<li><a href="#slide-4">4. Hypothesis Tests for Models</a></li>
-<li><a href="#slide-5">5. Hypothesis Tests for Models</a></li>
-<li><a href="#slide-6">6. Example where null is nonzero</a></li>
-<li><a href="#slide-7">7. Example-I</a></li>
-<li><a href="#slide-8">8. Example-II</a></li>
-<li><a href="#slide-9">9. Example-II</a></li>
-<li><a href="#slide-10">10. Slide 10</a></li>
-<li><a href="#slide-11">11. Information Theoretic Criteria for Model Selection (i.e. AIC, BIC, etc.)</a></li>
-<li><a href="#slide-12">12. Information Theoretic Criteria for Model Selection</a></li>
-<li><a href="#slide-13">13. Slide 13</a></li>
-<li><a href="#slide-14">14. Slide 14</a></li>
-<li><a href="#slide-15">15. Slide 15</a></li>
-<li><a href="#slide-16">16. Most common mistake in ecology!</a></li>
-<li><a href="#slide-17">17. Slide 17</a></li>
+<li><a href="#slide-2">2. Model selection — Why?</a></li>
+<li><a href="#slide-3">3. Inference, Estimation, Prediction</a></li>
+<li><a href="#slide-4">4. Model selection — Why?</a></li>
+<li><a href="#slide-5">5. Fit?</a></li>
+<li><a href="#slide-6">6. Definitions: AIC, BIC, LRT</a></li>
+<li><a href="#slide-7">7. Hypothesis Tests to Compare Models (not parameters)</a></li>
+<li><a href="#slide-8">8. Nested Models</a></li>
+<li><a href="#slide-9">9. Hypothesis Tests for Models</a></li>
+<li><a href="#slide-10">10. Hypothesis Tests for Models</a></li>
+<li><a href="#slide-11">11. When is this useful rather than just interpreting coefficients?</a></li>
+<li><a href="#slide-12">12. Usually the simpler model sets some parameters to zero, but null can be nonzero</a></li>
+<li><a href="#slide-13">13. Example-I</a></li>
+<li><a href="#slide-14">14. Example-II</a></li>
+<li><a href="#slide-15">15. Example-II</a></li>
+<li><a href="#slide-16">16. Slide 16</a></li>
+<li><a href="#slide-17">17. Information Theoretic Criteria for Model Selection</a></li>
 <li><a href="#slide-18">18. Slide 18</a></li>
 <li><a href="#slide-19">19. Slide 19</a></li>
 <li><a href="#slide-20">20. Slide 20</a></li>
-<li><a href="#slide-21">21. Slide 21</a></li>
+<li><a href="#slide-21">21. Most common mistake in ecology!</a></li>
 <li><a href="#slide-22">22. Slide 22</a></li>
-<li><a href="#slide-23">23. Slide 23</a></li>
-<li><a href="#slide-24">24. Slide 24</a></li>
-<li><a href="#slide-25">25. Slide 25</a></li>
+<li><a href="#slide-23">23. The Cult of AIC</a></li>
+<li><a href="#slide-24">24. Two key questions</a></li>
+<li><a href="#slide-25">25. AIC and p-values</a></li>
 <li><a href="#slide-26">26. Slide 26</a></li>
-<li><a href="#slide-27">27. Slide 27</a></li>
-<li><a href="#slide-28">28. Slide 28</a></li>
-<li><a href="#slide-29">29. Confidence intervals and p-values</a></li>
-<li><a href="#slide-30">30. P-values should be interpreted on a continuum. Not a step function at 0.05. AIC should be interpreted in the same way!</a></li>
-<li><a href="#slide-31">31. So why use AIC?</a></li>
-<li><a href="#slide-32">32. Slide 32</a></li>
-<li><a href="#slide-33">33. Slide 33</a></li>
+<li><a href="#slide-27">27. Confidence intervals and p-values</a></li>
+<li><a href="#slide-28">28. P-values should be interpreted on a continuum. Not a step function at 0.05. AIC should be interpreted in the same way!</a></li>
+<li><a href="#slide-29">29. So why use AIC?</a></li>
+<li><a href="#slide-30">30. Slide 30</a></li>
+<li><a href="#slide-31">31. AIC in practice…</a></li>
+<li><a href="#slide-32">32. AIC in practice</a></li>
+<li><a href="#slide-33">33. Most common mistake in ecology!</a></li>
 <li><a href="#slide-34">34. Slide 34</a></li>
-<li><a href="#slide-35">35. AIC in practice</a></li>
-<li><a href="#slide-36">36. Most common mistake in ecology!</a></li>
-<li><a href="#slide-37">37. Slide 37</a></li>
-<li><a href="#slide-38">38. Best recent paper as a resource to stop doing dumb stuff with AIC</a></li>
-<li><a href="#slide-39">39. Slide 39</a></li>
-<li><a href="#slide-40">40. Burnham and Anderson did not advocate model dredging (fitting all/many combinations of predictors)</a></li>
+<li><a href="#slide-35">35. Best recent paper as a resource to stop doing dumb stuff with AIC</a></li>
+<li><a href="#slide-36">36. B &amp; A recipe for modelling</a></li>
+<li><a href="#slide-37">37. Burnham and Anderson did not advocate model dredging (fitting all/many combinations of predictors)</a></li>
+<li><a href="#slide-38">38. Slide 38</a></li>
+<li><a href="#slide-39">39. Then what about BIC? Is it just a similar alternative?</a></li>
+<li><a href="#slide-40">40. AIC vs BIC</a></li>
 <li><a href="#slide-41">41. Slide 41</a></li>
-<li><a href="#slide-42">42. Then what about BIC? Is it just a similar alternative?</a></li>
-<li><a href="#slide-43">43. AIC vs BIC</a></li>
-<li><a href="#slide-44">44. Crossvalidation: Split data, train model, compare predictions to actual using test data. Repeat.</a></li>
-<li><a href="#slide-45">45. Recommended Readings</a></li>
+<li><a href="#slide-42">42. Crossvalidation: Split data, train model, compare predictions to actual using test data. Repeat.</a></li>
+<li><a href="#slide-43">43. Recommended Readings</a></li>
+<li><a href="#slide-44">44. Slide 44</a></li>
+<li><a href="#slide-45">45. Don’t take my word for it…</a></li>
 <li><a href="#slide-46">46. Slide 46</a></li>
 <li><a href="#slide-47">47. Don’t take my word for it…</a></li>
-<li><a href="#slide-48">48. Slide 48</a></li>
-<li><a href="#slide-49">49. Don’t take my word for it…</a></li>
-<li><a href="#slide-50">50. Slide 50</a></li>
-<li><a href="#slide-51">51. Slide 51</a></li>
-<li><a href="#slide-52">52. Are any statistical procedures required?</a></li>
-<li><a href="#slide-53">53. Hmm…let’s think, will banning the use of p-values1. Reduce type I errors and help solve the replication crisis in Psychology?2. Allow absolute garbage conclusions to be published that would otherwise not have passed “significance testing”</a></li>
-<li><a href="#slide-54">54. Slide 54</a></li>
-<li><a href="#slide-55">55. Further buffoonery</a></li>
-<li><a href="#slide-56">56. Further buffoonery</a></li>
-<li><a href="#slide-57">57. The chief benefit of AIC/BIC</a></li>
-<li><a href="#slide-58">58. Slide 58</a></li>
-<li><a href="#slide-59">59. Slide 59</a></li>
 </ul></nav></aside>
 <main class="content" id="main-content" tabindex="-1">
 <header class="lab-header">
@@ -86,7 +74,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <h1>Hypothesis tests and model selection</h1>
 <p class="lede">A screen-reader-friendly transcript of the lecture slides: all slide text, tables, figure descriptions, and speaker notes.</p>
 </header>
-<div class="callout key"><p class="callout-label">About these notes</p>Each section is one slide. Figures carry text descriptions where available. For the concepts with worked examples, also read the <a href="plain_language_summary.html">plain-language summary</a> and <a href="lab.html">lab</a> for this session. You can also download the <a href="../../Day3_MixedModels_ModelSelection/FW536_Day3_Afternoon_hypothesis%20test%20and%20model%20selection_accessible.pptx">alt-texted PowerPoint deck</a> (the same slides with image descriptions embedded).</div>
+<div class="callout key"><p class="callout-label">About these notes</p>Each section is one slide. Figures carry text descriptions where available. For the concepts with worked examples, also read the <a href="plain_language_summary.html">plain-language summary</a> and <a href="lab.html">lab</a> for this session.</div>
 <section aria-labelledby="slide-1-h">
 <h2 id="slide-1-h"><span id="slide-1"></span>Slide 1</h2>
 <p>1</p>
@@ -98,8 +86,64 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <details class="answer"><summary>Speaker notes for this slide</summary><div class="answer-body"><p>a</p></div></details>
 </section>
 <section aria-labelledby="slide-2-h">
-<h2 id="slide-2-h"><span id="slide-2"></span>Slide 2: Hypothesis Tests to Compare Models (not parameters)</h2>
-<p>2</p>
+<h2 id="slide-2-h"><span id="slide-2"></span>Slide 2: Model selection — Why?</h2>
+<ul>
+<li>Understand which explanatory variables are important</li>
+<li>Find evidence of relationship(s) between variable(s) and response</li>
+<li>Quantify the effects of explanatory variables on the response</li>
+<li>Use model to predict response values</li>
+<li>Predict response at another location or time</li>
+</ul>
+</section>
+<section aria-labelledby="slide-3-h">
+<h2 id="slide-3-h"><span id="slide-3"></span>Slide 3: Inference, Estimation, Prediction</h2>
+<ul>
+<li>Understand which explanatory variables are important</li>
+<li>Find evidence of relationship(s) between variable(s) and response</li>
+<li>Quantify the effects of explanatory variables on the response</li>
+<li>Use model to predict response values</li>
+<li>Predict response at another location or time</li>
+</ul>
+</section>
+<section aria-labelledby="slide-4-h">
+<h2 id="slide-4-h"><span id="slide-4"></span>Slide 4: Model selection — Why?</h2>
+<ul>
+<li>Q: Why not just include all explanatory variables?</li>
+<li>A: They will (almost certainly) be correlated.</li>
+<li>Correlation between explanatory variables…</li>
+<li>makes it hard to identify important effects;</li>
+<li>causes bias in effect sizes/parameter estimates;</li>
+<li>leads to overfitting, and poor out-of-sample prediction.</li>
+</ul>
+</section>
+<section aria-labelledby="slide-5-h">
+<h2 id="slide-5-h"><span id="slide-5"></span>Slide 5: Fit?</h2>
+<ul>
+<li>Compare “fit” of different models</li>
+<li>Define “fit” — (maximum) likelihood?</li>
+<li>Increases when adding more variables</li>
+<li>Need to penalise fit somehow (to avoid overfitting)</li>
+<li>Choice between different approaches reflects choice of penalty</li>
+<li>sometimes just strength of penalty</li>
+<li>Three ways of comparing likelihoods…</li>
+</ul>
+</section>
+<section aria-labelledby="slide-6-h">
+<h2 id="slide-6-h"><span id="slide-6"></span>Slide 6: Definitions: AIC, BIC, LRT</h2>
+<ul>
+<li>AIC — Akaike’s Information Criterion</li>
+<li>AIC = −2 log ℓ(θ̂) + 2p</li>
+<li>AICC — corrected for small samples</li>
+<li>AICC = AIC + 2p(p+1) / (n − p − 1)</li>
+<li>BIC — Bayesian Information Criterion</li>
+<li>BIC = −2 log ℓ(θ̂) + p log n</li>
+<li>LRT — Likelihood Ratio Test</li>
+<li>−2 log ℓ(θ̂₁) + 2 log ℓ(θ̂₂)   ~   χ² with df = p₂ − p₁</li>
+</ul>
+</section>
+<section aria-labelledby="slide-7-h">
+<h2 id="slide-7-h"><span id="slide-7"></span>Slide 7: Hypothesis Tests to Compare Models (not parameters)</h2>
+<p>7</p>
 <ul>
 <li>One can use the likelihood ratio test to compare two models when</li>
 <li style="margin-left:1.2em">both are based on the same data</li>
@@ -107,9 +151,9 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li style="margin-left:2.4em">That is, one model is a special case with a parameter equal to a specific value (usually zero) from the more general model.</li>
 </ul>
 </section>
-<section aria-labelledby="slide-3-h">
-<h2 id="slide-3-h"><span id="slide-3"></span>Slide 3: Nested Models</h2>
-<p>3</p>
+<section aria-labelledby="slide-8-h">
+<h2 id="slide-8-h"><span id="slide-8"></span>Slide 8: Nested Models</h2>
+<p>8</p>
 <ul>
 <li>The following models are nested:</li>
 <li>y = Time + Depth * Region</li>
@@ -121,8 +165,8 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li>y = Temp + Depth * Region</li>
 </ul>
 </section>
-<section aria-labelledby="slide-4-h">
-<h2 id="slide-4-h"><span id="slide-4"></span>Slide 4: Hypothesis Tests for Models</h2>
+<section aria-labelledby="slide-9-h">
+<h2 id="slide-9-h"><span id="slide-9"></span>Slide 9: Hypothesis Tests for Models</h2>
 <ul>
 <li>Model A nested within more general model B can be compared as follows:</li>
 <li>H0: Model A fits the data as well as Model B</li>
@@ -133,23 +177,35 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li style="margin-left:1.2em">the negative log-likelihood at the best fit</li>
 <li style="margin-left:1.2em">the number of parameters in models A and B, pA and pB.</li>
 </ul>
-<p>4</p>
+<p>9</p>
 </section>
-<section aria-labelledby="slide-5-h">
-<h2 id="slide-5-h"><span id="slide-5"></span>Slide 5: Hypothesis Tests for Models</h2>
-<p>5</p>
+<section aria-labelledby="slide-10-h">
+<h2 id="slide-10-h"><span id="slide-10"></span>Slide 10: Hypothesis Tests for Models</h2>
+<p>10</p>
 <p>Compute the likelihood ratio</p>
+<p>( −ln LA − (−ln LB) )</p>
+<p>If using lm or glm objects in R: lrtest(full_model, reduced_model)</p>
 </section>
-<section aria-labelledby="slide-6-h">
-<h2 id="slide-6-h"><span id="slide-6"></span>Slide 6: Example where null is nonzero</h2>
+<section aria-labelledby="slide-11-h">
+<h2 id="slide-11-h"><span id="slide-11"></span>Slide 11: When is this useful rather than just interpreting coefficients?</h2>
+<p>Interpret coefficients when you&#x27;re asking about individual parameters. Use a likelihood ratio test (LRT) when you&#x27;re asking about a model or a collection of parameters.</p>
+<p>glm(count ~ temperature + elevation, family = poisson)</p>
+<p>No Need for LRT, just interpret coefficients</p>
+<p>glm(count ~ treatment, family = poisson)</p>
+<p>Suppose treatment has 5 levels. How do you know if the model is better with treatment? Use LRT</p>
+<p>glm(count ~ treatment*temperature, family = poisson)</p>
+<p>How do you know if the interaction term makes the model better? Use LRT</p>
+</section>
+<section aria-labelledby="slide-12-h">
+<h2 id="slide-12-h"><span id="slide-12"></span>Slide 12: Usually the simpler model sets some parameters to zero, but null can be nonzero</h2>
 <ul>
 <li>You monitor an intersection for cars that run the red light. Based on 50 days of observation, you detect 30 days on which “light running” took place. You repeat the “experiment” after a red light camera is installed and now observe 10 days on which “running” occurred.</li>
 <li>How do we know if there is a significant difference in the rate of running red lights after a camera is installed?</li>
 </ul>
 </section>
-<section aria-labelledby="slide-7-h">
-<h2 id="slide-7-h"><span id="slide-7"></span>Slide 7: Example-I</h2>
-<p>7</p>
+<section aria-labelledby="slide-13-h">
+<h2 id="slide-13-h"><span id="slide-13"></span>Slide 13: Example-I</h2>
+<p>13</p>
 <ul>
 <li>Let us define P1 as the probability of running the light before the</li>
 <li>camera was installed and P2 the probability after the camera</li>
@@ -159,9 +215,10 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li>Model B: P1 may differ from P2.</li>
 <li>(The more general model – more parameters)</li>
 </ul>
+<p>L = P130 (1 − P1)20 P210 (1 − P2)40</p>
 </section>
-<section aria-labelledby="slide-8-h">
-<h2 id="slide-8-h"><span id="slide-8"></span>Slide 8: Example-II</h2>
+<section aria-labelledby="slide-14-h">
+<h2 id="slide-14-h"><span id="slide-14"></span>Slide 14: Example-II</h2>
 <p>Summary for this example</p>
 <ul>
 <li>Model A:                  0.4        0.4              67.30</li>
@@ -173,128 +230,109 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li>Twice this difference is 17.2</li>
 <li>Is this significant given the difference in parameters is 1?</li>
 </ul>
+<p>P̂1</p>
+<p>P̂2</p>
+<p>−ln L</p>
 </section>
-<section aria-labelledby="slide-9-h">
-<h2 id="slide-9-h"><span id="slide-9"></span>Slide 9: Example-II</h2>
+<section aria-labelledby="slide-15-h">
+<h2 id="slide-15-h"><span id="slide-15"></span>Slide 15: Example-II</h2>
 <ul>
 <li>The difference between the negative log likelihoods is 8.6 – is</li>
 <li>this significant given the difference in parameters is 1?</li>
 <li>2*8.6=17.2, compare to chisq distribution with one d.f</li>
 </ul>
-<figure role="group"><figcaption><strong>Figure 9.1.</strong> Chi-square distribution table: rows are degrees of freedom, columns are upper-tail probabilities from 0.99 to 0.01, giving critical chi-square values. Used to find p-values for likelihood ratio tests.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 15.1.</strong> Chi-square distribution table: rows are degrees of freedom, columns are upper-tail probabilities from 0.99 to 0.01, giving critical chi-square values. Used to find p-values for likelihood ratio tests.</figcaption></figure>
 <ul>
 <li>REJECT THE NULL</li>
 <li>That the one parameter model fits that data. Much better to use two parameters, indicating that the probability of running the red light has changed!</li>
 </ul>
-<figure role="group"><figcaption><strong>Figure 9.2.</strong> R console: 1-pchisq(8.630462*2, 1) returns 3.258189e-05, the p-value for the likelihood ratio test with 1 degree of freedom.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 15.2.</strong> R console: 1-pchisq(8.630462*2, 1) returns 3.258189e-05, the p-value for the likelihood ratio test with 1 degree of freedom.</figcaption></figure>
 </section>
-<section aria-labelledby="slide-10-h">
-<h2 id="slide-10-h"><span id="slide-10"></span>Slide 10</h2>
+<section aria-labelledby="slide-16-h">
+<h2 id="slide-16-h"><span id="slide-16"></span>Slide 16</h2>
 <ul>
 <li>Likelihood ratio test can typically only be applied to nested models</li>
 <li>“Information theoretic” approaches (e.g. AIC, BIC) can be used to compare non-nested models.</li>
 <li>Models with smaller values of AIC or BIC are “better”, or “have more support” or “are more parsimonious”, but we’ll dig into what this really means for AIC and BIC.</li>
 </ul>
 </section>
-<section aria-labelledby="slide-11-h">
-<h2 id="slide-11-h"><span id="slide-11"></span>Slide 11: Information Theoretic Criteria for Model Selection (i.e. AIC, BIC, etc.)</h2>
-<p>The likelihood ratio statistic is twice the log of the likelihood ratio</p>
-<figure role="group"><figcaption><strong>Figure 11.1.</strong> Equation: LRT = -2 log_e ( L_s(theta-hat) / L_g(theta-hat) ), the likelihood ratio of the specific model over the general model.</figcaption></figure>
-<p>Can also be written as difference in log-likelihoods or deviances</p>
-<figure role="group"><figcaption><strong>Figure 11.2.</strong> Equation: LRT = -2 ( log_e(L_s) - log_e(L_g) ) = -2 log_e(L_s) + 2 log_e(L_g) = deviance_s - deviance_g.</figcaption></figure>
-<p>Compare to chi.sq distribution with degrees of freedom = # parameters</p>
-</section>
-<section aria-labelledby="slide-12-h">
-<h2 id="slide-12-h"><span id="slide-12"></span>Slide 12: Information Theoretic Criteria for Model Selection</h2>
+<section aria-labelledby="slide-17-h">
+<h2 id="slide-17-h"><span id="slide-17"></span>Slide 17: Information Theoretic Criteria for Model Selection</h2>
 <p>Look familiar?</p>
-<figure role="group"><figcaption><strong>Figure 12.1.</strong> Equation: LRT = -2 log_e ( L_s(theta-hat) / L_g(theta-hat) ), the likelihood ratio of the specific model over the general model.</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 12.2.</strong> Equation: AIC_i = -2 log L_i + 2 p_i, and BIC_i = -2 log L_i + p_i log n. Both penalize the fit by the number of parameters.</figcaption></figure>
 <p>Compare to chi.sq distribution with degrees of freedom = # parameters</p>
 <p>AIC and BIC are meaningless on their own, but models with lower values are more parsimonious (i.e. supported). They balance better fit with more parameters. This is exactly what the likelihood ratio test does.</p>
+<p>LRT = −2 loge ( ℒs(θˆ) / ℒg(θˆ) )</p>
+<ul>
+<li>AICi = −2 log Li + 2 pi</li>
+<li>BICi = −2 log Li + pi log n</li>
+</ul>
 </section>
-<section aria-labelledby="slide-13-h">
-<h2 id="slide-13-h"><span id="slide-13"></span>Slide 13</h2>
-<figure role="group"><figcaption><strong>Figure 13.1.</strong> Equation: LRT = -2 log_e ( L_s(theta-hat) / L_g(theta-hat) ), the likelihood ratio of the specific model over the general model.</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 13.2.</strong> Equation: AIC_i = -2 log L_i + 2 p_i, and BIC_i = -2 log L_i + p_i log n. Both penalize the fit by the number of parameters.</figcaption></figure>
+<section aria-labelledby="slide-18-h">
+<h2 id="slide-18-h"><span id="slide-18"></span>Slide 18</h2>
 <p>Compare to chi.sq distribution with degrees of freedom = # parameters</p>
-<p>Say you compare two models with k parameters and with k+1</p>
+<p>compare two models with k parameters and with k+1</p>
 <p>Information Theoretic Criteria for Model Selection</p>
-<figure role="group"><figcaption><strong>Figure 13.3.</strong> Figure (vector image, not machine-readable here) illustrating the difference in information criteria between models with k versus k+1 parameters. Ask instructor for details.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 18.1.</strong> Figure (vector image, not machine-readable here) illustrating the difference in information criteria between models with k versus k+1 parameters. Ask instructor for details.</figcaption></figure>
+<p>LRT = −2 loge ( ℒs(θˆ) / ℒg(θˆ) )</p>
 </section>
-<section aria-labelledby="slide-14-h">
-<h2 id="slide-14-h"><span id="slide-14"></span>Slide 14</h2>
-<figure role="group"><figcaption><strong>Figure 14.1.</strong> Chi-square distribution table: rows are degrees of freedom, columns are upper-tail probabilities from 0.99 to 0.01, giving critical chi-square values. Used to find p-values for likelihood ratio tests.</figcaption></figure>
+<section aria-labelledby="slide-19-h">
+<h2 id="slide-19-h"><span id="slide-19"></span>Slide 19</h2>
+<figure role="group"><figcaption><strong>Figure 19.1.</strong> Chi-square distribution table: rows are degrees of freedom, columns are upper-tail probabilities from 0.99 to 0.01, giving critical chi-square values. Used to find p-values for likelihood ratio tests.</figcaption></figure>
 <p>Convention within&gt;2 AIC units are “considered competitive”, and this is approximately the same as frequentist model selection using LRT</p>
 <p>If 1 parameter separate the model. AIC likes bigger models</p>
+<p>“the extra parameter is worth it”</p>
 </section>
-<section aria-labelledby="slide-15-h">
-<h2 id="slide-15-h"><span id="slide-15"></span>Slide 15</h2>
-<figure role="group"><figcaption><strong>Figure 15.1.</strong> Chi-square distribution table: rows are degrees of freedom, columns are upper-tail probabilities from 0.99 to 0.01, giving critical chi-square values. Used to find p-values for likelihood ratio tests.</figcaption></figure>
+<section aria-labelledby="slide-20-h">
+<h2 id="slide-20-h"><span id="slide-20"></span>Slide 20</h2>
+<figure role="group"><figcaption><strong>Figure 20.1.</strong> Chi-square distribution table: rows are degrees of freedom, columns are upper-tail probabilities from 0.99 to 0.01, giving critical chi-square values. Used to find p-values for likelihood ratio tests.</figcaption></figure>
 <p>What if 3 parameters separate the model? AIC likes bigger models</p>
 <p>(reject the null that the parameters equal 0)</p>
 <p>2 deltaAIC still equivalent to p = 0.05</p>
 </section>
-<section aria-labelledby="slide-16-h">
-<h2 id="slide-16-h"><span id="slide-16"></span>Slide 16: Most common mistake in ecology!</h2>
+<section aria-labelledby="slide-21-h">
+<h2 id="slide-21-h"><span id="slide-21"></span>Slide 21: Most common mistake in ecology!</h2>
 <ul>
 <li>Interpretation of relative AIC is not symmetric</li>
-<li>If a more complex model has higher AIC but less than 2 units, it is NOT competitive</li>
-<li style="margin-left:1.2em">Penalty for adding parameter is 2 units and fit improves with complexity, so models with random data as predictor will be within 2 AIC.</li>
+<li style="margin-left:1.2em">More complex model only “significantly better” is it’s AIC score is &gt;2 units smaller.</li>
+<li style="margin-left:1.2em">Otherwise simpler and complex model are competitive</li>
+<li>Penalty for adding parameter is 2 units and fit improves with complexity, so models with random data as predictor will be within 2 AIC. The complex model has not support even if within 2 AIC units</li>
 <li>The 2 AIC convention is about whether a more complex model with lower AIC is better enough relative to simpler model (in the sense that the parameters are informative)</li>
 </ul>
-<figure role="group"><figcaption><strong>Figure 16.1.</strong> Equation: AIC_i = -2 log L_i + 2 p_i, and BIC_i = -2 log L_i + p_i log n. Both penalize the fit by the number of parameters.</figcaption></figure>
-<p>Taal, show why with a simulation and math</p>
+<p>AICi = −2 log Li + 2 pi</p>
 </section>
-<section aria-labelledby="slide-17-h">
-<h2 id="slide-17-h"><span id="slide-17"></span>Slide 17</h2>
+<section aria-labelledby="slide-22-h">
+<h2 id="slide-22-h"><span id="slide-22"></span>Slide 22</h2>
 <ul>
 <li>3700 Citations!</li>
 <li>72% of all papers incorrectly interpret uninformative parameters!</li>
 </ul>
-<figure role="group"><figcaption><strong>Figure 17.1.</strong> Journal of Wildlife Management article header: Arnold, &quot;Uninformative Parameters and Model Selection Using Akaike&#x27;s Information Criterion.&quot; Free Access.</figcaption></figure>
-</section>
-<section aria-labelledby="slide-18-h">
-<h2 id="slide-18-h"><span id="slide-18"></span>Slide 18</h2>
-<p><em>(No text on this slide.)</em></p>
-</section>
-<section aria-labelledby="slide-19-h">
-<h2 id="slide-19-h"><span id="slide-19"></span>Slide 19</h2>
-<p>From statisticians Mark Brewer and Adam Butler</p>
-</section>
-<section aria-labelledby="slide-20-h">
-<h2 id="slide-20-h"><span id="slide-20"></span>Slide 20</h2>
-<p><em>(No text on this slide.)</em></p>
-</section>
-<section aria-labelledby="slide-21-h">
-<h2 id="slide-21-h"><span id="slide-21"></span>Slide 21</h2>
-<p><em>(No text on this slide.)</em></p>
-</section>
-<section aria-labelledby="slide-22-h">
-<h2 id="slide-22-h"><span id="slide-22"></span>Slide 22</h2>
-<p><em>(No text on this slide.)</em></p>
+<figure role="group"><figcaption><strong>Figure 22.1.</strong> Journal of Wildlife Management article header: Arnold, &quot;Uninformative Parameters and Model Selection Using Akaike&#x27;s Information Criterion.&quot; Free Access.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-23-h">
-<h2 id="slide-23-h"><span id="slide-23"></span>Slide 23</h2>
-<figure role="group"><figcaption><strong>Figure 23.1.</strong> Figure (vector image, not machine-readable here). Slide had no accompanying text. Ask instructor for a description.</figcaption></figure>
+<h2 id="slide-23-h"><span id="slide-23"></span>Slide 23: The Cult of AIC</h2>
+<p>Burnham &amp; Anderson (2002)</p>
+<figure role="group"><figcaption><strong>Figure 23.1.</strong> Book cover of &#x27;Model Selection and Multimodel Inference: A Practical Information-Theoretic Approach,&#x27; Second Edition, by Kenneth P. Burnham and David R. Anderson (2002). The cover shows rows of stylized blue-and-yellow spotted frogs on a yellow band (top) and a blue band (bottom), with the title in a black central stripe. This is the foundational AIC and multimodel-inference textbook, shown under the slide title &#x27;The Cult of AIC.&#x27;</figcaption></figure>
 </section>
 <section aria-labelledby="slide-24-h">
-<h2 id="slide-24-h"><span id="slide-24"></span>Slide 24</h2>
-<p><em>(No text on this slide.)</em></p>
+<h2 id="slide-24-h"><span id="slide-24"></span>Slide 24: Two key questions</h2>
+<ul>
+<li>“Always use AIC for model selection or model comparison”:</li>
+<li>Is this instruction correct?</li>
+<li>Why is it wrong?</li>
+</ul>
+<p>From statisticians Mark Brewer and Adam Butler</p>
 </section>
 <section aria-labelledby="slide-25-h">
-<h2 id="slide-25-h"><span id="slide-25"></span>Slide 25</h2>
-<p><em>(No text on this slide.)</em></p>
+<h2 id="slide-25-h"><span id="slide-25"></span>Slide 25: AIC and p-values</h2>
+<ul>
+<li>From Murtaugh Ecology (2014), Fig. 2:</li>
+<li>Direct comparison</li>
+<li>Two models, differ by one parameter</li>
+</ul>
+<figure role="group"><figcaption><strong>Figure 25.1.</strong> Line plot from Murtaugh (2014, Ecology, Fig. 2) of the p-value (x-axis, 0 to 0.30) against delta-AIC (y-axis, about -1 to 15) for two models that differ by one parameter. Four curves are shown for sample sizes n = 10 (dashed), n = 20 (dotted), n = 50 (dash-dot) and n = infinity (solid). Every curve falls steeply as the p-value rises from 0, then flattens; all four cross delta-AIC = 0 at roughly p = 0.15 to 0.17 and become slightly negative by p = 0.30. The curves nearly coincide except near p = 0, where smaller samples give larger delta-AIC, illustrating that AIC differences and p-values carry essentially the same information for a one-parameter comparison.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-26-h">
 <h2 id="slide-26-h"><span id="slide-26"></span>Slide 26</h2>
-<p><em>(No text on this slide.)</em></p>
-</section>
-<section aria-labelledby="slide-27-h">
-<h2 id="slide-27-h"><span id="slide-27"></span>Slide 27</h2>
-<p><em>(No text on this slide.)</em></p>
-</section>
-<section aria-labelledby="slide-28-h">
-<h2 id="slide-28-h"><span id="slide-28"></span>Slide 28</h2>
 <ul>
 <li>P &lt; 0.05 is an arbitrary threshold</li>
 <li style="margin-left:1.2em">But ⍙AIC &lt; 2 is as well</li>
@@ -307,21 +345,21 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 </ul>
 <p>Why does the cult of AIC hate p-values?</p>
 </section>
-<section aria-labelledby="slide-29-h">
-<h2 id="slide-29-h"><span id="slide-29"></span>Slide 29: Confidence intervals and p-values</h2>
+<section aria-labelledby="slide-27-h">
+<h2 id="slide-27-h"><span id="slide-27"></span>Slide 27: Confidence intervals and p-values</h2>
 <p>-3   -2   -1   0   1   2   3</p>
 <p>Estimate and 95% CI. What is p?</p>
 <p>Estimate and 99% CI. What is p?</p>
 <p>Effect sizes and p tell you the same thing as effect sizes and CIs!</p>
 </section>
-<section aria-labelledby="slide-30-h">
-<h2 id="slide-30-h"><span id="slide-30"></span>Slide 30: P-values should be interpreted on a continuum. Not a step function at 0.05. AIC should be interpreted in the same way!</h2>
-<figure role="group"><figcaption><strong>Figure 30.1.</strong> Diagram: a horizontal p-value scale from 0 to 1, shaded from black (Convincing) at low values through Moderate and Suggestive-but-inconclusive to white (No evidence). Ramsey and Schafer 2002; p-value as a continuum.</figcaption></figure>
+<section aria-labelledby="slide-28-h">
+<h2 id="slide-28-h"><span id="slide-28"></span>Slide 28: P-values should be interpreted on a continuum. Not a step function at 0.05. AIC should be interpreted in the same way!</h2>
+<figure role="group"><figcaption><strong>Figure 28.1.</strong> Diagram: a horizontal p-value scale from 0 to 1, shaded from black (Convincing) at low values through Moderate and Suggestive-but-inconclusive to white (No evidence). Ramsey and Schafer 2002; p-value as a continuum.</figcaption></figure>
 <p>deltaAIC=2</p>
 <p>deltaAIC=7</p>
 </section>
-<section aria-labelledby="slide-31-h">
-<h2 id="slide-31-h"><span id="slide-31"></span>Slide 31: So why use AIC?</h2>
+<section aria-labelledby="slide-29-h">
+<h2 id="slide-29-h"><span id="slide-29"></span>Slide 29: So why use AIC?</h2>
 <ul>
 <li>It is easy to assess non-nested models of highly variable structure.</li>
 <li>It is good for selecting models for prediction</li>
@@ -330,8 +368,8 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li style="margin-left:1.2em">Often used incorrectly, resulting in more error (more on this later)</li>
 </ul>
 </section>
-<section aria-labelledby="slide-32-h">
-<h2 id="slide-32-h"><span id="slide-32"></span>Slide 32</h2>
+<section aria-labelledby="slide-30-h">
+<h2 id="slide-30-h"><span id="slide-30"></span>Slide 30</h2>
 <p>Why did AIC take over wildlife science?</p>
 <ul>
 <li>Aggressive marketing of the method by Burnham and Anderson, who were in Fisheries and Wildlife and “wrote the book”</li>
@@ -340,57 +378,72 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li>People like ranking things</li>
 </ul>
 </section>
-<section aria-labelledby="slide-33-h">
-<h2 id="slide-33-h"><span id="slide-33"></span>Slide 33</h2>
-<p><em>(No text on this slide.)</em></p>
-</section>
-<section aria-labelledby="slide-34-h">
-<h2 id="slide-34-h"><span id="slide-34"></span>Slide 34</h2>
-<figure role="group"><figcaption><strong>Figure 34.1.</strong> Figure (vector image, not machine-readable here) supporting the question of which model is the top model and which are competitive. Ask instructor for the AIC values shown.</figcaption></figure>
+<section aria-labelledby="slide-31-h">
+<h2 id="slide-31-h"><span id="slide-31"></span>Slide 31: AIC in practice…</h2>
+<table><thead><tr><th scope="col">Var 1</th><th scope="col">Var 2</th><th scope="col">Var 3</th><th scope="col">Var 4</th><th scope="col">Var 5</th><th scope="col">AIC</th><th scope="col">ΔAIC</th><th scope="col">Weight</th></tr></thead>
+<tbody>
+<tr><td></td><td>-0.539 (± 0.244)</td><td></td><td>-0.602 (± 0.190)</td><td></td><td>1789.73</td><td>0.00</td><td>0.26</td></tr>
+<tr><td></td><td>-0.674 (± 0.336)</td><td></td><td>-0.609 (± 0.192)</td><td>0.173 (± 0.295)</td><td>1791.38</td><td>1.65</td><td>0.12</td></tr>
+<tr><td></td><td>-0.544 (± 0.245)</td><td>0.003 (± 0.008)</td><td>-0.566 (± 0.214)</td><td></td><td>1791.60</td><td>1.86</td><td>0.10</td></tr>
+<tr><td>-0.090 (± 0.333)</td><td>-0.541 (± 0.244)</td><td></td><td>-0.574 (± 0.217)</td><td></td><td>1791.66</td><td>1.93</td><td>0.10</td></tr>
+<tr><td></td><td></td><td></td><td>-0.641 (± 0.201)</td><td></td><td>1792.23</td><td>2.50</td><td>0.08</td></tr>
+<tr><td>-0.070 (± 0.335)</td><td>-0.670 (± 0.336)</td><td></td><td>-0.586 (± 0.220)</td><td>0.167 (± 0.296)</td><td>1793.34</td><td>3.61</td><td>0.04</td></tr>
+<tr><td></td><td></td><td></td><td>-0.622 (± 0.198)</td><td>-0.212 (± 0.222)</td><td>1793.34</td><td>3.61</td><td>0.04</td></tr>
+<tr><td></td><td>-0.662 (± 0.344)</td><td>0.001 (± 0.008)</td><td>-0.591 (± -0.591)</td><td>0.155 (± 0.316)</td><td>1793.35</td><td>3.62</td><td>0.04</td></tr>
+</tbody>
+</table>
 <p>Which is the top model? Which models are competitive?</p>
 </section>
-<section aria-labelledby="slide-35-h">
-<h2 id="slide-35-h"><span id="slide-35"></span>Slide 35: AIC in practice</h2>
+<section aria-labelledby="slide-32-h">
+<h2 id="slide-32-h"><span id="slide-32"></span>Slide 32: AIC in practice</h2>
 <ul>
 <li>For small sample sizes, AIC is biased and so people use AICc. AICc is treated as “corrected AIC” and converges to AIC for large n.</li>
 <li>Model weights. Each model i of R is weighted based on its deltaAIC.</li>
 <li style="margin-left:1.2em">Variables included with lots of model weight considered important.</li>
 <li style="margin-left:1.2em">Model weight used for averaging across models for prediction</li>
-<li style="margin-left:1.2em">Both deltaAIC and weights depend on model set. Notice, no intercept model here, estimates, or R2. All the models could be garbage.</li>
+<li style="margin-left:1.2em">Both deltaAIC and weights depend on model set</li>
 </ul>
-<figure role="group"><figcaption><strong>Figure 35.1.</strong> Model-selection table: models (e.g. Age+Method, Age) with columns Log-likelihood, K, deltaAICc, and weight w. Top model Age+Method has deltaAICc 0.00, w 0.14; several models within about 2 units.</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 35.2.</strong> Equation: AICc = AIC + (2k^2 + 2k) / (n - k - 1), the small-sample correction to AIC.</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 35.3.</strong> Equation: w_i = exp(-0.5 delta_i) / sum over r=1 to R of exp(-0.5 delta_r), the Akaike model weight for model i.</figcaption></figure>
-<p>Why would I HATE this table as presentation of results?</p>
+<figure role="group"><figcaption><strong>Figure 32.1.</strong> Model-selection table: models (e.g. Age+Method, Age) with columns Log-likelihood, K, deltaAICc, and weight w. Top model Age+Method has deltaAICc 0.00, w 0.14; several models within about 2 units.</figcaption></figure>
+<p>Why would I hate this table as the only presentation of results?</p>
+<p>AICc = AIC + (2k2 + 2k) / (n − k − 1)</p>
+<p>wi = exp(−0.5 Δi) / Σr=1 R exp(−0.5 Δr)</p>
 </section>
-<section aria-labelledby="slide-36-h">
-<h2 id="slide-36-h"><span id="slide-36"></span>Slide 36: Most common mistake in ecology!</h2>
+<section aria-labelledby="slide-33-h">
+<h2 id="slide-33-h"><span id="slide-33"></span>Slide 33: Most common mistake in ecology!</h2>
 <ul>
 <li>Interpretation of relative AIC is not symmetric</li>
 <li>If a more complex model has higher AIC but less than 2 units, it is NOT competitive</li>
 <li style="margin-left:1.2em">Penalty for adding parameter is 2 units and fit improves with complexity, so models with random data as predictor will be within 2 AIC.</li>
 <li>The 2 AIC convention is about whether a more complex model with lower AIC is better enough relative to simpler model</li>
 </ul>
-<figure role="group"><figcaption><strong>Figure 36.1.</strong> Equation: AIC_i = -2 log L_i + 2 p_i, and BIC_i = -2 log L_i + p_i log n. Both penalize the fit by the number of parameters.</figcaption></figure>
+<p>AICi = −2 log Li + 2 pi</p>
 </section>
-<section aria-labelledby="slide-37-h">
-<h2 id="slide-37-h"><span id="slide-37"></span>Slide 37</h2>
+<section aria-labelledby="slide-34-h">
+<h2 id="slide-34-h"><span id="slide-34"></span>Slide 34</h2>
 <ul>
 <li>3700 Citations!</li>
 <li>72% of all papers incorrectly interpret uninformative parameters!</li>
 </ul>
-<figure role="group"><figcaption><strong>Figure 37.1.</strong> Journal of Wildlife Management article header: Arnold, &quot;Uninformative Parameters and Model Selection Using Akaike&#x27;s Information Criterion.&quot; Free Access.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 34.1.</strong> Journal of Wildlife Management article header: Arnold, &quot;Uninformative Parameters and Model Selection Using Akaike&#x27;s Information Criterion.&quot; Free Access.</figcaption></figure>
 </section>
-<section aria-labelledby="slide-38-h">
-<h2 id="slide-38-h"><span id="slide-38"></span>Slide 38: Best recent paper as a resource to stop doing dumb stuff with AIC</h2>
+<section aria-labelledby="slide-35-h">
+<h2 id="slide-35-h"><span id="slide-35"></span>Slide 35: Best recent paper as a resource to stop doing dumb stuff with AIC</h2>
 <p><em>(No text on this slide.)</em></p>
 </section>
-<section aria-labelledby="slide-39-h">
-<h2 id="slide-39-h"><span id="slide-39"></span>Slide 39</h2>
-<p><em>(No text on this slide.)</em></p>
+<section aria-labelledby="slide-36-h">
+<h2 id="slide-36-h"><span id="slide-36"></span>Slide 36: B &amp; A recipe for modelling</h2>
+<ul>
+<li>Procedure for model selection:</li>
+<li>Decide on scientific questions to answer</li>
+<li>Define small candidate set of models</li>
+<li>Fit models, calculate AIC, find “best” model</li>
+<li>Use threshold on ΔAIC to determine set of “plausible” models</li>
+<li>Calculate model weights via ΔAIC</li>
+<li>(Assess variable importance using weights)</li>
+</ul>
 </section>
-<section aria-labelledby="slide-40-h">
-<h2 id="slide-40-h"><span id="slide-40"></span>Slide 40: Burnham and Anderson did not advocate model dredging (fitting all/many combinations of predictors)</h2>
+<section aria-labelledby="slide-37-h">
+<h2 id="slide-37-h"><span id="slide-37"></span>Slide 37: Burnham and Anderson did not advocate model dredging (fitting all/many combinations of predictors)</h2>
 <ul>
 <li>If you look at many models, you will have many Type I errors leading to “overfitting”.</li>
 <li>But did ecologists listen to B&amp;A and construct sensible model sets?</li>
@@ -400,29 +453,42 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 </ul>
 <p>“An investigator with, say, 10 explanatory variables cannot expect to learn much from his data and a multiple linear regression analysis unless there is some substantial supporting science that can be used to help narrow the number of models to consider. In this example, there would be 1,024 models (many more if transformations or interaction terms were allowed), and over-ﬁtting would surely be a serious risk. The analysis, by whatever method, should probably be considered exploratory and the results used to design further data gathering leading to a more conﬁrmatory analysis, based on some a priori considerations” (Burnham and Anderson 2002:85)</p>
 </section>
-<section aria-labelledby="slide-41-h">
-<h2 id="slide-41-h"><span id="slide-41"></span>Slide 41</h2>
+<section aria-labelledby="slide-38-h">
+<h2 id="slide-38-h"><span id="slide-38"></span>Slide 38</h2>
 <p><em>(No text on this slide.)</em></p>
 </section>
-<section aria-labelledby="slide-42-h">
-<h2 id="slide-42-h"><span id="slide-42"></span>Slide 42: Then what about BIC? Is it just a similar alternative?</h2>
+<section aria-labelledby="slide-39-h">
+<h2 id="slide-39-h"><span id="slide-39"></span>Slide 39: Then what about BIC? Is it just a similar alternative?</h2>
 <ul>
 <li>The penalty in BIC increases with the sample size</li>
 <li>AIC retains more complex models than BIC or p-values</li>
 <li>AIC chooses the model that gives the best prediction. It is efficient for prediction.</li>
 <li>BIC chooses the “correct” model if it is in the set.</li>
 </ul>
-<figure role="group"><figcaption><strong>Figure 42.1.</strong> Equation: AIC_i = -2 log L_i + 2 p_i, and BIC_i = -2 log L_i + p_i log n. Both penalize the fit by the number of parameters.</figcaption></figure>
+<ul>
+<li>AICi = −2 log Li + 2 pi</li>
+<li>BICi = −2 log Li + pi log n</li>
+</ul>
 </section>
-<section aria-labelledby="slide-43-h">
-<h2 id="slide-43-h"><span id="slide-43"></span>Slide 43: AIC vs BIC</h2>
+<section aria-labelledby="slide-40-h">
+<h2 id="slide-40-h"><span id="slide-40"></span>Slide 40: AIC vs BIC</h2>
 <ul>
 <li>“Theoretically, AIC is optimal in the sense of minimizing the mean square error of predictions, whereas a competing metric, the Bayesian Information Criterion (BIC; Schwarz 1978), is consistent – that is, it will tend to select the ‘true’ model as the sample size increases to infinity.”</li>
 <li>AIC is asymptotically equivalent to leave-one-out crossvalidation (prediction), and BIC is most similar to inference (p-values)</li>
 </ul>
 </section>
-<section aria-labelledby="slide-44-h">
-<h2 id="slide-44-h"><span id="slide-44"></span>Slide 44: Crossvalidation: Split data, train model, compare predictions to actual using test data. Repeat.</h2>
+<section aria-labelledby="slide-41-h">
+<h2 id="slide-41-h"><span id="slide-41"></span>Slide 41</h2>
+<table><thead><tr><th scope="col">Method</th><th scope="col">Primary purpose</th><th scope="col">Requires nested models?</th><th scope="col">Complexity penalty</th><th scope="col">Produces p-value?</th></tr></thead>
+<tbody>
+<tr><td>Likelihood Ratio Test (LRT)</td><td>Test a specific null hypothesis</td><td>Yes</td><td>None; compares improvement in likelihood to chi^2 distribution</td><td>Yes</td></tr>
+<tr><td>AIC</td><td>Select the model expected to predict new data best</td><td>No</td><td>2 AIC units per additional parameter</td><td>No</td></tr>
+<tr><td>BIC</td><td>Select the simplest plausible data-generating model</td><td>No</td><td>Log(n) BIC units per additional parameter</td><td>No</td></tr>
+</tbody>
+</table>
+</section>
+<section aria-labelledby="slide-42-h">
+<h2 id="slide-42-h"><span id="slide-42"></span>Slide 42: Crossvalidation: Split data, train model, compare predictions to actual using test data. Repeat.</h2>
 <ul>
 <li>k-fold crossvalidation</li>
 <li>Leave-one-out (n-fold crossvalidation)</li>
@@ -431,8 +497,8 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <p>Test</p>
 <p>Dataset</p>
 </section>
-<section aria-labelledby="slide-45-h">
-<h2 id="slide-45-h"><span id="slide-45"></span>Slide 45: Recommended Readings</h2>
+<section aria-labelledby="slide-43-h">
+<h2 id="slide-43-h"><span id="slide-43"></span>Slide 43: Recommended Readings</h2>
 <ul>
 <li>Aho et al. 2014 “Model selection for ecologists: The worldviews of AIC and BIC”. Ecology</li>
 <li>Shmueli 2010 “To explain or to predict”. Statistical Science</li>
@@ -444,98 +510,26 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li>Bolker 2024 “Multimodel Approaches Are Not the Best Way to Understand Multifactorial Systems”. Entropy</li>
 </ul>
 </section>
-<section aria-labelledby="slide-46-h">
-<h2 id="slide-46-h"><span id="slide-46"></span>Slide 46</h2>
-<figure role="group"><figcaption><strong>Figure 46.1.</strong> Journal article header: Murtaugh 2007, &quot;Simplicity and Complexity in Ecological Data Analysis,&quot; Ecology, with abstract arguing analyses are often needlessly complicated.</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 46.2.</strong> Quote in italics: a professor says they could test hypotheses with simple t tests but want something more elegant to fit a better journal. Attributed to an Oregon State University professor requesting statistical help.</figcaption></figure>
+<section aria-labelledby="slide-44-h">
+<h2 id="slide-44-h"><span id="slide-44"></span>Slide 44</h2>
+<figure role="group"><figcaption><strong>Figure 44.1.</strong> Journal article header: Murtaugh 2007, &quot;Simplicity and Complexity in Ecological Data Analysis,&quot; Ecology, with abstract arguing analyses are often needlessly complicated.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 44.2.</strong> Quote in italics: a professor says they could test hypotheses with simple t tests but want something more elegant to fit a better journal. Attributed to an Oregon State University professor requesting statistical help.</figcaption></figure>
 </section>
-<section aria-labelledby="slide-47-h">
-<h2 id="slide-47-h"><span id="slide-47"></span>Slide 47: Don’t take my word for it…</h2>
+<section aria-labelledby="slide-45-h">
+<h2 id="slide-45-h"><span id="slide-45"></span>Slide 45: Don’t take my word for it…</h2>
 <p>One way to avoid some of the problems associated with model selection is to “just say no” to data-driven model selection—in other words, ﬁt a single pre-speciﬁed model, one in which all explanatory variables are chosen prior to looking at their relationship with the response variable, and then use this model for inference (Harrell 2001, Babyak 2004, Whittingham et al. 2006, Guidice et al. 2012).</p>
 </section>
-<section aria-labelledby="slide-48-h">
-<h2 id="slide-48-h"><span id="slide-48"></span>Slide 48</h2>
+<section aria-labelledby="slide-46-h">
+<h2 id="slide-46-h"><span id="slide-46"></span>Slide 46</h2>
 <p>“If researchers want to accurately estimate the strength of multiple competing ecological processes along with reliable confidence intervals, their best hope is to use full (maximal) statistical models after making principled, a priori decisions about which predictors to include. “</p>
-<figure role="group"><figcaption><strong>Figure 48.1.</strong> Multi-panel plot of relative probability of selection versus canopy cover, distance to road, distance to water, and ruggedness, one row per species, with fitted curves and shaded confidence bands.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 46.1.</strong> Multi-panel plot of relative probability of selection versus canopy cover, distance to road, distance to water, and ruggedness, one row per species, with fitted curves and shaded confidence bands.</figcaption></figure>
 <p>Don’t take my word for it…</p>
 <p>Left as a preprint for years until Bolker finally submitted it to a journal after we chatted about this problem</p>
 </section>
-<section aria-labelledby="slide-49-h">
-<h2 id="slide-49-h"><span id="slide-49"></span>Slide 49: Don’t take my word for it…</h2>
+<section aria-labelledby="slide-47-h">
+<h2 id="slide-47-h"><span id="slide-47"></span>Slide 47: Don’t take my word for it…</h2>
 <p>The associated sums of AIC model weights recommended to assess relative importance of individual predictors are really a measure of relative importance of models, with little information about contributions by individual predictors compared to other measures of relative importance based on effects size or variance reduction.</p>
 <p>The standardized estimates or equivalently the t statistics on unstandardized estimates also can be used to provide more informative measures of relative importance than sums of AIC weights. Finally, I illustrate how seriously compromised statistical interpretations and predictions can be for all three of these flawed practices by critiquing their use in a recent species distribution modeling technique developed for predicting Greater Sage‐Grouse (Centrocercus urophasianus) distribution in Colorado, USA. These model averaging issues are common in other ecological literature and ought to be discontinued if we are to make effective scientific contributions to ecological knowledge and conservation of natural resources.</p>
-</section>
-<section aria-labelledby="slide-50-h">
-<h2 id="slide-50-h"><span id="slide-50"></span>Slide 50</h2>
-<figure role="group"><figcaption><strong>Figure 50.1.</strong> Figure (vector image, not machine-readable here). Slide had no accompanying text. Ask instructor for a description.</figcaption></figure>
-</section>
-<section aria-labelledby="slide-51-h">
-<h2 id="slide-51-h"><span id="slide-51"></span>Slide 51</h2>
-<figure role="group"><figcaption><strong>Figure 51.1.</strong> Text screenshot listing Trafimow and Marks&#x27; (2015) three reasons for banning p-values: hypothesis testing does not give the probability a hypothesis is true, confidence intervals do not give the probability a parameter lies in an interval, and Bayesian priors depend on Laplacian assumptions.</figcaption></figure>
-</section>
-<section aria-labelledby="slide-52-h">
-<h2 id="slide-52-h"><span id="slide-52"></span>Slide 52: Are any statistical procedures required?</h2>
-<p>No, because the state of the art remains uncertain. However, BASP will require strong descriptive statistics, including effect sizes. We also encourage the presentation of frequency or distributional data when this is feasible. Finally, we encourage the use of larger sample sizes than is typical in much psychology research, because as the sample size increases, descriptive statistics become increasingly stable and sampling error is less of a problem.</p>
-<p>banning the NHSTP will have the effect of increasing the quality of submitted manuscripts by liberating authors from the stultified structure of NHSTP thinking thereby eliminating an important obstacle to creative thinking</p>
-</section>
-<section aria-labelledby="slide-53-h">
-<h2 id="slide-53-h"><span id="slide-53"></span>Slide 53: Hmm…let’s think, will banning the use of p-values1. Reduce type I errors and help solve the replication crisis in Psychology?2. Allow absolute garbage conclusions to be published that would otherwise not have passed “significance testing”</h2>
-<p>Large-scale efforts (e.g., the Open Science Collaboration’s Reproducibility Project in 2015) showed that only about 35–40% of published effects could be replicated with similar effect sizes.</p>
-</section>
-<section aria-labelledby="slide-54-h">
-<h2 id="slide-54-h"><span id="slide-54"></span>Slide 54</h2>
-<figure role="group"><figcaption><strong>Figure 54.1.</strong> Journal article title: &quot;Assessing the Statistical Analyses Used in Basic and Applied Social Psychology After Their p-Value Ban,&quot; by Fricker, Burke, Han and Woodall.</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 54.2.</strong> Article abstract: assessing 31 articles in Basic and Applied Social Psychology in 2016 after the p-value ban; found authors overstating conclusions beyond what data support.</figcaption></figure>
-</section>
-<section aria-labelledby="slide-55-h">
-<h2 id="slide-55-h"><span id="slide-55"></span>Slide 55: Further buffoonery</h2>
-<ul>
-<li>Journal: you should use Cohen’s d to compare two samples</li>
-<li style="margin-left:1.2em">0.2≤d&lt;0.5 indicates there is a “small” practical effect</li>
-<li style="margin-left:1.2em">0.5≤d&lt;0.8 indicates a “medium” practical effect</li>
-<li style="margin-left:1.2em">d≥0.8 indicates a “large” practical effect</li>
-<li>Does Cohen’s d look familiar?</li>
-</ul>
-<figure role="group"><figcaption><strong>Figure 55.1.</strong> Equation: Cohen&#x27;s d = (x-bar_2 minus x-bar_1) divided by pooled standard deviation s_p.</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 55.2.</strong> Equation: t = (X-bar_1 minus X-bar_2) divided by s_p times the square root of (1/n_1 + 1/n_2); the two-sample t statistic, structurally like Cohen&#x27;s d.</figcaption></figure>
-</section>
-<section aria-labelledby="slide-56-h">
-<h2 id="slide-56-h"><span id="slide-56"></span>Slide 56: Further buffoonery</h2>
-<figure role="group"><figcaption><strong>Figure 56.1.</strong> Scatter plot of absolute effect size |d| (y-axis) versus approximate p-value (x-axis) with marginal histograms. Points colored by p-value bin; dashed lines mark small, medium, large effect thresholds. Small effects span a wide p-value range.</figcaption></figure>
-<ul>
-<li>d values larger than Cohen’s minimum medium effect size were statistically significant and all below Cohen’s small effect size limit were not</li>
-<li>For d values that correspond to small effect sizes (45.3% of the d values), there is no way to decide whether a particular d value is consistent with random fluctuations in the data under the assumption of equal population means without some measure of statistical significance</li>
-<li>How do you think the media will report on these results? Cautious and measured?</li>
-</ul>
-</section>
-<section aria-labelledby="slide-57-h">
-<h2 id="slide-57-h"><span id="slide-57"></span>Slide 57: The chief benefit of AIC/BIC</h2>
-<p>Stresses the importance of evaluating multiple competing hypotheses when applied properly to actual competing hypothesis</p>
-<figure role="group"><figcaption><strong>Figure 57.1.</strong> Journal review-article header: Betini, Avgar and Fryxell 2017, &quot;Why are we not evaluating multiple competing hypotheses in ecology and evolution?&quot;, Royal Society Open Science.</figcaption></figure>
-<p>“While often used as a tool for statistical inference, a set of regression models containing partially overlapping sets of explanatory variables does not necessarily represent a valid evaluation of multiple hypotheses unless each statistical model represents a unique research hypothesis [31]. In other words, model competition, based on AIC and BIC, is not a stepwise regression procedure.”</p>
-</section>
-<section aria-labelledby="slide-58-h">
-<h2 id="slide-58-h"><span id="slide-58"></span>Slide 58</h2>
-<table><thead><tr><th scope="col">Species</th><th scope="col">ΔAIC</th><th scope="col"></th></tr></thead>
-<tbody>
-<tr><td></td><td>Habitat Only</td><td>Habitat + Cougar</td></tr>
-<tr><td>Bobcat</td><td>0</td><td>2.69</td></tr>
-<tr><td>Bear</td><td>10.36</td><td>0</td></tr>
-<tr><td>Coyote</td><td>24.0</td><td>0</td></tr>
-</tbody>
-</table>
-<p>Compare habitat only models for resource selection vs. models that include interactions with cougars.</p>
-<figure role="group"><figcaption><strong>Figure 58.1.</strong> Table of parameter estimates (beta, SE, P) for landscape and cougar variables in step-selection functions for coyotes, bears, and bobcats. Cougar-interaction terms are significant for coyotes but mostly not for bobcats.</figcaption></figure>
-</section>
-<section aria-labelledby="slide-59-h">
-<h2 id="slide-59-h"><span id="slide-59"></span>Slide 59</h2>
-<figure role="group"><figcaption><strong>Figure 59.1.</strong> Multi-panel plot: relative probability of selection versus canopy cover, distance to road, distance to water, and ruggedness for coyote, bear, and bobcat (rows), with fitted curves and shaded confidence bands showing species-specific responses.</figcaption></figure>
-<p>How SHOULD we be making inference</p>
-<ul>
-<li>Interpret point estimates algebraically and geometrically with uncertainty</li>
-<li>Don’t ask “if” there is an effect. Ask how much a variable affects an outcome</li>
-<li>Quantify our uncertainty around this</li>
-</ul>
 </section>
 </main>
 

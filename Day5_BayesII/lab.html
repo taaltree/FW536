@@ -13,7 +13,7 @@
 <div class="shell">
 
 <aside class="sidebar">
- <h1><a href="../index.html" title="Back to course home">FW 536 · Day 5</a></h1>
+ <p class="brand"><a href="../index.html" title="Back to course home">FW 536 · Day 5</a></p>
  <div class="subtitle">Bayes II — Hierarchical &amp; Latent-State Models</div>
  <nav>
  <div class="section">Lab</div>
@@ -169,7 +169,7 @@
 </div>
 
 <h3>The trap: vague priors on a link scale</h3>
-<p>A common rookie move is to put a "vague" prior $\beta \sim \mathcal{N}(0, 10000)$ on every coefficient. On the log link, a coefficient $\beta_j = 7$ corresponds to a $e^7 \approx 1096$-fold multiplicative effect on $\lambda$ &mdash; a 1000x change in richness from a one-unit change in latitude. The prior says that's plausible. It is not.</p>
+<p>A common rookie move is to put a "vague" prior on every coefficient &mdash; in NIMBLE, <code>dnorm(0, tau = 1/10000)</code>, which is $\beta \sim \mathcal{N}(0,\ \sigma^2 = 10000)$, i.e. a standard deviation of $\sigma = 100$. On the log link, a coefficient $\beta_j = 7$ corresponds to a $e^7 \approx 1096$-fold multiplicative effect on $\lambda$ &mdash; a 1000x change in richness from a one-unit change in latitude. The prior says that's plausible. It is not.</p>
 
 <p>Worse, when one of the predictors (here <em>latitude</em>, on raw scale ~41&deg;-45&deg;) has a large mean, $\beta_j \cdot x_{ij}$ multiplies and shifts so wildly during MCMC that $\lambda_i$ overflows the floating-point range. The sampler stalls or wanders into nonsense.</p>
 
@@ -187,8 +187,8 @@ ants$elevation &lt;- <span class="fn">as.numeric</span>(<span class="fn">scale</
 
 antCode &lt;- <span class="fn">nimbleCode</span>({
  <span class="kw">for</span> (i <span class="kw">in</span> <span class="nu">1</span>:n) {
- ants[i, <span class="nu">1</span>] ~ <span class="fn">dpois</span>(lam[i])
- <span class="fn">log</span>(lam[i]) &lt;- b0 + b1 * ants[i,<span class="nu">2</span>] + b2 * ants[i,<span class="nu">3</span>] + b3 * ants[i,<span class="nu">4</span>]
+ y[i] ~ <span class="fn">dpois</span>(lam[i])
+ <span class="fn">log</span>(lam[i]) &lt;- b0 + b1 * forest[i] + b2 * latitude[i] + b3 * elevation[i]
  }
  b0 ~ <span class="fn">dnorm</span>(<span class="nu">0</span>, tau) <span class="cm"># tau = 1/sigma^2 (NIMBLE = JAGS parameterisation)</span>
  b1 ~ <span class="fn">dnorm</span>(<span class="nu">0</span>, tau)
@@ -196,22 +196,42 @@ antCode &lt;- <span class="fn">nimbleCode</span>({
  b3 ~ <span class="fn">dnorm</span>(<span class="nu">0</span>, tau)
 })
 
-constants &lt;- <span class="kw">list</span>(ants = <span class="fn">as.matrix</span>(ants), n = <span class="fn">nrow</span>(ants), tau = <span class="nu">1</span>/<span class="nu">10</span>)
-samples &lt;- <span class="fn">nimbleMCMC</span>(antCode, constants = constants,
+<span class="cm"># constants= : nothing here ever appears on the LHS of a `~`</span>
+constants &lt;- <span class="kw">list</span>(n = <span class="fn">nrow</span>(ants), forest = ants$forest,
+ latitude = ants$latitude, elevation = ants$elevation,
+ tau = <span class="nu">1</span>/<span class="nu">10</span>)
+<span class="cm"># data= : the observed random variable, and nothing else</span>
+data &lt;- <span class="kw">list</span>(y = ants$richness)
+
+samples &lt;- <span class="fn">nimbleMCMC</span>(antCode, constants = constants, data = data,
  monitors = <span class="fn">c</span>(<span class="st">"b0"</span>,<span class="st">"b1"</span>,<span class="st">"b2"</span>,<span class="st">"b3"</span>),
  nchains = <span class="nu">3</span>, niter = <span class="nu">10000</span>, nburnin = <span class="nu">500</span>,
  samplesAsCodaMCMC = <span class="kw">TRUE</span>)
 <span class="fn">MCMCsummary</span>(samples)</code></pre>
 
 <div class="callout warn">
-<p>Why <code>tau = 1/10</code> and not <code>tau = 1/10000</code>? On the log link, a $\mathcal{N}(0, \sigma=\sqrt{10})$ prior on each $\beta$ corresponds to roughly a $e^{\pm 6}$ range of multiplicative effects &mdash; still very wide, but not crazy. The truly "vague" $\mathcal{N}(0, 100)$ is informative in the wrong direction: it puts huge prior weight on impossible parameter values.</p>
+<p><strong>Apply the constants/data rule to this model.</strong> Look back at the rule above: <code>constants=</code> holds anything that never appears on the LHS of a <code>~</code>; <code>data=</code> holds the observed random variables. Here <code>y[i] ~ dpois(lam[i])</code> is the only stochastic statement with an observed quantity on its left, so <code>y</code> is the <em>only</em> thing in <code>data=</code>. The covariates, <code>n</code>, and the prior's <code>tau</code> are all constants.</p>
+<p>You will see a shortcut in older scripts: pass the whole data frame as a constant and index the response out of it, like this &mdash;</p>
+<pre><code>constants = <span class="kw">list</span>(ants = <span class="fn">as.matrix</span>(ants), n = <span class="fn">nrow</span>(ants), forest = ants$forest, ...)
+<span class="cm"># ...and in the model code:</span>
+ants[i,<span class="nu">1</span>] ~ <span class="fn">dpois</span>(lam[i])
+<span class="cm"># ...and no data= argument at all</span></code></pre>
+<p>NIMBLE does rescue this &mdash; it notices the node on the LHS of a <code>~</code> and reclassifies it as data for you, so the model runs and gives the right answer &mdash; but it is <em>not</em> silent about it. <code>nimbleModel</code> prints:</p>
+<pre><code>  [Note] Using 'ants' (given within 'constants') as data.
+  [Warning] dimensions specified are larger than model specification
+            for variable `ants`.</code></pre>
+<p>Learn to read that Note: it is NIMBLE telling you your constants/data split was wrong and that it patched it up for you. Notes and Warnings scroll past easily, but this one is a real diagnostic &mdash; noticing it is the skill. (The Warning is a second symptom &mdash; you handed over a whole 44&times;4 matrix when the model only ever uses column 1.) Don't copy the pattern. It puts an observed random variable in <code>constants=</code>, which contradicts the rule you just learned, and it breaks the moment you want to do anything with the response: posterior predictive replicates, missing values, or a simulation from the fitted model all need <code>y</code> to be a proper data node. The shipped <code>ant.priors.R</code> uses the correct split &mdash; the form above is shown only so you recognise it in the wild.</p>
+</div>
+
+<div class="callout warn">
+<p>Why <code>tau = 1/10</code> and not <code>tau = 1/10000</code>? Remember NIMBLE's <code>dnorm</code> takes a <em>precision</em>, so <code>tau = 1/10</code> means $\sigma^2 = 10$, i.e. $\sigma = \sqrt{10} \approx 3.2$. On the log link that corresponds to roughly a $e^{\pm 6}$ range of multiplicative effects &mdash; still very wide, but not crazy. The truly "vague" <code>tau = 1/10000</code> ($\sigma^2 = 10000$, $\sigma = 100$) is informative in the wrong direction: it puts huge prior weight on impossible parameter values.</p>
 </div>
 
 <div class="callout key">
 <p><strong>How to choose and specify a prior &mdash; a short checklist.</strong> A prior is a deliberate modeling choice, not a nuisance to zero out. Every model in today's lab follows these same rules.</p>
 <ul>
  <li><strong>Think on the scale the parameter lives on.</strong> A prior that looks "vague" on a link scale (log, logit) can be violently informative on the natural scale (a rate, a probability) &mdash; you just saw a "flat" log-scale prior imply 1000-fold effects. Always ask what the prior implies for the quantity you actually care about, ideally by simulating from it: a <em>prior predictive check</em> draws parameters from the prior, pushes them through the model, and looks at the fake data they produce.</li>
- <li><strong>Default to weakly-informative, not "flat."</strong> On standardized predictors, $\mathcal{N}(0, \sigma \approx 1\text{–}2)$ for logit/log coefficients rules out physically impossible effects while letting the data dominate. The genuinely flat priors ($\mathcal{N}(0, 10000)$) are the ones that misbehave.</li>
+ <li><strong>Default to weakly-informative, not "flat."</strong> On standardized predictors, $\mathcal{N}(0,\ \sigma \approx 1\text{–}2)$ (note: $\sigma$, not $\sigma^2$) for logit/log coefficients rules out physically impossible effects while letting the data dominate. The genuinely flat priors ($\mathcal{N}(0,\ \sigma^2 = 10000)$, i.e. $\sigma = 100$) are the ones that misbehave.</li>
  <li><strong>Standardize predictors first.</strong> It puts every coefficient on a common, interpretable scale, so one prior width is sensible for all of them &mdash; and it fixes the overflow and mixing problems shown above.</li>
  <li><strong>Match the prior's support to the parameter.</strong> Use <code>dunif(0,1)</code> or <code>dbeta</code> for probabilities, a positive-only prior (<code>dunif(0,&middot;)</code> or half-normal) for standard deviations, and a Normal on the unconstrained link scale for regression coefficients.</li>
  <li><strong>Use an informative prior only when you genuinely have prior information</strong> &mdash; a published survival rate, a physical bound &mdash; and state it explicitly. Reserve it for real knowledge, not convenience.</li>
@@ -221,9 +241,9 @@ samples &lt;- <span class="fn">nimbleMCMC</span>(antCode, constants = constants,
 <div class="exercise" id="ex-1">
 <span class="ex-tag">Exercise 1</span><span class="difficulty easy"> · 10 min · prior intuition</span>
 <h3>What does a "vague" log-scale prior actually look like?</h3>
-<p>You're putting a $\mathcal{N}(0, 100)$ prior on the slope of a log-link Poisson regression. Latitude in the ants data ranges from 41.97&deg; to 45.00&deg; <em>on the raw scale</em>.</p>
+<p>You're putting a $\mathcal{N}(0,\ \sigma = 100)$ prior (that is, $\sigma^2 = 10000$; in NIMBLE, <code>dnorm(0, tau = 1/10000)</code>) on the slope of a log-link Poisson regression. Latitude in the ants data ranges from 41.97&deg; to 45.00&deg; <em>on the raw scale</em>.</p>
 <ol type="a">
- <li>Draw $10^5$ values of $\beta_2$ from $\mathcal{N}(0, 100)$. For each draw, compute the implied multiplicative effect $e^{\beta_2 \cdot 3}$ over the latitudinal range (3 degrees). Plot the distribution of $\log_{10}$ of that effect.</li>
+ <li>Draw $10^5$ values of $\beta_2$ from $\mathcal{N}(0,\ \sigma = 100)$. For each draw, compute the implied multiplicative effect $e^{\beta_2 \cdot 3}$ over the latitudinal range (3 degrees). Plot the distribution of $\log_{10}$ of that effect.</li>
  <li>What fraction of the prior puts $|\log_{10}(\text{effect})| &gt; 6$ (a million-fold change)?</li>
  <li>Now standardise latitude. Repeat (a) using $\beta_2 \cdot 1$ (a one-SD change in scaled latitude). Compare.</li>
 </ol>
@@ -232,11 +252,11 @@ samples &lt;- <span class="fn">nimbleMCMC</span>(antCode, constants = constants,
 beta &lt;- <span class="fn">rnorm</span>(<span class="nu">1e5</span>, <span class="nu">0</span>, <span class="nu">100</span>)
 eff &lt;- <span class="fn">exp</span>(beta * <span class="nu">3</span>) <span class="cm"># raw scale: 3 deg latitude</span>
 <span class="fn">hist</span>(<span class="fn">log10</span>(eff), breaks=<span class="nu">200</span>, xlab=<span class="st">"log10(effect)"</span>)
-<span class="fn">mean</span>(<span class="fn">abs</span>(<span class="fn">log10</span>(eff)) &gt; <span class="nu">6</span>) <span class="cm"># ~ 0.98</span>
+<span class="fn">mean</span>(<span class="fn">abs</span>(<span class="fn">log10</span>(eff)) &gt; <span class="nu">6</span>) <span class="cm"># 0.963</span>
 
 eff2 &lt;- <span class="fn">exp</span>(beta * <span class="nu">1</span>) <span class="cm"># scaled scale: 1 SD</span>
-<span class="fn">mean</span>(<span class="fn">abs</span>(<span class="fn">log10</span>(eff2)) &gt; <span class="nu">6</span>) <span class="cm"># still ~ 0.94 (!) -- prior is too wide</span></code></pre>
-<p>The takeaway: a $\mathcal{N}(0, 100)$ prior on a log-scale coefficient is almost always far too wide. Use $\mathcal{N}(0, \approx 2)$ or $\mathcal{N}(0, \approx 3)$ for standardised predictors. Tight, weakly informative priors are what most of the modern Bayesian regression literature now recommends.</p>
+<span class="fn">mean</span>(<span class="fn">abs</span>(<span class="fn">log10</span>(eff2)) &gt; <span class="nu">6</span>) <span class="cm"># still 0.890 (!) -- prior is too wide</span></code></pre>
+<p>With this seed, <strong>96.3%</strong> of the prior implies more than a million-fold effect over the raw 3&deg; latitudinal range (analytic value 0.9633), and standardising only drops that to <strong>89.0%</strong> (analytic 0.8901) &mdash; still almost the whole prior. The takeaway: a $\mathcal{N}(0,\ \sigma = 100)$ prior on a log-scale coefficient is almost always far too wide. Use $\mathcal{N}(0,\ \sigma \approx 2)$ or $\mathcal{N}(0,\ \sigma \approx 3)$ for standardised predictors. Tight, weakly informative priors are what most of the modern Bayesian regression literature now recommends.</p>
 </div></details>
 </div>
 
@@ -251,7 +271,7 @@ eff2 &lt;- <span class="fn">exp</span>(beta * <span class="nu">1</span>) <span c
 </ol>
 <details class="answer"><summary>Reveal worked solution (actual NIMBLE run)</summary><div class="answer-body">
 <p>Numbers below are from an actual run (<code>set.seed(10)</code>, 3 chains, <code>niter=10000</code>, <code>nburnin=500</code>): posterior mean [95% CI] with R-hat and effective sample size from <code>MCMCsummary</code>. Coefficients are <code>b1</code>=forest, <code>b2</code>=latitude, <code>b3</code>=elevation.</p>
-<p><strong>(a) Raw predictors, <code>dnorm(0, tau=1/10000)</code> (i.e. $\sigma=100$).</strong> The intercept and latitude are badly non-identified because raw latitude ($\approx$ 42&deg;) is far from 0 and strongly correlated with the intercept: <code>b0</code> = 6.26 [1.46, 10.38] and <code>b2</code> = &minus;0.10 [&minus;0.20, 0.01] both come back with <strong>R-hat = 1.13 and only n.eff &asymp; 6</strong> effective draws &mdash; the chains have <em>not</em> converged, and they disagree with <code>glm()</code> (which gives intercept 11.94, latitude &minus;0.24). Forest (<code>b1</code> = 0.64, R-hat 1.00) and elevation happen to mix, but the fit is broken. Longer chains help only slowly; the real fix is scaling.</p>
+<p><strong>(a) Raw predictors, <code>dnorm(0, tau=1/10000)</code> (i.e. $\sigma=100$).</strong> The intercept and latitude are badly non-identified because raw latitude ($\approx$ 42&deg;) is far from 0 and strongly correlated with the intercept, so the posterior is a long narrow ridge the sampler cannot traverse. Even with the dispersed <code>glm()</code>-based inits from <code>ant.priors.R</code>, <code>b0</code> and <code>b2</code> come back with <strong>R-hat in the tens</strong> (roughly 7&ndash;30, and it jumps around from run to run &mdash; itself a sign of non-convergence) and only <strong>n.eff &asymp; 12&ndash;17</strong> effective draws; their posterior means are unstable and disagree with <code>glm()</code> (which gives intercept 11.94, latitude &minus;0.24). Forest (<code>b1</code> &asymp; 0.64, R-hat 1.00) happens to mix, but the fit is broken. If you instead leave the inits at their defaults the raw chains stall outright, with NaN log densities. Longer chains help only slowly; the real fix is scaling &mdash; and note that scaling, not the choice of inits, is what does it.</p>
 <p><strong>(b) Scaled predictors, same vague prior.</strong> Everything converges (R-hat = 1.00, n.eff &asymp; 5000&ndash;6000) and the posterior means match <code>glm()</code> to two decimals:</p>
 <table>
 <tr><th>Coefficient</th><th>Posterior mean [95% CI]</th><th>R-hat</th><th><code>glm()</code></th></tr>
@@ -349,9 +369,9 @@ samples &lt;- <span class="fn">nimbleMCMC</span>(lizardCode, constants=constants
 <p>The <code>nimbleCode</code> above <em>is</em> the model, but it helps to see it written out as a likelihood times priors &mdash; every Bayesian model has exactly this shape.</p>
 <p><strong>Likelihood (how the data arise):</strong></p>
 <div class="eq-block">$y_i \sim \text{Bernoulli}(p_i), \qquad \text{logit}\,p_i = a + b\,x_i, \qquad i = 1,\dots,n$</div>
-<p><strong>Priors (what we believe about the parameters before seeing data):</strong></p>
-<div class="eq-block">$a \sim \mathcal{N}(0,\ \sigma^2 = 2.71), \qquad b \sim \mathcal{N}(0,\ \sigma^2 = 2.71)$</div>
-<p>The posterior NIMBLE samples is proportional to the product of these: $p(a,b \mid y) \propto \big[\prod_i \text{Bernoulli}(y_i \mid p_i)\big]\,\mathcal{N}(a \mid 0,2.71)\,\mathcal{N}(b \mid 0,2.71)$. The $\mathcal{N}(0,2.71)$ priors are the weakly-informative choice from section A: on standardized $x$, they keep each coefficient in a biologically sane range and make the implied prior on $p_i$ nearly flat, without injecting real information.</p>
+<p><strong>Priors (what we believe about the parameters before seeing data):</strong> the excerpt above uses NIMBLE's precision parameterisation, <code>dnorm(0, 1e-6)</code>, i.e. precision $\tau = 10^{-6}$, i.e.</p>
+<div class="eq-block">$a \sim \mathcal{N}(0,\ \sigma^2 = 10^{6}), \qquad b \sim \mathcal{N}(0,\ \sigma^2 = 10^{6}) \qquad (\sigma = 1000)$</div>
+<p>The posterior NIMBLE samples is proportional to the product of these: $p(a,b \mid y) \propto \big[\prod_i \text{Bernoulli}(y_i \mid p_i)\big]\,\mathcal{N}(a \mid 0,10^6)\,\mathcal{N}(b \mid 0,10^6)$. That prior is the <em>intentionally bad</em> one, and the rest of this section is about why: on the logit scale it looks flat, but pushed through the inverse-logit it is anything but. The weakly-informative alternative developed below replaces it with $a, b \sim \mathcal{N}(0,\ \sigma^2 = 2.71)$, i.e. <code>dnorm(0, 1/2.71)</code>, which keeps each coefficient in a biologically sane range on standardized $x$ and makes the implied prior on $p_i$ nearly flat.</p>
 <p><strong>The same model as a DAG</strong> (directed acyclic graph). Arrows run from causes to effects; each node is a quantity, and the graph is exactly the factorization above &mdash; the parents of a node are the things that appear on the right of its <code>~</code> or <code>&lt;-</code>.</p>
 <svg viewBox="0 0 440 300" width="100%" role="img" aria-label="Directed acyclic graph of the lizard logistic model. Parameters a and b (with normal priors) and the observed covariate x_i all point into the deterministic node p_i, which points into the observed data y_i. The nodes x_i, p_i, y_i sit inside a plate repeated over islands i = 1 to n." font-family="'Helvetica Neue',Arial,sans-serif" font-size="13">
   <defs>
@@ -383,7 +403,7 @@ samples &lt;- <span class="fn">nimbleMCMC</span>(lizardCode, constants=constants
     <circle cx="300" cy="288" r="6.5" fill="#fff" stroke="#333"/><text x="312" y="292">parameter (has a prior)</text>
   </g>
 </svg>
-<p style="font-size:0.92em; color:#555;">Read it as: the parameters $a,b$ and the island's edge ratio $x_i$ together determine the detection-scale probability $p_i$ (a deterministic node &mdash; no randomness of its own), which in turn generates the observed presence/absence $y_i$. The plate means that inner structure repeats independently for every island; $a$ and $b$ sit <em>outside</em> the plate because they are shared by all islands.</p>
+<p style="font-size:0.92em; color:#555;">Read it as: the parameters $a,b$ and the island's edge ratio $x_i$ together determine the island's probability of being occupied, $p_i$ (a deterministic node &mdash; no randomness of its own), which in turn generates the observed presence/absence $y_i$. The plate means that inner structure repeats independently for every island; $a$ and $b$ sit <em>outside</em> the plate because they are shared by all islands. Note there is no detection layer anywhere in this model: $y_i$ is taken as the true presence/absence, and $p_i$ is the probability the species <em>occurs</em> on island $i$, not the probability you would detect it if it did. Sections E and F add exactly that missing layer.</p>
 </div></details>
 
 <h3>Init gotchas</h3>
@@ -401,7 +421,18 @@ samples &lt;- <span class="fn">nimbleMCMC</span>(lizardCode, constants=constants
 
 <p>The practical fix is a moderate prior on the logit-scale coefficients:</p>
 <div class="eq-block">$a, b \sim \mathcal{N}(0, \sigma^2 = 2.71) \quad\Leftrightarrow\quad \texttt{dnorm(0, 1/2.71)}$</div>
-<p>This is the "Gelman default" weakly-informative prior for logistic regression with standardised predictors. The implied marginal prior on $p_i$ is almost uniform on $[0, 1]$ &mdash; it flattens out the boundary spikes without smuggling in real information.</p>
+<p>The value $2.71$ (i.e. $\sigma \approx 1.65$) is chosen for one concrete reason: it is very close to the variance that makes the <em>implied</em> prior on $p_i = \text{ilogit}(a)$ come out nearly uniform on $[0,1]$. Push draws through the inverse-logit and check it yourself:</p>
+<div class="code-label">R · what does each logit-scale prior imply for $p$?</div>
+<pre><code><span class="fn">set.seed</span>(<span class="nu">1</span>)
+<span class="kw">for</span> (v <span class="kw">in</span> <span class="fn">c</span>(<span class="nu">1</span>, <span class="nu">2.71</span>, <span class="nu">4</span>, <span class="nu">10</span>, <span class="nu">1e6</span>)) {
+ p &lt;- <span class="fn">plogis</span>(<span class="fn">rnorm</span>(<span class="nu">2e6</span>, <span class="nu">0</span>, <span class="fn">sqrt</span>(v)))
+ <span class="fn">cat</span>(v, <span class="fn">sd</span>(p), <span class="fn">mean</span>(p &lt; <span class="nu">0.05</span> | p &gt; <span class="nu">0.95</span>), <span class="st">"\n"</span>)
+}
+<span class="cm"># Uniform(0,1) reference: sd = 0.289, P(tail) = 0.10</span></code></pre>
+<p>At $\sigma^2 = 2.71$ the implied prior on $p$ has SD 0.285 and puts 7.4% of its mass in the outer tails ($p&lt;0.05$ or $p&gt;0.95$) &mdash; against 0.289 and 10% for a true Uniform(0,1). At $\sigma^2 = 1$ it is too concentrated in the middle (SD 0.208, only 0.3% in the tails); at $\sigma^2 = 10$ it is already piling up at the boundaries (35% in the tails); and at the "vague" $\sigma^2 = 10^6$ essentially <strong>all</strong> of the prior mass (99.8%) sits in those tails. That last number is the U-shape in Panel A below, quantified.</p>
+<div class="callout warn">
+<p><strong>A naming caution.</strong> You will sometimes see $\mathcal{N}(0, 2.71)$ called "the Gelman default." Don't repeat that label &mdash; it is a misattribution. Gelman et al. (2008) recommend a <strong>Cauchy(0, 2.5)</strong> prior for coefficients of standardised predictors in logistic regression: heavier-tailed than a Normal, deliberately, so it regularises the bulk while still letting a genuinely large effect escape. $\mathcal{N}(0, 2.71)$ is a different, perfectly defensible weakly-informative choice, but it earns its keep from the near-uniform implied prior on $p$ shown above, not from that paper. The statistics in this section are unaffected; only the name was wrong.</p>
+</div>
 
 <figure class="prior-figure">
 <svg viewBox="0 0 844 298" role="img" aria-labelledby="priorfig-title priorfig-desc" xmlns="http://www.w3.org/2000/svg">
@@ -476,7 +507,7 @@ samples &lt;- <span class="fn">nimbleMCMC</span>(lizardCode, constants=constants
 <p><strong>(a) Convergence.</strong> For the vague-prior model <code>gelman.diag</code> returns R-hat = 1.00 for both $a$ and $b$ (upper C.I. 1.01) and <code>heidel.diag</code> passes the stationarity test for both ($p=0.62$ for $a$, $0.84$ for $b$). The tight-prior model behaves the same (R-hat = 1.00, stationarity passes); its only blemish is that the halfwidth precision test on $a$ flags, purely because $a$'s posterior mean sits almost exactly at 0. All three chains agree &mdash; the model converges.</p>
 <p><strong>(b) Sign of the slope.</strong> The slope is negative with near-certainty: $P(b&lt;0)$ = <strong>1.00</strong> under the vague prior and <strong>0.9995</strong> under the tight prior. Higher perimeter:area &rArr; lower occupancy.</p>
 <p><strong>(c) Management difference.</strong> Using the tight-prior model, predicted occupancy falls from $y_{10}$ = 0.73 [0.47, 0.91] at PA = 10 to $y_{20}$ = 0.41 [0.17, 0.68] at PA = 20, so <code>diff</code> $= P(\text{PA}=20)-P(\text{PA}=10)$ has posterior median <strong>&minus;0.30</strong>, 95% CI <strong>[&minus;0.54, &minus;0.10]</strong> &mdash; credibly negative (the interval excludes 0).</p>
-<p><strong>(d) Does the prior matter?</strong> Here it does. With only 19 islands and near-separation (small-PA islands are almost all occupied, large-PA almost all empty), the vague <code>dnorm(0, 1e-6)</code> lets the logit slope run large and diffuse: $b$ mean <strong>&minus;4.97</strong>, 95% CI [&minus;10.2, &minus;1.5]. The Gelman-default <code>dnorm(0, 1/2.71)</code> regularises it to $b$ mean <strong>&minus;2.44</strong>, 95% CI [&minus;4.5, &minus;0.8] &mdash; roughly half the magnitude and half the width. Both priors agree on the sign and the biological conclusion, but the marginal posterior of $b$ itself is much tighter and less extreme under the weakly-informative prior. This is exactly the small-$n$ regime, foreshadowed by the U-shaped-prior figure above, where the prior does real work rather than washing out.</p>
+<p><strong>(d) Does the prior matter?</strong> Here it does. With only 19 islands and near-separation (small-PA islands are almost all occupied, large-PA almost all empty), the vague <code>dnorm(0, 1e-6)</code> lets the logit slope run large and diffuse: $b$ mean <strong>&minus;4.97</strong>, 95% CI [&minus;10.2, &minus;1.5]. The weakly-informative <code>dnorm(0, 1/2.71)</code> regularises it to $b$ mean <strong>&minus;2.44</strong>, 95% CI [&minus;4.5, &minus;0.8] &mdash; roughly half the magnitude and half the width. Both priors agree on the sign and the biological conclusion, but the marginal posterior of $b$ itself is much tighter and less extreme under the weakly-informative prior. This is exactly the small-$n$ regime, foreshadowed by the U-shaped-prior figure above, where the prior does real work rather than washing out.</p>
 </div></details>
 </div>
 
@@ -668,6 +699,17 @@ samples &lt;- <span class="fn">nimbleMCMC</span>(lizardCode, constants=constants
 <p>Notice that we put the derived-quantity lines <em>inside</em> the model block. NIMBLE tracks them as deterministic nodes; at every MCMC iteration their values are computed from the current $(a, b)$ and stored. Posterior summaries of $S_\text{msy}$ and $H_\text{msy}$ come from <code>MCMCsummary</code> with no extra work and with all the parameter correlations properly accounted for.</p>
 </div>
 
+<div class="callout warn">
+<p><strong>Look hard at <code>a ~ dunif(1, 10)</code>. This is today's whole thesis, caught in the act.</strong> It looks like a harmless "wide, uninformative" prior. It is not. Both of its bounds silently make management decisions for you, <em>before the data say anything</em>.</p>
+<p><strong>The lower bound $a > 1$ makes collapse a priori impossible.</strong> The equilibrium is</p>
+<div class="eq-block">$N_\text{eq} = \dfrac{b(a-1)}{a}$</div>
+<p>which is the solution of $R(S) = S$ &mdash; set $\frac{aS}{1 + (a/b)S} = S$, cancel $S$, and rearrange. Read it: $N_\text{eq} > 0$ for every $a > 1$, and $N_\text{eq} = 0$ exactly at $a = 1$. Since the prior assigns zero density below $a=1$, the model <strong>cannot</strong> entertain a stock that fails to replace itself. If the real question on the table is "is this population collapsing?", this prior has already answered "no" &mdash; and no amount of data can overturn it. That is an informative prior wearing a uniform's clothing.</p>
+<p><strong>The upper bound $a &lt; 10$ caps the harvest rate.</strong> Since $H_\text{msy} = 1 - \sqrt{1/a}$ is strictly increasing in $a$, the prior imposes a hard ceiling</p>
+<div class="eq-block">$H_\text{msy} &lt; 1 - \sqrt{1/10} = 0.684$</div>
+<p>and the posterior is visibly pressed against it: in the Exercise 5 run, $a$'s 97.5th percentile is <strong>9.25</strong> against a ceiling of 10, and the upper end of the $H_\text{msy}$ 95% CI, <strong>0.671</strong>, sits at <strong>98% of the 0.684 bound</strong>. That is what a truncated posterior looks like. The reported interval is not "what the data say" &mdash; it is "what the data say, clipped by a bound nobody defended."</p>
+<p><strong>We are keeping the prior anyway</strong> &mdash; deliberately, so you can see this. In a real assessment you would either justify the bounds from biology (a productivity above 10 recruits/spawner may genuinely be impossible for this species &mdash; then <em>say so, and cite it</em>), or replace them with something that does not cliff-edge: e.g. a lognormal on $a$, or $\log a \sim \mathcal{N}(0, 1)$, which is weakly informative but leaves both collapse and high productivity reachable. The rule from section A applies exactly as it did on the log link: <em>always ask what your prior implies for the quantity you actually care about</em> &mdash; here $N_\text{eq}$ and $H_\text{msy}$, not $a$.</p>
+</div>
+
 <div class="exercise" id="ex-5">
 <span class="ex-tag">Exercise 5</span><span class="difficulty medium"> · 25 min · R</span>
 <h3>Spawner-recruit: fit, predict, derive</h3>
@@ -741,17 +783,21 @@ samples &lt;- <span class="fn">nimbleMCMC</span>(lizardCode, constants=constants
 zst &lt;- <span class="fn">matrix</span>(<span class="nu">1L</span>, Nsites, Nyears) <span class="cm"># THE init trick</span></code></pre>
 
 <h3>Derived quantities: turning raw transitions into metapopulation summaries</h3>
-<p>The raw parameters $\phi_t$ (persistence) and $\gamma_t$ (colonization) are hard to read one at a time. As in the fisheries model, the biologically meaningful numbers are <em>derived</em> from them &mdash; and because we compute them inside the model, MCMC returns a full posterior for each. Add this block to <code>DynOccCode</code> and monitor the new names:</p>
-<div class="code-label">R · derived quantities, added inside DynOccCode</div>
+<p>The raw parameters $\phi_t$ (persistence) and $\gamma_t$ (colonization) are hard to read one at a time. As in the fisheries model, the biologically meaningful numbers are <em>derived</em> from them &mdash; and because we compute them inside the model, MCMC returns a full posterior for each. This block is already in <code>DynamicOccupancy_Nimble.R</code>; the names below are exactly the ones the script monitors:</p>
+<div class="code-label">R · derived quantities, inside DynOccCode</div>
 <pre><code> <span class="cm"># Derived quantities -- each gets a full posterior for free</span>
  psi.t[<span class="nu">1</span>] &lt;- psi
  <span class="kw">for</span> (t <span class="kw">in</span> <span class="nu">2</span>:Nyears) {
  psi.t[t] &lt;- psi.t[t-<span class="nu">1</span>]*phi[t-<span class="nu">1</span>] + (<span class="nu">1</span>-psi.t[t-<span class="nu">1</span>])*gamma[t-<span class="nu">1</span>] <span class="cm"># expected occupancy</span>
  lambda[t-<span class="nu">1</span>] &lt;- psi.t[t] / psi.t[t-<span class="nu">1</span>] <span class="cm"># finite rate of change</span>
- turnover[t-<span class="nu">1</span>] &lt;- (gamma[t-<span class="nu">1</span>]*(<span class="nu">1</span>-psi.t[t-<span class="nu">1</span>])) /
+ turn[t-<span class="nu">1</span>] &lt;- (gamma[t-<span class="nu">1</span>]*(<span class="nu">1</span>-psi.t[t-<span class="nu">1</span>])) /
  (gamma[t-<span class="nu">1</span>]*(<span class="nu">1</span>-psi.t[t-<span class="nu">1</span>]) + phi[t-<span class="nu">1</span>]*psi.t[t-<span class="nu">1</span>]) <span class="cm"># newly-colonized share</span>
- equilib[t-<span class="nu">1</span>] &lt;- gamma[t-<span class="nu">1</span>] / (gamma[t-<span class="nu">1</span>] + (<span class="nu">1</span>-phi[t-<span class="nu">1</span>])) <span class="cm"># equilibrium occupancy</span>
+ eq[t-<span class="nu">1</span>] &lt;- gamma[t-<span class="nu">1</span>] / (gamma[t-<span class="nu">1</span>] + (<span class="nu">1</span>-phi[t-<span class="nu">1</span>])) <span class="cm"># equilibrium occupancy</span>
  }</code></pre>
+<div class="callout warn">
+<p><strong>Two indexing points worth pausing on.</strong> All three derived quantities describe a <em>transition</em>, not a year, so they are indexed <code>[t-1]</code> and run 1&hellip;<code>Nyears-1</code> &mdash; the same index as <code>phi</code> and <code>gamma</code>. Writing one of them as <code>eq[t]</code> inside a <code>for (t in 2:Nyears)</code> loop would silently never assign <code>eq[1]</code>, and monitoring it would hand you a column of <code>NA</code>s.</p>
+<p>Note also that the turnover node is called <code>turn</code>, not <code>tau</code>. In NIMBLE and JAGS <code>tau</code> conventionally denotes a <em>precision</em> ($1/\sigma^2$) &mdash; that is exactly how it is used in the ant and N<sub>2</sub>O models earlier in this lab. Reusing the name for turnover invites a real mistake.</p>
+</div>
 
 <div class="callout key">
 <p>Each derived quantity answers a different management question:</p>
@@ -763,18 +809,18 @@ zst &lt;- <span class="fn">matrix</span>(<span class="nu">1L</span>, Nsites, Nye
 </ul>
 </div>
 
-<p>From the same run as Exercise 6 (30 sites, 8 years; every derived quantity has R-hat = 1.00), the posterior medians tell a story the raw $\phi,\gamma$ cannot:</p>
+<p>From the same run as Exercise 6 (30 sites, 8 years; R-hat = 1.00 for every derived quantity except $\lambda_3$, which is 1.01), the posterior medians tell a story the raw $\phi,\gamma$ cannot:</p>
 <table>
-<tr><th>Transition</th><th>$\psi_t \rightarrow \psi_{t+1}$</th><th>$\lambda_t$</th><th>$\tau_t$</th><th>$\hat\psi_{\text{eq}}$</th></tr>
-<tr><td>1 &rarr; 2</td><td>0.33 &rarr; 0.37</td><td>1.13</td><td>0.85</td><td>0.36</td></tr>
+<tr><th>Transition</th><th>$\psi_t \rightarrow \psi_{t+1}$</th><th><code>lambda</code> $\lambda_t$</th><th><code>turn</code> $\tau_t$</th><th><code>eq</code> $\hat\psi_{\text{eq}}$</th></tr>
+<tr><td>1 &rarr; 2</td><td>0.33 &rarr; 0.37</td><td>1.15</td><td>0.85</td><td>0.37</td></tr>
 <tr><td>2 &rarr; 3</td><td>0.37 &rarr; 0.18</td><td><strong>0.49</strong></td><td>0.47</td><td>0.15</td></tr>
-<tr><td>3 &rarr; 4</td><td>0.18 &rarr; 0.43</td><td><strong>2.38</strong></td><td>0.79</td><td>0.47</td></tr>
+<tr><td>3 &rarr; 4</td><td>0.18 &rarr; 0.43</td><td><strong>2.36</strong></td><td>0.79</td><td>0.46</td></tr>
 <tr><td>4 &rarr; 5</td><td>0.43 &rarr; 0.31</td><td>0.72</td><td>0.81</td><td>0.34</td></tr>
-<tr><td>5 &rarr; 6</td><td>0.31 &rarr; 0.41</td><td>1.31</td><td>0.95</td><td>0.38</td></tr>
-<tr><td>6 &rarr; 7</td><td>0.41 &rarr; 0.43</td><td>1.07</td><td>0.79</td><td>0.43</td></tr>
-<tr><td>7 &rarr; 8</td><td>0.43 &rarr; 0.40</td><td>0.92</td><td>0.52</td><td>0.40</td></tr>
+<tr><td>5 &rarr; 6</td><td>0.31 &rarr; 0.41</td><td>1.31</td><td>0.94</td><td>0.38</td></tr>
+<tr><td>6 &rarr; 7</td><td>0.41 &rarr; 0.43</td><td>1.06</td><td>0.79</td><td>0.43</td></tr>
+<tr><td>7 &rarr; 8</td><td>0.43 &rarr; 0.40</td><td>0.93</td><td>0.52</td><td>0.40</td></tr>
 </table>
-<p>The year-3 crash ($\lambda \approx 0.5$, occupancy roughly halved) and the year-4 rebound ($\lambda \approx 2.4$) jump straight out of the $\lambda$ column, and turnover stays high throughout (0.5&ndash;0.95) &mdash; so this is a <em>churny</em> metapopulation, sites blinking on and off, not a stable core of occupied patches. None of that is visible in the raw per-year $\phi_t,\gamma_t$.</p>
+<p>The year-3 crash ($\lambda \approx 0.5$, occupancy roughly halved) and the year-4 rebound ($\lambda \approx 2.4$) jump straight out of the <code>lambda</code> column, and turnover stays high throughout (0.5&ndash;0.94) &mdash; so this is a <em>churny</em> metapopulation, sites blinking on and off, not a stable core of occupied patches. None of that is visible in the raw per-year $\phi_t,\gamma_t$.</p>
 
 <div class="exercise" id="ex-6">
 <span class="ex-tag">Exercise 6</span><span class="difficulty hard"> · 35 min · R · latent states</span>
@@ -788,10 +834,10 @@ zst &lt;- <span class="fn">matrix</span>(<span class="nu">1L</span>, Nsites, Nye
  <li>Posterior intervals on individual $\phi_t$ are wide. Why? What would you do in a real analysis to tighten them?</li>
 </ol>
 <details class="answer"><summary>Reveal worked solution (actual NIMBLE run)</summary><div class="answer-body">
-<p>Numbers below are from actually running the script (<code>set.seed(2025)</code>: 30 sites, 8 years, 3 reps, true $p=0.6$, baseline occupancy $\approx 0.37$; 3 chains, 20000 iter, 10000 burn-in, thin 5). Every monitored parameter has <strong>R-hat = 1.00</strong>.</p>
+<p>Numbers below are from actually running the script (<code>set.seed(2025)</code>: 30 sites, 8 years, 3 reps, true $p=0.6$, baseline occupancy $\approx 0.37$; 3 chains, 20000 iter, 10000 burn-in, thin 5). Across all 45 monitored parameters, <strong>R-hat is 1.00 everywhere except $\lambda_3$, which is 1.01</strong> &mdash; convergence is not the problem here.</p>
 <p><strong>(a&ndash;c)</strong> The two quantities informed by <em>all</em> the data are recovered well: detection $p$ = 0.63 [0.55, 0.70] (truth 0.60) and baseline occupancy $\psi$ = 0.33 [0.18, 0.51] (truth 0.37). Year-specific persistence and colonization scatter around the 1:1 line but with <strong>very wide 95% CIs</strong> &mdash; e.g. $\phi_3$ = 0.52 [0.16, 0.89], $\phi_5$ = 0.08 [0.00, 0.36], $\gamma_1$ = 0.47 [0.26, 0.70] (its truth 0.47, recovered almost exactly; others land anywhere in their wide interval). The derived yearly occupancy $\psi_t$ tracks the true trajectory, including the dip in year 3 (true 0.13, posterior 0.18 [0.08, 0.34]).</p>
 <p><strong>(d)</strong> Replacing the all-ones <code>zst</code> with random 0/1 inits triggers an "initial values produce a density/likelihood of 0" error (a $-\infty$ log-prob), because any site-year where a randomly-drawn $z=0$ collides with an observed $y=1$ is logically impossible.</p>
-<p><strong>(e)</strong> Each year-transition $\phi_t,\gamma_t$ is informed by only ~30 sites across a single two-year step, so the CIs are wide even though R-hat is a perfect 1.00 &mdash; Bayes is being honest about a genuinely small sample, not failing to converge. The standard fixes: put a hierarchical prior on the transitions, e.g. $\text{logit}(\phi_t) \sim \mathcal{N}(\mu_\phi, \sigma_\phi^2)$ so years borrow strength, and/or add a covariate model for $\phi$ and $\gamma$.</p>
+<p><strong>(e)</strong> Each year-transition $\phi_t,\gamma_t$ is informed by only ~30 sites across a single two-year step, so the CIs are wide even though R-hat is essentially 1.00 throughout &mdash; Bayes is being honest about a genuinely small sample, not failing to converge. The standard fixes: put a hierarchical prior on the transitions, e.g. $\text{logit}(\phi_t) \sim \mathcal{N}(\mu_\phi, \sigma_\phi^2)$ so years borrow strength, and/or add a covariate model for $\phi$ and $\gamma$.</p>
 </div></details>
 </div>
 
@@ -836,11 +882,14 @@ zst &lt;- <span class="fn">matrix</span>(<span class="nu">1L</span>, Nsites, Nye
 
 <h3>Bayesian p-value as a goodness-of-fit check</h3>
 <p>This is likely the first time you have met a Bayesian p-value, so let's build it up slowly. The question it answers is simple: <em>could data like mine plausibly have come from this fitted model?</em> If the model is right, fake datasets simulated from it should look statistically like the real one. If the real data are systematically weirder than anything the model can produce, the model is missing something.</p>
-<p><strong>Step 1 &mdash; pick a discrepancy statistic $T(y)$.</strong> Choose a single number that captures a feature you care about &mdash; here, how spread out the counts are (a chi-square-type sum $\sum_i (y_i - \mathbb{E}[y_i])^2 / \mathbb{E}[y_i]$, which grows large when the data are more variable than the model expects). Compute it on the real data.</p>
-<p><strong>Step 2 &mdash; build a reference distribution from the model itself.</strong> At each MCMC iteration $m$ you already hold a full set of parameter draws. Use them to simulate a fresh "replicate" dataset $y^\text{rep}_m$ of the same size &mdash; a dataset the fitted model considers perfectly ordinary &mdash; and compute the same statistic on it, $T(y^\text{rep}_m)$. Repeating over all $M$ iterations gives a whole distribution of $T$-values the model believes are normal.</p>
-<p><strong>Step 3 &mdash; ask where the real data land in that distribution.</strong> The Bayesian p-value is the fraction of replicates whose statistic exceeds the observed one:</p>
-<div class="eq-block">$p_B = \dfrac{1}{M}\sum_{m=1}^M \mathbb{1}\!\left[ T(y^\text{rep}_m) &gt; T(y_m) \right]$</div>
-<p>Reading the notation: $\mathbb{1}[\cdot]$ is an <em>indicator</em> that equals 1 when the bracketed comparison is true and 0 when it is false, so the sum simply counts how many of the $M$ replicates were <em>more extreme</em> than the data, and dividing by $M$ turns that count into a proportion. Both sides use iteration $m$'s parameters (that is why $y_m$ carries the subscript), so the data and its replicate are always compared at matching draws &mdash; this pairing is what makes it a <em>posterior predictive</em> check rather than a plug-in one.</p>
+<p><strong>Step 1 &mdash; pick a discrepancy statistic $T(y, \theta)$.</strong> Choose a single number that captures a feature you care about &mdash; here, a chi-square-type sum $\sum_i (y_i - \mathbb{E}[y_i \mid \theta])^2 / \mathbb{E}[y_i \mid \theta]$, which grows large when the data are more variable than the model expects. Note it depends on the parameters $\theta$ as well as the data, because the expected value it compares against is itself a function of $\theta$. (In the code below the same idea appears as a Freeman-Tukey statistic, $\sum_i (\sqrt{y_i} - \sqrt{\mathbb{E}[y_i \mid \theta]})^2$ &mdash; same logic, better-behaved for small counts.)</p>
+<p><strong>Step 2 &mdash; build a reference distribution from the model itself.</strong> At each MCMC iteration $m$ you hold a full set of parameter draws $\theta^{(m)}$. Use them to simulate a fresh "replicate" dataset $y^\text{rep}_m$ of the same size &mdash; a dataset the fitted model considers perfectly ordinary &mdash; and compute the statistic on it, $T(y^\text{rep}_m, \theta^{(m)})$. Compute the statistic on the <em>real</em> data at the same draw, $T(y, \theta^{(m)})$. Repeating over all $M$ iterations gives paired values of $T$ across the posterior.</p>
+<p><strong>Step 3 &mdash; ask where the real data land in that distribution.</strong> The Bayesian p-value is the fraction of iterations at which the replicate's statistic exceeds the observed one:</p>
+<div class="eq-block">$p_B = \dfrac{1}{M}\sum_{m=1}^M \mathbb{1}\!\left[ T(y^\text{rep}_m,\, \theta^{(m)}) &gt; T(y,\, \theta^{(m)}) \right]$</div>
+<p>Reading the notation: $\mathbb{1}[\cdot]$ is an <em>indicator</em> that equals 1 when the bracketed comparison is true and 0 when it is false, so the sum counts how many of the $M$ iterations put the replicate above the data, and dividing by $M$ turns that count into a proportion.</p>
+<div class="callout warn">
+<p><strong>Which thing carries the $m$?</strong> The superscript/subscript $m$ is on $\theta^{(m)}$ and on $y^\text{rep}_m$ &mdash; <em>never</em> on $y$. Your observed data are a fixed dataset; they do not change from one MCMC iteration to the next, so writing "$T(y_m)$" is meaningless. What changes across iterations is (i) the parameter draw $\theta^{(m)}$ and (ii) the fresh replicate $y^\text{rep}_m$ simulated from it. Both sides of the comparison are evaluated at the <em>same</em> $\theta^{(m)}$, and that is the pairing that makes this a <em>posterior predictive</em> check rather than a plug-in one: the discrepancy is averaged over the posterior of $\theta$ instead of being computed once at a point estimate.</p>
+</div>
 <p><strong>Reading the number.</strong> If the model fits, the real data are a typical draw, so roughly half the replicates land above it and half below: $p_B \approx 0.5$. A value near 0 means the observed statistic is larger than almost every replicate (the data are far more variable &mdash; or more clustered &mdash; than the model can generate); a value near 1 means the opposite. Either extreme is evidence of misfit, and, unlike a bare point estimate, it tells you <em>which</em> feature (whatever $T$ measured) the model gets wrong. Values from about 0.1 to 0.9 are unremarkable.</p>
 
 <div class="exercise" id="ex-7">
@@ -874,6 +923,7 @@ zst &lt;- <span class="fn">matrix</span>(<span class="nu">1L</span>, Nsites, Nye
  <li>What is the posterior of $\sigma_\epsilon$? Does it capture the overdispersion that the basic Poisson missed?</li>
 </ol>
 <details class="answer"><summary>Reveal sketch</summary><div class="answer-body">
+<p>The random effect is the new part, but keep the whole goodness-of-fit apparatus from <code>Nmix4Code</code> &mdash; the replicate <code>y.pred</code>, the expected value <code>e</code>, the two Freeman-Tukey residual arrays, and the two <code>fit.*</code> sums &mdash; or part (c) has nothing to compute. Note that <code>e[i,j]</code> now uses the <em>site-specific</em> <code>lambda[i]</code>:</p>
 <pre><code>Nmix5Code &lt;- <span class="fn">nimbleCode</span>({
  <span class="kw">for</span> (i <span class="kw">in</span> <span class="nu">1</span>:Nsites) {
  eps[i] ~ <span class="fn">dnorm</span>(<span class="nu">0</span>, <span class="nu">1</span>/sig.eps^<span class="nu">2</span>)
@@ -881,12 +931,22 @@ zst &lt;- <span class="fn">matrix</span>(<span class="nu">1L</span>, Nsites, Nye
  N[i] ~ <span class="fn">dpois</span>(lambda[i])
  <span class="kw">for</span> (j <span class="kw">in</span> <span class="nu">1</span>:Nreps) {
  y[i,j] ~ <span class="fn">dbinom</span>(prob = p, size = N[i])
+ y.pred[i,j] ~ <span class="fn">dbinom</span>(prob = p, size = N[i]) <span class="cm"># posterior replicate</span>
+ e[i,j] &lt;- p * lambda[i] <span class="cm"># expected count under the model</span>
+ resid[i,j] &lt;- <span class="fn">pow</span>(<span class="fn">pow</span>(y[i,j], <span class="nu">0.5</span>) - <span class="fn">pow</span>(e[i,j], <span class="nu">0.5</span>), <span class="nu">2</span>)
+ resid.pred[i,j] &lt;- <span class="fn">pow</span>(<span class="fn">pow</span>(y.pred[i,j], <span class="nu">0.5</span>) - <span class="fn">pow</span>(e[i,j], <span class="nu">0.5</span>), <span class="nu">2</span>)
  }
  }
+ fit.data &lt;- <span class="fn">sum</span>(resid[<span class="nu">1</span>:Nsites, <span class="nu">1</span>:Nreps]) <span class="cm"># T(y, theta)</span>
+ fit.pred &lt;- <span class="fn">sum</span>(resid.pred[<span class="nu">1</span>:Nsites, <span class="nu">1</span>:Nreps]) <span class="cm"># T(y.rep, theta)</span>
+
  b0 ~ <span class="fn">dunif</span>(-<span class="nu">5</span>, <span class="nu">5</span>)
  p ~ <span class="fn">dbeta</span>(<span class="nu">1</span>, <span class="nu">1</span>)
  sig.eps ~ <span class="fn">dunif</span>(<span class="nu">0</span>, <span class="nu">5</span>)
 })</code></pre>
+<p>Monitor <code>c("b0", "p", "sig.eps", "fit.data", "fit.pred")</code>, then read the p-value off exactly as in Model 4:</p>
+<pre><code>post &lt;- <span class="fn">as.matrix</span>(samples5)
+<span class="fn">mean</span>(post[, <span class="st">"fit.pred"</span>] &gt; post[, <span class="st">"fit.data"</span>])</code></pre>
 <p>After fitting, the Bayesian p-value moves much closer to 0.5 and the posterior of $\sigma_\epsilon$ is bounded away from 0.</p>
 </div></details>
 </div>

@@ -13,7 +13,7 @@
 <div class="shell">
 
 <aside class="sidebar">
- <h1><a href="../index.html" title="Back to course home">FW 536 · Day 4</a></h1>
+ <p class="brand"><a href="../index.html" title="Back to course home">FW 536 · Day 4</a></p>
  <div class="subtitle">Answer key</div>
  <nav>
  <ul>
@@ -58,14 +58,14 @@
 <div class="eq-block">$-\ell''(\hat p) = \dfrac{n}{\hat p} + \dfrac{n}{1-\hat p} = \dfrac{n}{\hat p (1 - \hat p)}.$</div>
 <p>So Fisher information is $I(\hat p) = n/[\hat p(1-\hat p)]$, and Wald SE is $1/\sqrt{I(\hat p)} = \sqrt{\hat p(1-\hat p)/n}$.</p>
 
-<p><strong>(d) Red-light data.</strong> $s=30, n=50$. $\hat p = 0.6$; Wald SE $= \sqrt{0.6 \cdot 0.4/50} \approx 0.0693$; Wald 95% CI $\approx (0.464, 0.736)$; profile 95% CI $\approx (0.461, 0.726)$ from <code>confint(mle(...))</code>.</p>
+<p><strong>(d) Red-light data.</strong> $s=30, n=50$. $\hat p = 0.6$; Wald SE $= \sqrt{0.6 \cdot 0.4/50} \approx 0.0693$; Wald 95% CI $\approx (0.464, 0.736)$; profile 95% CI $\approx (0.462, 0.728)$ from <code>confint(mle(...))</code>.</p>
 
 <pre><code><span class="kw">library</span>(stats4)
 nll &lt;- function(p) -(<span class="nu">30</span> * log(p) + <span class="nu">20</span> * log(<span class="nu">1</span> - p))
 fit &lt;- mle(nll, start = list(p = <span class="nu">0.5</span>), method = <span class="st">"L-BFGS-B"</span>,
  lower = <span class="nu">0.001</span>, upper = <span class="nu">0.999</span>)
 summary(fit)
-confint(fit) <span class="cm"># profile-likelihood CI: (0.461, 0.726)</span></code></pre>
+confint(fit) <span class="cm"># profile-likelihood CI: (0.462, 0.728)</span></code></pre>
 
 <div class="callout key"><strong>What to look for:</strong> Students should set the derivative to zero <em>by hand</em>, not just quote the answer. The Fisher-information step is where the connection between curvature and SE clicks; if they skip it, walk them back through it.</div>
 </section>
@@ -163,7 +163,7 @@ do.call(rbind, lapply(c(<span class="nu">1</span>, <span class="nu">2.5</span>, 
 <tr><td>8</td><td>~0.36</td><td>~0.006</td><td>~0.36</td><td>~961</td></tr>
 </table>
 
-<p>(c) Why the small-$\lambda$ case is hardest: at $\lambda=1$ a plain Poisson already produces P(Y=0) $= e^{-1} \approx 0.37$, not far from the inflated observed proportion of ~0.63. The likelihood signal that distinguishes Poisson from ZIP is weak. At $\lambda = 8$, plain Poisson predicts essentially zero zeros; any zero inflation is unmistakable.</p>
+<p>(c) Why the small-$\lambda$ case is hardest: at $\lambda_{\text{true}}=1$ the extra zeros drag the plain Poisson's estimate down to $\hat\lambda \approx 0.62$, and that fitted Poisson already produces P(Y=0) $= e^{-0.62} \approx 0.54$ — not far from the inflated observed proportion of ~0.63. The plain Poisson absorbs most of the zero inflation just by shrinking $\lambda$. The likelihood signal that distinguishes Poisson from ZIP is weak. At $\lambda = 8$, plain Poisson predicts essentially zero zeros; any zero inflation is unmistakable.</p>
 </section>
 
 <!-- ============== EX 5 ============== -->

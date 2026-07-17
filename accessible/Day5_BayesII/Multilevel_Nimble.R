@@ -20,7 +20,7 @@
 #   3. Group-level regression on a random intercept ("modeled intercept").
 #   4. Separating constants (sizes, indices) from data (observed RVs).
 #
-# Author: FW599 Enhanced (Day 5 -- Bayes II), Oregon State University.
+# Author: FW 536 (Day 5 -- Bayes II), Oregon State University.
 # =============================================================================
 
 # ----- Packages -------------------------------------------------------------

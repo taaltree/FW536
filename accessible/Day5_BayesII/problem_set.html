@@ -155,7 +155,7 @@ nsites &lt;- <span class="fn">length</span>(<span class="fn">unique</span>(group
 x.scaled &lt;- <span class="fn">as.numeric</span>(<span class="fn">scale</span>(liz$perimeterAreaRatio))
 y        &lt;- <span class="fn">as.integer</span>(liz$presence)</code></pre>
 <ol type="a">
- <li>Fit in <span class="pill nimble">NIMBLE</span> with the Gelman-default weakly informative prior $a, b \sim \mathcal{N}(0, \sigma^2{=}2.71)$ (i.e. <code>dnorm(0, 1/2.71)</code>). Report R-hat and <code>heidel.diag</code> for $a$ and $b$. Use starting values near 0 (why is that necessary here?).</li>
+ <li>Fit in <span class="pill nimble">NIMBLE</span> with the weakly informative prior $a, b \sim \mathcal{N}(0, \sigma^2{=}2.71)$ (i.e. <code>dnorm(0, 1/2.71)</code>, chosen because it implies a near-uniform prior on $p$). Report R-hat and <code>heidel.diag</code> for $a$ and $b$. Use starting values near 0 (why is that necessary here?).</li>
  <li>What is the posterior probability that the slope $b$ is negative (i.e., more edge per unit area $\Rightarrow$ lower occupancy)?</li>
  <li>Re-fit with a genuinely vague prior $a,b \sim \mathcal{N}(0, 10^6)$. With only 19 islands, does the prior visibly change the posterior of $b$? Overlay the two posterior densities.</li>
 </ol>

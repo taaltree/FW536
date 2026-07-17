@@ -13,7 +13,7 @@
 <div class="shell">
 
 <aside class="sidebar">
- <h1><a href="../index.html" title="Back to course home">FW 536 · Day 1</a></h1>
+ <p class="brand"><a href="../index.html" title="Back to course home">FW 536 · Day 1</a></p>
  <div class="subtitle">Answer key</div>
  <nav>
  <ul>
@@ -44,7 +44,7 @@
 <header class="lab-header">
  <div class="eyebrow">Day 1 · Answer key</div>
  <h1>Worked solutions — Probability & Discrete Distributions</h1>
- <p class="lede">Full numeric and conceptual answers to every Day 1 exercise. Each answer includes the underlying logic, the R verification, and a short "what to look for in a student response", plus a note on what to look for in student work.</p>
+ <p class="lede">Full numeric and conceptual answers to every Day 1 exercise. Each answer lays out the underlying logic, and — wherever the result is numeric — the R code that verifies it. Where a problem has a recurring sticking point, a "What to look for" note flags what to watch for in student work.</p>
 </header>
 
 <section id="a1">
@@ -137,7 +137,7 @@ dbinom(0, 24, 0.12) # 0.0465</code></pre>
 <section id="a8">
 <h2>Exercise 8 — Elk multinomial</h2>
 <pre><code>p &lt;- c(0.20, 0.45, 0.25, 0.10)
-dmultinom(c(18, 38, 18, 6), prob=p) # 0.00115
+dmultinom(c(18, 38, 18, 6), prob=p) # 0.00117
 set.seed(1)
 flights &lt;- rmultinom(5000, size=80, prob=p)
 hist(flights[3,], main="Calves observed", xlab="count")
@@ -182,25 +182,58 @@ which(1 - dbinom(0, 1:10, 0.25) &gt;= 0.5)[1] # 3</code></pre>
 <li>$(1-\lambda/n)^{-k} \to 1$.</li>
 </ol>
 <p>Product: $\frac{\lambda^k e^{-\lambda}}{k!}$, the Poisson PMF.</p>
-<pre><code>for(pp in list(c(20,0.2), c(100,0.04), c(1000,0.004))) {
+<p>Every case below holds $np = 4$ fixed while $n$ grows. The mean is pinned at 4 throughout; the <em>variance</em> is what moves:</p>
+<pre><code># Exact variances: Binomial is np(1-p), Poisson is lambda
+20*0.2*0.8 # 3.20
+100*0.04*0.96 # 3.84
+1000*0.004*0.996 # 3.984
+# Pois(4) # 4.00
+
+set.seed(1)
+for(pp in list(c(20,0.2), c(100,0.04), c(1000,0.004))) {
  x &lt;- rbinom(1e4, pp[1], pp[2])
  cat("n=", pp[1], " mean=", mean(x), " var=", var(x), "\n")
 }
-y &lt;- rpois(1e4, 4); cat("Pois mean=", mean(y), " var=", var(y), "\n")</code></pre>
-<p>All four distributions look essentially identical, with mean ≈ variance ≈ 4.</p>
+y &lt;- rpois(1e4, 4); cat("Pois mean=", mean(y), " var=", var(y), "\n")
+# n= 20   mean= 4.0015  var= 3.256023
+# n= 100  mean= 4.0021  var= 3.825078
+# n= 1000 mean= 3.9707  var= 3.917433
+# Pois    mean= 4.0035  var= 3.993687</code></pre>
+<p>The Binomial variance $np(1-p) = \lambda(1-p)$ is <em>always</em> short of the Poisson variance $\lambda$ by exactly the factor $(1-p)$. That is the whole story: Bin(20, 0.2) has variance 3.20, a full 20% below 4, and a histogram visibly narrower than Pois(4). Push $p$ down to 0.04 and the shortfall is 4%; at $p = 0.004$ it is 0.4%. The Poisson is the limit reached only as $p \to 0$ with $\lambda = np$ held fixed — so the distributions are <em>not</em> interchangeable at $n = 20$, and become so only as $n$ grows.</p>
+<p>The PMFs tell the same story. Comparing each Binomial to Pois(4) over $k = 0, \dots, 15$, the largest absolute difference in probability is:</p>
+<pre><code>k &lt;- 0:15
+max(abs(dbinom(k, 20, 0.2) - dpois(k, 4))) # 0.0228
+max(abs(dbinom(k, 100, 0.04) - dpois(k, 4))) # 0.0040
+max(abs(dbinom(k, 1000, 0.004) - dpois(k, 4))) # 0.00039</code></pre>
+<p>The error is $O(p) = O(\lambda/n)$, so asymptotically each tenfold increase in $n$ should buy a tenfold reduction in the gap. Watch the two steps separately: $0.02283 / 0.004022 = 5.7$, but $0.004022 / 0.0003918 = 10.3$. The second step delivers the promised factor of ten; the first only manages 5.7. The reason is that the $O(p)$ rate is an asymptotic statement, and $p = 0.2$ is not small — $n = 20$ is not yet in the regime where the rate applies. That is exactly why Bin(20, 0.2) is the case that shows you the approximation has to be earned.</p>
+
+<div class="callout key"><strong>What to look for:</strong> students should notice that the mean is fixed at 4 by construction and therefore carries no information about convergence — the variance is the diagnostic. A student who reports "they all look the same" has not looked at $n = 20$.</div>
 </section>
 
 <section id="a13">
 <h2>Stretch 13 — Monty Hall (camera trap)</h2>
 <p>P(initial guess right) = 1/3 regardless of what is revealed. The technician's reveal of an empty camera moves the remaining 2/3 onto the unopened alternative. So <strong>switch</strong>.</p>
+<p>The simulation has to actually model the technician and the switch — otherwise it just restates the analytic claim. Draw the truth and the guess, let the technician open a camera that is neither, then switch to whatever is left:</p>
 <pre><code>set.seed(1)
 trials &lt;- 1e5
-truth &lt;- sample(1:3, trials, replace=TRUE)
-guess &lt;- 1
-# Without switching:
-mean(truth == guess) # 1/3
-# With switching, we always end up on the unchosen alternative
-mean(truth != guess) # 2/3</code></pre>
+truth &lt;- sample(1:3, trials, replace=TRUE) # camera holding the marten
+guess &lt;- sample(1:3, trials, replace=TRUE) # your initial pick
+
+# Technician opens a camera that is neither your pick nor the marten's
+opened &lt;- vapply(seq_len(trials), function(i) {
+ choices &lt;- setdiff(1:3, c(guess[i], truth[i]))
+ if (length(choices) == 1) choices else sample(choices, 1)
+}, numeric(1))
+
+# You switch to the one remaining unopened camera
+switched &lt;- vapply(seq_len(trials), function(i) {
+ setdiff(1:3, c(guess[i], opened[i]))
+}, numeric(1))
+
+mean(guess == truth) # stay wins: 0.33257
+mean(switched == truth) # switch wins: 0.66743</code></pre>
+<p>Real output: staying wins 0.33257 of 100,000 trials, switching wins 0.66743 — matching 1/3 and 2/3.</p>
+<div class="callout key"><strong>What to look for:</strong> the simulation must contain a host who is constrained to open a losing, non-chosen camera. A student whose code fixes <code>guess &lt;- 1</code> and reports <code>mean(truth != guess)</code> has computed P(initial guess wrong) by construction — it returns 2/3 whether or not switching is a good idea, so it verifies nothing.</div>
 </section>
 
 <div style="margin-top:60px;">

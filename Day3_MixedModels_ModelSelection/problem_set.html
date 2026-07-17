@@ -13,7 +13,7 @@
 <div class="shell">
 
 <aside class="sidebar">
- <h1><a href="../index.html" title="Back to course home">FW 536 · Day 3</a></h1>
+ <p class="brand"><a href="../index.html" title="Back to course home">FW 536 · Day 3</a></p>
  <div class="subtitle">Assessed Problem Set</div>
  <nav>
  <div class="section">Morning · mixed models</div>
@@ -204,7 +204,7 @@ VarCorr(m)
 <div class="exercise" id="p6">
 <span class="ex-tag">Problem 6</span><span class="difficulty hard"> · nested random effects · overdispersion</span>
 <h3>Nested counts and the overdispersion check</h3>
-<p>An agency flies aerial surveys that produce counts nested three deep: 3 flights × 6 transects per flight × 4 management units = 72 transect-flights, each a single count. Counts vary among units, among transects within units, and among flights within transects.</p>
+<p>An agency flies aerial surveys that produce counts nested three deep: 4 management units × 6 transects per unit × 3 flights per transect = 72 transect-flights, each a single count. Counts vary among units, among transects within units, and among flights within transects.</p>
 <ol type="a">
 <li>Diagram the nesting, then write the equation for a Poisson GLMM with random intercepts at each level. With one count per flight, what happens to the flight-level term, and what is the standard trick for using it anyway?</li>
 <li>In lme4 syntax, what is the difference between <code>(1 | unit/transect)</code> and <code>(1 | unit) + (1 | transect)</code>? If transect IDs are reused across units (transect "1" exists in every unit but they are different transects), which do you use?</li>
@@ -330,7 +330,7 @@ aicc &lt;- <span class="fn">sapply</span>(forms, <span class="kw">function</span
 <pre><code>Model   K   AICc     deltaAICc   weight
 M3      5   1240.0   0.0         0.45
 M1      4   1240.6   0.6         0.33
-M2      4   1241.9   1.9         0.18
+M2      4   1241.9   1.9         0.17
 M0      3   1244.7   4.7         0.04</code></pre>
 <ol type="a">
 <li>Write the Akaike-weight formula. Confirm the weights in the table from the $\Delta$AICc column, and list which models are "competitive" by the $\Delta\text{AICc} &lt; 2$ rule.</li>

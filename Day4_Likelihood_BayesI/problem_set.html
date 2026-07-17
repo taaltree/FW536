@@ -13,7 +13,7 @@
 <div class="shell">
 
 <aside class="sidebar">
- <h1><a href="../index.html" title="Back to course home">FW 536 · Day 4</a></h1>
+ <p class="brand"><a href="../index.html" title="Back to course home">FW 536 · Day 4</a></p>
  <div class="subtitle">Assessed Problem Set — Likelihood &amp; Bayesian I</div>
  <nav>
  <div class="section">Morning · Maximum likelihood</div>
@@ -48,7 +48,7 @@
 <header class="lab-header">
  <div class="eyebrow">Day 4 · Assessed Problem Set (20 pts)</div>
  <h1>Ten problems on maximum likelihood and Bayesian inference</h1>
- <p class="lede">A dataset-driven problem set that mirrors the two Day 4 lectures. The morning problems are pure <strong>maximum likelihood</strong> — grid search, numerical optimization, likelihood-ratio tests, and profile confidence intervals. The afternoon problems are your first <strong>Bayesian</strong> models, fit with <span class="pill nimble">Nimble</span>. Three problems use the real course datasets (<code>vonbert.csv</code>, <code>whale.csv</code>, <code>Logistic.csv</code>); the rest are short simulate-and-fit or conceptual questions.</p>
+ <p class="lede">A dataset-driven problem set that mirrors the two Day 4 lectures. The morning problems are pure <strong>maximum likelihood</strong> — grid search, numerical optimization, likelihood-ratio tests, and profile confidence intervals. The afternoon problems are your first <strong>Bayesian</strong> models, fit with <span class="pill nimble">Nimble</span>. Five problems use the three real course datasets — <code>vonbert.csv</code> (Problem 2), <code>whale.csv</code> (Problems 3 and 10), and <code>Logistic.csv</code> (Problems 4 and 7); the rest are short simulate-and-fit or conceptual questions.</p>
 </header>
 
 <section class="callout warn" style="margin-top:24px;"><p><strong>Assessed problem set &middot; worth 20 points.</strong> Answers are <em>not</em> shown here. Write your work in the R Markdown templates: <a href="morning_lab_template.Rmd"><code>morning_lab_template.Rmd</code></a> for the morning (MLE) problems, <a href="afternoon_lab_template.Rmd"><code>afternoon_lab_template.Rmd</code></a> for the afternoon (Bayesian) problems. Knit each to HTML and upload to the matching Canvas assignment.</p><p>For worked examples with visible answers, see <a href="lab.html">the in-class practice lab</a>.</p></section>
@@ -126,6 +126,7 @@ blows &lt;- TheData$blows   <span class="cm"># the mixture ignores the sex colum
 <li>Write the joint negative log-likelihood and fit it with <code>mle()</code>, starting from $\lambda_1 &lt; \lambda_2$ (e.g. <code>lam1 = 10, lam2 = 30, p = 0.4</code>). Report the estimated male rate $\hat\lambda_1$, female rate $\hat\lambda_2$, proportion of males $\hat\pi$, and their standard errors.</li>
 <li>Refit from at least 8 different starting values. How many distinct local optima appear? Report the global best (lowest NLL) and the fraction of starts that reached it.</li>
 <li>The two-component mixture is invariant under relabeling: $(\lambda_1,\lambda_2,\pi)$ and $(\lambda_2,\lambda_1,1-\pi)$ are the same model. Explain how this shows up if you <em>don't</em> constrain $\lambda_1 &lt; \lambda_2$, and why it would corrupt your standard errors.</li>
+<li><strong>Validate against the labels.</strong> Your mixture never used the <code>sex</code> column — it estimated $\hat\pi$, the proportion of whales in the low-rate component, from the counts alone. In this dataset sex is coded <code>1 = male</code>, <code>2 = female</code>, and males are the lower-rate group. Compute the <em>actual</em> proportion of males, <code>mean(TheData$sex == 1)</code>, and compare it to $\hat\pi$. Also compare the observed mean blow count within each sex to $\hat\lambda_1$ and $\hat\lambda_2$. Does the unsupervised mixture recover the real sex structure?</li>
 </ol>
 </div>
 
@@ -221,15 +222,43 @@ Logistic &lt;- Logistic[<span class="fn">order</span>(Logistic$PopulationSize), 
 </div>
 
 <div class="exercise" id="p10">
-<span class="ex-tag">Problem 10</span><span class="difficulty hard"> · Conceptual · Identifiability &amp; label switching · 25 min</span>
+<span class="ex-tag">Problem 10</span><span class="difficulty hard"> · Bayesian · Nimble · Real data · Identifiability &amp; label switching · 25 min</span>
 <h3>Identifiability and label switching in a Bayesian mixture</h3>
-<p>You refit the two-component whale-blow mixture from Problem 3 (males vs females) in <span class="pill nimble">Nimble</span> instead of with <code>mle()</code>. With 3 chains and no constraint on the ordering of $\lambda_1$ and $\lambda_2$, the trace plots for "$\lambda_1$" jump between two values across iterations and between chains, and $\hat R$ is enormous.</p>
+<p>You refit the two-component whale-blow mixture from Problem 3 (males vs females) in <span class="pill nimble">Nimble</span> instead of with <code>mle()</code>. With 3 chains, no constraint on the ordering of $\lambda_1$ and $\lambda_2$, and chains started from <em>different labelings</em>, each chain locks onto its own labeling and stays there: one chain reports "$\lambda_1$" $\approx 10$ while another reports "$\lambda_1$" $\approx 30$ for the whole run. Every individual trace plot looks perfectly well mixed, but the chains disagree about what "$\lambda_1$" <em>means</em>, and $\hat R$ is enormous.</p>
 <p>The culprit is <strong>identifiability</strong>. A parameter — or a combination of parameters — is <em>non-identifiable</em> when two different parameter values produce <em>exactly the same likelihood</em>, so no amount of data can separate them. Here the mixture is invariant under relabeling: $(\lambda_1,\lambda_2,\pi)$ and $(\lambda_2,\lambda_1,\,1-\pi)$ give an identical likelihood — swapping the "male" and "female" labels changes nothing the data can see. That exchange symmetry is what breaks the sampler.</p>
 <ol type="a">
 <li>Explain geometrically what is happening. Why is $\hat R$ huge even though each chain has, in a sense, "converged" and the model fit is fine?</li>
+<li><strong>Reproduce the pathology.</strong> First fit the mixture with <em>no</em> ordering constraint, deliberately starting chain 2 from the mirrored labeling (rates swapped, labels flipped) so the chains disagree from the outset. Run this and record $\hat R$ for <code>lam[1]</code> — this is your "before" number:
+<div class="code-label">R · unconstrained mixture — the "before" run</div>
+<pre><code><span class="kw">library</span>(nimble); <span class="kw">library</span>(MCMCvis); <span class="kw">library</span>(coda)
+<span class="fn">set.seed</span>(<span class="nu">10</span>)                                <span class="cm"># so everyone gets the same Rhat</span>
+unc_code &lt;- <span class="fn">nimbleCode</span>({
+ lam[<span class="nu">1</span>] ~ <span class="fn">dunif</span>(<span class="nu">0</span>, <span class="nu">50</span>)
+ lam[<span class="nu">2</span>] ~ <span class="fn">dunif</span>(<span class="nu">0</span>, <span class="nu">50</span>)     <span class="cm"># nothing forces lam[1] &lt; lam[2]</span>
+ pi    ~ <span class="fn">dbeta</span>(<span class="nu">1</span>, <span class="nu">1</span>)
+ pz[<span class="nu">1</span>] &lt;- pi
+ pz[<span class="nu">2</span>] &lt;- <span class="nu">1</span> - pi
+ <span class="kw">for</span> (i <span class="kw">in</span> <span class="nu">1</span>:n) {
+ z[i] ~ <span class="fn">dcat</span>(pz[<span class="nu">1</span>:<span class="nu">2</span>])
+ y[i] ~ <span class="fn">dpois</span>(lam[z[i]])
+ }
+})
+zinit &lt;- <span class="kw">ifelse</span>(blows &lt; <span class="nu">20</span>, <span class="nu">1</span>, <span class="nu">2</span>)             <span class="cm"># rough starting labels</span>
+unc &lt;- <span class="fn">nimbleMCMC</span>(unc_code,
+ constants = <span class="kw">list</span>(n = <span class="fn">length</span>(blows)),
+ data      = <span class="kw">list</span>(y = blows),
+ inits     = <span class="kw">list</span>(<span class="kw">list</span>(lam = <span class="kw">c</span>(<span class="nu">8</span>, <span class="nu">28</span>),  pi = <span class="nu">0.4</span>,  z = zinit),
+                  <span class="kw">list</span>(lam = <span class="kw">c</span>(<span class="nu">28</span>, <span class="nu">8</span>),  pi = <span class="nu">0.6</span>,  z = <span class="nu">3</span> - zinit),  <span class="cm"># mirrored start</span>
+                  <span class="kw">list</span>(lam = <span class="kw">c</span>(<span class="nu">10</span>, <span class="nu">32</span>), pi = <span class="nu">0.35</span>, z = zinit)),
+ monitors  = <span class="kw">c</span>(<span class="st">"lam"</span>, <span class="st">"pi"</span>),
+ nchains = <span class="nu">3</span>, nburnin = <span class="nu">2000</span>, niter = <span class="nu">8000</span>,
+ samplesAsCodaMCMC = <span class="kw">TRUE</span>)
+<span class="fn">MCMCsummary</span>(unc)                            <span class="cm"># Rhat for lam[1] is enormous</span></code></pre>
+Also plot the three traces for <code>lam[1]</code> and note that each one is individually flat and well mixed — the disagreement is <em>between</em> chains, not within any one of them.</li>
 <li><strong>Fix it with an ordering constraint, then confirm the fix.</strong> The clean cure is to make the two rates un-swappable by <em>construction</em> — force $\lambda_1 &lt; \lambda_2$. One simple way: give the lower (male) rate its own prior, build the higher (female) rate on top of it with a positive gap $\delta$, and give each whale a latent sex label. Complete and run this skeleton (3 chains, the same <code>blows</code> vector as Problem 3):
 <div class="code-label">R · Nimble mixture with λ₁ &lt; λ₂ enforced</div>
 <pre><code><span class="kw">library</span>(nimble); <span class="kw">library</span>(MCMCvis); <span class="kw">library</span>(coda)
+<span class="fn">set.seed</span>(<span class="nu">11</span>)                                <span class="cm"># so everyone gets the same Rhat</span>
 mix_code &lt;- <span class="fn">nimbleCode</span>({
  lam1  ~ <span class="fn">dunif</span>(<span class="nu">0</span>, <span class="nu">50</span>)        <span class="cm"># lower (male) rate</span>
  delta ~ <span class="fn">dunif</span>(<span class="nu">0</span>, <span class="nu">50</span>)        <span class="cm"># positive gap, so lam[2] &gt; lam[1]</span>
@@ -254,7 +283,7 @@ out &lt;- <span class="fn">nimbleMCMC</span>(mix_code,
  nchains = <span class="nu">3</span>, nburnin = <span class="nu">2000</span>, niter = <span class="nu">8000</span>,
  samplesAsCodaMCMC = <span class="kw">TRUE</span>)
 <span class="fn">MCMCsummary</span>(out)                             <span class="cm"># check Rhat ~ 1</span></code></pre>
-<strong>What to look for:</strong> after the constraint the traces for $\lambda_1$ and $\lambda_2 = $ <code>lam1 + delta</code> stay in their own lanes (no jumping between ~10 and ~30), $\hat R$ drops to $\approx 1$, and the posterior means land on the Problem 3 MLEs ($\lambda_1\approx 10$, $\lambda_2\approx 30$, $\pi\approx 0.42$). Report $\hat R$ for $\lambda_1$ before and after adding the constraint.</li>
+<strong>What to look for:</strong> after the constraint every chain agrees on which rate is which — $\lambda_1$ sits near 10 and $\lambda_2 = $ <code>lam1 + delta</code> near 30 in <em>all three</em> chains, rather than one chain having them the other way round. $\hat R$ drops to $\approx 1$, and the posterior means land on the Problem 3 MLEs ($\lambda_1\approx 10$, $\lambda_2\approx 30$, $\pi\approx 0.42$). Report $\hat R$ for $\lambda_1$ before and after adding the constraint — the two numbers should be dramatically different.</li>
 <li>If you relabel the posterior draws post hoc so that $\lambda_1 &lt; \lambda_2$ always, what bias might you introduce, and when is such post hoc relabeling justified?</li>
 </ol>
 <div class="callout bio">The same non-identifiability logic appears throughout fisheries and wildlife modeling — for instance the catchability–biomass product $qB$ in surplus-production stock assessment, where only the product is identified from a single index. Recognizing an unidentified parameter combination is a core modeling skill.</div>

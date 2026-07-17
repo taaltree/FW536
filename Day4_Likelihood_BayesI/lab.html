@@ -890,8 +890,7 @@ mass_rep_chain &lt;- <span class="fn">MCMCchains</span>(reg_samps, <span class="
 <span class="fn">points</span>(length_mm, mass_g, pch = <span class="nu">19</span>, col = <span class="st">"red"</span>)</code></pre>
 
 <div class="callout key">
-The recipe is always the same three steps: <strong>(1)</strong> simulate fake datasets from the posterior, <strong>(2)</strong> compute the same summary on the fake data and the real data, <strong>(3)</strong> ask how often the fake beats the real. That fraction is the Bayesian p-value. Near 0.5 means the real data look like something your model would produce. Near 0 or 1 is a red flag.<br><br>
-One trap is worth knowing. <strong>The summary has to be something your model could get wrong.</strong> <code>sigma</code> is estimated from how far the points sit from the line, so any summary built on that spread — the SD of the residuals, or the sum of squared residuals — will pass no matter what: the model just makes <code>sigma</code> bigger until the fake data spread like the real data. Feed it heteroscedastic, heavy-tailed or curved data and it still answers ≈0.5. It cannot fail, so it cannot warn you. "The biggest miss" can fail, because nothing in the model is tuned to match it. And always look at the plot too — a single number will never show you the wrong <em>shape</em>.
+The recipe is always the same three steps: <strong>(1)</strong> simulate fake datasets from the posterior, <strong>(2)</strong> compute the same summary on the fake data and the real data, <strong>(3)</strong> ask how often the fake beats the real. That fraction is the Bayesian p-value. Near 0.5 means the real data look like something your model would produce. Near 0 or 1 is a red flag. Look at the plot as well as the number — they can tell you different things.
 </div>
 </section>
 

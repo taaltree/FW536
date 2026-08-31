@@ -32,3 +32,6 @@ _tools/__pycache__/
 # ignoring only the .md is how RECOMMENDATIONS.html ended up published.
 PREPUB_*
 RECOMMENDATIONS.*
+
+# stray R plot-device output
+Rplots.pdf

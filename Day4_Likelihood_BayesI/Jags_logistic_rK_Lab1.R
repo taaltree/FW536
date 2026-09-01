@@ -181,8 +181,13 @@ zm = coda.samples(jm, variable.names = c("K", "r", "sigma", "N_at_maxdNdt","MSY"
 df = as.data.frame(rbind(zm[[1]], zm[[2]], zm[[3]])) #each chain
 dim(df)
 
-library(mcmcplots)
-mcmcplot(zm.short)
+# OPTIONAL. mcmcplots is archived on CRAN and is NOT installed for this course,
+# so this browser-based diagnostic is guarded: the script runs either way, and
+# nothing below depends on its output. MCMCtrace(zm.short) above already gives
+# you the same trace/density diagnostics.
+if (requireNamespace("mcmcplots", quietly = TRUE)) {
+  mcmcplots::mcmcplot(zm.short)
+}
 
 # 1. (done) Convert the coda object zm, into a data frame using df = as.data.frame(rbind(zm[[1]], zm[[2]], zm[[3]])) Note the double brack- ets, which effectively unlist each element of zm, allowing them to be combined. Another way to do this is do.call(rbind,zm).
 # 2. Look at the first six rows of the data frame.
@@ -209,7 +214,11 @@ rug(MSY, col = "red")
 
 HPDI <-  MCMCpstr(zm, params = c("dNdt"), func = function(x) hdi(x, .95))#Note hdi() is highest density interval
 medN <- MCMCpstr(zm, params = c("dNdt"), func = median)
-plot(N, medN$dNdt,  ylab = "Population growth rate dN/dt", xlab = "Population size N", type = "l", ylim = c(-40, 80))
+# Let the DATA set ylim. N runs to 1500, well past K, where dN/dt goes strongly
+# negative; a hard-coded ylim = c(-40, 80) clips the median and the lower HPDI and
+# hides exactly the N > K region the model has the most to say about.
+plot(N, medN$dNdt,  ylab = "Population growth rate dN/dt", xlab = "Population size N", type = "l",
+     ylim = range(medN$dNdt, HPDI$dNdt))
 abline(h=0)
 lines(N, HPDI$dNdt[,1], lty = "dashed")
 lines(N, HPDI$dNdt[,2], lty = "dashed")

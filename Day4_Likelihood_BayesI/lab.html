@@ -71,7 +71,7 @@
 
 <div class="lab-toc" id="lab-toc">
   <h2>What's in this lab and what to hand in</h2>
-  <p class="toc-intro">This page is your <strong>in-class practice</strong> problem set — worked examples with visible answers. Your <strong>graded 20-point assignment</strong> is a separate problem set; write up your answers in the R Markdown template and submit on Canvas.</p>
+  <p class="toc-intro">This page is your <strong>in-class practice</strong> problem set — worked examples with visible answers. Your <strong>graded 40-point assignment</strong> (20 points per session) is a separate problem set; write up your answers in the R Markdown template and submit on Canvas.</p>
   
 <div class="session">
   <div class="session-label">Morning · 20 pts</div>
@@ -84,7 +84,7 @@
             <span class="note">— answers NOT shown; graded — submit on Canvas</span></span></div>
     <div class="row"><span class="tag template">Hand-in</span><span><a href="morning_lab_template.Rmd">morning_lab_template.Rmd</a> <span class="note">— knit to HTML and upload to Canvas</span></span></div>
     <div class="row"><span class="tag lecture">Lecture</span>
-      <span><a href="FW536_Day4_Morning_maximum%20likelihod_accessible.pptx">Morning lecture · maximum likelihood</a></span></div>
+      <span><a href="FW536_Day4_Morning_maximum%20likelihod_nosoln_accessible.pptx">Morning lecture · maximum likelihood</a></span></div>
   </div>
 </div>
 
@@ -99,7 +99,7 @@
             <span class="note">— answers NOT shown; graded — submit on Canvas</span></span></div>
     <div class="row"><span class="tag template">Hand-in</span><span><a href="afternoon_lab_template.Rmd">afternoon_lab_template.Rmd</a> <span class="note">— knit to HTML and upload to Canvas</span></span></div>
     <div class="row"><span class="tag lecture">Lecture</span>
-      <span><a href="FW536_Day4_Afternoon_BayesI_accessible.pptx">Afternoon lecture · Bayes I</a></span></div>
+      <span><a href="FW536_Day4_Afternoon_BayesI_nosoln_accessible.pptx">Afternoon lecture · Bayes I</a></span></div>
   </div>
 </div>
 
@@ -226,18 +226,22 @@ The MLE under <em>any</em> Bernoulli/Binomial model is the sample proportion. Th
 <p>where $a$ is age, $L_a$ is length at age $a$, $L_\infty$ is asymptotic maximum length, and $\kappa$ is the growth coefficient. Given $n$ aged individuals, the likelihood is</p>
 <div class="eq-block">$L(L_\infty, \kappa, \sigma \mid \text{data}) = \prod_{i=1}^n \dfrac{1}{\sqrt{2\pi}\sigma}\exp\!\left[-\dfrac{(L_i - L_\infty(1 - e^{-\kappa a_i}))^2}{2\sigma^2}\right].$</div>
 
-<p>The original course code holds $\sigma = 10$ and $L_\infty = 100$ fixed and grids over $\kappa \in \{0.1, 0.2, 0.3, 0.4\}$ to show how the likelihood changes with the parameter. Here is that grid search, complete and runnable.</p>
+<p>The original course code holds $\sigma = 10$ and $L_\infty = 100$ fixed and grids over $\kappa$ to show how the likelihood changes with the parameter. Here is that grid search on a grid fine enough to locate the minimum &mdash; $\kappa$ from $0.05$ to $0.50$ in steps of $0.005$ &mdash; complete and runnable.</p>
+
+<div class="callout warn">
+<strong>Two things to hold on to before you run it.</strong> (i) This walk-through and the next one both use <em>only the <code>sex == 1</code> subgroup</em> (50 fish), not the whole file &mdash; the vectors are therefore named <code>age1</code> and <code>len1</code>, to keep them separate from the full-dataset <code>Age</code>/<code>Len</code> built in Walk-through 5. Re-use the wrong pair and you will silently fit the wrong data. (ii) The grid varies $\kappa$ <em>alone</em>, with $L_\infty$ and $\sigma$ frozen at the nominal values 100 and 10. Freezing $L_\infty$ is not innocent, and Walk-through 3 shows exactly what it costs.
+</div>
 
 <div class="code-label">R · grid search for Vonbert κ</div>
-<pre><code><span class="cm"># Load the Vonbert data (columns: sex, age, length). Keep sex==1.</span>
+<pre><code><span class="cm"># Load the Vonbert data (columns: sex, age, length) and keep the sex == 1 fish.</span>
 TheData &lt;- <span class="fn">read.csv</span>(<span class="st">"data/vonbert.csv"</span>)
-TheData &lt;- TheData[TheData$sex == <span class="nu">1</span>, ]
-age &lt;- TheData$age; len &lt;- TheData$length
+Sex1 &lt;- TheData[TheData$sex == <span class="nu">1</span>, ]
+age1 &lt;- Sex1$age; len1 &lt;- Sex1$length
 
 <span class="cm"># negative log-likelihood as a function of (Linf, kappa, sigma)</span>
 nll_vbgf &lt;- <span class="kw">function</span>(Linf, kappa, sigma) {
- pred &lt;- Linf * (<span class="nu">1</span> - <span class="fn">exp</span>(-kappa * age))
- -<span class="fn">sum</span>(<span class="fn">dnorm</span>(len, mean = pred, sd = sigma, log = <span class="kw">TRUE</span>))
+ pred &lt;- Linf * (<span class="nu">1</span> - <span class="fn">exp</span>(-kappa * age1))
+ -<span class="fn">sum</span>(<span class="fn">dnorm</span>(len1, mean = pred, sd = sigma, log = <span class="kw">TRUE</span>))
 }
 
 <span class="cm"># Grid search over kappa with Linf and sigma fixed (as in the original lab).</span>
@@ -256,14 +260,18 @@ A grid search is conceptually clean but does not scale. With 3 parameters at 50 
 <section id="mle-vbgf">
 <h2>Walk-through 3 · Numerical optimization: <code>mle()</code> and <code>optim()</code></h2>
 
-<p>The <code>stats4::mle()</code> wrapper around <code>optim()</code> takes a function of named parameters and a list of starting values. It returns the MLE, the Hessian-based standard errors, and lets you compute Wald or profile confidence intervals.</p>
+<p>The <code>stats4::mle()</code> wrapper around <code>optim()</code> takes a function of named parameters and a list of starting values. It returns the MLE, the Hessian-based standard errors, and lets you compute Wald or profile confidence intervals. We stay on the <em>same</em> <code>sex == 1</code> subgroup as Walk-through 2, so the two results are directly comparable &mdash; the block below rebuilds <code>age1</code>/<code>len1</code> from scratch so it also runs on its own.</p>
 
 <div class="code-label">R · MLE of the full 3-parameter Vonbert model</div>
 <pre><code><span class="kw">library</span>(stats4)
 
+TheData &lt;- <span class="fn">read.csv</span>(<span class="st">"data/vonbert.csv"</span>)
+Sex1 &lt;- TheData[TheData$sex == <span class="nu">1</span>, ]
+age1 &lt;- Sex1$age; len1 &lt;- Sex1$length
+
 nll_vbgf3 &lt;- <span class="kw">function</span>(Linf, kappa, sigma) {
- pred &lt;- Linf * (<span class="nu">1</span> - <span class="fn">exp</span>(-kappa * age))
- -<span class="fn">sum</span>(<span class="fn">dnorm</span>(len, mean = pred, sd = sigma, log = <span class="kw">TRUE</span>))
+ pred &lt;- Linf * (<span class="nu">1</span> - <span class="fn">exp</span>(-kappa * age1))
+ -<span class="fn">sum</span>(<span class="fn">dnorm</span>(len1, mean = pred, sd = sigma, log = <span class="kw">TRUE</span>))
 }
 
 fit &lt;- <span class="fn">mle</span>(nll_vbgf3,
@@ -274,6 +282,17 @@ fit &lt;- <span class="fn">mle</span>(nll_vbgf3,
 <span class="fn">summary</span>(fit)
 <span class="fn">confint</span>(fit) <span class="cm"># profile-likelihood CIs (the right kind for nonlinear models)</span>
 -<span class="fn">logLik</span>(fit)[<span class="nu">1</span>] <span class="cm"># minimum NLL at the MLE</span></code></pre>
+
+<div class="callout key">
+<strong>Why this $\hat\kappa$ is not the grid&rsquo;s $\kappa$ &mdash; and why that is the whole point.</strong> Walk-through 2 searched a grid and reported $\kappa \approx 0.15$. This block, on the <em>identical</em> 50 fish, returns $\hat\kappa = 0.2591$. Nothing went wrong in either one: they are answers to two different questions.
+
+<ul>
+<li>The grid pinned $L_\infty$ at the round number $100$. But the sex-1 fish level off near $\hat L_\infty = 82.6$, so a curve forced up to an asymptote of 100 will overshoot the older fish &mdash; unless the only free knob, $\kappa$, is turned <em>down</em> to make the curve approach that too-high ceiling more slowly. $\kappa \approx 0.15$ is that compensation, not a growth coefficient.</li>
+<li>Free all three and the model no longer needs the compensation: $\hat L_\infty = 82.60$, $\hat\kappa = 0.2591$, $\hat\sigma = 8.18$. The minimum NLL drops from $198.78$ on the grid to $176.05$ &mdash; a gap of nearly 23 log-likelihood units, so the grid answer is not even close in likelihood terms.</li>
+</ul>
+
+$L_\infty$ and $\kappa$ are strongly correlated in the VBGF, and that is the general lesson: <strong>a &ldquo;profile&rdquo; taken with the other parameters <em>frozen</em> is not a profile at all.</strong> A real profile likelihood (Walk-through 5, and Exercise 2) re-optimizes every nuisance parameter at each grid point, which is exactly why it gives back $0.2591$ and the frozen grid does not.
+</div>
 
 <div class="callout warn">
 Pick starting values in the same ballpark as the data. <code>L-BFGS-B</code> with sensible bounds protects against negative <code>sigma</code> and other nonsense. If <code>summary()</code> tells you the Hessian is singular, your model is unidentified or you're at a boundary — diagnose, don't ignore.
@@ -316,7 +335,7 @@ fit_mix &lt;- <span class="fn">mle</span>(nll_mix,
 <section id="lrt-profile">
 <h2>Walk-through 5 · Likelihood ratio tests &amp; profile likelihood</h2>
 
-<h3>LRT: do males and females share a growth curve?</h3>
+<h3>LRT: do the two sex groups share a growth curve?</h3>
 <p>Fit two nested Vonbert models to the full dataset (sex 1 and sex 2 combined):</p>
 <ul>
 <li><strong>Model A</strong> (null, 3 parameters): one $L_\infty$, one $\kappa$, one $\sigma$, shared across sexes.</li>
@@ -325,7 +344,9 @@ fit_mix &lt;- <span class="fn">mle</span>(nll_mix,
 <p>Likelihood-ratio statistic: $\Lambda = 2(\ell_B - \ell_A)$. Under $H_0$: $\Lambda \sim \chi^2_{\Delta\,\text{df} = 2}$.</p>
 
 <div class="code-label">R · LRT for sex-specific Vonbert</div>
-<pre><code>TheData &lt;- <span class="fn">read.csv</span>(<span class="st">"data/vonbert.csv"</span>)
+<pre><code><span class="cm"># Capitalised Sex/Age/Len = ALL 100 fish, both sexes. (Walk-throughs 2 and 3</span>
+<span class="cm"># used lower-case age1/len1, the 50 fish with sex == 1. Do not mix them up.)</span>
+TheData &lt;- <span class="fn">read.csv</span>(<span class="st">"data/vonbert.csv"</span>)
 Sex &lt;- TheData$sex; Age &lt;- TheData$age; Len &lt;- TheData$length
 
 nll_A &lt;- <span class="kw">function</span>(Linf, kappa, sigma) {
@@ -672,25 +693,27 @@ N_grid &lt;- <span class="fn">seq</span>(<span class="nu">0</span>, <span class=
  y[i] ~ <span class="fn">dnorm</span>(mu[i], tau)
  }
 
- <span class="cm"># derived quantities</span>
+ <span class="cm"># derived quantities (scalars -- monitoring these is free)</span>
  N_at_maxdNdt &lt;- K / <span class="nu">2</span>
  MSY &lt;- r * K / <span class="nu">4</span>
-
- <span class="kw">for</span> (j <span class="kw">in</span> <span class="nu">1</span>:nN) {
- dNdt[j] &lt;- r * N[j] * (<span class="nu">1</span> - N[j] / K)
- }
 })</code></pre>
+
+<div class="callout warn">
+<strong>What a monitor costs, and the one habit that saves you.</strong> The run below keeps $3 \times (25{,}000 - 5{,}000) = 60{,}000$ draws. Each monitored node is therefore a column of 60,000 doubles &mdash; about 0.46 MB. That is nothing for a scalar like <code>MSY</code>, which is why you should put scalar derived quantities straight into the model code and monitor them.
+
+<p>It is <em>not</em> nothing for a vector. The obvious way to get the $dN/dt$ curve is to pass the grid in as constants (<code>N</code>, <code>nN</code>), add <code>for (j in 1:nN) { dNdt[j] &lt;- r * N[j] * (1 - N[j] / K) }</code> to the model, and monitor <code>dNdt</code>. With a 151-point grid, plus the 50 fitted <code>mu[i]</code>, that is 206 columns &mdash; a <strong>94.3 MB</strong> posterior object instead of a 2.3 MB one, slow to summarise and slow to save.</p>
+
+<p>You do not have to choose between the curve and the memory. <code>dNdt[j]</code> and <code>mu[i]</code> are <em>deterministic</em> functions of $r$ and $K$, so evaluating them draw-by-draw in R on the saved $r$ and $K$ columns gives back the identical posterior &mdash; identical to floating-point, not approximately &mdash; at zero storage cost. <strong>Rule of thumb: monitor scalars in the model; for a long prediction grid, save the parameters and rebuild the grid afterwards in R.</strong> <code>Logistic_BayesianGrowth_Nimble.R</code> does exactly this.</p>
+</div>
 
 <div class="code-label">R · constants vs data, inits, MCMC</div>
 <pre><code><span class="cm"># Nimble splits the JAGS "data" list into:</span>
-<span class="cm"># constants : sizes, indices, fixed covariates, prediction grids</span>
+<span class="cm"># constants : sizes, indices, fixed covariates (things that are not random variables)</span>
 <span class="cm"># data : observed stochastic nodes (y[i] here)</span>
 constants &lt;- <span class="kw">list</span>(
  n = <span class="fn">nrow</span>(Logistic),
- x = <span class="fn">as.double</span>(Logistic$PopulationSize),
- N = N_grid,
- nN = <span class="fn">length</span>(N_grid)
-)
+ x = <span class="fn">as.double</span>(Logistic$PopulationSize)
+) <span class="cm"># N_grid stays in R -- it is a plotting grid, not part of the model</span>
 data &lt;- <span class="kw">list</span>(y = <span class="fn">as.double</span>(Logistic$GrowthRate))
 
 inits_list &lt;- <span class="kw">list</span>(
@@ -705,7 +728,7 @@ samples &lt;- <span class="fn">nimbleMCMC</span>(
  constants = constants,
  data = data,
  inits = inits_list,
- monitors = <span class="kw">c</span>(<span class="st">"K"</span>, <span class="st">"r"</span>, <span class="st">"sigma"</span>, <span class="st">"mu"</span>, <span class="st">"N_at_maxdNdt"</span>, <span class="st">"MSY"</span>, <span class="st">"dNdt"</span>),
+ monitors = <span class="kw">c</span>(<span class="st">"K"</span>, <span class="st">"r"</span>, <span class="st">"sigma"</span>, <span class="st">"N_at_maxdNdt"</span>, <span class="st">"MSY"</span>),
  nchains = <span class="nu">3</span>,
  nburnin = <span class="nu">5000</span>,
  niter = <span class="nu">25000</span>,
@@ -727,9 +750,36 @@ samples &lt;- <span class="fn">nimbleMCMC</span>(
 <pre><code><span class="fn">MCMCtrace</span>(samples, params = <span class="kw">c</span>(<span class="st">"K"</span>, <span class="st">"r"</span>, <span class="st">"sigma"</span>), pdf = <span class="kw">FALSE</span>, Rhat = <span class="kw">TRUE</span>, n.eff = <span class="kw">TRUE</span>)
 <span class="fn">MCMCsummary</span>(samples, params = <span class="kw">c</span>(<span class="st">"K"</span>, <span class="st">"r"</span>, <span class="st">"sigma"</span>, <span class="st">"N_at_maxdNdt"</span>, <span class="st">"MSY"</span>), round = <span class="nu">3</span>)
 
+<span class="fn">print</span>(<span class="fn">object.size</span>(samples), units = <span class="st">"MB"</span>) <span class="cm"># ~2.3 Mb, not 94.3</span>
+
 <span class="cm"># P(r > 0.22 | data)</span>
-r_chain &lt;- <span class="fn">MCMCchains</span>(samples, params = <span class="st">"r"</span>)
+r_chain &lt;- <span class="fn">as.numeric</span>(<span class="fn">MCMCchains</span>(samples, params = <span class="st">"r"</span>))
+K_chain &lt;- <span class="fn">as.numeric</span>(<span class="fn">MCMCchains</span>(samples, params = <span class="st">"K"</span>))
 <span class="fn">mean</span>(r_chain &gt; <span class="nu">0.22</span>)</code></pre>
+
+<div class="code-label">R · rebuilding the dN/dt curve from the r and K draws</div>
+<pre><code><span class="kw">library</span>(HDInterval)
+N_grid &lt;- <span class="fn">seq</span>(<span class="nu">0</span>, <span class="nu">1500</span>, by = <span class="nu">10</span>); N_grid[<span class="nu">1</span>] &lt;- <span class="nu">1</span>
+
+<span class="cm"># One grid point at a time, so the full 60,000 x 151 matrix never exists.</span>
+dNdt_summary &lt;- <span class="fn">sapply</span>(N_grid, <span class="kw">function</span>(Nj) {
+ d &lt;- r_chain * Nj * (<span class="nu">1</span> - Nj / K_chain)
+ <span class="fn">c</span>(median = <span class="fn">median</span>(d), <span class="fn">hdi</span>(d, <span class="nu">0.95</span>)) <span class="cm"># median, lower, upper</span>
+})
+med_dNdt &lt;- dNdt_summary[<span class="st">"median"</span>, ]
+lo_dNdt &lt;- dNdt_summary[<span class="st">"lower"</span>, ]
+hi_dNdt &lt;- dNdt_summary[<span class="st">"upper"</span>, ]
+
+<span class="cm"># Let the DATA set ylim. The grid runs to N = 1500, well past K ~ 1235, where</span>
+<span class="cm"># dN/dt goes strongly negative (median bottoms out at -64.9, lower HPDI at</span>
+<span class="cm"># -104.2). A hard-coded ylim = c(-40, 80) would silently clip both and hide</span>
+<span class="cm"># exactly the N > K region the model has the most to say about.</span>
+<span class="fn">plot</span>(N_grid, med_dNdt, type = <span class="st">"l"</span>, lwd = <span class="nu">2</span>,
+ ylim = <span class="fn">range</span>(med_dNdt, lo_dNdt, hi_dNdt),
+ xlab = <span class="st">"Population size N"</span>, ylab = <span class="st">"Population growth rate dN/dt"</span>)
+<span class="fn">abline</span>(h = <span class="nu">0</span>, col = <span class="st">"grey"</span>)
+<span class="fn">lines</span>(N_grid, lo_dNdt, lty = <span class="st">"dashed"</span>)
+<span class="fn">lines</span>(N_grid, hi_dNdt, lty = <span class="st">"dashed"</span>)</code></pre>
 </section>
 
 <!-- ================ BCI VS HPDI =================================== -->
@@ -746,18 +796,20 @@ r_chain &lt;- <span class="fn">MCMCchains</span>(samples, params = <span class="
 </ul>
 
 <div class="code-label">R · BCI and HPDI for the fitted line</div>
-<pre><code>BCI &lt;- <span class="fn">MCMCpstr</span>(samples, params = <span class="st">"mu"</span>,
- func = <span class="kw">function</span>(x) <span class="fn">quantile</span>(x, <span class="kw">c</span>(<span class="nu">.025</span>, <span class="nu">.50</span>, <span class="nu">.975</span>)))
-HPDI &lt;- <span class="fn">MCMCpstr</span>(samples, params = <span class="st">"mu"</span>,
- func = <span class="kw">function</span>(x) <span class="fn">hdi</span>(x, <span class="nu">.95</span>))
+<pre><code><span class="cm"># mu[i] = r - (r/K)*x[i] is deterministic, so rebuild its 60,000 posterior</span>
+<span class="cm"># draws from the saved r and K columns rather than monitoring 50 extra nodes.</span>
+mu_draws &lt;- <span class="fn">sapply</span>(constants$x, <span class="kw">function</span>(xi) r_chain - (r_chain / K_chain) * xi)
+
+BCI &lt;- <span class="fn">apply</span>(mu_draws, <span class="nu">2</span>, quantile, probs = <span class="kw">c</span>(<span class="nu">.025</span>, <span class="nu">.50</span>, <span class="nu">.975</span>)) <span class="cm"># 3 x n</span>
+HPDI &lt;- <span class="fn">apply</span>(mu_draws, <span class="nu">2</span>, <span class="kw">function</span>(v) <span class="fn">hdi</span>(v, <span class="nu">.95</span>)) <span class="cm"># 2 x n</span>
 
 <span class="fn">plot</span>(constants$x, data$y, pch = <span class="nu">19</span>,
  xlab = <span class="st">"Population size N"</span>, ylab = <span class="st">"Per-capita growth (1/yr)"</span>)
-<span class="fn">lines</span>(constants$x, BCI$mu[, <span class="nu">2</span>], lwd = <span class="nu">2</span>)
-<span class="fn">lines</span>(constants$x, BCI$mu[, <span class="nu">1</span>], lty = <span class="nu">2</span>, col = <span class="st">"red"</span>)
-<span class="fn">lines</span>(constants$x, BCI$mu[, <span class="nu">3</span>], lty = <span class="nu">2</span>, col = <span class="st">"red"</span>)
-<span class="fn">lines</span>(constants$x, HPDI$mu[, <span class="nu">1</span>], lty = <span class="nu">2</span>, col = <span class="st">"blue"</span>)
-<span class="fn">lines</span>(constants$x, HPDI$mu[, <span class="nu">2</span>], lty = <span class="nu">2</span>, col = <span class="st">"blue"</span>)</code></pre>
+<span class="fn">lines</span>(constants$x, BCI[<span class="nu">2</span>, ], lwd = <span class="nu">2</span>)
+<span class="fn">lines</span>(constants$x, BCI[<span class="nu">1</span>, ], lty = <span class="nu">2</span>, col = <span class="st">"red"</span>)
+<span class="fn">lines</span>(constants$x, BCI[<span class="nu">3</span>, ], lty = <span class="nu">2</span>, col = <span class="st">"red"</span>)
+<span class="fn">lines</span>(constants$x, HPDI[<span class="nu">1</span>, ], lty = <span class="nu">2</span>, col = <span class="st">"blue"</span>)
+<span class="fn">lines</span>(constants$x, HPDI[<span class="nu">2</span>, ], lty = <span class="nu">2</span>, col = <span class="st">"blue"</span>)</code></pre>
 </section>
 
 <!-- ====== ADDITIONAL EXAMPLE 1 (BAYES): SURVIVAL ============== -->
@@ -977,8 +1029,8 @@ best &lt;- <span class="fn">min</span>(prof)
 <p><em>Deterministic MLE fit (<code>stats4::mle</code>, L-BFGS-B) on the full <code>data/vonbert.csv</code> ($n = 100$, 50 per sex), model $L_a = L_\infty(1 - e^{-\kappa a})$ — no seed needed.</em></p>
 <p>(a) <strong>Full (Model B, 5 param) vs null (Model A, 3 param), 2 df:</strong> $\Lambda = 2(\ell_B - \ell_A) = 75.4$, $p \approx 4\times10^{-17}$ — the null of a single shared growth curve is decisively rejected.</p>
 <p>(b) <strong>AIC (lower is better):</strong> Model A (pooled, 3p) $= 798.0$; intermediate (shared $L_\infty$, sex-specific $\kappa$, 4p) $= 767.1$; Model B (full sex-specific $L_\infty$ and $\kappa$, 5p) $= \mathbf{726.6}$. The full model wins by ~40 AIC over the intermediate and ~71 over the null — far beyond the 2-unit rule of thumb. AIC and the LRT agree.</p>
-<p>(c) <strong>Second LRT — intermediate (4p) vs null (3p), 1 df:</strong> $\Lambda = 32.9$, $p \approx 9.7\times10^{-9}$. A single sex-specific $\kappa$ already helps a lot, but it is <em>not</em> where the action is: fitting Model B shows the sex difference is concentrated in asymptotic length $L_\infty$ ($\hat L_{\infty,1} \approx 102.5$ vs $\hat L_{\infty,2} \approx 82.6$) far more than in growth coefficient $\kappa$ ($0.284$ vs $0.259$). When the intermediate model is forced to share $L_\infty$, it can only compensate by splaying the two $\kappa$'s apart ($0.335$ vs $0.167$) — and still lands ~40 AIC units short of the full model.</p>
-<p><strong>Conclusion:</strong> the sexes differ mainly in asymptotic size $L_\infty$ (one sex reaches a substantially larger maximum length) and only modestly in $\kappa$; the fully sex-specific model is preferred by both criteria. Remember the division of labor — the LRT needs nesting and returns a p-value; AIC needs no nesting and returns a ranking.</p>
+<p>(c) <strong>Second LRT — intermediate (4p) vs null (3p), 1 df:</strong> $\Lambda = 32.9$, $p \approx 9.7\times10^{-9}$. A single sex-specific $\kappa$ already helps a lot, but it is <em>not</em> where the action is: fitting Model B shows the sex difference is concentrated in asymptotic length $L_\infty$ ($\hat L_{\infty,1} \approx 82.6$ for sex 1 vs $\hat L_{\infty,2} \approx 102.5$ for sex 2) far more than in growth coefficient $\kappa$ ($0.259$ vs $0.284$). When the intermediate model is forced to share $L_\infty$, it can only compensate by splaying the two $\kappa$'s apart ($0.167$ for sex 1 vs $0.335$ for sex 2) — and still lands ~40 AIC units short of the full model.</p>
+<p><strong>Conclusion:</strong> the sexes differ mainly in asymptotic size $L_\infty$ (sex 2 reaches a substantially larger maximum length; the file does not record which code is male and which is female, so report the result by code) and only modestly in $\kappa$; the fully sex-specific model is preferred by both criteria. Remember the division of labor — the LRT needs nesting and returns a p-value; AIC needs no nesting and returns a ranking.</p>
 </div></details>
 </div>
 
@@ -1041,20 +1093,49 @@ post &lt;- <span class="fn">rbeta</span>(<span class="nu">1e5</span>, <span clas
 <p>There is one bookkeeping price for that reparameterization, and it is the <code>+ log_lam</code> line in the log-posterior — the <strong>Jacobian</strong>. When you sample $u=\log\lambda$ rather than $\lambda$, the change of variables stretches the density by the factor $\left|\dfrac{d\lambda}{du}\right| = \dfrac{d\,e^{u}}{du} = e^{u} = \lambda$, so the target density expressed in $u$ is $p(\lambda)\,L(\lambda)\cdot\lambda$. Take logs and that trailing factor becomes an additive term:</p>
 <div class="eq-block">$\log \tilde p(u) \;=\; \log p(\lambda) + \log L(\lambda) + \log\lambda, \qquad \lambda = e^{u}.$</div>
 <p>Drop the $+\log\lambda$ and the chain converges to $p(\lambda)L(\lambda)/\lambda$ — the wrong distribution. It survives into the acceptance ratio while the proposal density does not: because the random-walk proposal is <em>symmetric</em> in $u$ (a Normal step is as likely up as down), the proposal terms cancel in $\alpha = \min(1,\, \tilde p(u^\star)/\tilde p(u_{\text{current}}))$, leaving the Jacobian as the only correction you owe for the switch to log-space.</p>
+<p>(b) Wrap the sampler in a function of the proposal SD <code>s</code>, so that part (c) is one <code>sapply()</code> instead of five copy-pastes. <code>set.seed(3)</code> inside the function means every value of <code>s</code> is judged on the <em>same</em> stream of random numbers, and you get the acceptance rates quoted below to the digit.</p>
 <pre><code>y &lt;- <span class="kw">c</span>(<span class="nu">3</span>,<span class="nu">1</span>,<span class="nu">4</span>,<span class="nu">2</span>,<span class="nu">0</span>,<span class="nu">5</span>,<span class="nu">2</span>,<span class="nu">3</span>,<span class="nu">1</span>,<span class="nu">4</span>)
 log_post &lt;- <span class="kw">function</span>(log_lam) {
  lam &lt;- <span class="fn">exp</span>(log_lam)
  <span class="fn">dgamma</span>(lam, <span class="nu">2</span>, <span class="nu">1</span>, log = <span class="kw">TRUE</span>) + <span class="fn">sum</span>(<span class="fn">dpois</span>(y, lam, log = <span class="kw">TRUE</span>)) + log_lam <span class="cm"># Jacobian</span>
 }
-ll &lt;- <span class="fn">numeric</span>(<span class="nu">3e4</span>); ll[<span class="nu">1</span>] &lt;- <span class="fn">log</span>(<span class="nu">2</span>); acc &lt;- <span class="nu">0</span>; s &lt;- <span class="nu">0.30</span>
-<span class="kw">for</span> (i <span class="kw">in</span> <span class="nu">2</span>:<span class="fn">length</span>(ll)) {
+
+run_mh &lt;- <span class="kw">function</span>(s, seed = <span class="nu">3</span>) {
+ <span class="fn">set.seed</span>(seed)
+ ll &lt;- <span class="fn">numeric</span>(<span class="nu">3e4</span>); ll[<span class="nu">1</span>] &lt;- <span class="fn">log</span>(<span class="nu">2</span>); acc &lt;- <span class="nu">0</span>
+ <span class="kw">for</span> (i <span class="kw">in</span> <span class="nu">2</span>:<span class="fn">length</span>(ll)) {
  prop &lt;- <span class="fn">rnorm</span>(<span class="nu">1</span>, ll[i - <span class="nu">1</span>], s)
  <span class="kw">if</span> (<span class="fn">log</span>(<span class="fn">runif</span>(<span class="nu">1</span>)) &lt; <span class="fn">log_post</span>(prop) - <span class="fn">log_post</span>(ll[i - <span class="nu">1</span>])) { ll[i] &lt;- prop; acc &lt;- acc + <span class="nu">1</span> } <span class="kw">else</span> ll[i] &lt;- ll[i - <span class="nu">1</span>]
+ }
+ <span class="kw">list</span>(rate = acc / <span class="fn">length</span>(ll), lam = <span class="fn">exp</span>(ll[-(<span class="nu">1</span>:<span class="nu">3000</span>)]))
 }
-lam &lt;- <span class="fn">exp</span>(ll[-(<span class="nu">1</span>:<span class="nu">3000</span>)])
-<span class="fn">hist</span>(lam, breaks = <span class="nu">60</span>, freq = <span class="kw">FALSE</span>)
+
+<span class="cm"># (b) trace, running mean, histogram vs the closed form, at a first guess s = 0.30</span>
+fit0 &lt;- <span class="fn">run_mh</span>(<span class="nu">0.30</span>)
+<span class="fn">par</span>(mfrow = <span class="fn">c</span>(<span class="nu">1</span>, <span class="nu">3</span>))
+<span class="fn">plot</span>(fit0$lam, type = <span class="st">"l"</span>, xlab = <span class="st">"iteration"</span>, ylab = expression(lambda), main = <span class="st">"trace"</span>)
+<span class="fn">plot</span>(<span class="fn">cumsum</span>(fit0$lam) / <span class="fn">seq_along</span>(fit0$lam), type = <span class="st">"l"</span>,
+ xlab = <span class="st">"iteration"</span>, ylab = <span class="st">"running mean"</span>, main = <span class="st">"running mean"</span>)
+<span class="fn">hist</span>(fit0$lam, breaks = <span class="nu">60</span>, freq = <span class="kw">FALSE</span>, main = <span class="st">"posterior"</span>, xlab = expression(lambda))
 <span class="fn">curve</span>(<span class="fn">dgamma</span>(x, <span class="nu">2</span> + <span class="fn">sum</span>(y), <span class="nu">1</span> + <span class="fn">length</span>(y)), add = <span class="kw">TRUE</span>, col = <span class="st">"red"</span>, lwd = <span class="nu">2</span>)
-acc / <span class="fn">length</span>(ll)</code></pre>
+<span class="fn">par</span>(mfrow = <span class="fn">c</span>(<span class="nu">1</span>, <span class="nu">1</span>))
+fit0$rate
+
+<span class="cm"># (c) THE TUNING STEP: sweep s and read off which one lands near 30%</span>
+ladder &lt;- <span class="fn">c</span>(<span class="nu">0.15</span>, <span class="nu">0.30</span>, <span class="nu">0.60</span>, <span class="nu">0.75</span>, <span class="nu">0.90</span>, <span class="nu">1.20</span>)
+<span class="fn">round</span>(<span class="fn">sapply</span>(ladder, <span class="kw">function</span>(s) <span class="fn">run_mh</span>(s)$rate), <span class="nu">3</span>)
+tuned &lt;- <span class="fn">run_mh</span>(<span class="nu">0.75</span>) <span class="cm"># acceptance 0.303 -- this is the answer to (c)</span>
+<span class="fn">c</span>(rate = tuned$rate, mean = <span class="fn">mean</span>(tuned$lam),
+ <span class="fn">quantile</span>(tuned$lam, <span class="fn">c</span>(<span class="nu">.025</span>, <span class="nu">.975</span>)))</code></pre>
+
+<p>(c) The starting guess $s = 0.30$ is <strong>not</strong> the tuned answer &mdash; it accepts 58% of proposals, roughly double the target. Bigger jumps are rejected more often, so tuning <em>down</em> the acceptance rate means tuning <em>up</em> the proposal SD. With <code>set.seed(3)</code> the ladder reads:</p>
+
+<table>
+<tr><th>proposal SD $s$</th><td>0.15</td><td>0.30</td><td>0.60</td><td><strong>0.75</strong></td><td>0.90</td><td>1.20</td></tr>
+<tr><th>acceptance rate</th><td>0.764</td><td>0.579</td><td>0.365</td><td><strong>0.303</strong></td><td>0.260</td><td>0.202</td></tr>
+</table>
+
+<p>So <strong>$s \approx 0.75$</strong> is the tuned proposal SD: acceptance $0.303$, right on the ~30% target. Its posterior mean is $2.458$ with 95% BCI $(1.617,\ 3.469)$, against the exact Gamma$(27, 11)$ posterior mean $27/11 = 2.4545$ and BCI $(1.618,\ 3.463)$ &mdash; agreement to Monte Carlo noise, which is the check that the sampler is right and not merely well-tuned. Note that every $s$ in the table converges to the same posterior; tuning buys <em>efficiency</em> (effective sample size per iteration), not correctness. That is why an untuned chain can still look fine in a histogram and still be wasting most of your run.</p>
 </div></details>
 </div>
 
@@ -1108,8 +1189,58 @@ acc / <span class="fn">length</span>(ll)</code></pre>
 <li><strong>Beta(1,1)</strong> (flat, pseudo-$n=2$, $w=2/27=0.07$) &rarr; Beta(19,&nbsp;8), mean $0.07(0.5)+0.93(0.72)=$ <strong>0.704</strong> &mdash; barely moved; the data dominate.</li>
 <li><strong>Beta(9,11)</strong> (mean 0.45, pseudo-$n=20$, $w=20/45=0.44$) &rarr; Beta(27,&nbsp;18), mean $0.44(0.45)+0.56(0.72)=$ <strong>0.600</strong> &mdash; pulled about halfway, because pseudo-$n \approx n$.</li>
 <li><strong>Beta(50,50)</strong> (mean 0.50, pseudo-$n=100$, $w=100/125=0.80$) &rarr; Beta(68,&nbsp;57), mean $0.80(0.50)+0.20(0.72)=$ <strong>0.544</strong> &mdash; yanked most of the way to 0.50: the prior is worth four times the data.</li>
-<li><strong>Beta(50,100)</strong> (mean 0.33, pseudo-$n=150$, $w=150/175=0.86$) &rarr; Beta(68,&nbsp;107), mean $0.86(0.33)+0.14(0.72)=$ <strong>0.389</strong> &mdash; the posterior now sits closer to the prior than to the data.</li>
+<li><strong>Beta(50,100)</strong> (mean 0.33, pseudo-$n=150$, $w=150/175=0.86$) &rarr; Beta(68,&nbsp;107), mean $0.86(0.33)+0.14(0.72)=$ <strong>0.389</strong> &mdash; the posterior now sits closer to the prior than to the data. <em>(This fourth prior is a bonus, past the three the exercise asks for; it is here to show what happens once the prior outweighs the data by 6:1.)</em></li>
 </ul>
+
+<p><strong>(a) &amp; (b) &mdash; the three numbers per prior.</strong> Posterior mean, 95% equal-tailed BCI, and $\Pr(\phi > 0.5 \mid y)$, all from the closed-form Beta posterior (and reproduced by the Nimble run below to three decimals):</p>
+
+<table>
+<tr><th>Prior</th><th>Posterior</th><th>Posterior mean</th><th>95% BCI</th><th>$\Pr(\phi > 0.5 \mid y)$</th></tr>
+<tr><td>Beta(1, 1)</td><td>Beta(19, 8)</td><td>0.704</td><td>(0.522, 0.857)</td><td>0.986</td></tr>
+<tr><td>Beta(9, 11)</td><td>Beta(27, 18)</td><td>0.600</td><td>(0.455, 0.737)</td><td>0.913</td></tr>
+<tr><td>Beta(50, 50)</td><td>Beta(68, 57)</td><td>0.544</td><td>(0.457, 0.630)</td><td>0.838</td></tr>
+<tr><td><em>Beta(50, 100)</em> (bonus)</td><td>Beta(68, 107)</td><td>0.389</td><td>(0.318, 0.462)</td><td>0.002</td></tr>
+</table>
+
+<p>Read the last column top to bottom: the evidence that survival exceeds one half falls from near-certain (0.986) to strong (0.913) to merely suggestive (0.838) &mdash; on <em>identical data</em>. Nothing changed but the prior. Note also that the intervals <em>shrink</em> as the prior strengthens (width 0.335 &rarr; 0.282 &rarr; 0.174): a heavy prior does not merely move the posterior, it makes it look more precise than 25 birds can justify. That is the whole reason reviewers interrogate priors.</p>
+
+<p><strong>The Nimble version</strong> (the exercise is tagged <span class="pill nimble">Nimble</span> &mdash; conjugacy gives you the exact answer to check it against, which is exactly why this is a good first Nimble model):</p>
+
+<div class="code-label">R · Nimble, three priors, one loop</div>
+<pre><code><span class="kw">library</span>(nimble); <span class="kw">library</span>(MCMCvis); <span class="kw">library</span>(coda)
+
+surv_code &lt;- <span class="fn">nimbleCode</span>({
+ phi ~ <span class="fn">dbeta</span>(a, b) <span class="cm"># a, b passed in as constants: one model, three priors</span>
+ y ~ <span class="fn">dbinom</span>(phi, n)
+})
+
+fit_prior &lt;- <span class="kw">function</span>(a, b) {
+ <span class="fn">set.seed</span>(<span class="nu">4</span>)
+ out &lt;- <span class="fn">nimbleMCMC</span>(surv_code,
+ constants = <span class="kw">list</span>(n = <span class="nu">25</span>, a = a, b = b),
+ data = <span class="kw">list</span>(y = <span class="nu">18</span>),
+ inits = <span class="kw">list</span>(<span class="kw">list</span>(phi = <span class="nu">0.3</span>), <span class="kw">list</span>(phi = <span class="nu">0.5</span>), <span class="kw">list</span>(phi = <span class="nu">0.8</span>)),
+ monitors = <span class="st">"phi"</span>, nchains = <span class="nu">3</span>, nburnin = <span class="nu">2000</span>, niter = <span class="nu">22000</span>,
+ samplesAsCodaMCMC = <span class="kw">TRUE</span>)
+ phi &lt;- <span class="fn">as.numeric</span>(<span class="fn">MCMCchains</span>(out, <span class="st">"phi"</span>))
+ <span class="fn">c</span>(mean = <span class="fn">mean</span>(phi),
+ <span class="fn">quantile</span>(phi, <span class="fn">c</span>(<span class="nu">.025</span>, <span class="nu">.975</span>)),
+ p_gt_0.5 = <span class="fn">mean</span>(phi &gt; <span class="nu">0.5</span>),
+ Rhat = <span class="fn">MCMCsummary</span>(out)$Rhat[<span class="nu">1</span>])
+}
+
+priors &lt;- <span class="kw">list</span>(<span class="fn">c</span>(<span class="nu">1</span>,<span class="nu">1</span>), <span class="fn">c</span>(<span class="nu">9</span>,<span class="nu">11</span>), <span class="fn">c</span>(<span class="nu">50</span>,<span class="nu">50</span>), <span class="fn">c</span>(<span class="nu">50</span>,<span class="nu">100</span>))
+<span class="fn">round</span>(<span class="fn">t</span>(<span class="fn">sapply</span>(priors, <span class="kw">function</span>(ab) <span class="fn">fit_prior</span>(ab[<span class="nu">1</span>], ab[<span class="nu">2</span>]))), <span class="nu">3</span>)
+
+<span class="cm"># Exact check -- no MCMC needed, because Beta-Binomial is conjugate:</span>
+<span class="cm"># posterior is Beta(a + 18, b + 7)</span>
+<span class="fn">qbeta</span>(<span class="fn">c</span>(<span class="nu">.025</span>, <span class="nu">.975</span>), <span class="nu">19</span>, <span class="nu">8</span>) <span class="cm"># 0.5221 0.8567</span>
+<span class="fn">pbeta</span>(<span class="nu">0.5</span>, <span class="nu">19</span>, <span class="nu">8</span>, lower.tail = <span class="kw">FALSE</span>) <span class="cm"># 0.9855</span></code></pre>
+
+<p>All chains give $\hat R = 1.00$, and the MCMC means/BCIs match the closed form to three decimals &mdash; which is the point of running a conjugate model in Nimble at all: it is the one case where you can audit the sampler against a known answer.</p>
+
+<p><strong>(c) The one-sentence answer.</strong> A Beta$(\alpha,\beta)$ prior carries an effective sample size of $\alpha+\beta$ pseudo-observations, so against $n=25$ real birds Beta(1,1) is worth 2 (weight $0.07$ &mdash; the data decide), Beta(9,11) is worth 20 (weight $0.44$ &mdash; a near-tie), and Beta(50,50) is worth 100 (weight $0.80$ &mdash; the prior decides, four to one).</p>
+
 <p>The lesson: the prior matters most when its pseudo-sample size is large relative to $n$. Beta(50,50) is not a "weak" prior just because it is centred at one half &mdash; with $n=25$ it overwhelms the data.</p>
 </div></details>
 </div>

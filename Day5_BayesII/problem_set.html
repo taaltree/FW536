@@ -241,7 +241,7 @@ y &lt;- <span class="fn">array</span>(<span class="kw">NA</span>, <span class="f
 <span class="kw">for</span> (t <span class="kw">in</span> <span class="nu">1</span>:nY) <span class="kw">for</span> (i <span class="kw">in</span> <span class="nu">1</span>:nS) <span class="kw">for</span> (j <span class="kw">in</span> <span class="nu">1</span>:nR)
   y[i,j,t] &lt;- <span class="fn">rbinom</span>(<span class="nu">1</span>, <span class="nu">1</span>, p.t) * z[i,t]</code></pre>
 <ol type="a">
- <li>Fit the model in <span class="pill nimble">NIMBLE</span>. Use the z-init trick (<code>zst &lt;- matrix(1L, nS, nY)</code>) &mdash; explain in one sentence why initialising $z$ at all-1 is required.</li>
+ <li>Fit the model in <span class="pill nimble">NIMBLE</span>. Use the z-init trick (<code>zst &lt;- matrix(1L, nS, nY)</code>) &mdash; explain in one sentence why an all-1 start for $z$ is always consistent with the data, and what a random 0/1 start would produce instead. (Try it: NIMBLE will tell you something. Report exactly what it does, and whether the run finishes.)</li>
  <li>Plot the posterior medians of $\gamma_t$ against year. Does the rising-colonization signal come through?</li>
  <li>The individual $\phi_t$ posteriors are wide. Why? Name one change to the model that would tighten them in a real analysis.</li>
 </ol>

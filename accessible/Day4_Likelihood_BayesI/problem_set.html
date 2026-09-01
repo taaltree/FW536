@@ -55,12 +55,12 @@ MathJax = {
 
 <main class="content" id="main-content" tabindex="-1">
 <header class="lab-header">
- <div class="eyebrow">Day 4 · Assessed Problem Set (20 pts)</div>
+ <div class="eyebrow">Day 4 · Assessed Problem Set (40 pts)</div>
  <h1>Ten problems on maximum likelihood and Bayesian inference</h1>
  <p class="lede">A dataset-driven problem set that mirrors the two Day 4 lectures. The morning problems are pure <strong>maximum likelihood</strong> — grid search, numerical optimization, likelihood-ratio tests, and profile confidence intervals. The afternoon problems are your first <strong>Bayesian</strong> models, fit with <span class="pill nimble">Nimble</span>. Five problems use the three real course datasets — <code>vonbert.csv</code> (Problem 2), <code>whale.csv</code> (Problems 3 and 10), and <code>Logistic.csv</code> (Problems 4 and 7); the rest are short simulate-and-fit or conceptual questions.</p>
 </header>
 
-<section class="callout warn" style="margin-top:24px;"><p class="callout-label">Watch out</p><p><strong>Assessed problem set &middot; worth 20 points.</strong> Answers are <em>not</em> shown here. Write your work in the R Markdown templates: <a href="morning_lab_template.Rmd"><code>morning_lab_template.Rmd</code></a> for the morning (MLE) problems, <a href="afternoon_lab_template.Rmd"><code>afternoon_lab_template.Rmd</code></a> for the afternoon (Bayesian) problems. Knit each to HTML and upload to the matching Canvas assignment.</p><p>For worked examples with visible answers, see <a href="lab.html">the in-class practice lab</a>.</p></section>
+<section class="callout warn" style="margin-top:24px;"><p class="callout-label">Watch out</p><p><strong>Assessed problem set &middot; worth 40 points</strong> — 20 for the morning problems (1&ndash;4) and 20 for the afternoon problems (5&ndash;10), graded as two Canvas submissions. Answers are <em>not</em> shown here. Write your work in the R Markdown templates: <a href="morning_lab_template.Rmd"><code>morning_lab_template.Rmd</code></a> for the morning (MLE) problems, <a href="afternoon_lab_template.Rmd"><code>afternoon_lab_template.Rmd</code></a> for the afternoon (Bayesian) problems. Knit each to HTML and upload to the matching Canvas assignment.</p><p>For worked examples with visible answers, see <a href="lab.html">the in-class practice lab</a>.</p></section>
 
 <section class="callout key"><p class="callout-label">Key idea</p><p><strong>Topic scope — read this before you start.</strong> The two sessions use two different paradigms, and you must keep them separate.</p>
 <ul>
@@ -68,7 +68,7 @@ MathJax = {
 <li><strong>Afternoon (Problems 5–10) — Bayesian only.</strong> Use priors, posteriors, conjugacy, and MCMC. All fitted Bayesian models must be written in <span class="pill nimble">Nimble</span> (<code>nimbleCode</code> + <code>nimbleMCMC</code>), not JAGS.</li>
 </ul></section>
 
-<section><p>Aim for roughly 3 hours total (about 90 minutes per session). Try each problem before checking anything. All datasets live in this Day's <a href="data/"><code>data/</code></a> folder and are loaded exactly as in <a href="lab.html">the lab</a>.</p></section>
+<section><p>Aim for roughly 5 hours total &mdash; about 145 minutes for the morning problems (1&ndash;4) and 165 for the afternoon (5&ndash;10), following the per-problem estimates on each problem&rsquo;s pill. Try each problem before checking anything. All datasets live in this Day's <a href="data/"><code>data/</code></a> folder and are loaded exactly as in <a href="lab.html">the lab</a>.</p></section>
 
 <!-- ================================================================= -->
 <!-- ================ MORNING · MAXIMUM LIKELIHOOD =================== -->
@@ -149,7 +149,20 @@ blows &lt;- TheData$blows   <span class="cm"># the mixture ignores the sex colum
 Logistic &lt;- Logistic[<span class="fn">order</span>(Logistic$PopulationSize), ]</code></pre>
 <ol type="a">
 <li>The model is linear: intercept $= r$, slope $= -r/K$. Fit it with <code>lm(GrowthRate ~ PopulationSize)</code>. Because a Normal-error linear model fit by least squares <em>is</em> its maximum-likelihood fit, the fitted intercept and slope are already the MLEs of $r$ and $-r/K$. Now use the <strong>invariance property of the MLE</strong>: if $\hat\theta$ is the MLE of $\theta$, then $g(\hat\theta)$ is the MLE of any transformation $g(\theta)$. That is exactly why you may push the fitted coefficients through a formula to get MLEs of the biological parameters — e.g. $\hat K = -\hat r / \widehat{\text{slope}}$ is the MLE of $K$. Recover $\hat r$ and $\hat K$ this way. (You will invoke the same invariance property again in part (c) to turn $\hat r,\hat K$ into the MLE of MSY.)</li>
-<li>Now fit the <em>same</em> model directly by maximum likelihood with <code>mle()</code>, parameterized in $(r, K, \sigma)$ so that $\mu_i = r - (r/K)N_i$. Confirm you recover the same $\hat r$ and $\hat K$ as in (a), and report profile-likelihood 95% CIs.</li>
+<li>Now fit the <em>same</em> model directly by maximum likelihood with <code>mle()</code>, parameterized in $(r, K, \sigma)$ so that $\mu_i = r - (r/K)N_i$. Confirm you recover the same $\hat r$ and $\hat K$ as in (a), and report profile-likelihood 95% CIs. Start from this skeleton:
+<div class="code-label">R · direct MLE in (r, K, sigma)</div>
+<pre><code><span class="kw">library</span>(stats4)
+x &lt;- Logistic$PopulationSize; y &lt;- Logistic$GrowthRate
+nll_rk &lt;- <span class="kw">function</span>(r, K, sigma) {
+ mu &lt;- r - (r / K) * x
+ -<span class="fn">sum</span>(<span class="fn">dnorm</span>(y, mu, sigma, log = <span class="kw">TRUE</span>))
+}
+fit &lt;- <span class="fn">mle</span>(nll_rk, start = <span class="kw">list</span>(r = <span class="nu">0.2</span>, K = <span class="nu">1000</span>, sigma = <span class="nu">0.03</span>),
+ method = <span class="st">"L-BFGS-B"</span>, lower = <span class="kw">c</span>(<span class="nu">0.001</span>, <span class="nu">100</span>, <span class="nu">1e-4</span>),
+ upper = <span class="kw">c</span>(<span class="nu">2</span>, <span class="nu">4000</span>, <span class="nu">2</span>),
+ control = <span class="kw">list</span>(parscale = <span class="kw">c</span>(<span class="nu">0.2</span>, <span class="nu">1000</span>, <span class="nu">0.03</span>)))
+<span class="fn">summary</span>(fit); <span class="fn">confint</span>(fit)</code></pre>
+Keep the <code>control = list(parscale = ...)</code> line. <code>optim()</code> — which <code>mle()</code> calls — takes one common step size in all three coordinates, and here the three parameters differ in scale by four orders of magnitude ($r \approx 0.2$, $K \approx 10^3$, $\sigma \approx 0.03$). A step large enough to move $K$ is catastrophic for $r$ and $\sigma$, so the optimizer converges on the first two and leaves $K$ sitting at its starting value: drop the <code>control</code> argument and you get $\hat K = 1000.00$, exactly where you started, with no warning of any kind. <code>parscale</code> divides each parameter by its own typical magnitude so that one step size fits all three. If your $\hat K$ ever comes back equal to your starting value, suspect scaling first.</li>
 <li>Using the invariance of the MLE, compute the plug-in MLE of the maximum sustainable yield $\text{MSY} = \hat r\hat K/4$ and of the population size at maximum growth $K/2$.</li>
 <li>Maximum likelihood gives you point estimates and CIs for $r$ and $K$, but propagating that uncertainty into a derived quantity like MSY is awkward (delta method, bootstrap). Note in one sentence why — you will revisit this exact model in Problem 7, where the Bayesian posterior propagates the uncertainty for free.</li>
 </ol>
@@ -235,6 +248,11 @@ Logistic &lt;- Logistic[<span class="fn">order</span>(Logistic$PopulationSize), 
 <h3>Identifiability and label switching in a Bayesian mixture</h3>
 <p>You refit the two-component whale-blow mixture from Problem 3 (males vs females) in <span class="pill nimble">Nimble</span> instead of with <code>mle()</code>. With 3 chains, no constraint on the ordering of $\lambda_1$ and $\lambda_2$, and chains started from <em>different labelings</em>, each chain locks onto its own labeling and stays there: one chain reports "$\lambda_1$" $\approx 10$ while another reports "$\lambda_1$" $\approx 30$ for the whole run. Every individual trace plot looks perfectly well mixed, but the chains disagree about what "$\lambda_1$" <em>means</em>, and $\hat R$ is enormous.</p>
 <p>The culprit is <strong>identifiability</strong>. A parameter — or a combination of parameters — is <em>non-identifiable</em> when two different parameter values produce <em>exactly the same likelihood</em>, so no amount of data can separate them. Here the mixture is invariant under relabeling: $(\lambda_1,\lambda_2,\pi)$ and $(\lambda_2,\lambda_1,\,1-\pi)$ give an identical likelihood — swapping the "male" and "female" labels changes nothing the data can see. That exchange symmetry is what breaks the sampler.</p>
+
+<div class="callout warn"><p class="callout-label">Watch out</p><strong>Load the data first.</strong> Both skeletons below use a vector named <code>blows</code>. Problem 3 built one, but that was the <em>morning</em> template — nothing carries over into <code>afternoon_lab_template.Rmd</code>. Rebuild it there, under exactly that name, before you run either chunk:
+<pre><code>TheData &lt;- <span class="fn">read.csv</span>(<span class="st">"data/whale.csv"</span>) <span class="cm"># columns: sex (1/2), blows</span>
+blows &lt;- TheData$blows                    <span class="cm"># the mixture ignores the sex column</span></code></pre></div>
+
 <ol type="a">
 <li>Explain geometrically what is happening. Why is $\hat R$ huge even though each chain has, in a sense, "converged" and the model fit is fine?</li>
 <li><strong>Reproduce the pathology.</strong> First fit the mixture with <em>no</em> ordering constraint, deliberately starting chain 2 from the mirrored labeling (rates swapped, labels flipped) so the chains disagree from the outset. Run this and record $\hat R$ for <code>lam[1]</code> — this is your "before" number:

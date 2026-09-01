@@ -18,10 +18,10 @@ library(nimble)
 library(MCMCvis)
 library(coda)
 library(ggplot2)
-# Optional but handy for a few problems:
-# library(HDInterval)  # hdi() for highest-density intervals
-# library(dplyr)       # site-level summaries for Problem 4
-# library(MASS)        # rnegbin() for the overdispersed sim in Problem 9
+library(HDInterval)  # hdi() for highest-density intervals (Problems 6 and 7)
+library(MASS)        # rnegbin() for the overdispersed sim in Problem 9
+library(dplyr)       # site-level summaries for Problem 4
+                     # (load dplyr AFTER MASS so dplyr::select is not masked)
 ```
 
 # Day 5 morning problem set — Hierarchical & latent-state Bayesian inference

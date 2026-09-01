@@ -61,16 +61,21 @@
 <pre><code>boxplot(split(resid(lm1), Streams$Stream), ylab="Residual", xlab="Stream")
 abline(0, 0, lwd=3)</code></pre>
 
-<p><strong>(c) Shrinkage in action.</strong> Comparing <code>coef(lm2)</code> with <code>coef(lm3)</code> stream by stream, every <code>lm3</code> estimate is shifted slightly toward the grand mean (63.26). The shift is <strong>1.49% of the deviation for every stream</strong> — the same percentage for all 100, not larger for the extreme ones. The design is balanced (exactly 3 observations per stream), and the shrinkage weight depends only on $n_j$:</p>
-<div class="eq-block">$B = \dfrac{\sigma^2/n}{\tau^2 + \sigma^2/n} = \dfrac{20.8/3}{459.1 + 20.8/3} = 0.0149$</div>
-<p>It is small because among-stream variance (459) dwarfs the uncertainty in a 3-observation mean (≈6.9): each stream's own data are precise <em>relative to</em> how much streams truly differ, so the model barely pulls them. Stream 11 (the lowest, 8.92) moves to 9.73; Stream 43 (the highest, 111.69) moves to 110.97.</p>
+<p><strong>(c) Shrinkage in action.</strong> Comparing <code>coef(lm2)</code> with <code>coef(lm3)</code> stream by stream, every <code>lm3</code> estimate is shifted slightly toward the grand mean (63.26). The shift is <strong>1.49% of the deviation for every stream</strong> — the same percentage for all 100, not larger for the extreme ones. The design is balanced (exactly 3 observations per stream), so the weight $B$ that each stream keeps on <em>its own</em> mean is identical for all 100:</p>
+<div class="eq-block">$B = \dfrac{\tau^2}{\tau^2 + \sigma^2/n} = \dfrac{459.1}{459.1 + 20.8/3} = 0.9851,$</div>
+<p>and the complementary fraction $1 - B = 0.0149$ is what gets taken from the grand mean. (This is the same $B$ the <a href="explore_shrinkage.html">shrinkage demo</a> reports: there the readout says each site "keeps $B$ percent of its own mean". Keep the symbol pointing the same way in both places &mdash; $B$ is what you <em>keep</em>, $1-B$ is what you <em>shrink</em>.)</p>
+<p>The pull is small because among-stream variance (459) dwarfs the uncertainty in a 3-observation mean (≈6.9): each stream's own data are precise <em>relative to</em> how much streams truly differ, so the model barely pulls them. Stream 11 (the lowest, 8.92) moves to 9.73; Stream 43 (the highest, 111.69) moves to 110.97.</p>
 
 <pre><code># Compare side by side
 data.frame(
  noPool   = coef(lm(Density ~ factor(Stream) - 1, data=Streams)),
- partPool = coef(lm3)$Stream[ , "(Intercept)"]
-)</code></pre>
-<div class="callout warn"><strong>Two traps in this code.</strong> <code>Stream</code> is stored as an integer, so <code>lm(Density ~ Stream - 1)</code> silently fits a single <em>slope</em> and recycles it down the column — you must write <code>factor(Stream)</code> to get per-stream means. And <code>coef()</code> on an <code>lmer</code> fit returns a list by grouping factor, so the intercepts are <code>coef(lm3)$Stream[ , "(Intercept)"]</code>. (<code>fixef()</code> does not work on an <code>lm</code> at all — it errors with "no applicable method".)</div>
+ partPool = coef(lm3)[ , "(Intercept)"]
+)
+#                    noPool partPool
+# factor(Stream)1  95.41200 94.93289
+# factor(Stream)2  91.50867 91.08772
+# ...</code></pre>
+<div class="callout warn"><strong>The trap in this code.</strong> <code>lm3</code> is an <code>nlme::lme</code> fit, not a <code>merMod</code>: <code>coef()</code> on an <code>lme</code> returns a single data frame with one row per group level, so the intercepts are <code>coef(lm3)[ , "(Intercept)"]</code>. Writing <code>coef(lm3)$Stream</code> — the <code>lmer</code> idiom, where <code>coef()</code> returns a <em>list</em> indexed by grouping factor — yields <code>NULL</code> here and the <code>data.frame()</code> call then fails with "arguments imply differing number of rows: 100, 0". (<code>fixef()</code> does not work on an <code>lm</code> at all — it errors with "no applicable method".) The <code>factor()</code> wrapper on the <code>lm</code> line is belt-and-braces: the setup block already ran <code>Streams$Stream &lt;- factor(Streams$Stream)</code>, so it changes nothing but the coefficient names (<code>factor(Stream)1</code> rather than <code>Stream1</code>). It matters only if a student skips that setup line — <code>Stream</code> is an integer column in the CSV, and <code>lm(Density ~ Stream - 1)</code> on the unconverted data fits a single <em>slope</em> instead of 100 means.</div>
 
 <p><strong>(d) Variance components.</strong> Approximate output:</p>
 <pre><code>Random effects:
@@ -78,11 +83,13 @@ data.frame(
  (Intercept) Residual
 StdDev: 21.43 4.56
 
-intervals(lm3)
+intervals(lm3)$reStruct$Stream
  lower est. upper
 sd((Intercept)) 18.60 21.43 24.68
-sigma 3.6 4.6 5.8</code></pre>
-<p>ICC = $21.43^2 / (21.43^2 + 4.56^2) \approx 0.957$. <strong>97% of the variance is between streams</strong>; only 3% is the within-stream replicate noise. Ignoring the random effect (using <code>lm1</code>) would give standard errors that are far too small — the effective sample size is closer to 18 (streams) than to 54 (observations).</p>
+intervals(lm3)$sigma
+ lower est. upper
+ 4.14 4.56 5.03</code></pre>
+<p>ICC = $21.43^2 / (21.43^2 + 4.56^2) \approx 0.957$. <strong>96% of the variance is between streams</strong>; only 4% is the within-stream replicate noise. Ignoring the random effect (using <code>lm1</code>) would give standard errors that are far too small — with an ICC this high the effective sample size is closer to 100 (streams) than to 300 (observations).</p>
 
 <div class="callout key"><strong>What to look for:</strong> students explicitly counting parameters in each model; recognizing that residual clustering by group is the diagnostic that motivates a random effect; computing ICC as an interpretable summary. Bonus: noticing that with only 3 observations per stream, the partial-pool shrinkage is small — and articulating why.</div>
 </section>
@@ -107,9 +114,13 @@ Length           3.0172     0.0296  89   101.975</code></pre>
 <p><strong>(e) Random-slope test.</strong></p>
 <pre><code>m_slope &lt;- lmer(Weight ~ Length + (1 + Length | Subject), data=LenW)
 anova(m1b, m_slope, refit=FALSE) # REML LRT on random structure</code></pre>
-<p>Typical output shows a small LRT statistic (often $\chi^2 &lt; 1$ on 2 df), $p$-value &gt; 0.5, AND a singular-fit warning indicating the slope variance is at the boundary. The data don't support a random slope. We use <code>refit = FALSE</code> because we're comparing models that differ in random structure only, with identical fixed effects — REML log-likelihoods are valid for that comparison.</p>
+<pre><code>        npar     AIC    BIC  logLik -2*log(L)  Chisq Df Pr(&gt;Chisq)
+m1b        4  6.7266 17.147 0.63669   -1.2734
+m_slope    6 10.6483 26.279 0.67585   -1.3517 0.0783  2     0.9616</code></pre>
+<p>$\chi^2 = 0.0783$ on 2 df, $p = 0.9616$ — two extra variance parameters buy essentially nothing, and the data do not support a random slope. We use <code>refit = FALSE</code> because we're comparing models that differ in random structure only, with identical fixed effects — REML log-likelihoods are valid for that comparison.</p>
+<div class="callout warn"><strong>Name the warning correctly — it is <em>not</em> a singular fit.</strong> Fitting <code>m_slope</code> emits <code>Model failed to converge with max|grad| = 0.00216204 (tol = 0.002, component 1)</code>, which is a <em>convergence</em> warning, not <code>boundary (singular) fit</code>. Check rather than assume: <code>isSingular(m_slope)</code> returns <code>FALSE</code>, and <code>getME(m_slope, "theta")</code> is <code>1.122874, -0.04310811, 0.0002617662</code> — the third element is tiny but not zero, so the fit is not on the boundary. What <em>is</em> extreme is the correlation: <code>summary()</code> prints <code>Corr = -1.00</code> (the exact value is $-0.999982$), with a slope SD of $0.0089$ against an intercept SD of $0.2309$. The conclusion is unchanged — the random-slope structure is over-specified for 10 subjects — but report the warning R actually gave you.</div>
 
-<div class="callout key"><strong>What to look for:</strong> students translating the fitted SDs into biological language ("subjects of the same length differ by ± X in expected weight" — in the file's transformed units, not grams); using the REML LRT rule correctly; recognizing the singular-fit warning as a signal that the random structure is too complex for the data.</div>
+<div class="callout key"><strong>What to look for:</strong> students translating the fitted SDs into biological language ("subjects of the same length differ by ± X in expected weight" — in the file's transformed units, not grams); using the REML LRT rule correctly; reading the warning R actually emitted (a convergence warning, plus a slope–intercept correlation pinned at $-1.00$) as a signal that the random structure is too complex for the data.</div>
 </section>
 
 <!-- =========================== EX 3 =========================== -->
@@ -121,10 +132,13 @@ anova(m1b, m_slope, refit=FALSE) # REML LRT on random structure</code></pre>
 <p><strong>(b) Diagnostic.</strong> <code>boxplot(split(residuals(m_fixed), AgeLen$Subject))</code> shows whole subjects sitting consistently above or below the zero line — the within-subject residuals are <em>not</em> independent. Same diagnostic as the streams example.</p>
 
 <p><strong>(c) Residual SE comparison.</strong></p>
-<pre><code>summary(m_fixed)$sigma # ~ 9.5 (made-up but typical)
-summary(m_nlme)$sigma # ~ 3.5
-VarCorr(m_nlme) # SD(Linf | Subject) ~ 8.5</code></pre>
-<p>The within-subject residual SE of <code>m_nlme</code> (≈ 3.5) is much smaller than the <code>nls</code> residual SE (≈ 9.5) because the random effect absorbed the among-subject variation in $L_\infty$. By the variance partition $\sigma^2_\text{nls} \approx \sigma_{L_\infty}^2 + \sigma^2_\text{within}$, the within-subject residual <em>has to</em> be smaller — that is the whole point of accounting for the random effect.</p>
+<pre><code>summary(m_fixed)$sigma # 5.4168
+summary(m_nlme)$sigma # 0.1060
+VarCorr(m_nlme) # SD(Linf | Subject) = 8.2884  (variance 68.697)</code></pre>
+<p>The within-subject residual SE of <code>m_nlme</code> (0.1060) is far smaller than the <code>nls</code> residual SE (5.4168), because the random effect absorbed the among-subject variation in $L_\infty$ that <code>nls</code> had no choice but to leave in the residual.</p>
+<p><strong>Do not write the partition as $\sigma^2_\text{nls} \approx \sigma_{L_\infty}^2 + \sigma^2_\text{within}$ — it is false here.</strong> $8.2884^2 + 0.1060^2 = 68.71$, more than twice the <code>nls</code> residual variance of $29.34$. The reason is <strong>attenuation</strong>. A fish whose $L_\infty$ sits $\delta$ above the population value is not $\delta$ too long at every age: at age $a$ the curve is $L_\infty(1 - e^{-\kappa(a-t_0)})$, so the deviation reaches the observed length multiplied by $(1 - e^{-\kappa(a-t_0)})$, a factor below 1 everywhere in the sampled age range. The among-subject variance that actually shows up in the residuals of the pooled fit is therefore the <em>attenuated</em> version, averaged over the ages we observed:</p>
+<div class="eq-block">$\overline{\left(1 - e^{-\kappa(a - t_0)}\right)^2}\;\sigma_{L_\infty}^2 = 0.4211 \times 68.697 = 28.93 \;\approx\; \sigma^2_\text{nls} = 29.34.$</div>
+<p>That identity <em>does</em> hold, and it is the one to teach. <em>Grading note:</em> a student who writes the unattenuated sum and does not notice it is off by a factor of two has taken the slogan without checking it — the slogan is only right for a random effect that enters the mean linearly with coefficient 1 (a random intercept), which is exactly what $L_\infty$ is not.</p>
 
 <p><strong>(d) What does <code>m_nlme$coefficients$fixed[1] + m_nlme$coefficients$random$Subject</code> produce?</strong> The BLUP of each subject's $L_\infty$: the population mean plus the partially-pooled subject-specific deviation. Equivalent to the BLUPs you'd get from <code>coef(m_nlme)</code> for the $L_\infty$ component.</p>
 
@@ -187,10 +201,10 @@ Z_Length 0.422 0.092</code></pre>
 
 <p><strong>(b) LRT result.</strong></p>
 <pre><code>anova(fit_no_x, fit_with_x)
-# Df AIC BIC logLik deviance Chisq Chi Df Pr(&gt;Chisq)
-# 4 ... ... ... ...
-# 5 ... ... ... ... ~6-8 1 ~0.005-0.01</code></pre>
-<p>$\chi^2 \approx 6$–$8$ on 1 df, $p \approx 0.005$–$0.01$. Body length is supported as a predictor of trophic position even after accounting for lake and species.</p>
+#            npar    AIC     BIC  logLik -2*log(L)  Chisq Df Pr(&gt;Chisq)
+# fit_no_x      4 300.84 313.61 -146.42    292.84
+# fit_with_x    5  76.96  92.92  -33.48     66.96 225.88  1  &lt; 2.2e-16 ***</code></pre>
+<p>$\Lambda = 2\big(-33.48 - (-146.42)\big) = 225.88$ on 1 df, $p = 4.7\times10^{-51}$. Body length is overwhelmingly supported as a predictor of trophic position even after accounting for lake and species — not a marginal call. The Wald view agrees: $\hat\beta = 0.4198$ with SE $0.0194$, so $t = 21.6$. Matches <a href="lab.html#ex-5">lab Exercise 5</a>.</p>
 
 <p><strong>(c) Refitting with REML for reporting.</strong> Variance components estimated by ML are biased downward (they ignore the df consumed by the fixed effects). REML corrects that bias. The fixed-effect point estimates barely change, but the random-effect SDs and the SEs that depend on them are more honest under REML.</p>
 
@@ -318,7 +332,7 @@ m123 6.286 235.389 2.330
 m12  6.309 235.939 2.880</code></pre>
 <p><strong>Both criteria pick m3 — a pure-noise predictor.</strong> They do not disagree; they fail together, and their orderings correlate at 0.95 (Spearman). Students expecting CV to rescue them from AIC's mistake will find that CV made the same mistake.</p>
 <p>Note the scale: the intercept-only CV MSE is <strong>6.031</strong>, not the $\sigma^2 = 9$ you might predict from <code>rnorm(n, 5, 3)</code>. This particular sample drew <code>var(y) = 5.910</code>, well below the population value — a useful incidental reminder that at $n=50$ the realized variance wanders.</p>
-<p><strong>(b) is where the real lesson lives.</strong> m3 is m0 plus one junk predictor, so the identity from the core-concepts section pins the margin exactly: $\Delta\text{AIC} = 2 - \chi^2_1 = 2 - 2.658 = -0.658$. The whole "win" is the likelihood-ratio statistic for x3 ($\chi^2_1 = 2.658$, $p = 0.103$) happening to exceed 2 — the $P(\chi^2_1 &gt; 2) = 15.7\%$ event already dissected in the $\Delta\text{AIC} &lt; 2$ discussion. x3's coefficient is $-1.914$, 95% CI $[-4.232, 0.403]$, spanning zero.</p>
+<p><strong>(b) is where the real lesson lives.</strong> m3 is m0 plus one junk predictor, so the identity from the core-concepts section pins the margin exactly: $\Delta\text{AIC} = 2 - \chi^2_1 = 2 - 2.658 = -0.658$. The whole "win" is the likelihood-ratio statistic for x3 ($\chi^2_1 = 2.658$, $p = 0.103$) happening to exceed 2 — the $P(\chi^2_1 &gt; 2) = 15.7\%$ event already dissected in the $\Delta\text{AIC} &lt; 2$ discussion. x3's coefficient is $-1.914$, 95% CI $[-4.292, 0.463]$, spanning zero.</p>
 <p>Do not accept an answer that reads this table via "models within 2 AIC are competitive" — the lab has already shown that a nested junk model is within 2 by construction.</p>
 
 <p><strong>(c) 100-replication summary.</strong></p>

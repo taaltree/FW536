@@ -40,8 +40,9 @@ For setup help see the [R Markdown tutorial](../rmarkdown_tutorial.html).
 ```{r}
 # Load the packages you'll need. Add or remove as appropriate.
 library(ggplot2)
-library(dplyr)
 library(MASS)        # for glm.nb
+library(dplyr)       # AFTER MASS on purpose: MASS::select would otherwise
+                     # mask dplyr::select and break any select() call below
 library(effects)     # for allEffects() plots
 library(emmeans)     # for pairwise contrasts on the fitted GLM
 ```

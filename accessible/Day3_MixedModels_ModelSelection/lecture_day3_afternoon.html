@@ -62,11 +62,16 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li><a href="#slide-40">40. AIC vs BIC</a></li>
 <li><a href="#slide-41">41. Slide 41</a></li>
 <li><a href="#slide-42">42. Crossvalidation: Split data, train model, compare predictions to actual using test data. Repeat.</a></li>
-<li><a href="#slide-43">43. Recommended Readings</a></li>
-<li><a href="#slide-44">44. Slide 44</a></li>
-<li><a href="#slide-45">45. Don’t take my word for it…</a></li>
-<li><a href="#slide-46">46. Slide 46</a></li>
-<li><a href="#slide-47">47. Don’t take my word for it…</a></li>
+<li><a href="#slide-43">43. If the goal is prediction, is a linear model the right tool?</a></li>
+<li><a href="#slide-44">44. What a tree actually does</a></li>
+<li><a href="#slide-45">45. From one tree to many</a></li>
+<li><a href="#slide-46">46. Two ways to use many trees</a></li>
+<li><a href="#slide-47">47. Which one do you want?</a></li>
+<li><a href="#slide-48">48. Don’t take my word for it…</a></li>
+<li><a href="#slide-49">49. Slide 49</a></li>
+<li><a href="#slide-50">50. Don’t take my word for it…</a></li>
+<li><a href="#slide-51">51. Slide 51</a></li>
+<li><a href="#slide-52">52. Recommended Readings</a></li>
 </ul></nav></aside>
 <main class="content" id="main-content" tabindex="-1">
 <header class="lab-header">
@@ -109,11 +114,13 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <h2 id="slide-4-h"><span id="slide-4"></span>Slide 4: Model selection — Why?</h2>
 <ul>
 <li>Q: Why not just include all explanatory variables?</li>
-<li>A: They will (almost certainly) be correlated.</li>
-<li>Correlation between explanatory variables…</li>
-<li>makes it hard to identify important effects;</li>
-<li>causes bias in effect sizes/parameter estimates;</li>
-<li>leads to overfitting, and poor out-of-sample prediction.</li>
+<li>A: Extra predictors cost precision, and they are almost always correlated.</li>
+<li>Too many predictors relative to sample size…</li>
+<li>fits noise as if it were signal (overfitting), so out-of-sample prediction gets worse;</li>
+<li>spends degrees of freedom, inflating variance of estimates and predictions.</li>
+<li>Correlation among explanatory variables (collinearity)…</li>
+<li>inflates standard errors, so real effects are hard to detect;</li>
+<li>makes individual coefficients unstable and hard to interpret — estimates are imprecise.</li>
 </ul>
 </section>
 <section aria-labelledby="slide-5-h">
@@ -139,6 +146,14 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li>BIC = −2 log ℓ(θ̂) + p log n</li>
 <li>LRT — Likelihood Ratio Test</li>
 <li>−2 log ℓ(θ̂₁) + 2 log ℓ(θ̂₂)   ~   χ² with df = p₂ − p₁</li>
+</ul>
+<ul>
+<li>Reduced</li>
+<li>(simpler)</li>
+</ul>
+<ul>
+<li>Full</li>
+<li>(complex)</li>
 </ul>
 </section>
 <section aria-labelledby="slide-7-h">
@@ -184,7 +199,11 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <p>10</p>
 <p>Compute the likelihood ratio</p>
 <p>( −ln LA − (−ln LB) )</p>
-<p>If using lm or glm objects in R: lrtest(full_model, reduced_model)</p>
+<ul>
+<li>If using lm or glm objects in R:</li>
+<li>lrtest(full_model, reduced_model) from lmtest</li>
+<li>anova(reduced, full, test = &quot;Chisq&quot;) in base R</li>
+</ul>
 </section>
 <section aria-labelledby="slide-11-h">
 <h2 id="slide-11-h"><span id="slide-11"></span>Slide 11: When is this useful rather than just interpreting coefficients?</h2>
@@ -244,7 +263,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <figure role="group"><figcaption><strong>Figure 15.1.</strong> Chi-square distribution table: rows are degrees of freedom, columns are upper-tail probabilities from 0.99 to 0.01, giving critical chi-square values. Used to find p-values for likelihood ratio tests.</figcaption></figure>
 <ul>
 <li>REJECT THE NULL</li>
-<li>That the one parameter model fits that data. Much better to use two parameters, indicating that the probability of running the red light has changed!</li>
+<li>That the one parameter model fits the data. Much better to use two parameters, indicating that the probability of running the red light has changed!</li>
 </ul>
 <figure role="group"><figcaption><strong>Figure 15.2.</strong> R console: 1-pchisq(8.630462*2, 1) returns 3.258189e-05, the p-value for the likelihood ratio test with 1 degree of freedom.</figcaption></figure>
 </section>
@@ -259,7 +278,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <section aria-labelledby="slide-17-h">
 <h2 id="slide-17-h"><span id="slide-17"></span>Slide 17: Information Theoretic Criteria for Model Selection</h2>
 <p>Look familiar?</p>
-<p>Compare to chi.sq distribution with degrees of freedom = # parameters</p>
+<p>Compare to chi.sq distribution with degrees of freedom = difference in # parameters</p>
 <p>AIC and BIC are meaningless on their own, but models with lower values are more parsimonious (i.e. supported). They balance better fit with more parameters. This is exactly what the likelihood ratio test does.</p>
 <p>LRT = −2 loge ( ℒs(θˆ) / ℒg(θˆ) )</p>
 <ul>
@@ -269,16 +288,16 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 </section>
 <section aria-labelledby="slide-18-h">
 <h2 id="slide-18-h"><span id="slide-18"></span>Slide 18</h2>
-<p>Compare to chi.sq distribution with degrees of freedom = # parameters</p>
 <p>compare two models with k parameters and with k+1</p>
 <p>Information Theoretic Criteria for Model Selection</p>
 <figure role="group"><figcaption><strong>Figure 18.1.</strong> Figure (vector image, not machine-readable here) illustrating the difference in information criteria between models with k versus k+1 parameters. Ask instructor for details.</figcaption></figure>
 <p>LRT = −2 loge ( ℒs(θˆ) / ℒg(θˆ) )</p>
+<p>Compare to chi.sq distribution with degrees of freedom = difference in # parameters</p>
 </section>
 <section aria-labelledby="slide-19-h">
 <h2 id="slide-19-h"><span id="slide-19"></span>Slide 19</h2>
 <figure role="group"><figcaption><strong>Figure 19.1.</strong> Chi-square distribution table: rows are degrees of freedom, columns are upper-tail probabilities from 0.99 to 0.01, giving critical chi-square values. Used to find p-values for likelihood ratio tests.</figcaption></figure>
-<p>Convention within&gt;2 AIC units are “considered competitive”, and this is approximately the same as frequentist model selection using LRT</p>
+<p>Convention within &lt;2 AIC units are “considered competitive”, and this is approximately the same as frequentist model selection using LRT</p>
 <p>If 1 parameter separate the model. AIC likes bigger models</p>
 <p>“the extra parameter is worth it”</p>
 </section>
@@ -293,9 +312,9 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <h2 id="slide-21-h"><span id="slide-21"></span>Slide 21: Most common mistake in ecology!</h2>
 <ul>
 <li>Interpretation of relative AIC is not symmetric</li>
-<li style="margin-left:1.2em">More complex model only “significantly better” is it’s AIC score is &gt;2 units smaller.</li>
+<li style="margin-left:1.2em">More complex model only “significantly better” if its AIC score is &gt;2 units smaller.</li>
 <li style="margin-left:1.2em">Otherwise simpler and complex model are competitive</li>
-<li>Penalty for adding parameter is 2 units and fit improves with complexity, so models with random data as predictor will be within 2 AIC. The complex model has not support even if within 2 AIC units</li>
+<li>Penalty for adding parameter is 2 units and fit improves with complexity, so models with random data as predictor will be within 2 AIC. The complex model has no support even if within 2 AIC units</li>
 <li>The 2 AIC convention is about whether a more complex model with lower AIC is better enough relative to simpler model (in the sense that the parameters are informative)</li>
 </ul>
 <p>AICi = −2 log Li + 2 pi</p>
@@ -363,7 +382,6 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <ul>
 <li>It is easy to assess non-nested models of highly variable structure.</li>
 <li>It is good for selecting models for prediction</li>
-<li>Useful when you have lots of potentially correlated predictors</li>
 <li>But it is widely used for inference, resulting in more Type I error</li>
 <li style="margin-left:1.2em">Often used incorrectly, resulting in more error (more on this later)</li>
 </ul>
@@ -463,7 +481,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li>The penalty in BIC increases with the sample size</li>
 <li>AIC retains more complex models than BIC or p-values</li>
 <li>AIC chooses the model that gives the best prediction. It is efficient for prediction.</li>
-<li>BIC chooses the “correct” model if it is in the set.</li>
+<li>BIC chooses the “correct” model if it is in the set (asymptotically).</li>
 </ul>
 <ul>
 <li>AICi = −2 log Li + 2 pi</li>
@@ -481,7 +499,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <h2 id="slide-41-h"><span id="slide-41"></span>Slide 41</h2>
 <table><thead><tr><th scope="col">Method</th><th scope="col">Primary purpose</th><th scope="col">Requires nested models?</th><th scope="col">Complexity penalty</th><th scope="col">Produces p-value?</th></tr></thead>
 <tbody>
-<tr><td>Likelihood Ratio Test (LRT)</td><td>Test a specific null hypothesis</td><td>Yes</td><td>None; compares improvement in likelihood to chi^2 distribution</td><td>Yes</td></tr>
+<tr><td>Likelihood Ratio Test (LRT)</td><td>Test a specific null hypothesis</td><td>Yes</td><td>compares improvement in likelihood to chi^2 distribution</td><td>Yes</td></tr>
 <tr><td>AIC</td><td>Select the model expected to predict new data best</td><td>No</td><td>2 AIC units per additional parameter</td><td>No</td></tr>
 <tr><td>BIC</td><td>Select the simplest plausible data-generating model</td><td>No</td><td>Log(n) BIC units per additional parameter</td><td>No</td></tr>
 </tbody>
@@ -498,7 +516,113 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <p>Dataset</p>
 </section>
 <section aria-labelledby="slide-43-h">
-<h2 id="slide-43-h"><span id="slide-43"></span>Slide 43: Recommended Readings</h2>
+<h2 id="slide-43-h"><span id="slide-43"></span>Slide 43: If the goal is prediction, is a linear model the right tool?</h2>
+<ul>
+<li>Cross-validation asks the right question: how well does this model predict data it has never seen?</li>
+<li>But it can only compare the models you wrote down \u2014 and every one of them is a straight-line combination of the terms you chose.</li>
+<li>Ecological responses are often nonlinear, full of thresholds, and full of interactions we would never think to write down.</li>
+<li>When prediction is the goal, there are tools built for that job. You should know they exist.</li>
+</ul>
+</section>
+<section aria-labelledby="slide-44-h">
+<h2 id="slide-44-h"><span id="slide-44"></span>Slide 44: What a tree actually does</h2>
+<p>Response: juvenile coho density (fish per 100 m²). Predictors: stream temperature, large wood, canopy cover.</p>
+<p>Temperature &lt; 16.5 °C</p>
+<p>Large wood ≥ 8 pieces</p>
+<p>Canopy cover ≥ 45%</p>
+<ul>
+<li>24.3</li>
+<li>n = 31</li>
+</ul>
+<ul>
+<li>11.6</li>
+<li>n = 24</li>
+</ul>
+<ul>
+<li>7.2</li>
+<li>n = 38</li>
+</ul>
+<ul>
+<li>2.1</li>
+<li>n = 27</li>
+</ul>
+<p>yes</p>
+<p>no</p>
+<p>yes</p>
+<p>no</p>
+<p>yes</p>
+<p>no</p>
+<ul>
+<li>Every observation lands in one leaf; the prediction is the mean of the training data in that leaf.</li>
+<li>The wood split applies only in cold streams — an interaction nobody had to specify.</li>
+</ul>
+</section>
+<section aria-labelledby="slide-45-h">
+<h2 id="slide-45-h"><span id="slide-45"></span>Slide 45: From one tree to many</h2>
+<ul>
+<li>A single tree is easy to read, but unstable — change a few data points and the splits change.</li>
+<li>So we use many trees instead of one. Two versions of this idea are everywhere in ecology:</li>
+<li style="margin-left:1.2em">Random forests: grow hundreds of trees on resampled data, then average them.</li>
+<li style="margin-left:1.2em">Boosted regression trees: add trees one at a time, each improving on the last.</li>
+<li>What you get back is a prediction, not an equation to interpret.</li>
+</ul>
+</section>
+<section aria-labelledby="slide-46-h">
+<h2 id="slide-46-h"><span id="slide-46"></span>Slide 46: Two ways to use many trees</h2>
+<p>Random forest: many trees, averaged</p>
+<p>Full dataset</p>
+<p>Tree 1</p>
+<p>Tree 2</p>
+<p>Tree 3</p>
+<p>Average all the trees</p>
+<p>Each tree sees a different random slice of the data. Averaging them gives a steadier prediction than any single tree.</p>
+<p>Boosted trees: many trees, added up</p>
+<p>Tree 1 makes a rough prediction</p>
+<p>Tree 2 fixes what Tree 1 got wrong</p>
+<p>Tree 3 fixes what is still wrong</p>
+<p>Prediction = all the trees added up</p>
+<p>No single tree is very good. Together they build up a prediction that fits patterns no straight line could.</p>
+</section>
+<section aria-labelledby="slide-47-h">
+<h2 id="slide-47-h"><span id="slide-47"></span>Slide 47: Which one do you want?</h2>
+<ul>
+<li>Reach for trees when…</li>
+<li>A map or a forecast is the actual deliverable.</li>
+<li>You have many predictors and little idea which matter.</li>
+<li>You expect thresholds or interactions you cannot specify.</li>
+<li>You want a check on whether your GLM is missing something.</li>
+</ul>
+<ul>
+<li>Stay with a GLM when…</li>
+<li>You need an effect size with a confidence interval.</li>
+<li>You have a hypothesis to test.</li>
+<li>You are asking why, not just what.</li>
+<li>You need to predict beyond the range of your data.</li>
+</ul>
+</section>
+<section aria-labelledby="slide-48-h">
+<h2 id="slide-48-h"><span id="slide-48"></span>Slide 48: Don’t take my word for it…</h2>
+<p>One way to avoid some of the problems associated with model selection is to “just say no” to data-driven model selection—in other words, ﬁt a single pre-speciﬁed model, one in which all explanatory variables are chosen prior to looking at their relationship with the response variable, and then use this model for inference (Harrell 2001, Babyak 2004, Whittingham et al. 2006, Guidice et al. 2012).</p>
+</section>
+<section aria-labelledby="slide-49-h">
+<h2 id="slide-49-h"><span id="slide-49"></span>Slide 49</h2>
+<p>“If researchers want to accurately estimate the strength of multiple competing ecological processes along with reliable confidence intervals, their best hope is to use full (maximal) statistical models after making principled, a priori decisions about which predictors to include. “</p>
+<figure role="group"><figcaption><strong>Figure 49.1.</strong> Multi-panel plot of relative probability of selection versus canopy cover, distance to road, distance to water, and ruggedness, one row per species, with fitted curves and shaded confidence bands.</figcaption></figure>
+<p>Don’t take my word for it…</p>
+<p>Left as a preprint for years until Bolker finally submitted it to a journal after we chatted about this problem</p>
+</section>
+<section aria-labelledby="slide-50-h">
+<h2 id="slide-50-h"><span id="slide-50"></span>Slide 50: Don’t take my word for it…</h2>
+<p>The associated sums of AIC model weights recommended to assess relative importance of individual predictors are really a measure of relative importance of models, with little information about contributions by individual predictors compared to other measures of relative importance based on effects size or variance reduction.</p>
+<p>The standardized estimates or equivalently the t statistics on unstandardized estimates also can be used to provide more informative measures of relative importance than sums of AIC weights. Finally, I illustrate how seriously compromised statistical interpretations and predictions can be for all three of these flawed practices by critiquing their use in a recent species distribution modeling technique developed for predicting Greater Sage‐Grouse (Centrocercus urophasianus) distribution in Colorado, USA. These model averaging issues are common in other ecological literature and ought to be discontinued if we are to make effective scientific contributions to ecological knowledge and conservation of natural resources.</p>
+</section>
+<section aria-labelledby="slide-51-h">
+<h2 id="slide-51-h"><span id="slide-51"></span>Slide 51</h2>
+<figure role="group"><figcaption><strong>Figure 51.1.</strong> Journal article header: Murtaugh 2007, &quot;Simplicity and Complexity in Ecological Data Analysis,&quot; Ecology, with abstract arguing analyses are often needlessly complicated.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 51.2.</strong> Quote in italics: a professor says they could test hypotheses with simple t tests but want something more elegant to fit a better journal. Attributed to an Oregon State University professor requesting statistical help.</figcaption></figure>
+</section>
+<section aria-labelledby="slide-52-h">
+<h2 id="slide-52-h"><span id="slide-52"></span>Slide 52: Recommended Readings</h2>
 <ul>
 <li>Aho et al. 2014 “Model selection for ecologists: The worldviews of AIC and BIC”. Ecology</li>
 <li>Shmueli 2010 “To explain or to predict”. Statistical Science</li>
@@ -509,27 +633,6 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li>Sutherland et al. 2023 “Practical advice on variable selection and reporting using Akaike information criterion. Proceedings B</li>
 <li>Bolker 2024 “Multimodel Approaches Are Not the Best Way to Understand Multifactorial Systems”. Entropy</li>
 </ul>
-</section>
-<section aria-labelledby="slide-44-h">
-<h2 id="slide-44-h"><span id="slide-44"></span>Slide 44</h2>
-<figure role="group"><figcaption><strong>Figure 44.1.</strong> Journal article header: Murtaugh 2007, &quot;Simplicity and Complexity in Ecological Data Analysis,&quot; Ecology, with abstract arguing analyses are often needlessly complicated.</figcaption></figure>
-<figure role="group"><figcaption><strong>Figure 44.2.</strong> Quote in italics: a professor says they could test hypotheses with simple t tests but want something more elegant to fit a better journal. Attributed to an Oregon State University professor requesting statistical help.</figcaption></figure>
-</section>
-<section aria-labelledby="slide-45-h">
-<h2 id="slide-45-h"><span id="slide-45"></span>Slide 45: Don’t take my word for it…</h2>
-<p>One way to avoid some of the problems associated with model selection is to “just say no” to data-driven model selection—in other words, ﬁt a single pre-speciﬁed model, one in which all explanatory variables are chosen prior to looking at their relationship with the response variable, and then use this model for inference (Harrell 2001, Babyak 2004, Whittingham et al. 2006, Guidice et al. 2012).</p>
-</section>
-<section aria-labelledby="slide-46-h">
-<h2 id="slide-46-h"><span id="slide-46"></span>Slide 46</h2>
-<p>“If researchers want to accurately estimate the strength of multiple competing ecological processes along with reliable confidence intervals, their best hope is to use full (maximal) statistical models after making principled, a priori decisions about which predictors to include. “</p>
-<figure role="group"><figcaption><strong>Figure 46.1.</strong> Multi-panel plot of relative probability of selection versus canopy cover, distance to road, distance to water, and ruggedness, one row per species, with fitted curves and shaded confidence bands.</figcaption></figure>
-<p>Don’t take my word for it…</p>
-<p>Left as a preprint for years until Bolker finally submitted it to a journal after we chatted about this problem</p>
-</section>
-<section aria-labelledby="slide-47-h">
-<h2 id="slide-47-h"><span id="slide-47"></span>Slide 47: Don’t take my word for it…</h2>
-<p>The associated sums of AIC model weights recommended to assess relative importance of individual predictors are really a measure of relative importance of models, with little information about contributions by individual predictors compared to other measures of relative importance based on effects size or variance reduction.</p>
-<p>The standardized estimates or equivalently the t statistics on unstandardized estimates also can be used to provide more informative measures of relative importance than sums of AIC weights. Finally, I illustrate how seriously compromised statistical interpretations and predictions can be for all three of these flawed practices by critiquing their use in a recent species distribution modeling technique developed for predicting Greater Sage‐Grouse (Centrocercus urophasianus) distribution in Colorado, USA. These model averaging issues are common in other ecological literature and ought to be discontinued if we are to make effective scientific contributions to ecological knowledge and conservation of natural resources.</p>
 </section>
 </main>
 

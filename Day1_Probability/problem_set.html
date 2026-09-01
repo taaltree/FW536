@@ -121,7 +121,7 @@
 <ol type="a">
 <li>Using indicator variables and linearity of expectation, compute the expected number of isolated callers. (Write $X = \sum_i X_i$ where $X_i = 1$ if cougar $i$ is an isolated caller.)</li>
 <li>Verify your answer by simulation with 20,000 replicate nights.</li>
-<li>Would the expected value in (a) change if calling events were positively correlated between neighbors (as they often are)? Which of your two arguments &mdash; the expectation or a variance calculation &mdash; would be affected? One or two sentences.</li>
+<li>Would the expected value you computed in (a) change if calling events were positively correlated between neighbors (as they often are)? Would the <em>variance</em> of the number of isolated callers change? Say which of the two &mdash; mean, variance, or both &mdash; is affected, and why. One or two sentences.</li>
 </ol>
 <div class="callout bio">The indicator trick &mdash; break a complicated count into a sum of simple 0/1 pieces, then add their expectations &mdash; is one of the most reusable moves in ecology: expected number of local-maximum nest sites, of solitary singers, of runs in a track survey, and more.</div>
 <div class="callout try"><strong>Your answer goes in the R Markdown hand-in.</strong> Show the indicator argument and the simulation check in <code>morning_lab_template.Rmd</code>.</div>
@@ -232,7 +232,7 @@ v   &lt;- <span class="fn">var</span>(coyote$scats)
 <li>In one or two sentences: what does this exercise tell you about why <em>real</em> count data are over-dispersed even when the process is Poisson within each homogeneous unit?</li>
 </ol>
 <div class="callout bio">This is the mechanism behind the Negative Binomial itself: a Poisson whose rate varies (here across two sites; in the NB, continuously via a gamma distribution). Unmodeled heterogeneity in the rate is the single most common source of over-dispersion in ecological counts.</div>
-<div class="callout try"><strong>Your answer goes in the R Markdown hand-in.</strong> Give the simulation and the total-variance derivation in <code>afternoon_lab_template.Rmd</code> under Problem 11.</div>
+<div class="callout try"><strong>Your answer goes in the R Markdown hand-in.</strong> Give the simulation and the step-by-step mean-and-variance derivation in <code>afternoon_lab_template.Rmd</code> under Problem 11.</div>
 </div>
 
 <div class="exercise" id="p12">

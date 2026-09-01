@@ -20,6 +20,7 @@
  <li><a href="#what">What we did today</a></li>
  <li><a href="#likelihood">What is a likelihood?</a></li>
  <li><a href="#mle">What is an MLE?</a></li>
+ <li><a href="#lrt-profile">Comparing models &amp; honest CIs</a></li>
  <li><a href="#prior-post">From prior to posterior</a></li>
  <li><a href="#flip">The big Bayesian flip</a></li>
  <li><a href="#mcmc">What does MCMC do?</a></li>
@@ -74,6 +75,40 @@ A likelihood is not a probability about parameters. That sentence is the most im
 
 <div class="callout bio">
 <strong>Why ecologists love MLE.</strong> It gives a single best estimate, a standard error, and a CI. It is computationally cheap for moderate-size problems. It plays well with information criteria (AIC) and likelihood-ratio tests. Most published ecological models are MLE fits — anything that says <code>lm</code>, <code>glm</code>, or <code>nlme</code> is using MLE under the hood.
+</div>
+</section>
+
+<section id="lrt-profile">
+<h2>Two things you can do once you have a likelihood</h2>
+
+<p>The morning lab spends a lot of time on two tools that fall straight out of the likelihood, and both are easier than they sound. One compares <em>models</em>. The other builds an honest <em>confidence interval</em> for a single parameter.</p>
+
+<h3>The likelihood-ratio test: is the bigger model worth it?</h3>
+
+<p>Suppose you fit two models to the same data. The <strong>simple</strong> one says one growth curve describes every fish in the file. The <strong>complicated</strong> one gives each sex its own curve — two extra parameters. The complicated model will <em>always</em> fit at least as well, because it contains the simple one as a special case: it can always just set the two curves equal. So "it fit better" proves nothing on its own. The real question is whether it fit <em>enough</em> better to justify the two extra parameters.</p>
+
+<p>The <strong>likelihood-ratio test</strong> (LRT) answers that. Take the log-likelihood of each fit — the number that says how well each model explains the data — and compute</p>
+
+<div class="eq-block">$\Lambda = 2\,\big(\ell_{\text{complicated}} - \ell_{\text{simple}}\big).$</div>
+
+<p>Big $\Lambda$ means the extra parameters bought you a lot. The useful fact is that we know how big $\Lambda$ gets <em>by luck alone</em> when the simple model is actually true: it follows a $\chi^2$ distribution with degrees of freedom equal to the number of extra parameters. So you compare your $\Lambda$ to that reference and read off a p-value. In the Day 4 growth example $\Lambda = 75.4$ on 2 df, which gives $p \approx 4\times10^{-17}$ — luck is not a plausible explanation, and the sexes really do grow differently.</p>
+
+<div class="callout warn">
+<strong>The one rule you must not break: the models have to be <em>nested</em>.</strong> Nested means the simple model is a special case of the complicated one, reachable by fixing some of its parameters. One-curve-for-all is nested inside a-curve-per-sex (set the two curves equal). A Poisson model is <em>not</em> nested inside a lognormal one. If the models are not nested the $\chi^2$ reference is simply wrong and the p-value is meaningless. That is precisely the gap <strong>AIC</strong> fills: AIC ranks any set of models fit to the same data, nested or not — but it gives you a ranking, not a test, and never a p-value. Use the LRT when you want a yes/no on a specific added effect; use AIC when you want to sort a collection of candidates.
+</div>
+
+<h3>Profile likelihood: a confidence interval that does not lie</h3>
+
+<p>The quick way to get a 95% CI is "estimate $\pm$ 1.96 standard errors." That recipe quietly assumes the likelihood is a symmetric hill around its peak. For a mean of a large sample, fine. For nonlinear parameters like a growth coefficient $\kappa$, a rate, or a variance, the hill is usually lopsided — steep on one side, with a long shallow shoulder on the other — and the symmetric interval then puts its bounds in the wrong places. It can even hand you a negative lower bound for a quantity that cannot be negative.</p>
+
+<p>The <strong>profile likelihood</strong> fixes that by simply looking at the actual shape of the hill. Pick a candidate value for the parameter you care about, say $\kappa = 0.22$. Freeze it there, and re-fit <em>everything else</em> — let all the other parameters move to their best values given that $\kappa$. Record how much worse the fit got. Do that across a grid of $\kappa$ values and you have traced a curve. The 95% CI is every value whose fit is within <strong>1.92</strong> log-likelihood units of the best one. (1.92 is not arbitrary: it is half of $\chi^2_{1,\,0.95} = 3.84$ — the same LRT arithmetic, run one parameter at a time.) In R, <code>confint()</code> on an <code>mle()</code> fit does exactly this for you.</p>
+
+<div class="callout key">
+The words "re-fit everything else" are the whole idea, and the commonest way to get this wrong is to skip them. If you hold the other parameters <em>frozen</em> at their best-fit values while you slide $\kappa$, you are not profiling — you are taking a slice — and the interval comes out too narrow. Day 4's lab shows this happening on purpose: a grid over $\kappa$ with $L_\infty$ nailed to 100 reports $\kappa \approx 0.15$, while letting $L_\infty$ move returns $\kappa = 0.259$ on the same fish.
+</div>
+
+<div class="callout bio">
+<strong>The Bayesian echo.</strong> Both tools exist because maximum likelihood gives you a point and then has to work to describe the uncertainty around it. In the afternoon you get a whole posterior distribution, so the "interval" is just a question you ask of the draws you already have. That is the same trade-off you will meet again with derived quantities such as MSY: awkward for likelihood, free for Bayes.
 </div>
 </section>
 

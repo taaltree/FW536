@@ -288,7 +288,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <section aria-labelledby="slide-19-h">
 <h2 id="slide-19-h"><span id="slide-19"></span>Slide 19: Start by assuming we know Propn We now have a three dimensional likelihood surface</h2>
 <ul>
-<li>TheData &lt;- matrix(scan(”Whale.dat&quot;,skip=1),byrow=T,ncol=2)</li>
+<li>TheData &lt;- matrix(scan(&quot;Whale.dat&quot;,skip=1),byrow=T,ncol=2)</li>
 <li>TheData &lt;- TheData[,2]</li>
 <li>Blow1 &lt;- seq(from=1,to=40,by=1)</li>
 <li>Blow2 &lt;- seq(from=1,to=60,by=1)</li>
@@ -450,7 +450,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li>NegLogLike &lt;- -1*sum(log(LikeOut))</li>
 <li>return(NegLogLike)</li>
 <li>}</li>
-<li>TheData &lt;- matrix(scan(”Whale.dat&quot;,skip=1),byrow=T,ncol=2)</li>
+<li>TheData &lt;- matrix(scan(&quot;Whale.dat&quot;,skip=1),byrow=T,ncol=2)</li>
 <li>Blows &lt;- TheData[,2]</li>
 <li>ret3 &lt;- mle(LL3,start=list(lam1=10,lam2=10,p=0.4),fixed=list(Blows=Blows),lower=c(0.01,0.01,0.00001),upper=c(Inf,Inf,0.99999),method=&quot;L-BFGS-B&quot;)</li>
 <li>print(summary(ret3))</li>

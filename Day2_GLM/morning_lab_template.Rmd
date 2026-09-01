@@ -38,8 +38,9 @@ For setup help see the [R Markdown tutorial](../rmarkdown_tutorial.html).
 ```{r}
 # Load the packages you'll need. Add or remove as appropriate.
 library(ggplot2)
-library(dplyr)
 library(MASS)        # for glm.nb and negative-binomial helpers
+library(dplyr)       # AFTER MASS on purpose: MASS::select would otherwise
+                     # mask dplyr::select and break any select() call below
 library(effects)
 library(emmeans)
 ```
@@ -85,10 +86,13 @@ library(emmeans)
 
 # Problem 3 — Line-transect detection as an exponential process
 
-> Exponential detection with rate $\lambda = 0.02$/m. Write the survival
-> function $S(x) = e^{-\lambda x}$ and its mean; compute the probability of
-> missing an animal at 50 m; find the half-distance $\ln 2/\lambda$; explain
-> what memorylessness implies.
+> Exponential detection function with rate $\lambda = 0.02$/m, where the
+> latent detection range is $X \sim \mathrm{Exponential}(\lambda)$ and an
+> animal at distance $x$ is seen when $X \ge x$. Write the survival function
+> $S(x) = e^{-\lambda x}$ and its mean; compute the probability of *missing*
+> an animal at 50 m (remember $S(50)$ is the probability it is *seen*); find
+> the half-distance $\ln 2/\lambda$; explain what memorylessness implies
+> about the detection hazard with distance.
 
 **My work:**
 

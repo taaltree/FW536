@@ -286,7 +286,7 @@ pstor &lt;- AICstor &lt;- AICcstor &lt;- BICstor &lt;- <span class="fn">rep</spa
 <p>Three predictors have known effect sizes: one strong, one modest, one weak. Ask which criterion keeps the weak one.</p>
 <div class="code-label">Code</div>
 <pre><code><span class="kw">library</span>(MuMIn); <span class="fn">options</span>(na.action=<span class="st">"na.fail"</span>)
-<span class="fn">set.seed</span>(<span class="nu">7</span>); n &lt;- <span class="nu">60</span>
+<span class="fn">set.seed</span>(<span class="nu">11</span>); n &lt;- <span class="nu">60</span>
 strong &lt;- <span class="fn">runif</span>(n); modest &lt;- <span class="fn">runif</span>(n); weak &lt;- <span class="fn">runif</span>(n)
 y &lt;- <span class="nu">0.8</span>*strong - <span class="nu">0.4</span>*modest + <span class="nu">0.1</span>*weak + <span class="fn">rnorm</span>(n, <span class="nu">0</span>, <span class="nu">0.5</span>)
 d &lt;- <span class="fn">data.frame</span>(y, strong, modest, weak)

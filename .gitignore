@@ -35,3 +35,6 @@ RECOMMENDATIONS.*
 
 # stray R plot-device output
 Rplots.pdf
+
+# JAGS model file written at runtime by Jags_logistic_rK_Lab1.R (sink -> jags.model)
+LogisticJAGS.R

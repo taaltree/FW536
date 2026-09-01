@@ -119,13 +119,14 @@
 <div class="exercise" id="p3">
 <span class="ex-tag">Problem 3</span><span class="difficulty medium"> · Exponential, survival function</span>
 <h3>Line-transect detection as an exponential process</h3>
-<p>On a line transect the probability of detecting an animal declines with perpendicular distance $x$. Model the detection process as Exponential with rate $\lambda = 0.02$ per meter, so that the chance of <em>not yet</em> having detected an animal at distance $x$ follows the survival function of the Exponential.</p>
+<p>On a line transect the probability of detecting an animal declines with perpendicular distance $x$. Model detection with an exponential detection function at rate $\lambda = 0.02$ per meter: give each animal a latent <em>detection range</em> $X \sim \text{Exponential}(\lambda)$ &mdash; the farthest perpendicular distance at which the observer would still have picked it up &mdash; so an animal at distance $x$ is seen exactly when $X \ge x$, and the detection function $g(x)$ is the survival function of $X$.</p>
 <ol type="a">
 <li>Write the survival function $S(x) = P(X \ge x)$ for an Exponential$(\lambda)$ and state its mean.</li>
-<li>Compute the probability of missing an animal that is 50 m off the transect line.</li>
+<li>Compute the probability of <em>missing</em> an animal that is 50 m off the transect line. (Careful: $S(50)$ is the probability the animal <em>is seen</em>.)</li>
 <li>At what perpendicular distance does the detection process reach its "half-life" (the distance at which $S(x) = 0.5$)? Show that this equals $\ln 2 / \lambda$.</li>
+<li>The Exponential is memoryless. Explain what memorylessness implies about the detection hazard as perpendicular distance increases, and what that assumption commits you to biologically for an animal sitting almost on the trackline.</li>
 </ol>
-<div class="callout try"><strong>Your answer goes in the R Markdown hand-in.</strong> Show $S(x)$, the value at 50 m, and the half-distance.</div>
+<div class="callout try"><strong>Your answer goes in the R Markdown hand-in.</strong> Show $S(x)$, the miss probability at 50 m, the half-distance, and one or two sentences on memorylessness.</div>
 </div>
 
 <!-- =========================== PROBLEM 4 =========================== -->
@@ -191,7 +192,7 @@ prop &lt;- read.csv("data/titanic_prop.csv", stringsAsFactors = TRUE)
 f1 &lt;- glm(survived ~ class, family = binomial, data = long)
 f2 &lt;- glm(cbind(Yes, No) ~ Class, family = binomial, data = prop)</code></pre>
 <ol type="a">
-<li>Fit both models. The fitted survival <em>probability for each class</em> should match between the two fits and should equal the raw survival proportion in that class. Verify this with <code>predict(f1, type = "response")</code> and <code>tapply(long$survived, long$class, mean)</code>. Why must the individual-level (Bernoulli) and aggregated (Binomial) likelihoods give the same fitted probabilities?</li>
+<li>Fit both models. The fitted survival <em>probability for each class</em> should match between the two fits and should equal the raw survival proportion in that class. Verify this with <code>predict(f1, data.frame(class = levels(long$class)), type = "response")</code> and <code>tapply(long$survived, long$class, mean)</code>. (Predicting without <code>newdata</code> would return one fitted value per passenger &mdash; all 2201 of them &mdash; rather than the four class-level probabilities you want to line up against <code>tapply</code>.) Why must the individual-level (Bernoulli) and aggregated (Binomial) likelihoods give the same fitted probabilities?</li>
 <li>The raw coefficient <em>tables</em> from <code>f1</code> and <code>f2</code> do not look identical. Explain why &mdash; think about which class each fit uses as its reference level. (Hint: <code>levels(long$class)</code> vs <code>levels(prop$Class)</code>.)</li>
 <li>Take the intercept and the first-class coefficient from <code>f1</code> and convert them, by hand, from log-odds to odds to probability. Confirm your first-class probability against the fitted value and against the raw first-class survival proportion.</li>
 <li>Express the first-class-vs-reference coefficient as an odds ratio and state, in plain English, how many times greater the odds of survival were for that class relative to the reference.</li>

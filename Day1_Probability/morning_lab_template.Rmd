@@ -83,7 +83,11 @@ head(edna)
 > $\mathrm{Var}(aX+b)=a^2\mathrm{Var}(X)$, and $\mathrm{Var}(X+Y)=\mathrm{Var}(X)+\mathrm{Var}(Y)$.
 > (a) Calibrated aerial $X_c = 1.2X - 3$: find $E[X_c]$, $\mathrm{Var}(X_c)$, SD.
 > (b) Total index $T = X + Y$: find $E[T]$, $\mathrm{Var}(T)$.
-> (c) Weighted index: see the problem set for the exact weights.
+> (c) Weighted index $I = 0.6X + 0.4Y$: find $E[I]$ and $\mathrm{Var}(I)$. Is its variance larger
+> or smaller than that of the total $T$, and why?
+> (d) If $X$ and $Y$ were in fact *positively correlated* (good survey conditions inflate both),
+> which of your variance answers in (b) and (c) would be wrong, and would the true variance be
+> larger or smaller than what you computed? One or two sentences — no calculation needed.
 
 **My work:** (algebra — no simulation needed)
 
@@ -98,7 +102,9 @@ head(edna)
 > n = 30 cougars in a line; each calls independently with p = 0.3. An "isolated caller"
 > calls while neither neighbor calls. Using the 28 interior cougars:
 > (a) E[X] via indicator variables. (b) Verify by simulation (20,000 reps).
-> (c) Would positive correlation between neighbors change the mean, the variance, or both?
+> (c) Would positive correlation between neighbors change the expected value you found in (a)?
+> Would it change the *variance* of the number of isolated callers? Say which of the two —
+> mean, variance, or both — is affected, and why.
 
 **My work:**
 

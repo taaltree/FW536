@@ -67,6 +67,16 @@ PPTX_TO_NOTES = {
  "FW536_Day4_Morning_maximum%20likelihod.pptx":"lecture_day4_morning.html",
  "FW536_Day4_Afternoon_BayesI.pptx":"lecture_day4_afternoon.html",
  "FW536_Day5_BayesII.pptx":"lecture_day5.html",
+ # no-solution decks are what the standard site links; map them to the same notes
+ "FW536_Day1_Morning_intro%20to%20probability_nosoln_accessible.pptx":"lecture_day1_morning.html",
+ "FW536_Day1_Afternoon%20Distributions%20I_nosoln_accessible.pptx":"lecture_day1_afternoon.html",
+ "FW536_Day2_Morning_ContinuousDistributions_nosoln_accessible.pptx":"lecture_day2_morning.html",
+ "FW536_Day2_Afternoon_GeneralizedLinear%20Models_nosoln_accessible.pptx":"lecture_day2_afternoon.html",
+ "FW536_Day3_Morning_mixed%20effects_nosoln_accessible.pptx":"lecture_day3_morning.html",
+ "FW536_Day3_Afternoon_hypothesis%20test%20and%20model%20selection_nosoln_accessible.pptx":"lecture_day3_afternoon.html",
+ "FW536_Day4_Morning_maximum%20likelihod_nosoln_accessible.pptx":"lecture_day4_morning.html",
+ "FW536_Day4_Afternoon_BayesI_nosoln_accessible.pptx":"lecture_day4_afternoon.html",
+ "FW536_Day5_BayesII_nosoln_accessible.pptx":"lecture_day5.html",
 }
 
 def transform(text, depth):

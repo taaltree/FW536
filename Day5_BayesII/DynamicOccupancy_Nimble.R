@@ -28,8 +28,9 @@
 #   1. Simulating data from a dynamic occupancy model.
 #   2. Translating the JAGS model to nimbleCode().
 #   3. The "z initialization trick": initialize the entire latent z matrix
-#      at 1 so that y == 1 observations are never impossible (otherwise the
-#      sampler is stuck with log-density = -Inf).
+#      at 1 so that y == 1 observations are never impossible (otherwise those
+#      observations start at log-density = -Inf; see section 3 below for what
+#      NIMBLE actually does about that, which is NOT to stop).
 #   4. Using `monitors` to track latent occupancy across years.
 #   5. Comparing recovered (phi, gamma) to truth.
 #
@@ -134,13 +135,28 @@ data <- list(
 # 3. The z-initialization trick (READ THIS)
 # =============================================================================
 # If any y[i, j, t] = 1, then z[i, t] must be 1 (because P(y=1 | z=0) = 0).
-# Random initial z values risk z = 0 where y = 1, which gives log-density
-# = -Inf and the MCMC will refuse to start. The classic safe trick:
+# Random initial z values risk z = 0 where y = 1, which makes that
+# observation's initial log-density -Inf. The classic safe trick:
 #
 #     z.init <- matrix(1, Nsites, Nyears)   # ALL z = 1
 #
 # This guarantees consistency with all observed 1's. The sampler will quickly
 # learn (from the data) that some sites/years are actually empty.
+#
+# WHAT ACTUALLY HAPPENS IF YOU SKIP IT (checked against NIMBLE 1.4.2):
+#   NIMBLE does NOT refuse to start. It prints one line per offending node,
+#       warning: logProb of data node y[7, 1, 7]: logProb is -Inf.
+#   (dozens of them here), then builds the model and runs the MCMC to
+#   completion. Because z is binary, its samplers flip those cells to 1
+#   almost immediately and the posterior comes back essentially unchanged
+#   (detection p median 0.63 with either start).
+#   The SAME inits are fatal in JAGS: jags.model() aborts with
+#       Error in node y[1,1,1]  /  Node inconsistent with parents
+#   So use the trick because (a) it keeps the model portable, (b) it keeps
+#   the console clean so a real initialization failure is visible, and
+#   (c) NIMBLE's automatic recovery here depends on z being BINARY -- a
+#   continuous latent state, or a block sampler that cannot propose out of a
+#   -Inf region, can sit there silently for the whole run.
 zst <- matrix(1L, nrow = Nsites, ncol = Nyears)
 
 init.fun <- function() {
@@ -194,8 +210,10 @@ par(mfrow = c(1, 1))
 # Teaching takeaways
 # =============================================================================
 # - Latent-state models separate two layers: process (z) and observation (y).
-# - The z initialization trick is THE most common reason a nimble dynamic-
-#   occupancy model "won't start". Always initialize z = 1 everywhere.
+# - A -Inf initial log-density is THE most common latent-state startup
+#   problem. JAGS treats it as fatal; NIMBLE only warns and runs on, so the
+#   symptom is a wall of "logProb is -Inf" warnings rather than an error.
+#   Read those warnings, and always initialize z = 1 everywhere.
 # - With only 30 sites, 8 years, and 3 visits, year-specific phi/gamma have
 #   huge posterior intervals -- that's a feature, not a bug. Bayes is being
 #   honest about what such a small dataset actually tells you.

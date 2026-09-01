@@ -27,6 +27,8 @@ summary(m2)
 grid2 <- expand.grid(x1 = seq(-2, 2, length=50),
                      x2 = seq(-2, 2, length=50))
 grid2$yhat <- predict(m2, newdata=grid2)
+# expand.grid() varies x1 fastest, so filling column-major gives
+# zmat[i, j] = yhat at (x1 = i-th value, x2 = j-th value).
 zmat_noint <- matrix(grid2$yhat, nrow = 50, ncol = 50)
 
 p1 <- ggplot(grid2, aes(x1, x2, fill=yhat)) +
@@ -39,10 +41,12 @@ p1
 
 
 # 3D interactive surface plot
+# plot_ly() reads z row-wise as y and column-wise as x, so z must be
+# transposed for the surface to match the "x1" / "x2" axis labels below.
 p2 <- plot_ly(
-  x = seq(-2, 2, length = 50),
-  y = seq(-2, 2, length = 50),
-  z = zmat_noint,
+  x = seq(-2, 2, length = 50),   # x axis = x1
+  y = seq(-2, 2, length = 50),   # y axis = x2
+  z = t(zmat_noint),
   type = "surface"
 ) %>%
   layout(
@@ -80,6 +84,7 @@ summary(m1)
 grid1 <- expand.grid(x1 = seq(-2, 2, length=50),
                      x2 = seq(-2, 2, length=50))
 grid1$yhat <- predict(m1, newdata=grid1)
+# Same orientation as above: zmat[i, j] = yhat at (x1 = i-th, x2 = j-th).
 zmat_int <- matrix(grid1$yhat, nrow = 50, ncol = 50)
 
 p3 <- ggplot(grid1, aes(x1, x2, fill=yhat)) +
@@ -88,10 +93,11 @@ p3 <- ggplot(grid1, aes(x1, x2, fill=yhat)) +
   labs(title="Heatmap of Predicted y with Interaction")
 
 # 3D interactive surface plot
+# Transposed for the same reason as p2: plot_ly reads rows as y, columns as x.
 p4 <- plot_ly(
-  x = seq(-2, 2, length = 50),
-  y = seq(-2, 2, length = 50),
-  z = zmat_int,
+  x = seq(-2, 2, length = 50),   # x axis = x1
+  y = seq(-2, 2, length = 50),   # y axis = x2
+  z = t(zmat_int),
   type = "surface"
 ) %>%
   layout(
@@ -133,7 +139,19 @@ p5 <- ggplot(grid_glm, aes(x1, x2, fill=phat)) +
   scale_fill_viridis_c() +
   labs(title="Predicted Probability (GLM with interaction)")
 
+# Same fit, but on the linear-predictor (log-odds) scale.
+# Compare p6 with p5: the interaction is a clean twist in the log-odds
+# surface, but the logistic link squashes it toward 0 and 1 on the
+# probability scale, so the two heatmaps do not look alike.
+grid_glm$eta <- predict(m_glm, newdata=grid_glm, type="link")
+
+p6 <- ggplot(grid_glm, aes(x1, x2, fill=eta)) +
+  geom_tile() +
+  scale_fill_viridis_c() +
+  labs(title="Linear Predictor / Log-Odds (GLM with interaction)")
+
 p5
+p6
 
 
 #Question 5 - what is the algebra and geometry of this model?

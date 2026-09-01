@@ -90,13 +90,14 @@ We tackled the fact that real ecological data are not independent — fish are i
 <section id="shrink">
 <h2>What "shrinkage" actually does (the magic of partial pooling)</h2>
 
-<p>Imagine measuring fish density in 18 streams. Two of those streams (call them Stream 11 and Stream 12) only had three observations each, and one of those three happened to be unusually low. If you fit a separate intercept per stream (no pooling), those two streams will look extreme. If you fit one grand mean and ignore stream (complete pooling), you'll miss the fact that streams really are different.</p>
+<p>Imagine measuring fish density in 100 streams, three measurements in each — the Day 3 stream dataset. A few streams come out looking extreme (Stream 11 has the lowest average, 8.9; Stream 43 the highest, 111.7, against a grand mean of 63.3). If you fit a separate intercept per stream (no pooling), those streams keep their raw averages exactly as measured. If you fit one grand mean and ignore stream (complete pooling), you miss the fact that streams really are different.</p>
 
 <p>A mixed model splits the difference. It says: "the streams probably aren't quite as different as their raw means suggest — let me pull the extreme ones a little toward the overall average." That pull is shrinkage. The strength of the pull depends on:</p>
 <ul>
-<li><strong>How much data each stream has.</strong> A stream with 30 observations gets pulled very little; the data dominate. A stream with 3 observations gets pulled a lot; we don't trust the data as much.</li>
+<li><strong>How much data each stream has.</strong> A stream with 30 observations gets pulled very little; its own data dominate. A stream with 3 observations gets pulled more; we trust its own average less.</li>
 <li><strong>How variable streams are overall.</strong> If among-stream variance is huge, even small samples convince us streams really do differ. If it's small, the model assumes most variation is residual noise and pulls hard.</li>
 </ul>
+<p>Both dials are pinned in the Day 3 stream data. Every stream has exactly the same three measurements, so the first dial cannot differ between streams. And streams differ enormously (among-stream SD 21.4 against a within-stream SD of 4.6), so the second dial is set to "barely pull at all". The result: <strong>every one of the 100 streams is pulled by the same 1.49% of its distance from the grand mean</strong>, keeping 98.5% of its own average. Stream 11 moves from 8.9 to 9.7; Stream 43 from 111.7 to 111.0. Nothing here shrinks harder than anything else — to see that you would need an unbalanced design, where some streams have far fewer measurements than others. The <a href="explore_shrinkage.html">interactive shrinkage demo</a> lets you move both dials yourself and watch strong shrinkage appear.</p>
 
 <div class="callout key">
 <p>The shrinkage formula is not magic — it's exactly what an idealized Bayesian would do with a prior "fish density is around the population mean, with variance $\sigma_\text{stream}^2$" combined with the actual data for each stream. Mixed models are quietly Bayesian.</p>
@@ -150,10 +151,11 @@ The trap that has wrecked many graduate theses is to run all subsets of predicto
 
 <p>Cross-validation answers the question "how well does this model predict data it hasn't seen?" by literally hiding some data, fitting the model on what's left, and seeing how badly the predictions miss the hidden values. Repeat for every observation (leave-one-out CV) or every fold of, say, ten (10-fold CV), and average the prediction errors.</p>
 
-<p>If a model is overfit — using random noise to make the training data look great — it will look bad on the held-out data. CV catches that directly. AIC tries to <em>predict</em> CV behavior from in-sample likelihood. When they agree, that's reassuring. When they disagree, trust CV for prediction questions.</p>
+<p>If a model is overfit — using random noise to make the training data look great — it will look bad on the held-out data. CV catches that directly.</p>
+<p><strong>But CV is not an independent second opinion on AIC.</strong> For a Gaussian linear model, leave-one-out CV and AIC are <em>asymptotically the same criterion</em> (Stone 1977), and at the sample sizes in this lab they have already nearly converged: in Exercise 10 the two rankings correlate at 0.95, they pick the same model about 90% of the time, and over 2000 simulated datasets they recover the truth at indistinguishable rates (58.4% vs 57.6%). Holding data out does not buy you protection that AIC lacks — it is a slower route to the same number. That equivalence is the reason AIC is everywhere: LOOCV costs you $n$ refits, AIC gives the same answer in closed form from one fit.</p>
 
 <div class="callout key">
-For any modeling project whose goal is "predict X for new units", cross-validation should appear in your methods. It is much more honest than reporting the in-sample $R^2$ or the AIC of the best model.
+For any modeling project whose goal is "predict X for new units", cross-validation should appear in your methods. It is much more honest than reporting the in-sample $R^2$. Reporting AIC instead is not a lesser substitute — for Gaussian models AIC <em>is</em> the closed-form version of LOOCV — but neither one answers "is this effect real?" Both rank models for prediction; only the coefficient, its interval, and the study design speak to whether an effect exists.
 </div>
 </section>
 

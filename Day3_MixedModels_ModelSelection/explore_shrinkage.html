@@ -76,7 +76,7 @@
 <li><strong>Large τ → almost no shrinkage.</strong> Slide τ up. The model trusts each site's own data, and the teal estimates sit almost on top of the orange ones.</li>
 <li><strong>More data → less shrinkage.</strong> Raise n. Each site's own mean becomes more reliable, so it is pulled less toward the center.</li>
 <li><strong>Noisier observations → more shrinkage.</strong> Raise σ. Each site's own mean is now measured badly, so the model leans harder on the grand mean. Notice that τ and σ/√n are in a tug of war: only their <em>ratio</em> matters.</li>
-<li><strong>The shrinkage weight</strong> shown below is τ² / (τ² + σ²/n): the fraction of the way each estimate stays at its own site mean rather than the grand mean.</li>
+<li><strong>The retention weight B</strong> shown below is B = τ² / (τ² + σ²/n): the fraction of the way each estimate stays at its own site mean rather than the grand mean. Careful with the direction — B is what a site <em>keeps</em>, and 1 &minus; B is how far it is <em>shrunk</em> toward the grand mean. The Day 3 <a href="answer_key.html#a1">answer key</a> uses B the same way.</li>
 </ol>
 </div>
 <p><a href="lab.html">← Back to the Day 3 lab</a></p>
@@ -135,7 +135,7 @@ function render(){
                            `Moderate shrinkage — a balance of site data and the shared population.`;
   document.getElementById('interp').innerHTML=
     `With τ = <b>${S.tau.toFixed(2)}</b>, n = <b>${Math.round(S.n)}</b> and σ = <b>${sigma.toFixed(1)}</b>, `+
-    `the shrinkage weight B = τ²/(τ² + σ²/n) = ${tau2.toFixed(2)}/(${tau2.toFixed(2)} + ${se2.toFixed(2)}) = <b>${B.toFixed(2)}</b>. `+
+    `the retention weight B = τ²/(τ² + σ²/n) = ${tau2.toFixed(2)}/(${tau2.toFixed(2)} + ${se2.toFixed(2)}) = <b>${B.toFixed(2)}</b>. `+
     `Each site estimate keeps <b>${(B*100).toFixed(0)}%</b> of its own site mean and takes <b>${((1-B)*100).toFixed(0)}%</b> from the grand mean. `+
     verdict;
   describe(B,sigma,verdict);
@@ -153,7 +153,7 @@ function describe(B,sigma,verdict){
   const nn=Math.round(S.n);
   const msg=`Between-site SD tau = ${S.tau.toFixed(2)}, n = ${nn} observation${nn===1?'':'s'} per site, `+
     `within-site residual SD sigma = ${sigma.toFixed(1)}. `+
-    `Shrinkage weight B = tau squared over (tau squared plus sigma squared over n) = ${B.toFixed(2)}. `+
+    `Retention weight B = tau squared over (tau squared plus sigma squared over n) = ${B.toFixed(2)}. `+
     `Each site keeps ${(B*100).toFixed(0)} percent of its own mean and takes ${((1-B)*100).toFixed(0)} percent `+
     `from the grand mean of ${grand.toFixed(2)}. `+
     `Site ${far.name}, the furthest out at ${far.ybar.toFixed(2)}, is pulled in to ${far.pp.toFixed(2)}. `+verdict;

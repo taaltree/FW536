@@ -119,7 +119,7 @@ MathJax = {
 <h2>Common mistakes</h2>
 <div class="callout warn"><p class="callout-label">Watch out</p><strong>Fitting a Normal to count data.</strong> Predicts negative counts; variance assumption usually wrong. Use a Poisson or NB instead.</div>
 <div class="callout warn"><p class="callout-label">Watch out</p><strong>Forgetting to back-transform.</strong> A log-link coefficient of 0.5 is not "a 0.5 increase in response per unit x" — it's "a $\times e^{0.5} = \times 1.65$ multiplicative effect." Always exponentiate.</div>
-<div class="callout warn"><p class="callout-label">Watch out</p><strong>Trusting Poisson SEs when overdispersed.</strong> Overdispersion makes Poisson SEs too small. Switch to NB (or quasipoisson if you only need point estimates).</div>
+<div class="callout warn"><p class="callout-label">Watch out</p><strong>Trusting Poisson SEs when overdispersed.</strong> Overdispersion makes Poisson SEs too small &mdash; on the sockeye counts the Poisson SE on <code>logED</code> is 0.013 when it should be ~0.09. Switch to NB, or to quasipoisson if the Poisson point estimate is all you need to keep: quasipoisson does not move the estimate at all (0.737 either way), it just multiplies the SEs by $\sqrt{\hat\phi}$ &mdash; here $\sqrt{51}\approx 7.1$. The NB is a different likelihood and moves the estimate too.</div>
 <div class="callout warn"><p class="callout-label">Watch out</p><strong>Treating interactions as one-size-fits-all.</strong> An interaction that looks important on the log scale might disappear on the natural scale, and vice versa. Always state which scale you're talking about.</div>
 </section>
 

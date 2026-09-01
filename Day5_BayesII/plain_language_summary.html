@@ -177,7 +177,7 @@ We took the Bayesian models from Day 4 (one likelihood, a small handful of param
 </div>
 
 <div class="callout warn">
-<p><strong>Bad starting values in latent-state models.</strong> If your initial latent state implies a $y$ that contradicts the data, the log-density is $-\infty$ and the chain won't start. <em>Fix:</em> in dynamic occupancy, initialise all $z = 1$; in N-mixture, initialise $N_i = \max_j y_{i,j}$.</p>
+<p><strong>Bad starting values in latent-state models.</strong> If your initial latent state implies a $y$ that contradicts the data, that observation's log-density is $-\infty$. In JAGS this is fatal (<code>Node inconsistent with parents</code>); NIMBLE 1.4.2 instead prints a <code>logProb is -Inf</code> warning for every offending node and runs anyway &mdash; which is worse in one way, because the message scrolls past and you may never notice. With a binary latent state the sampler usually recovers on its own; with a continuous one it can sit at $-\infty$ for the whole run. <em>Fix:</em> in dynamic occupancy, initialise all $z = 1$; in N-mixture, initialise $N_i = \max_j y_{i,j}$. Then the warnings never appear, and if they ever do you know something is genuinely wrong.</p>
 </div>
 
 <div class="callout warn">
@@ -185,7 +185,12 @@ We took the Bayesian models from Day 4 (one likelihood, a small handful of param
 </div>
 
 <div class="callout warn">
-<p><strong>Wrong split between constants and data.</strong> If you put a covariate vector in <code>data=</code> but never assign it with <code>~</code>, NIMBLE will treat it as missing (NA) and try to estimate it. <em>Fix:</em> covariates and indices go in <code>constants=</code>. Only random variables observed with <code>~</code> go in <code>data=</code>.</p>
+<p><strong>Wrong split between constants and data.</strong> Two mistakes are worth knowing apart, because only one of them is loud.</p>
+<ul>
+ <li><strong>An index or loop bound in <code>data=</code> is a hard error.</strong> Move <code>n</code> out of <code>constants=</code> and into <code>data=</code> and the model never builds: <code>Could not evaluate loop syntax: is indexing information provided via 'constants'?</code> Anything that sets a dimension or a loop range <em>must</em> be a constant.</li>
+ <li><strong>An observed variable in <code>constants=</code> is silently rescued.</strong> NIMBLE notices the node on the left of a <code>~</code> and reclassifies it, printing <code>[Note] Using 'y' (given within 'constants') as data.</code> The fit is right, but the mental model is wrong, and it breaks the moment you want posterior-predictive replicates, missing values, or a simulation from the fitted model.</li>
+</ul>
+<p><em>Fix:</em> sizes, indices, and covariates go in <code>constants=</code>; only random variables observed with <code>~</code> go in <code>data=</code>. (A plain covariate placed in <code>data=</code> is <em>not</em> a disaster &mdash; NIMBLE keeps it as a fixed right-hand-side-only value and the posterior is unchanged &mdash; but it is still the wrong drawer, and the rule above is the one to hold in your head.)</p>
 </div>
 
 <div class="callout warn">

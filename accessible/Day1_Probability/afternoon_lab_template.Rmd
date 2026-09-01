@@ -120,7 +120,8 @@ set.seed(1)
 
 > Poisson counts with lambda_A = 2, lambda_B = 8; 50 mussels from each site, pooled.
 > (a) Naive pooled mean/variance — still Poisson? (b) Simulate and show over-dispersion.
-> (c) Derive the exact mean and variance via the law of total variance and compare.
+> (c) Derive the exact pooled mean and variance step by step, using only the definitions of
+> mean and variance — no new theorem — and compare with (b).
 > (d) Why are real count data over-dispersed even when Poisson within each unit?
 
 **My work:**

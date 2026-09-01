@@ -107,6 +107,12 @@ library(stats4)   # mle() and confint() for profile-likelihood CIs
 # Load exactly as in the lab:
 # Logistic <- read.csv("data/Logistic.csv", header = TRUE)
 # Logistic <- Logistic[order(Logistic$PopulationSize), ]
+#
+# For part (b), keep the control argument from the problem set when you call mle():
+#   control = list(parscale = c(0.2, 1000, 0.03))
+# r, K and sigma differ in scale by ~10^4, and optim() uses one step size for all
+# three. Without parscale, K comes back stuck at its starting value (1000) with no
+# warning. If your K_hat equals your start, that is the bug.
 ```
 
 **My work:**

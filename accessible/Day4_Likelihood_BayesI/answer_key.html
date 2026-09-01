@@ -127,9 +127,9 @@ AIC(fitA, fitB)</code></pre>
 
 <p>On the shipped data: $\Lambda \approx 75.4$ on 2 df, $p \approx 4\times10^{-17}$ — overwhelming. Both LRT and AIC decisively favor Model B (AIC $\approx 798$ for Model A vs $\approx 727$ for Model B, a drop of ~71).</p>
 
-<p>(b) Intermediate model (shared $L_\infty$, sex-specific $\kappa$, 4 parameters): AIC $\approx 767$ — better than the shared Model A ($\approx 798$) but still well above the full Model B ($\approx 727$). Each sex-specific parameter helps, and the fully sex-specific model wins. Fitting Model B shows the difference is concentrated in asymptotic length $L_\infty$ ($\hat L_{\infty,1}\approx 102.5$ vs $\hat L_{\infty,2}\approx 82.6$) more than in growth rate $\kappa$ ($0.284$ vs $0.259$).</p>
+<p>(b) Intermediate model (shared $L_\infty$, sex-specific $\kappa$, 4 parameters): AIC $\approx 767$ — better than the shared Model A ($\approx 798$) but still well above the full Model B ($\approx 727$). Each sex-specific parameter helps, and the fully sex-specific model wins. Fitting Model B shows the difference is concentrated in asymptotic length $L_\infty$ ($\hat L_{\infty,1}\approx 82.6$ for sex 1 vs $\hat L_{\infty,2}\approx 102.5$ for sex 2) more than in growth rate $\kappa$ ($0.259$ vs $0.284$).</p>
 
-<p>(c) Conclusion: the sexes differ mainly in asymptotic size $L_\infty$ (one sex reaches a substantially larger maximum length) and only modestly in $\kappa$; the full sex-specific model is preferred by both criteria. LRT requires nesting and delivers a p-value; AIC ranks (no nesting required) and here also points to Model B.</p>
+<p>(c) Conclusion: the sexes differ mainly in asymptotic size $L_\infty$ (sex 2 reaches a substantially larger maximum length; the file does not record which code is male and which is female, so grade the result stated by code) and only modestly in $\kappa$; the full sex-specific model is preferred by both criteria. LRT requires nesting and delivers a p-value; AIC ranks (no nesting required) and here also points to Model B.</p>
 
 <div class="callout key"><p class="callout-label">Key idea</p><strong>What to look for:</strong> Comfort with both LRT and AIC. Reinforce: LRT requires nesting; AIC does not. LRT delivers a p-value; AIC delivers a ranking, not a test.</div>
 </section>
@@ -221,7 +221,14 @@ lam &lt;- exp(ll[-(<span class="nu">1</span>:<span class="nu">3000</span>)])
 hist(lam, breaks = <span class="nu">60</span>, freq = <span class="kw">FALSE</span>, main = <span class="st">""</span>, xlab = expression(lambda))
 curve(dgamma(x, <span class="nu">2</span> + sum(y), <span class="nu">1</span> + length(y)), add = <span class="kw">TRUE</span>, lwd = <span class="nu">2</span>, col = <span class="st">"red"</span>)</code></pre>
 
-<p>Acceptance with $s = 0.30$ is about <strong>58%</strong> here — above the ~30% target, so to tune down you would <em>raise</em> $s$ (bigger jumps get rejected more often). The posterior approximation matches the closed-form Gamma(27, 11) (mean 2.45) to within MCMC noise.</p>
+<p>Acceptance with $s = 0.30$ is about <strong>58%</strong> here — above the ~30% target, so to tune down you would <em>raise</em> $s$ (bigger jumps get rejected more often). $s=0.30$ is therefore the <em>starting guess</em>, not the answer to (c): part (c) asks the student to actually sweep $s$. With <code>set.seed(3)</code> and 30,000 iterations the sweep reads</p>
+
+<table>
+<tr><th scope="col">$s$</th><td>0.15</td><td>0.30</td><td>0.60</td><td><strong>0.75</strong></td><td>0.90</td><td>1.20</td></tr>
+<tr><th scope="col">acceptance</th><td>0.764</td><td>0.579</td><td>0.365</td><td><strong>0.303</strong></td><td>0.260</td><td>0.202</td></tr>
+</table>
+
+<p>so <strong>$s \approx 0.75$</strong> is the tuned value (acceptance $0.303$). Full credit for any $s$ that lands the acceptance rate in roughly 25–35% ($s$ between about 0.6 and 0.9) <em>together with the sweep that found it</em> — the tuning, not the number, is the exercise. At $s = 0.75$ the posterior mean is $2.458$ with 95% BCI $(1.617, 3.469)$, against the closed-form Gamma(27, 11) mean $27/11 = 2.4545$ and BCI $(1.618, 3.463)$ — agreement to MCMC noise. Point out that <em>every</em> $s$ in the table converges to that same posterior: tuning buys effective sample size, not correctness.</p>
 </section>
 
 <!-- ============== EX 7 ============== -->
@@ -233,17 +240,17 @@ curve(dgamma(x, <span class="nu">2</span> + sum(y), <span class="nu">1</span> + 
 <table>
 <tr><th scope="col">parameter</th><th scope="col">median</th><th scope="col">95% BCI</th><th scope="col">95% HPDI</th></tr>
 <tr><td>$r$</td><td>~0.20</td><td>(0.18, 0.22)</td><td>(0.18, 0.22)</td></tr>
-<tr><td>$K$</td><td>~1233</td><td>(1129, 1376)</td><td>(1120, 1363)</td></tr>
+<tr><td>$K$</td><td>~1234</td><td>(1131, 1378)</td><td>(1122, 1365)</td></tr>
 <tr><td>$\sigma$</td><td>~0.028</td><td>(0.023, 0.035)</td><td>(0.023, 0.035)</td></tr>
-<tr><td>$N_{\max\,dN/dt}=K/2$</td><td>~616</td><td>(564, 688)</td><td>(560, 681)</td></tr>
+<tr><td>$N_{\max\,dN/dt}=K/2$</td><td>~617</td><td>(565, 689)</td><td>(561, 683)</td></tr>
 <tr><td>$\text{MSY}=rK/4$</td><td>~62</td><td>(57, 67)</td><td>(57, 67)</td></tr>
 </table>
 
-<p>(c) $\Pr(r > 0.22 \mid \text{data}) \approx 0.025$ — the $r$ posterior is tight (sd $\approx 0.01$), so 0.22 sits about two SDs above the mean.</p>
+<p>(c) $\Pr(r > 0.22 \mid \text{data}) \approx 0.023$ — the $r$ posterior is tight (sd $\approx 0.01$), so 0.22 sits about two SDs above the mean.</p>
 <p>(d) $\Pr(\text{MSY} > 50 \mid \text{data}) \approx 1.0$ — essentially certain, since the entire 95% MSY interval (~57 to 67) lies above 50.</p>
 <p>(e) The clearest BCI–HPDI separation is on $\sigma$, which is bounded below by zero and mildly right-skewed: the HPDI ($\approx 0.023$–$0.035$) sits a hair lower than the equal-tailed BCI and is marginally shorter. <em>Why:</em> equal-tail intervals split the 5% miscoverage symmetrically by quantile; HPDI captures the densest 95% of mass, which for a right-skewed distribution shifts the interval toward (but not past) the lower bound. The effect is modest here because $\sigma$ is well-determined — it would be dramatic for a strongly skewed posterior.</p>
 
-<div class="callout key"><p class="callout-label">Key idea</p><strong>What to look for:</strong> Students should monitor <em>derived quantities</em> directly (MSY, K/2, dNdt) inside the Nimble code, not compute them externally from $r$ and $K$ samples (though that works too — make sure they understand the equivalence: any function of monitored RVs has a posterior that's just the function applied draw-by-draw).</div>
+<div class="callout key"><p class="callout-label">Key idea</p><strong>What to look for:</strong> Students should understand that a <em>derived quantity</em> gets a posterior for free, and that they may obtain it either way — declared inside the Nimble code and monitored, or evaluated draw-by-draw in R on the saved $r$ and $K$ columns. The two are <em>exactly</em> equivalent (identical to floating point), because the derived node is a deterministic function of the parameters; make sure they can say why. Accept either. Do <em>not</em> mark down a student who computes <code>dNdt</code> externally — for a 151-point prediction grid that is the better choice, and it is what <code>Logistic_BayesianGrowth_Nimble.R</code> now does: monitoring <code>mu</code> (50 nodes) and <code>dNdt</code> (151 nodes) as well as the 5 scalars makes the coda object 206 columns wide, 94.3 MB instead of 2.3 MB, for no gain in information. Scalars like MSY and $K/2$ are cheap and should be monitored in the model.</div>
 </section>
 
 <!-- ============== EX 8 ============== -->
@@ -254,9 +261,9 @@ curve(dgamma(x, <span class="nu">2</span> + sum(y), <span class="nu">1</span> + 
 
 <table>
 <tr><th scope="col">Prior</th><th scope="col">Posterior</th><th scope="col">Posterior mean</th><th scope="col">95% BCI</th><th scope="col">$\Pr(\phi > 0.5)$</th></tr>
-<tr><td>Beta(1, 1)</td><td>Beta(19, 8)</td><td>0.704</td><td>(0.53, 0.85)</td><td>~0.98</td></tr>
+<tr><td>Beta(1, 1)</td><td>Beta(19, 8)</td><td>0.704</td><td>(0.52, 0.86)</td><td>~0.99</td></tr>
 <tr><td>Beta(9, 11)</td><td>Beta(27, 18)</td><td>0.600</td><td>(0.45, 0.74)</td><td>~0.91</td></tr>
-<tr><td>Beta(50, 50)</td><td>Beta(68, 57)</td><td>0.544</td><td>(0.46, 0.63)</td><td>~0.83</td></tr>
+<tr><td>Beta(50, 50)</td><td>Beta(68, 57)</td><td>0.544</td><td>(0.46, 0.63)</td><td>~0.84</td></tr>
 </table>
 
 <pre><code><span class="kw">library</span>(nimble); <span class="kw">library</span>(MCMCvis)

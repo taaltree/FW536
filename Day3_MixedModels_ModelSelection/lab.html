@@ -201,7 +201,7 @@ You'll see two packages in this lab: <code>nlme</code> (Pinheiro &amp; Bates, th
 
 <!-- Example 1: Streams -->
 <div class="exercise" id="ex-1">
-<span class="ex-tag">Exercise 1</span><span class="difficulty easy"> · 20 min · streams</span>
+<span class="ex-tag">Practice Exercise M1</span><span class="difficulty easy"> · 20 min · streams</span>
 <h3>Streams: complete pooling vs no pooling vs partial pooling</h3>
 <p>The file <code>stream_density.csv</code> has fish density measurements from 100 streams, three observations per stream.</p>
 
@@ -256,7 +256,7 @@ intervals(lm3)$sigma
 
 <!-- Example 2: Length-Weight -->
 <div class="exercise" id="ex-2">
-<span class="ex-tag">Exercise 2</span><span class="difficulty medium"> · 25 min · length-weight</span>
+<span class="ex-tag">Practice Exercise M2</span><span class="difficulty medium"> · 25 min · length-weight</span>
 <h3>Length–weight: random intercepts with a fixed-effect covariate</h3>
 <p><code>length_weight.csv</code> has length and weight for individuals from multiple subjects (groups). The biological question: is there a length–weight relationship, and does the intercept vary by subject?</p>
 
@@ -296,7 +296,7 @@ m1b &lt;- <span class="fn">lmer</span>(Weight ~ Length + (<span class="nu">1</sp
 
 <!-- Example 3: VonB -->
 <div class="exercise" id="ex-3">
-<span class="ex-tag">Exercise 3</span><span class="difficulty hard"> · 35 min · nonlinear mixed</span>
+<span class="ex-tag">Practice Exercise M3</span><span class="difficulty hard"> · 35 min · nonlinear mixed</span>
 <h3>Von Bertalanffy growth — a nonlinear mixed model</h3>
 <p>The file <code>fish_growth.csv</code> contains age and length measurements for multiple individual fish ("Subject"). Each fish should follow the von Bertalanffy growth curve:</p>
 <div class="eq-block">$L(a) = L_\infty \left(1 - e^{-\kappa (a - t_0)}\right)$</div>
@@ -344,7 +344,7 @@ m_fixed &lt;- <span class="fn">nls</span>(Length ~ Linf*(<span class="nu">1</spa
 
 <!-- Example 4: Trophic position -->
 <div class="exercise" id="ex-4">
-<span class="ex-tag">Exercise 4</span><span class="difficulty hard"> · 40 min · crossed random effects + model selection preview</span>
+<span class="ex-tag">Practice Exercise M4</span><span class="difficulty hard"> · 40 min · crossed random effects + model selection preview</span>
 <h3>Fish trophic position — crossed random effects, slopes &amp; intercepts</h3>
 <p>The QCBS dataset <code>qcbs_w6_data.csv</code> has trophic position vs body length for three fish species (coded <code>S1</code>, <code>S2</code>, <code>S3</code> in the file) sampled across six lakes (<code>L1</code>–<code>L6</code>). The biological question: does trophic position increase with body length, and does that relationship differ by species and by lake?</p>
 
@@ -407,7 +407,7 @@ Z_Length 0.422 0.092
 
 <!-- Example 5: Choosing fixed effect basis -->
 <div class="exercise" id="ex-5">
-<span class="ex-tag">Exercise 5</span><span class="difficulty medium"> · 15 min · ML vs REML in action</span>
+<span class="ex-tag">Practice Exercise M5</span><span class="difficulty medium"> · 15 min · ML vs REML in action</span>
 <h3>Comparing fixed-effect structures requires ML, not REML</h3>
 <p>Using the trophic-position dataset and the random-effect structure of <code>M1</code>:</p>
 
@@ -434,9 +434,9 @@ fit_with_x &lt;- <span class="fn">lmer</span>(Z_TP ~ Z_Length + (<span class="nu
 
 <!-- Example 6: Diagnostics -->
 <div class="exercise" id="ex-6">
-<span class="ex-tag">Exercise 6</span><span class="difficulty medium"> · 20 min · diagnostics</span>
+<span class="ex-tag">Practice Exercise M6</span><span class="difficulty medium"> · 20 min · diagnostics</span>
 <h3>Diagnostics for the chosen mixed model</h3>
-<p>For the best-AICc model from Exercise 4 (call it <code>M8</code>):</p>
+<p>For the best-AICc model from Exercise M4 (call it <code>M8</code>):</p>
 <pre><code>E1 &lt;- <span class="fn">resid</span>(M8, type=<span class="st">"pearson"</span>)
 F1 &lt;- <span class="fn">fitted</span>(M8)
 <span class="fn">par</span>(mfrow=<span class="kw">c</span>(<span class="nu">2</span>,<span class="nu">2</span>))
@@ -488,7 +488,7 @@ F1 &lt;- <span class="fn">fitted</span>(M8)
 
 <h3>3. Cross-validation — the direct way to estimate prediction error</h3>
 <p>If the goal is predictive performance, the most honest evaluation is to hold out data, fit on the rest, and measure prediction error on the held-out set. Leave-one-out cross-validation (LOOCV) does this $n$ times, $k$-fold CV does it $k$ times. <code>boot::cv.glm()</code> gives you LOOCV (and $k$-fold) for a GLM.</p>
-<p>Be careful about what this does and does not buy you. CV gives you a direct <em>estimate</em> of out-of-sample error, which is exactly what you want when the question is "how well does this model predict?" It is <strong>not</strong> an independent safeguard against picking the wrong model: for a Gaussian linear model, LOOCV is asymptotically equivalent to AIC (Stone 1977), so the two agree far more often than intuition suggests — and are fooled by the same noise. Exercise 10 makes you measure this yourself rather than take it on faith.</p>
+<p>Be careful about what this does and does not buy you. CV gives you a direct <em>estimate</em> of out-of-sample error, which is exactly what you want when the question is "how well does this model predict?" It is <strong>not</strong> an independent safeguard against picking the wrong model: for a Gaussian linear model, LOOCV is asymptotically equivalent to AIC (Stone 1977), so the two agree far more often than intuition suggests — and are fooled by the same noise. Exercise A4 makes you measure this yourself rather than take it on faith.</p>
 
 <div class="eq-block">$\text{MSE}_\text{CV} = \dfrac{1}{n}\sum_{i=1}^n \big(y_i - \hat{f}_{-i}(\mathbf{x}_i)\big)^2$</div>
 <p>where $\hat{f}_{-i}$ is the model fit with the $i$-th observation withheld. Models that overfit will perform well on the training data but poorly on the held-out fold; CV exposes this directly.</p>
@@ -510,7 +510,7 @@ weight each model's predictions and can be used for model-averaged effect estima
 
 <!-- Selection ex 1 -->
 <div class="exercise" id="ex-7">
-<span class="ex-tag">Exercise 7</span><span class="difficulty easy"> · 15 min · the "competitive model" myth</span>
+<span class="ex-tag">Practice Exercise A1</span><span class="difficulty easy"> · 15 min · the "competitive model" myth</span>
 <h3>What does $\Delta\text{AIC} = 1.5$ actually mean?</h3>
 
 <div class="code-label">Code</div>
@@ -548,7 +548,7 @@ within2 &lt;- <span class="fn">replicate</span>(reps, {
 
 <!-- Selection ex 2 -->
 <div class="exercise" id="ex-8">
-<span class="ex-tag">Exercise 8</span><span class="difficulty medium"> · 25 min · simulated Type I error</span>
+<span class="ex-tag">Practice Exercise A2</span><span class="difficulty medium"> · 25 min · simulated Type I error</span>
 <h3>Simulation: how often does AIC pick noise as "best"?</h3>
 <p>Generate $y \sim \mathcal{N}(5, 3^2)$, completely unrelated to $x_1, x_2, x_3 \sim U(0,1)$. Fit every subset; record how many predictors the top model retains, under each criterion.</p>
 
@@ -592,7 +592,7 @@ pstor &lt;- AICstor &lt;- AICcstor &lt;- BICstor &lt;- <span class="fn">rep</spa
 <tr><td>AICc</td><td>~0.39</td></tr>
 <tr><td>BIC</td><td>~0.16</td></tr>
 </table>
-<p>AIC and AICc retain a noise predictor in the top model about 40&ndash;45% of the time. You can <em>predict</em> that rate rather than only reporting it, using the $\Delta\text{AIC} = 2 - \chi^2_1$ identity from Exercise 7: a single noise predictor enters the AIC-best model exactly when it clears $\chi^2_1 &gt; 2$ — probability $0.157$ each. With three near-independent noise predictors, the chance that <em>at least one</em> slips in is</p>
+<p>AIC and AICc retain a noise predictor in the top model about 40&ndash;45% of the time. You can <em>predict</em> that rate rather than only reporting it, using the $\Delta\text{AIC} = 2 - \chi^2_1$ identity from Exercise A1: a single noise predictor enters the AIC-best model exactly when it clears $\chi^2_1 &gt; 2$ — probability $0.157$ each. With three near-independent noise predictors, the chance that <em>at least one</em> slips in is</p>
 <div class="eq-block">$1 - (1 - 0.157)^3 = 1 - 0.843^3 = 0.40,$</div>
 <p>in line with the simulated 40&ndash;45% (the small excess is joint selection and the mild correlation among the fitted predictors). The same reusable move explains the two conservative criteria — each just raises the bar the extra variable must clear. The family-wise p-value rate is $1 - 0.95^3 \approx 0.14$. BIC replaces AIC's flat penalty of 2 with $\ln n \approx 3.9$ for $n = 50$, so a junk predictor now needs $\chi^2_1 &gt; 3.9$ (probability $P(\chi^2_1 &gt; 3.9) \approx 0.048$ each, hence $1 - (1 - 0.048)^3 \approx 0.14$ overall) — about as strict as the p-value screen, and matching the observed $\approx 0.16$. AIC's penalty of 2 is simply too small to keep junk out.</p>
 <p><strong>When would BIC backfire?</strong> When true effects are <em>weak</em>. BIC's heavier penalty buys Type-I safety at the cost of Type-II error — see the next exercise.</p>
@@ -601,7 +601,7 @@ pstor &lt;- AICstor &lt;- AICcstor &lt;- BICstor &lt;- <span class="fn">rep</spa
 
 <!-- Selection ex 3 -->
 <div class="exercise" id="ex-9">
-<span class="ex-tag">Exercise 9</span><span class="difficulty medium"> · 25 min · simulated Type II error</span>
+<span class="ex-tag">Practice Exercise A3</span><span class="difficulty medium"> · 25 min · simulated Type II error</span>
 <h3>Simulation: how often does BIC <em>drop</em> a real but weak effect?</h3>
 <p>Same harness, but now the data really do depend on $x_1, x_2, x_3$ — with effect sizes spanning orders of magnitude, and small residual SD.</p>
 
@@ -637,7 +637,7 @@ pstor &lt;- AICstor &lt;- AICcstor &lt;- BICstor &lt;- <span class="fn">rep</spa
 <tr><td>BIC</td><td>~1.5</td></tr>
 </table>
 <p>BIC misses about 1.5 of the 3 true predictors on average — essentially tied with the p-value approach. AIC and AICc are noticeably more inclusive of weak effects (missing ~1.1&ndash;1.2), which is what you want when the science is about small effects. <strong>Lesson:</strong> there is no free lunch. Whatever Type-I behavior you buy with a heavier penalty, you pay back in Type-II.</p>
-<p><strong>(c) Bigger n.</strong> Re-run both harnesses — this one (three real effects, Type II) and Exercise 8 (pure noise, Type I) — at $n = 50$ and again at $n = 500$. Averaged over 500 datasets, out of 3 predictors:</p>
+<p><strong>(c) Bigger n.</strong> Re-run both harnesses — this one (three real effects, Type II) and Exercise A2 (pure noise, Type I) — at $n = 50$ and again at $n = 500$. Averaged over 500 datasets, out of 3 predictors:</p>
 <table>
 <tr><th rowspan="2">Criterion</th><th colspan="2">Type I: noise predictors <em>kept</em> (of 3)</th><th colspan="2">Type II: real predictors <em>missed</em> (of 3)</th></tr>
 <tr><th>$n = 50$</th><th>$n = 500$</th><th>$n = 50$</th><th>$n = 500$</th></tr>
@@ -651,9 +651,9 @@ pstor &lt;- AICstor &lt;- AICcstor &lt;- BICstor &lt;- <span class="fn">rep</spa
 
 <!-- Selection ex 4 -->
 <div class="exercise" id="ex-10">
-<span class="ex-tag">Exercise 10</span><span class="difficulty medium"> · 20 min · cross-validation</span>
+<span class="ex-tag">Practice Exercise A4</span><span class="difficulty medium"> · 20 min · cross-validation</span>
 <h3>LOOCV vs AIC for the noise-only case</h3>
-<p>Same setup as Exercise 8 ($y$ unrelated to predictors). It is tempting to assume that cross-validation, because it actually holds data out, is the more trustworthy criterion. Test that assumption rather than accepting it. Fit all 8 models to one realization and rank them by both LOOCV MSE and AIC.</p>
+<p>Same setup as Exercise A2 ($y$ unrelated to predictors). It is tempting to assume that cross-validation, because it actually holds data out, is the more trustworthy criterion. Test that assumption rather than accepting it. Fit all 8 models to one realization and rank them by both LOOCV MSE and AIC.</p>
 
 <div class="code-label">Code</div>
 <pre><code><span class="kw">library</span>(boot)
@@ -694,7 +694,7 @@ m12  6.309 235.939 2.880</code></pre>
 <p>The two orderings are nearly identical (Spearman correlation 0.95). This is the first hint that CV is not an independent check on AIC.</p>
 <p><strong>(b)</strong> <code>m3</code> beats the truth by $\Delta$AIC = 0.658 and by 0.036 in CV MSE — six tenths of one percent. But the interesting part is <em>why</em> the margin has that value. <code>m3</code> is <code>m0</code> with one extra junk predictor, so the identity from the core-concepts section applies exactly:</p>
 <div class="eq-block">$\Delta\text{AIC} = 2 - \chi^2_1 = 2 - 2.658 = -0.658$</div>
-<p>The entire margin is just the likelihood-ratio statistic for <code>x3</code>, which is $\chi^2_1 = 2.658$ ($p = 0.103$ — not close to significant). <code>x3</code> wins for one reason and one reason only: its $\chi^2$ landed above 2. That is exactly the event you already met when the $\Delta\text{AIC} &lt; 2$ rule was picked apart — $P(\chi^2_1 &gt; 2) = 15.7\%$, the rate at which a junk variable takes the top spot outright. Exercise 10 is not a new phenomenon; it is that same 16% event, caught in the act.</p>
+<p>The entire margin is just the likelihood-ratio statistic for <code>x3</code>, which is $\chi^2_1 = 2.658$ ($p = 0.103$ — not close to significant). <code>x3</code> wins for one reason and one reason only: its $\chi^2$ landed above 2. That is exactly the event you already met when the $\Delta\text{AIC} &lt; 2$ rule was picked apart — $P(\chi^2_1 &gt; 2) = 15.7\%$, the rate at which a junk variable takes the top spot outright. Exercise A4 is not a new phenomenon; it is that same 16% event, caught in the act.</p>
 <p>So do <em>not</em> read this table by asking which models fall within 2 AIC of the winner. As you saw earlier, a nested junk model is within 2 by construction, so that question has a guaranteed answer and tells you nothing. Ask instead what <code>x3</code>'s coefficient does: $-1.914$ with a 95% CI of $[-4.292,\ 0.463]$, spanning zero. The variable that "won" cannot even sign its own effect.</p>
 <p><strong>(c)</strong> Over 2000 simulated datasets the intercept-only model wins <strong>58.4%</strong> of the time on LOOCV and <strong>57.6%</strong> on AIC. That gap of 0.8 points is smaller than the Monte Carlo error on either estimate (±2.2), so the honest reading is that the two criteria perform <em>identically</em>. They select the same model 90% of the time. Both are fooled by noise in roughly 42% of datasets.</p>
 <p>This is not a coincidence of this simulation. For a Gaussian linear model, leave-one-out CV and AIC are <strong>asymptotically equivalent</strong> — Stone (1977) proved they are the same criterion in the limit, and at $n=50$ they have already nearly converged. Holding data out does not buy you protection AIC lacks; it is a different route to the same number.</p>
@@ -707,7 +707,7 @@ m12  6.309 235.939 2.880</code></pre>
 
 <!-- Selection ex 5 -->
 <div class="exercise" id="ex-11">
-<span class="ex-tag">Exercise 11</span><span class="difficulty medium"> · 20 min · LRT for mixed models</span>
+<span class="ex-tag">Practice Exercise A5</span><span class="difficulty medium"> · 20 min · LRT for mixed models</span>
 <h3>LRT vs AICc for a random-slope decision</h3>
 <p>Return to the trophic-position dataset. Compare two nested random-effects structures using both LRT and AICc.</p>
 
@@ -736,7 +736,7 @@ AICcmodavg::aictab(list(intercepts_only=m_int, with_species_slope=m_slop))
 #                    K   AICc  Delta_AICc  AICcWt
 # with_species_slope 7  36.33    0.00      1.00
 # intercepts_only    5  82.81   46.48      0.00</code></pre>
-<p>The LRT gives $\chi^2 = 50.8$ on 2 df, $p \approx 9\times10^{-12}$; AICc favors the random-slope model by $\Delta$AICc $= 46.5$ (Akaike weight $\approx 1.00$). This is easy territory — keep the slope. But notice <em>what each statistic claimed</em>, because they answer different questions and will not always agree. The LRT asks "is the larger model significantly better at maximizing likelihood?" — an inference question about whether the slope variance is really nonzero. AICc asks "is the larger model expected to predict better out of sample?" When they disagree (LRT says "not significant" but AICc still prefers the bigger model), let the question decide: for inference — does the random slope matter biologically? — lean on the LRT and the variance-component CI; for prediction, trust AICc (which, from Exercise 10, is ≈ LOOCV).</p>
+<p>The LRT gives $\chi^2 = 50.8$ on 2 df, $p \approx 9\times10^{-12}$; AICc favors the random-slope model by $\Delta$AICc $= 46.5$ (Akaike weight $\approx 1.00$). This is easy territory — keep the slope. But notice <em>what each statistic claimed</em>, because they answer different questions and will not always agree. The LRT asks "is the larger model significantly better at maximizing likelihood?" — an inference question about whether the slope variance is really nonzero. AICc asks "is the larger model expected to predict better out of sample?" When they disagree (LRT says "not significant" but AICc still prefers the bigger model), let the question decide: for inference — does the random slope matter biologically? — lean on the LRT and the variance-component CI; for prediction, trust AICc (which, from Exercise A4, is ≈ LOOCV).</p>
 <p><strong>(c)</strong> One catch makes the LRT $p$-value untrustworthy in borderline cases. The null hypothesis is that the slope variance is <em>exactly zero</em> — but a variance cannot be negative, so zero sits on the very edge of the values the parameter is allowed to take. When you test a parameter at the boundary of its space, the usual $\chi^2$ reference distribution is the wrong one, and it makes the reported $p$-value <strong>too large</strong> (conservative). A genuinely important random slope can therefore come back looking "not significant."</p>
 <p>Here it does not matter — the effect is so strong ($p \approx 9\times10^{-12}$) that no correction would change the verdict. But in a borderline case the boundary correction can flip your conclusion. <strong>The practical rule:</strong> for a boundary test — "is this variance zero?" — do not trust <code>anova()</code>'s $p$-value. Use <code>RLRsim::exactRLRT()</code> or a parametric bootstrap, which build the correct reference distribution by simulation and give you an honest $p$-value.</p>
 </div></details>
@@ -762,7 +762,7 @@ AICcmodavg::aictab(list(intercepts_only=m_int, with_species_slope=m_slop))
 <li><strong>State the question first.</strong> Back in the razor-clam scenario from this morning (badjuice, the fictitious toxin, measured on 10 Oregon beaches): "Does badjuice affect clam abundance, controlling for beach?" is a different question from "Predict clam abundance at a new beach next year."</li>
 <li><strong>Decide the model structure from biology and design</strong>, not from automated selection. Beach and year are random effects because you want to generalize beyond the particular beaches you sampled. Badjuice is a fixed effect because you care about its coefficient &mdash; that slope <em>is</em> the answer to the student's question.</li>
 <li><strong>Fit one principal model</strong>; check assumptions; report the coefficient of interest with a CI.</li>
-<li><strong>If competing structures are scientifically interesting</strong>, compare them — but match the tool to the question. For <strong>inference</strong> (is this structure real?), use an LRT or BIC. For <strong>prediction</strong> (which structure forecasts best out of sample?), use AIC, AICc, or LOOCV — and since AIC is asymptotically LOOCV (Exercise 10), AIC gives you the cross-validation answer from a single fit, which is why it is the standard and easiest prediction criterion. Either way, show the coefficient of interest under each candidate: does the conclusion change?</li>
+<li><strong>If competing structures are scientifically interesting</strong>, compare them — but match the tool to the question. For <strong>inference</strong> (is this structure real?), use an LRT or BIC. For <strong>prediction</strong> (which structure forecasts best out of sample?), use AIC, AICc, or LOOCV — and since AIC is asymptotically LOOCV (Exercise A4), AIC gives you the cross-validation answer from a single fit, which is why it is the standard and easiest prediction criterion. Either way, show the coefficient of interest under each candidate: does the conclusion change?</li>
 </ol>
 
 <p>This is the philosophical stance you'll see again in Day 4 (likelihood/Bayes) and Day 5 (full Bayesian inference). The Bayesian framework makes points 2–4 explicit and quantitative: you specify priors, get a full posterior on every parameter, and the "uncertainty" you report is just the spread of that posterior.</p>

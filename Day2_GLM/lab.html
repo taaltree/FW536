@@ -380,7 +380,7 @@
 <h2>Morning exercises</h2>
 
 <div class="exercise" id="m1">
-<span class="ex-tag">Exercise M1</span><span class="difficulty easy"> · Exponential</span>
+<span class="ex-tag">Practice Exercise M1</span><span class="difficulty easy"> · Exponential</span>
 <h3>Orangutan line transects</h3>
 <p>The detection function for orangutans on a line transect is roughly exponential, with rate $\lambda = 0.02$ per meter of perpendicular distance: $g(x)$ is the probability that an orangutan sitting $x$ meters off the trackline <em>is seen</em>. Derive $g(x)$ as a survival function and use it to compute the probability of <strong>missing</strong> an orangutan at 50 m.</p>
 <details class="answer"><summary>Reveal</summary><div class="answer-body">
@@ -400,7 +400,7 @@
 </div>
 
 <div class="exercise" id="m2">
-<span class="ex-tag">Exercise M2</span><span class="difficulty medium"> · Normal linear transformations</span>
+<span class="ex-tag">Practice Exercise M2</span><span class="difficulty medium"> · Normal linear transformations</span>
 <h3>Prove that linear transformations of Normals are Normal</h3>
 <p>Let $Z \sim \mathcal{N}(0,1)$ and $Y = \mu + \sigma Z$. Using $E[aZ + b] = a E[Z] + b$ and $\mathrm{Var}(aZ+b) = a^2 \mathrm{Var}(Z)$, show $E[Y] = \mu$ and $\mathrm{Var}(Y) = \sigma^2$.</p>
 <details class="answer"><summary>Reveal</summary><div class="answer-body">
@@ -420,15 +420,16 @@
 </div>
 
 <div class="exercise" id="m3">
-<span class="ex-tag">Exercise M3</span><span class="difficulty hard"> · Beta-Binomial</span>
+<span class="ex-tag">Practice Exercise M3</span><span class="difficulty hard"> · Beta-Binomial</span>
 <h3>Marten cameras with heterogeneous detection</h3>
 <p>Twenty trail cameras are deployed for 10 nights each &mdash; 200 camera-nights in total. Plain assumption: per-camera detection probability $p = 0.03$ each night. But cameras vary: $p_i \sim \text{Beta}(0.03 \cdot \phi, 0.97 \cdot \phi)$ with $\phi = 1$ (so beta is very spread out).</p>
 <ol type="a">
 <li>What is the mean of this Beta?</li>
 <li>Each of <strong>20 cameras</strong> runs for <strong>10 nights</strong>, and a camera's detectability $p_i$ is drawn once and reused for all 10 of its nights. Simulate 5000 deployments under a plain Binomial(200, 0.03) and under this Beta-Binomial. Compare P(all-zero) and the mean/SD.</li>
-<li>Why does the Beta-Binomial put much more mass on "all-zero"? What would happen if each camera-night drew its <em>own</em> independent $p$?</li>
+<li>Why does the Beta-Binomial put much more mass on "all-zero"?</li>
 </ol>
 <details class="answer"><summary>Reveal</summary><div class="answer-body">
+<p><strong>(a)</strong> The Beta has mean $\dfrac{\alpha}{\alpha+\beta} = \dfrac{0.03\phi}{0.03\phi + 0.97\phi} = 0.03$ &mdash; the $\phi$ cancels, so <em>every</em> choice of $\phi$ leaves the mean at exactly the 0.03 of the plain assumption. $\phi$ sets only the spread: small $\phi$ makes cameras wildly unequal, large $\phi$ makes them nearly identical. That is why the two simulations below share a mean of ~6 and differ only in their tails.</p>
 <pre><code>set.seed(1); reps &lt;- 5000
 K &lt;- 20; J &lt;- 10 # 20 cameras x 10 nights = 200 camera-nights
 
@@ -440,10 +441,8 @@ betbin &lt;- replicate(reps, {
 mean(bin==0); mean(betbin==0) # 0.003 vs 0.166
 mean(bin); mean(betbin) # 6.0 vs 6.0 — same mean
 sd(bin); sd(betbin) # 2.5 vs 5.6 — about 5x the variance</code></pre>
+
 <p><strong>(c)</strong> With $\phi$ this small the Beta piles $p_i$ up near 0 or 1, so most cameras are near-blind while a few are hot. A camera that draws a tiny $p_i$ contributes zero on <em>all ten</em> of its nights, so all-zero deployments become common (0.166 vs 0.003) &mdash; even though the mean is unchanged at ~6. That is overdispersion: same mean, fatter tails.</p>
-<div class="callout warn">
-<p><strong>The clustering is the whole point.</strong> If each camera-<em>night</em> drew its own independent $p$, the heterogeneity would integrate straight out: marginally each night is Bernoulli($E[p] = 0.03$) and the nights are independent, so the total would be <em>exactly</em> Binomial(200, 0.03) &mdash; same mean, same SD, no overdispersion at all. Try it: swap the two lines above for <code>sum(rbinom(200, 1, rbeta(200, 0.03, 0.97)))</code> and you get SD 2.4, indistinguishable from the plain binomial. Overdispersion needs a $p$ that is <em>shared</em> across several observations &mdash; which is exactly why the Titanic and sockeye data overdisperse: repeated observations share a group.</p>
-</div>
 </div></details>
 </div>
 </section>
@@ -454,7 +453,7 @@ sd(bin); sd(betbin) # 2.5 vs 5.6 — about 5x the variance</code></pre>
 <h2>Afternoon exercises</h2>
 
 <div class="exercise" id="a1">
-<span class="ex-tag">Exercise A1</span><span class="difficulty medium"> · Normal vs Poisson vs NB on eDNA counts</span>
+<span class="ex-tag">Practice Exercise A1</span><span class="difficulty medium"> · Normal vs Poisson vs NB on eDNA counts</span>
 <h3>Sockeye eDNA — find the right distribution</h3>
 <p>Load <code>sockeye_adult.csv</code> from this Day's <code>data/</code> folder. It is in <strong>long format</strong> (one row per <code>Sockeyetype</code> per day), so first subset to adult sockeye. The response is the daily <code>Count</code> of adult sockeye; the predictor is <code>Qcorr_qPCR</code>, the <strong>flow-corrected eDNA signal</strong> &mdash; the raw qPCR eDNA concentration multiplied by stream discharge (flow). Multiplying by flow converts a concentration into a quantity proportional to the total amount of eDNA transported past the sampler, which tracks fish abundance better than concentration alone. Build a <code>Year</code> factor from <code>Date</code> and a log-transformed eDNA predictor:</p>
 <pre><code>library(MASS)
@@ -516,7 +515,7 @@ f_nb$deviance / f_nb$df.residual             # 48.8 / 52 = 0.94  (theta = 0.73)
 </div>
 
 <div class="exercise" id="a2">
-<span class="ex-tag">Exercise A2</span><span class="difficulty medium"> · Titanic logistic regression — long vs aggregated</span>
+<span class="ex-tag">Practice Exercise A2</span><span class="difficulty medium"> · Titanic logistic regression — long vs aggregated</span>
 <h3>Titanic survival</h3>
 <p>Using <code>titanic_long.csv</code> and <code>titanic_prop.csv</code>:</p>
 <ol type="a">
@@ -550,7 +549,7 @@ deviance(glm(survived ~ class*sex*age, family = binomial, data = long))  # 2097.
 </div>
 
 <div class="exercise" id="a3">
-<span class="ex-tag">Exercise A3</span><span class="difficulty hard"> · Titanic with interactions</span>
+<span class="ex-tag">Practice Exercise A3</span><span class="difficulty hard"> · Titanic with interactions</span>
 <h3>Sex × Class effects on survival</h3>
 <p>Fit <code>glm(survived ~ class * sex + age, family=binomial, data=titanic_long)</code>. Use <code>effects::allEffects()</code> to plot fitted probabilities, and use <code>emmeans::emmeans(fit, pairwise ~ class | sex)</code> to compare classes within each sex.</p>
 <p>(Note: in this dataset <code>age</code> is a two-level factor, <code>adult</code> vs <code>child</code> — not a number in years.)</p>

@@ -26,14 +26,14 @@ MathJax = {
  <div class="subtitle">Answer key</div>
  <nav aria-label="On this page and related documents">
  <ul>
- <li><a href="#a1">Exercise 1 — vague prior</a></li>
- <li><a href="#a2">Exercise 2 — ant fits</a></li>
- <li><a href="#a3">Exercise 3 — lizards diagnostics</a></li>
- <li><a href="#a4">Exercise 4 — all 5 N2O models</a></li>
- <li><a href="#a5">Exercise 5 — Beverton-Holt fit</a></li>
- <li><a href="#a6">Exercise 6 — dynamic occupancy</a></li>
- <li><a href="#a7">Exercise 7 — N-mixture build-up</a></li>
- <li><a href="#a8">Exercise 8 — Poisson-lognormal N-mix</a></li>
+ <li><a href="#a1">Exercise M1 — vague prior</a></li>
+ <li><a href="#a2">Exercise M2 — ant fits</a></li>
+ <li><a href="#a3">Exercise M3 — lizards diagnostics</a></li>
+ <li><a href="#a4">Exercise M4 — all 5 N2O models</a></li>
+ <li><a href="#a5">Exercise M5 — Beverton-Holt fit</a></li>
+ <li><a href="#a6">Exercise M6 — dynamic occupancy</a></li>
+ <li><a href="#a7">Exercise M7 — N-mixture build-up</a></li>
+ <li><a href="#a8">Exercise M8 — Poisson-lognormal N-mix</a></li>
  </ul>
  <div class="section">Day 5 docs</div>
  <ul>
@@ -52,7 +52,7 @@ MathJax = {
 </header>
 
 <section id="a1">
-<h2>Exercise 1 — "Vague" priors on a log link</h2>
+<h2>Exercise M1 — "Vague" priors on a log link</h2>
 <p>The point: a $\mathcal{N}(0, \sigma=100)$ prior on a regression coefficient is wildly informative once you exponentiate it.</p>
 <pre><code>set.seed(<span class="nu">1</span>)
 beta &lt;- <span class="fn">rnorm</span>(<span class="nu">1e5</span>, <span class="nu">0</span>, <span class="nu">100</span>)
@@ -65,7 +65,7 @@ eff_sc &lt;- <span class="fn">exp</span>(beta * <span class="nu">1</span>) <span
 </section>
 
 <section id="a2">
-<h2>Exercise 2 — Fit the ant model two ways</h2>
+<h2>Exercise M2 — Fit the ant model two ways</h2>
 <pre><code><span class="kw">library</span>(nimble); <span class="kw">library</span>(MCMCvis); <span class="kw">library</span>(coda)
 ants &lt;- <span class="fn">read.csv</span>(<span class="st">"data/ants.csv"</span>)
 
@@ -122,7 +122,7 @@ out_c &lt;- <span class="fn">nimbleMCMC</span>(antCode, constants=constsC, data=
 </section>
 
 <section id="a3">
-<h2>Exercise 3 — Lizards: convergence, prediction, and prior sensitivity</h2>
+<h2>Exercise M3 — Lizards: convergence, prediction, and prior sensitivity</h2>
 <pre><code><span class="kw">library</span>(nimble); <span class="kw">library</span>(MCMCvis); <span class="kw">library</span>(coda)
 liz &lt;- <span class="fn">read.csv</span>(<span class="st">"data/IslandsLizards.csv"</span>)
 x.scaled &lt;- <span class="fn">as.numeric</span>(<span class="fn">scale</span>(liz$perimeterAreaRatio))
@@ -156,7 +156,7 @@ b.post &lt;- <span class="fn">as.matrix</span>(samples)[, <span class="st">"b"</
 </section>
 
 <section id="a4">
-<h2>Exercise 4 — All five N2O models</h2>
+<h2>Exercise M4 — All five N2O models</h2>
 <p>Use <code>Multilevel_Nimble.R</code> top to bottom. Key reports:</p>
 <p><em>Actual run: <code>set.seed(10)</code>, 3 chains, niter=10000, nburnin=1000; 563 measurements, 107 sites, 10 fertilizer types. R-hat is 1.00 for every $\beta$ in Models 1&ndash;4 and for eight of the ten fertilizer slopes in Model 5; the remaining two &mdash; <code>beta[5]</code> (<code>UM</code>, the worst-mixing slope at n.eff $\approx$ 800) and <code>beta[10]</code> (<code>unknown</code>) &mdash; come back at 1.01.</em></p>
 <p>The site-level covariate is $w_j = \log(c_j/(100-c_j))$, the logit of site $j$'s mean soil organic carbon percentage $c_j$ (the <code>carbon</code> column).</p>
@@ -177,7 +177,7 @@ b.post &lt;- <span class="fn">as.matrix</span>(samples)[, <span class="st">"b"</
 
 
 <section id="a5">
-<h2>Exercise 5 — Beverton-Holt: fit, predict, derive</h2>
+<h2>Exercise M5 — Beverton-Holt: fit, predict, derive</h2>
 <p>Run <code>SpawnerRecruit_Nimble.R</code> top to bottom.</p>
 <p><strong>(a) Posterior summaries</strong> (<code>set.seed(2025)</code>, 3 chains, niter=10000, nburnin=1000; Nyears=20). Every 95% CI contains the truth (R-hat = 1.00&ndash;1.01):</p>
 <table>
@@ -203,7 +203,7 @@ b.post &lt;- <span class="fn">as.matrix</span>(samples)[, <span class="st">"b"</
 </section>
 
 <section id="a6">
-<h2>Exercise 6 — Dynamic occupancy</h2>
+<h2>Exercise M6 — Dynamic occupancy</h2>
 <p>Run <code>DynamicOccupancy_Nimble.R</code>.</p>
 <p><strong>(a-c)</strong> From an actual run (<code>set.seed(2025)</code>; 3 chains, 20000 iter, 10000 burn-in, thin 5; of the 45 monitored parameters, R-hat = 1.00 for all but the derived $\lambda_3$, which is 1.01): the quantities informed by all the data are recovered well &mdash; detection $p$ = 0.63 [0.55, 0.70] (truth 0.60) and baseline occupancy $\psi$ = 0.33 [0.18, 0.51] (truth 0.37). Posterior medians for $\phi_t, \gamma_t, \psi_t$ plotted vs truth scatter around the 1:1 line but with large per-parameter uncertainty (e.g. $\phi_3$ = 0.52 [0.16, 0.89], $\gamma_1$ = 0.47 [0.26, 0.70]) due to the small sample size (30 sites, 3 reps, 7 transitions). This is honest small-sample uncertainty, not a convergence failure.</p>
 <p><strong>(d) Without z-init trick.</strong> Try:</p>
@@ -221,7 +221,7 @@ warning: logProb of data node y[7, 2, 7]: logProb is -Inf.
 </section>
 
 <section id="a7">
-<h2>Exercise 7 — N-mixture build-up</h2>
+<h2>Exercise M7 — N-mixture build-up</h2>
 <p><em>Actual run: <code>set.seed(2025)</code>, 3 chains, niter=10000, nburnin=1000, thin 5; all R-hat = 1.00&ndash;1.02.</em></p>
 <p><strong>(a) Basic.</strong> Posterior medians $\lambda$ = 6.24 [5.06, 7.78], $p$ = 0.80 [0.67, 0.87] (truth $\lambda=6, p=0.8$) &mdash; both cover truth, intervals wide with only 20 sites.</p>
 <p><strong>(b) Covariate on abundance.</strong> $\beta_1$ = 1.00 [0.94, 1.07], credibly positive and matching the simulation truth ($\beta_1 = 1$); $\beta_0$ = 2.99 [2.91, 3.07].</p>
@@ -230,7 +230,7 @@ warning: logProb of data node y[7, 2, 7]: logProb is -Inf.
 </section>
 
 <section id="a8">
-<h2>Exercise 8 — Add a Poisson-lognormal random effect to fix overdispersion</h2>
+<h2>Exercise M8 — Add a Poisson-lognormal random effect to fix overdispersion</h2>
 <pre><code>Nmix5Code &lt;- <span class="fn">nimbleCode</span>({
  <span class="kw">for</span> (i <span class="kw">in</span> <span class="nu">1</span>:Nsites) {
  eps[i] ~ <span class="fn">dnorm</span>(<span class="nu">0</span>, tau.eps)

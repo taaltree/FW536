@@ -225,7 +225,7 @@ ants[i,<span class="nu">1</span>] ~ <span class="fn">dpois</span>(lam[i])
 
 <div class="callout warn">
 <p><strong>Why does this block keep <code>tau = 1/10000</code>?</strong> Because here the prior is the one thing that must <em>not</em> change. The shipped <code>ant.priors.R</code> fits this model twice &mdash; unscaled predictors in Part I, scaled predictors in Part II &mdash; holding the prior and the inits fixed at <code>tau = 1/10000</code> both times, so that scaling is the only difference between the two runs. Change the prior at the same time and you can no longer attribute the improvement to scaling, which is the whole point of the demonstration.</p>
-<p>That does not make <code>tau = 1/10000</code> a good default. NIMBLE's <code>dnorm</code> takes a <em>precision</em>, so <code>tau = 1/10</code> would mean $\sigma^2 = 10$, i.e. $\sigma = \sqrt{10} \approx 3.2$ &mdash; on the log link roughly an $e^{\pm 6}$ range of multiplicative effects, still very wide but not crazy. The truly "vague" <code>tau = 1/10000</code> ($\sigma^2 = 10000$, $\sigma = 100$) is informative in the wrong direction: it puts huge prior weight on impossible parameter values. Exercise 2(c) is where you swap it out &mdash; and shows that once the predictors are scaled and you have 44 bogs, the posterior barely notices.</p>
+<p>That does not make <code>tau = 1/10000</code> a good default. NIMBLE's <code>dnorm</code> takes a <em>precision</em>, so <code>tau = 1/10</code> would mean $\sigma^2 = 10$, i.e. $\sigma = \sqrt{10} \approx 3.2$ &mdash; on the log link roughly an $e^{\pm 6}$ range of multiplicative effects, still very wide but not crazy. The truly "vague" <code>tau = 1/10000</code> ($\sigma^2 = 10000$, $\sigma = 100$) is informative in the wrong direction: it puts huge prior weight on impossible parameter values. Exercise M2(c) is where you swap it out &mdash; and shows that once the predictors are scaled and you have 44 bogs, the posterior barely notices.</p>
 </div>
 
 <div class="callout key">
@@ -240,7 +240,7 @@ ants[i,<span class="nu">1</span>] ~ <span class="fn">dpois</span>(lam[i])
 </div>
 
 <div class="exercise" id="ex-1">
-<span class="ex-tag">Exercise 1</span><span class="difficulty easy"> · 10 min · prior intuition</span>
+<span class="ex-tag">Practice Exercise M1</span><span class="difficulty easy"> · 10 min · prior intuition</span>
 <h3>What does a "vague" log-scale prior actually look like?</h3>
 <p>You're putting a $\mathcal{N}(0,\ \sigma = 100)$ prior (that is, $\sigma^2 = 10000$; in NIMBLE, <code>dnorm(0, tau = 1/10000)</code>) on the slope of a log-link Poisson regression. Latitude in the ants data ranges from 41.97&deg; to 45.00&deg; <em>on the raw scale</em>.</p>
 <ol type="a">
@@ -265,13 +265,13 @@ eff2 &lt;- <span class="fn">exp</span>(beta * <span class="nu">1</span>) <span c
 <p>Now standardise the coefficient. Because $\beta_2/\sigma_\beta \sim \mathcal{N}(0,1)$, divide that threshold by $\sigma_\beta$ to read it as a $z$-score, and the prior mass is just a normal two-tail:</p>
 <div class="eq-block">$\Pr\!\big(|\log_{10}(\text{effect})| > 6\big) = 2\,\Phi\!\left(-\dfrac{6\ln 10}{\sigma_\beta\,\Delta x}\right).$</div>
 <p>That is the reusable result: <strong>the prior mass beyond a million-fold effect depends only on the single product $\sigma_\beta\,\Delta x$</strong> &mdash; prior SD times predictor range. Widen the prior or stretch the range and the same formula answers it. Only now do the numbers enter. Raw latitude spans $\Delta x = 3$ degrees, so $z = 6\ln 10/(100\cdot 3) = 4.605/300 = 0.0461$ and $2\,\Phi(-0.0461) = 0.9633$. Standardising collapses the range to $\Delta x = 1$ SD, tripling the threshold on $|\beta_2|$: $z = 6\ln 10/100 = 0.138$, and the fraction still only falls to $2\,\Phi(-0.138) = 0.8901$. Standardising helped a little, but nowhere near enough &mdash; and it is worth being clear about <em>why</em>, because this is the whole point of the exercise. Both moves you could make act through the <em>same</em> product $\sigma_\beta\,\Delta x$: standardising the predictor shrinks the range $\Delta x$, and tightening the prior shrinks the SD $\sigma_\beta$. What differs is the <strong>leverage</strong>. Standardising latitude shrinks $\Delta x$ from 3&deg; to 1 SD &mdash; a factor of 3 &mdash; which only triples the $z$-score threshold, from $0.046$ to $0.138$. On a $\mathcal{N}(0,1)$ both of those numbers sit almost on top of the mean, where the bell curve is flat, so tripling the threshold barely moves the tail mass ($0.963 \to 0.890$). To buy the protection that $\sigma_\beta = 2$ gives, you would have to shrink $\Delta x$ by a factor of about <strong>50</strong> &mdash; which no amount of rescaling a real predictor can do. That is the sense in which <strong>the cure is a sane prior, not standardising</strong>: at $\sigma_\beta = 2$ the scaled $z$ jumps to $6\ln 10/2 = 6.9$, and $2\,\Phi(-6.9) \approx 5\times10^{-12}$ &mdash; effectively no prior mass on million-fold effects at all.</p>
-<p>One more point, because it is a common source of confusion when you reach Exercise 2: standardising and priors solve two <em>different</em> problems, and you usually want both. Standardising centres the predictor and fixes the <strong>sampler</strong> &mdash; in Exercise 2 the raw-latitude chains stall because latitude near 42&deg; is nearly fused to the intercept, and centring breaks that. A sane prior fixes the <strong>prior-predictive</strong> &mdash; the absurd tails you just computed. They are not substitutes for each other. And a too-wide prior only actually distorts the <em>posterior</em> when the data are weak: with the 44 bogs in Exercise 2 the likelihood swamps even the $\sigma = 100$ prior, so the scaled fit lands in the right place regardless (that is exactly what Exercise 2(b) and 2(c) show). Tight priors earn their keep when data are scarce &mdash; which, in ecology, is often.</p>
+<p>One more point, because it is a common source of confusion when you reach Exercise M2: standardising and priors solve two <em>different</em> problems, and you usually want both. Standardising centres the predictor and fixes the <strong>sampler</strong> &mdash; in Exercise M2 the raw-latitude chains stall because latitude near 42&deg; is nearly fused to the intercept, and centring breaks that. A sane prior fixes the <strong>prior-predictive</strong> &mdash; the absurd tails you just computed. They are not substitutes for each other. And a too-wide prior only actually distorts the <em>posterior</em> when the data are weak: with the 44 bogs in Exercise M2 the likelihood swamps even the $\sigma = 100$ prior, so the scaled fit lands in the right place regardless (that is exactly what Exercise M2(b) and 2(c) show). Tight priors earn their keep when data are scarce &mdash; which, in ecology, is often.</p>
 <p>The takeaway: a $\mathcal{N}(0,\ \sigma = 100)$ prior on a log-scale coefficient is almost always far too wide. Use $\mathcal{N}(0,\ \sigma \approx 2)$ or $\mathcal{N}(0,\ \sigma \approx 3)$ for standardised predictors. Tight, weakly informative priors are what most of the modern Bayesian regression literature now recommends.</p>
 </div></details>
 </div>
 
 <div class="exercise" id="ex-2">
-<span class="ex-tag">Exercise 2</span><span class="difficulty medium"> · 25 min · R</span>
+<span class="ex-tag">Practice Exercise M2</span><span class="difficulty medium"> · 25 min · R</span>
 <h3>Fit the ant richness model twice</h3>
 <p>Using <code>ants.csv</code> and <code>ant.priors.R</code> as a starting point, fit the model:</p>
 <ol type="a">
@@ -339,7 +339,7 @@ eff2 &lt;- <span class="fn">exp</span>(beta * <span class="nu">1</span>) <span c
   <text x="440" y="60" fill="#2B6E61" font-size="10" text-anchor="middle">present (y=1)</text>
   <text x="392" y="283" fill="#2B6E61" font-size="10" text-anchor="middle">absent (y=0)</text>
 </svg>
-<figcaption>The 19 islands (teal): lizards are mostly <em>present</em> on low-edge islands (small perimeter:area) and <em>absent</em> on high-edge islands, with real scatter in between. The fitted logistic curve (orange) is the model's estimate of $P(\text{presence})$ as edge ratio increases &mdash; it falls from near 1 to near 0 and passes $p=0.5$ at a ratio of about 16. This is the data and fit behind Exercise 3.</figcaption>
+<figcaption>The 19 islands (teal): lizards are mostly <em>present</em> on low-edge islands (small perimeter:area) and <em>absent</em> on high-edge islands, with real scatter in between. The fitted logistic curve (orange) is the model's estimate of $P(\text{presence})$ as edge ratio increases &mdash; it falls from near 1 to near 0 and passes $p=0.5$ at a ratio of about 16. This is the data and fit behind Exercise M3.</figcaption>
 </figure>
 
 <h3>The full NIMBLE template</h3>
@@ -503,7 +503,7 @@ samples &lt;- <span class="fn">nimbleMCMC</span>(lizardCode, constants=constants
 </figure>
 
 <div class="exercise" id="ex-3">
-<span class="ex-tag">Exercise 3</span><span class="difficulty medium"> · 20 min · R · convergence</span>
+<span class="ex-tag">Practice Exercise M3</span><span class="difficulty medium"> · 20 min · R · convergence</span>
 <h3>Lizards: run the model, diagnose, predict</h3>
 <p>Run the script <code>Lizards_Nimble.R</code> end to end. Then:</p>
 <ol type="a">
@@ -590,7 +590,7 @@ samples &lt;- <span class="fn">nimbleMCMC</span>(lizardCode, constants=constants
 </div>
 
 <div class="exercise" id="ex-4">
-<span class="ex-tag">Exercise 4</span><span class="difficulty medium"> · 30 min · R · core lab</span>
+<span class="ex-tag">Practice Exercise M4</span><span class="difficulty medium"> · 30 min · R · core lab</span>
 <h3>Build and compare all five N2O models</h3>
 <p>Open <code>Multilevel_Nimble.R</code> and walk through all five models in order. For each:</p>
 <ol type="a">
@@ -724,12 +724,12 @@ samples &lt;- <span class="fn">nimbleMCMC</span>(lizardCode, constants=constants
 <p>which is the solution of $R(S) = S$ &mdash; set $\frac{aS}{1 + (a/b)S} = S$, cancel $S$, and rearrange. Read it: $N_\text{eq} > 0$ for every $a > 1$, and $N_\text{eq} = 0$ exactly at $a = 1$. Since the prior assigns zero density below $a=1$, the model <strong>cannot</strong> entertain a stock that fails to replace itself. If the real question on the table is "is this population collapsing?", this prior has already answered "no" &mdash; and no amount of data can overturn it. That is an informative prior wearing a uniform's clothing.</p>
 <p><strong>The upper bound $a &lt; 10$ caps the harvest rate.</strong> Since $H_\text{msy} = 1 - \sqrt{1/a}$ is strictly increasing in $a$, the prior imposes a hard ceiling</p>
 <div class="eq-block">$H_\text{msy} &lt; 1 - \sqrt{1/10} = 0.684$</div>
-<p>and the posterior is visibly pressed against it: in the Exercise 5 run, $a$'s 97.5th percentile is <strong>9.25</strong> against a ceiling of 10, and the upper end of the $H_\text{msy}$ 95% CI, <strong>0.671</strong>, sits at <strong>98% of the 0.684 bound</strong>. That is what a truncated posterior looks like. The reported interval is not "what the data say" &mdash; it is "what the data say, clipped by a bound nobody defended."</p>
+<p>and the posterior is visibly pressed against it: in the Exercise M5 run, $a$'s 97.5th percentile is <strong>9.25</strong> against a ceiling of 10, and the upper end of the $H_\text{msy}$ 95% CI, <strong>0.671</strong>, sits at <strong>98% of the 0.684 bound</strong>. That is what a truncated posterior looks like. The reported interval is not "what the data say" &mdash; it is "what the data say, clipped by a bound nobody defended."</p>
 <p><strong>We are keeping the prior anyway</strong> &mdash; deliberately, so you can see this. In a real assessment you would either justify the bounds from biology (a productivity above 10 recruits/spawner may genuinely be impossible for this species &mdash; then <em>say so, and cite it</em>), or replace them with something that does not cliff-edge: e.g. a lognormal on $a$, or $\log a \sim \mathcal{N}(0, 1)$, which is weakly informative but leaves both collapse and high productivity reachable. The rule from section A applies exactly as it did on the log link: <em>always ask what your prior implies for the quantity you actually care about</em> &mdash; here $N_\text{eq}$ and $H_\text{msy}$, not $a$.</p>
 </div>
 
 <div class="exercise" id="ex-5">
-<span class="ex-tag">Exercise 5</span><span class="difficulty medium"> · 25 min · R</span>
+<span class="ex-tag">Practice Exercise M5</span><span class="difficulty medium"> · 25 min · R</span>
 <h3>Spawner-recruit: fit, predict, derive</h3>
 <p>Open <code>SpawnerRecruit_Nimble.R</code>. The script simulates 20 years of data from a known truth ($a=5, b=5000, \sigma=0.2$), then fits the model.</p>
 <ol type="a">
@@ -835,7 +835,7 @@ zst &lt;- <span class="fn">matrix</span>(<span class="nu">1L</span>, Nsites, Nye
 </ul>
 </div>
 
-<p>From the same run as Exercise 6 (30 sites, 8 years; R-hat = 1.00 for every derived quantity except $\lambda_3$, which is 1.01), the posterior medians tell a story the raw $\phi,\gamma$ cannot:</p>
+<p>From the same run as Exercise M6 (30 sites, 8 years; R-hat = 1.00 for every derived quantity except $\lambda_3$, which is 1.01), the posterior medians tell a story the raw $\phi,\gamma$ cannot:</p>
 <table>
 <tr><th>Transition</th><th>$\psi_t \rightarrow \psi_{t+1}$</th><th><code>lambda</code> $\lambda_t$</th><th><code>turn</code> $\tau_t$</th><th><code>eq</code> $\hat\psi_{\text{eq}}$</th></tr>
 <tr><td>1 &rarr; 2</td><td>0.33 &rarr; 0.37</td><td>1.15</td><td>0.85</td><td>0.37</td></tr>
@@ -849,7 +849,7 @@ zst &lt;- <span class="fn">matrix</span>(<span class="nu">1L</span>, Nsites, Nye
 <p>The year-3 crash ($\lambda \approx 0.5$, occupancy roughly halved) and the year-4 rebound ($\lambda \approx 2.4$) jump straight out of the <code>lambda</code> column, and turnover stays high throughout (0.5&ndash;0.94) &mdash; so this is a <em>churny</em> metapopulation, sites blinking on and off, not a stable core of occupied patches. None of that is visible in the raw per-year $\phi_t,\gamma_t$.</p>
 
 <div class="exercise" id="ex-6">
-<span class="ex-tag">Exercise 6</span><span class="difficulty hard"> · 35 min · R · latent states</span>
+<span class="ex-tag">Practice Exercise M6</span><span class="difficulty hard"> · 35 min · R · latent states</span>
 <h3>Dynamic occupancy: simulate and recover</h3>
 <p>Open <code>DynamicOccupancy_Nimble.R</code> and run end-to-end.</p>
 <ol type="a">
@@ -919,7 +919,7 @@ zst &lt;- <span class="fn">matrix</span>(<span class="nu">1L</span>, Nsites, Nye
 <p><strong>Reading the number.</strong> If the model fits, the real data are a typical draw, so roughly half the replicates land above it and half below: $p_B \approx 0.5$. A value near 0 means the observed statistic is larger than almost every replicate (the data are far more variable &mdash; or more clustered &mdash; than the model can generate); a value near 1 means the opposite. Either extreme is evidence of misfit, and, unlike a bare point estimate, it tells you <em>which</em> feature (whatever $T$ measured) the model gets wrong. Values from about 0.1 to 0.9 are unremarkable.</p>
 
 <div class="exercise" id="ex-7">
-<span class="ex-tag">Exercise 7</span><span class="difficulty medium"> · 25 min · R</span>
+<span class="ex-tag">Practice Exercise M7</span><span class="difficulty medium"> · 25 min · R</span>
 <h3>N-mixture: build up from basic to overdispersed</h3>
 <p>Open <code>NMixture_Nimble.R</code> and run all four models.</p>
 <ol type="a">
@@ -933,12 +933,12 @@ zst &lt;- <span class="fn">matrix</span>(<span class="nu">1L</span>, Nsites, Nye
 <p><strong>(a) Basic model (20 sites, 3 reps; truth $\lambda=6,\ p=0.8$).</strong> Recovered cleanly: $\lambda$ = 6.24 [5.06, 7.78] and $p$ = 0.80 [0.67, 0.87]. With only 20 sites the intervals are wide, but both comfortably cover truth.</p>
 <p><strong>(b) Covariate on abundance (truth $\beta_1=1$).</strong> $\beta_1$ = <strong>1.00</strong> [0.94, 1.07] &mdash; credibly positive and bang on the simulated value; $\beta_0$ = 2.99 [2.91, 3.07].</p>
 <p><strong>(c) Covariate on both.</strong> Adding the detection covariate ($a_0$ = 0.92 [0.70, 1.11], $a_1$ = 1.00 [0.91, 1.09], both recovering truth 1) leaves the abundance-covariate inference essentially unchanged: $\beta_1$ moves only from 1.00 to <strong>1.04</strong> [0.97, 1.10]. Because these data are simulated clean, modeling detection heterogeneity here neither biases nor much tightens $\beta_1$; in messier data, ignoring detection structure is what would distort it.</p>
-<p><strong>(d) Overdispersion + Bayesian p-value.</strong> The 200-site data were generated from a negative binomial but fit with a Poisson N-mixture. The discrepancy sits almost entirely on one side &mdash; observed $T(\text{data})$ median 367 vs replicated $T(y^\text{rep})$ median 332 &mdash; giving a <strong>Bayesian p-value of 0.008</strong>, far from 0.5. The Poisson model cannot absorb the extra variance, so it is decisively rejected; the fix is a Poisson-lognormal or negative-binomial N-mixture (Exercise 8). Note $\lambda$ = 5.81 [5.46, 6.17] still looks confident and reasonable &mdash; the GOF check is what exposes the misfit the point estimate alone would hide.</p>
+<p><strong>(d) Overdispersion + Bayesian p-value.</strong> The 200-site data were generated from a negative binomial but fit with a Poisson N-mixture. The discrepancy sits almost entirely on one side &mdash; observed $T(\text{data})$ median 367 vs replicated $T(y^\text{rep})$ median 332 &mdash; giving a <strong>Bayesian p-value of 0.008</strong>, far from 0.5. The Poisson model cannot absorb the extra variance, so it is decisively rejected; the fix is a Poisson-lognormal or negative-binomial N-mixture (Exercise M8). Note $\lambda$ = 5.81 [5.46, 6.17] still looks confident and reasonable &mdash; the GOF check is what exposes the misfit the point estimate alone would hide.</p>
 </div></details>
 </div>
 
 <div class="exercise" id="ex-8">
-<span class="ex-tag">Exercise 8</span><span class="difficulty hard"> · 35 min · R · synthesis</span>
+<span class="ex-tag">Practice Exercise M8</span><span class="difficulty hard"> · 35 min · R · synthesis</span>
 <h3>Add a site-level random effect to the N-mixture model</h3>
 <p>Modify <code>Nmix4Code</code> to add a Poisson-lognormal structure:</p>
 <div class="eq-block">$\log \lambda_i = \beta_0 + \epsilon_i, \quad \epsilon_i \sim \mathcal{N}(0, \sigma_\epsilon^2)$</div>

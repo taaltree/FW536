@@ -292,7 +292,7 @@ fit &lt;- <span class="fn">mle</span>(nll_vbgf3,
 <li>Free all three and the model no longer needs the compensation: $\hat L_\infty = 82.60$, $\hat\kappa = 0.2591$, $\hat\sigma = 8.18$. The minimum NLL drops from $198.78$ on the grid to $176.05$ &mdash; a gap of nearly 23 log-likelihood units, so the grid answer is not even close in likelihood terms.</li>
 </ul>
 
-$L_\infty$ and $\kappa$ are strongly correlated in the VBGF, and that is the general lesson: <strong>a &ldquo;profile&rdquo; taken with the other parameters <em>frozen</em> is not a profile at all.</strong> A real profile likelihood (Walk-through 5, and Exercise 2) re-optimizes every nuisance parameter at each grid point, which is exactly why it gives back $0.2591$ and the frozen grid does not.
+$L_\infty$ and $\kappa$ are strongly correlated in the VBGF, and that is the general lesson: <strong>a &ldquo;profile&rdquo; taken with the other parameters <em>frozen</em> is not a profile at all.</strong> A real profile likelihood (Walk-through 5, and Exercise M2) re-optimizes every nuisance parameter at each grid point, which is exactly why it gives back $0.2591$ and the frozen grid does not.
 </div>
 
 <div class="callout warn">
@@ -489,9 +489,9 @@ The point of this example is not the ZIP per se — it is that mixture likelihoo
 <h2>Morning exercises</h2>
 <p>Four exercises on the likelihood half of the day. Work them with a partner; check the answer key only after you have tried. You are not expected to finish these during the session.</p>
 
-<!-- Exercise 1 -->
+<!-- Exercise M1 -->
 <div class="exercise" id="ex-1">
-<span class="ex-tag">Exercise 1</span><span class="difficulty easy"> · 15 min · MLE by hand</span>
+<span class="ex-tag">Practice Exercise M1</span><span class="difficulty easy"> · 15 min · MLE by hand</span>
 <h3>Bernoulli MLE from scratch</h3>
 <p>You observe $y_1, \dots, y_n$ independent Bernoulli($p$) trials with $s = \sum y_i$ successes.</p>
 <ol type="a">
@@ -512,9 +512,9 @@ fit &lt;- <span class="fn">mle</span>(nll, start = <span class="kw">list</span>(
 </div></details>
 </div>
 
-<!-- Exercise 2 -->
+<!-- Exercise M2 -->
 <div class="exercise" id="ex-2">
-<span class="ex-tag">Exercise 2</span><span class="difficulty medium"> · 25 min · Vonbert</span>
+<span class="ex-tag">Practice Exercise M2</span><span class="difficulty medium"> · 25 min · Vonbert</span>
 <h3>Profile likelihood for κ</h3>
 <p>Using the full Vonbert dataset (both sexes pooled) and the three-parameter model, compute and plot the <em>profile likelihood</em> for $\kappa$. For each $\kappa$ in a grid, optimize <em>over</em> $L_\infty$ and $\sigma$; record the minimum negative log-likelihood. Plot $-\Delta\ell$ vs $\kappa$; mark the 95% CI at the 1.92 line.</p>
 <details class="answer"><summary>Reveal solution</summary><div class="answer-body">
@@ -541,9 +541,9 @@ best &lt;- <span class="fn">min</span>(prof)
 </div></details>
 </div>
 
-<!-- Exercise 3 -->
+<!-- Exercise M3 -->
 <div class="exercise" id="ex-3">
-<span class="ex-tag">Exercise 3</span><span class="difficulty medium"> · 20 min · LRT + AIC</span>
+<span class="ex-tag">Practice Exercise M3</span><span class="difficulty medium"> · 20 min · LRT + AIC</span>
 <h3>Sex-specific VBGF revisited</h3>
 <p>Use the LRT code from the walk-through above. Report (a) the LRT statistic and p-value, (b) AIC for both models, (c) your conclusion. Then refit Model B with $L_\infty$ shared but $\kappa$ sex-specific (4 parameters) and run a second LRT against the same null. Comment on what you learn.</p>
 <details class="answer"><summary>Reveal worked solution (actual R run)</summary><div class="answer-body">
@@ -555,9 +555,9 @@ best &lt;- <span class="fn">min</span>(prof)
 </div></details>
 </div>
 
-<!-- Exercise 4 -->
+<!-- Exercise M4 -->
 <div class="exercise" id="ex-4">
-<span class="ex-tag">Exercise 4</span><span class="difficulty medium"> · 25 min · ZIP</span>
+<span class="ex-tag">Practice Exercise M4</span><span class="difficulty medium"> · 25 min · ZIP</span>
 <h3>Zero-inflated Poisson — diagnostics</h3>
 <p>Using the ZIP walk-through code, simulate three datasets with $\pi = 0.35$ and $\lambda \in \{1, 2.5, 8\}$. For each:</p>
 <ol type="a">
@@ -1105,9 +1105,9 @@ The recipe is always the same three steps: <strong>(1)</strong> simulate fake da
 <h2>Afternoon exercises</h2>
 <p>Four exercises on the Bayesian half of the day &mdash; conjugacy, Metropolis, and two Nimble fits. Work them with a partner; check the answer key only after you have tried. You are not expected to finish these during the session.</p>
 
-<!-- Exercise 5 -->
+<!-- Exercise A1 -->
 <div class="exercise" id="ex-5">
-<span class="ex-tag">Exercise 5</span><span class="difficulty easy"> · 15 min · Conjugacy</span>
+<span class="ex-tag">Practice Exercise A1</span><span class="difficulty easy"> · 15 min · Conjugacy</span>
 <h3>Beta–Binomial posterior arithmetic</h3>
 <p>You start with prior Beta(3, 7) for the probability of a snag containing a cavity-nesting bird (skeptical: prior mean 0.30). You survey 40 snags and find 22 with a bird.</p>
 <ol type="a">
@@ -1134,9 +1134,9 @@ post &lt;- <span class="fn">rbeta</span>(<span class="nu">1e5</span>, <span clas
 </div></details>
 </div>
 
-<!-- Exercise 6 -->
+<!-- Exercise A2 -->
 <div class="exercise" id="ex-6">
-<span class="ex-tag">Exercise 6</span><span class="difficulty medium"> · 30 min · Metropolis</span>
+<span class="ex-tag">Practice Exercise A2</span><span class="difficulty medium"> · 30 min · Metropolis</span>
 <h3>Roll your own Metropolis for Gamma–Poisson</h3>
 <p>Tick count data (the Gamma–Poisson walk-through). Implement Metropolis on a single parameter $\lambda > 0$:</p>
 <ol type="a">
@@ -1195,9 +1195,9 @@ tuned &lt;- <span class="fn">run_mh</span>(<span class="nu">0.75</span>) <span c
 </div></details>
 </div>
 
-<!-- Exercise 7 -->
+<!-- Exercise A3 -->
 <div class="exercise" id="ex-7">
-<span class="ex-tag">Exercise 7</span><span class="difficulty hard"> · 45 min · Nimble · core lab</span>
+<span class="ex-tag">Practice Exercise A3</span><span class="difficulty hard"> · 45 min · Nimble · core lab</span>
 <h3>Logistic growth in <span class="pill nimble">Nimble</span> — derived quantities</h3>
 <p>Fit the logistic-growth model (walk-through above). Then:</p>
 <ol type="a">
@@ -1224,9 +1224,9 @@ tuned &lt;- <span class="fn">run_mh</span>(<span class="nu">0.75</span>) <span c
 </div></details>
 </div>
 
-<!-- Exercise 8 -->
+<!-- Exercise A4 -->
 <div class="exercise" id="ex-8">
-<span class="ex-tag">Exercise 8</span><span class="difficulty medium"> · 30 min · Nimble</span>
+<span class="ex-tag">Practice Exercise A4</span><span class="difficulty medium"> · 30 min · Nimble</span>
 <h3>Bayesian survival with three priors</h3>
 <p>Repeat the bluebird-survival walk-through using priors Beta(1,1), Beta(9,11), and Beta(50,50). For each prior:</p>
 <ol type="a">

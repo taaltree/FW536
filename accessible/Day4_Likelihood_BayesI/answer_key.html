@@ -26,14 +26,14 @@ MathJax = {
  <div class="subtitle">Answer key</div>
  <nav aria-label="On this page and related documents">
  <ul>
- <li><a href="#a1">Ex 1 · Bernoulli MLE</a></li>
- <li><a href="#a2">Ex 2 · Profile likelihood for κ</a></li>
- <li><a href="#a3">Ex 3 · Sex-specific VBGF / LRT</a></li>
- <li><a href="#a4">Ex 4 · Zero-inflated Poisson</a></li>
- <li><a href="#a5">Ex 5 · Beta–Binomial</a></li>
- <li><a href="#a6">Ex 6 · Metropolis for λ</a></li>
- <li><a href="#a7">Ex 7 · Logistic growth in Nimble</a></li>
- <li><a href="#a8">Ex 8 · Bayesian survival</a></li>
+ <li><a href="#a1">Ex M1 · Bernoulli MLE</a></li>
+ <li><a href="#a2">Ex M2 · Profile likelihood for κ</a></li>
+ <li><a href="#a3">Ex M3 · Sex-specific VBGF / LRT</a></li>
+ <li><a href="#a4">Ex M4 · Zero-inflated Poisson</a></li>
+ <li><a href="#a5">Ex A1 · Beta–Binomial</a></li>
+ <li><a href="#a6">Ex A2 · Metropolis for λ</a></li>
+ <li><a href="#a7">Ex A3 · Logistic growth in Nimble</a></li>
+ <li><a href="#a8">Ex A4 · Bayesian survival</a></li>
  </ul>
  <div class="section">Day 4 docs</div>
  <ul>
@@ -53,7 +53,7 @@ MathJax = {
 
 <!-- ============== EX 1 ============== -->
 <section id="a1">
-<h2>Exercise 1 — Bernoulli MLE</h2>
+<h2>Exercise M1 — Bernoulli MLE</h2>
 
 <p>$y_i \sim \text{Bernoulli}(p)$ independently, $s = \sum y_i$, $n$ trials.</p>
 
@@ -81,7 +81,7 @@ confint(fit) <span class="cm"># profile-likelihood CI: (0.462, 0.728)</span></co
 
 <!-- ============== EX 2 ============== -->
 <section id="a2">
-<h2>Exercise 2 — Profile likelihood for κ</h2>
+<h2>Exercise M2 — Profile likelihood for κ</h2>
 
 <p>The profile-likelihood for $\kappa$ is built by holding $\kappa$ fixed at each grid point and optimizing the other two parameters; the resulting curve has its minimum at the joint MLE.</p>
 
@@ -117,7 +117,7 @@ cat(<span class="st">"Profile 95% CI for kappa:"</span>, round(ci, <span class="
 
 <!-- ============== EX 3 ============== -->
 <section id="a3">
-<h2>Exercise 3 — Sex-specific VBGF revisited</h2>
+<h2>Exercise M3 — Sex-specific VBGF revisited</h2>
 
 <p>(a) From the lab walk-through code (Model A = shared, Model B = full sex-specific):</p>
 <pre><code>LRT &lt;- <span class="nu">2</span> * (-logLik(fitA)[<span class="nu">1</span>] - (-logLik(fitB)[<span class="nu">1</span>]))
@@ -136,7 +136,7 @@ AIC(fitA, fitB)</code></pre>
 
 <!-- ============== EX 4 ============== -->
 <section id="a4">
-<h2>Exercise 4 — Zero-inflated Poisson</h2>
+<h2>Exercise M4 — Zero-inflated Poisson</h2>
 
 <pre><code><span class="kw">library</span>(stats4)
 fit_zip_and_pois &lt;- function(lambda_true) {
@@ -177,7 +177,7 @@ do.call(rbind, lapply(c(<span class="nu">1</span>, <span class="nu">2.5</span>, 
 
 <!-- ============== EX 5 ============== -->
 <section id="a5">
-<h2>Exercise 5 — Beta–Binomial posterior arithmetic</h2>
+<h2>Exercise A1 — Beta–Binomial posterior arithmetic</h2>
 
 <p>(a) Prior Beta(3, 7), data $y=22$, $n=40$. Posterior is Beta(3+22, 7+(40−22)) = <strong>Beta(25, 25)</strong>.</p>
 
@@ -197,7 +197,7 @@ c(mean = mean(post),
 
 <!-- ============== EX 6 ============== -->
 <section id="a6">
-<h2>Exercise 6 — Metropolis for Gamma–Poisson</h2>
+<h2>Exercise A2 — Metropolis for Gamma–Poisson</h2>
 
 <p>(a) Working in $\log\lambda$ ensures (i) the proposal is symmetric in the unconstrained space, (ii) you can't propose a negative $\lambda$, and (iii) tail behavior is well-handled. The Jacobian of the transformation contributes a $+\log\lambda$ term to the log-density (because $d\lambda/d(\log\lambda) = \lambda$).</p>
 
@@ -233,7 +233,7 @@ curve(dgamma(x, <span class="nu">2</span> + sum(y), <span class="nu">1</span> + 
 
 <!-- ============== EX 7 ============== -->
 <section id="a7">
-<h2>Exercise 7 — Logistic growth in <span class="pill nimble">Nimble</span></h2>
+<h2>Exercise A3 — Logistic growth in <span class="pill nimble">Nimble</span></h2>
 
 <p>The full code is in <code>Logistic_BayesianGrowth_Nimble.R</code>. Typical posterior summaries (rounded; will vary by seed):</p>
 
@@ -255,7 +255,7 @@ curve(dgamma(x, <span class="nu">2</span> + sum(y), <span class="nu">1</span> + 
 
 <!-- ============== EX 8 ============== -->
 <section id="a8">
-<h2>Exercise 8 — Bayesian bluebird survival</h2>
+<h2>Exercise A4 — Bayesian bluebird survival</h2>
 
 <p>Prior pseudo-sample sizes: Beta(1,1) = 2, Beta(9,11) = 20, Beta(50,50) = 100. Data: $y=18, n=25$.</p>
 

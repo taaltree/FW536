@@ -17,17 +17,17 @@
  <div class="subtitle">Answer key</div>
  <nav>
  <ul>
- <li><a href="#a1">Ex 1 — streams (pooling)</a></li>
- <li><a href="#a2">Ex 2 — length-weight</a></li>
- <li><a href="#a3">Ex 3 — von Bertalanffy NL mixed</a></li>
- <li><a href="#a4">Ex 4 — trophic position</a></li>
- <li><a href="#a5">Ex 5 — ML vs REML in action</a></li>
- <li><a href="#a6">Ex 6 — mixed-model diagnostics</a></li>
- <li><a href="#a7">Ex 7 — ΔAIC &lt; 2 myth</a></li>
- <li><a href="#a8">Ex 8 — Type I error simulation</a></li>
- <li><a href="#a9">Ex 9 — Type II error simulation</a></li>
- <li><a href="#a10">Ex 10 — LOOCV vs AIC</a></li>
- <li><a href="#a11">Ex 11 — LRT vs AICc</a></li>
+ <li><a href="#a1">Ex M1 — streams (pooling)</a></li>
+ <li><a href="#a2">Ex M2 — length-weight</a></li>
+ <li><a href="#a3">Ex M3 — von Bertalanffy NL mixed</a></li>
+ <li><a href="#a4">Ex M4 — trophic position</a></li>
+ <li><a href="#a5">Ex M5 — ML vs REML in action</a></li>
+ <li><a href="#a6">Ex M6 — mixed-model diagnostics</a></li>
+ <li><a href="#a7">Ex A1 — ΔAIC &lt; 2 myth</a></li>
+ <li><a href="#a8">Ex A2 — Type I error simulation</a></li>
+ <li><a href="#a9">Ex A3 — Type II error simulation</a></li>
+ <li><a href="#a10">Ex A4 — LOOCV vs AIC</a></li>
+ <li><a href="#a11">Ex A5 — LRT vs AICc</a></li>
  </ul>
  <div class="section">Day 3 docs</div>
  <ul>
@@ -47,7 +47,7 @@
 
 <!-- =========================== EX 1 =========================== -->
 <section id="a1">
-<h2>Exercise 1 — Streams: complete pooling vs no pooling vs partial pooling</h2>
+<h2>Exercise M1 — Streams: complete pooling vs no pooling vs partial pooling</h2>
 
 <p><strong>(a) Equations and parameter counts.</strong></p>
 <ul>
@@ -96,7 +96,7 @@ intervals(lm3)$sigma
 
 <!-- =========================== EX 2 =========================== -->
 <section id="a2">
-<h2>Exercise 2 — Length–weight random-intercept model</h2>
+<h2>Exercise M2 — Length–weight random-intercept model</h2>
 
 <p><strong>(a) Equation.</strong> $W_{ij} = \beta_0 + b_{0,j} + \beta_1 L_{ij} + \varepsilon_{ij}$, $b_{0,j} \sim \mathcal{N}(0, \sigma_S^2)$, $\varepsilon_{ij} \sim \mathcal{N}(0, \sigma^2)$. Biologically: $\beta_1$ is the population-average slope of weight on length; $\beta_0$ is the population-average intercept; $b_{0,j}$ is how much subject $j$'s expected weight at $L=0$ deviates from the population mean (a "scale" effect of subject identity).</p>
 
@@ -125,7 +125,7 @@ m_slope    6 10.6483 26.279 0.67585   -1.3517 0.0783  2     0.9616</code></pre>
 
 <!-- =========================== EX 3 =========================== -->
 <section id="a3">
-<h2>Exercise 3 — Von Bertalanffy nonlinear mixed model</h2>
+<h2>Exercise M3 — Von Bertalanffy nonlinear mixed model</h2>
 
 <p><strong>(a) Why expect $L_\infty$ to vary?</strong> Asymptotic body size is heritable and depends on individual conditions across life history — food, water temperature, parasites, genetics. Forcing all individuals to share the same $L_\infty$ is the same mistake as forcing all streams to share the same mean density.</p>
 
@@ -154,7 +154,7 @@ VarCorr(m_nlme) # SD(Linf | Subject) = 8.2884  (variance 68.697)</code></pre>
 
 <!-- =========================== EX 4 =========================== -->
 <section id="a4">
-<h2>Exercise 4 — Trophic position with crossed random effects</h2>
+<h2>Exercise M4 — Trophic position with crossed random effects</h2>
 
 <p><strong>(a) Random vs fixed for Lake and Fish_Species.</strong> Both are exchangeable groupings of observations (multiple fish per lake; multiple fish per species). If the goal is to generalize the length-trophic-position relationship to <em>other</em> lakes or <em>other</em> species, random effects are appropriate. Counter-argument: only 3 species and 6 lakes is on the edge of identifiability for a random-effect variance; species-specific feeding ecologies (S1 vs S2 vs S3) are biologically distinct enough that we may care about them by name — a case for fixed effects on species and possibly on lake.</p>
 
@@ -195,7 +195,7 @@ Z_Length 0.422 0.092</code></pre>
 
 <!-- =========================== EX 5 =========================== -->
 <section id="a5">
-<h2>Exercise 5 — ML vs REML for fixed-effect comparison</h2>
+<h2>Exercise M5 — ML vs REML for fixed-effect comparison</h2>
 
 <p><strong>(a) Why <code>REML = FALSE</code>?</strong> We are comparing models that differ in <em>fixed effects</em>. REML log-likelihoods are computed on data with the fixed effects partialed out — they are not comparable across different fixed-effect specifications. Use ML.</p>
 
@@ -204,7 +204,7 @@ Z_Length 0.422 0.092</code></pre>
 #            npar    AIC     BIC  logLik -2*log(L)  Chisq Df Pr(&gt;Chisq)
 # fit_no_x      4 300.84 313.61 -146.42    292.84
 # fit_with_x    5  76.96  92.92  -33.48     66.96 225.88  1  &lt; 2.2e-16 ***</code></pre>
-<p>$\Lambda = 2\big(-33.48 - (-146.42)\big) = 225.88$ on 1 df, $p = 4.7\times10^{-51}$. Body length is overwhelmingly supported as a predictor of trophic position even after accounting for lake and species — not a marginal call. The Wald view agrees: $\hat\beta = 0.4198$ with SE $0.0194$, so $t = 21.6$. Matches <a href="lab.html#ex-5">lab Exercise 5</a>.</p>
+<p>$\Lambda = 2\big(-33.48 - (-146.42)\big) = 225.88$ on 1 df, $p = 4.7\times10^{-51}$. Body length is overwhelmingly supported as a predictor of trophic position even after accounting for lake and species — not a marginal call. The Wald view agrees: $\hat\beta = 0.4198$ with SE $0.0194$, so $t = 21.6$. Matches <a href="lab.html#ex-5">lab Exercise M5</a>.</p>
 
 <p><strong>(c) Refitting with REML for reporting.</strong> Variance components estimated by ML are biased downward (they ignore the df consumed by the fixed effects). REML corrects that bias. The fixed-effect point estimates barely change, but the random-effect SDs and the SEs that depend on them are more honest under REML.</p>
 
@@ -213,7 +213,7 @@ Z_Length 0.422 0.092</code></pre>
 
 <!-- =========================== EX 6 =========================== -->
 <section id="a6">
-<h2>Exercise 6 — Mixed-model diagnostics</h2>
+<h2>Exercise M6 — Mixed-model diagnostics</h2>
 
 <p><strong>(a) What each plot checks.</strong></p>
 <table>
@@ -239,7 +239,7 @@ Z_Length 0.422 0.092</code></pre>
 
 <!-- =========================== EX 7 =========================== -->
 <section id="a7">
-<h2>Exercise 7 — The "$\Delta\text{AIC} &lt; 2$" misconception</h2>
+<h2>Exercise A1 — The "$\Delta\text{AIC} &lt; 2$" misconception</h2>
 
 <p><strong>(a) Single-run experience.</strong> Running the code a few times shows the model with the noise predictor is "competitive" <em>every</em> time — $\Delta\text{AIC}$ always lands below 2, usually somewhere in 0.5–2.0, and every so often it goes negative and the junk model wins outright. It never exceeds 2. Students who report seeing a value above 2 have a bug. If a student expects a large noise coefficient to <em>raise</em> $\Delta\text{AIC}$, correct that now: a larger $|\hat\beta_{x2}|$ means a larger likelihood-ratio statistic, which pushes $\Delta\text{AIC}$ <em>down</em>, not up.</p>
 
@@ -266,12 +266,12 @@ quantile(dAIC, c(0, .25, .5, .75, 1))
 
 <p>The second number matters just as much: $\Delta\text{AIC} &lt; 0$ in <strong>14.1%</strong> of reps, i.e. the pure-noise model has the <em>lower</em> AIC and wins outright. That is $P(\chi^2_1 &gt; 2) = 15.7\%$ in theory, recovered by simulation. A junk variable takes the top spot roughly one time in seven.</p>
 
-<div class="callout key"><strong>Instructor takeaway:</strong> the point is stronger than "the rule is permissive." The rule is <strong>vacuous</strong>. A nested model with one extra junk parameter is within 2 AIC units <em>by construction</em>, so asking "is it within 2?" has a guaranteed answer and is evidence of nothing at all — it tests the arithmetic of the penalty, not the data. Do not let students report a $\Delta\text{AIC} &lt; 2$ set as if it were a finding. Report the coefficient and its CI, and argue from the size and uncertainty of the effect. This is the same identity used in <a href="lab.html#ex-10">lab Exercise 10</a>, where the "winning" model beats the intercept-only model purely because its $\chi^2_1$ happened to land above 2.</div>
+<div class="callout key"><strong>Instructor takeaway:</strong> the point is stronger than "the rule is permissive." The rule is <strong>vacuous</strong>. A nested model with one extra junk parameter is within 2 AIC units <em>by construction</em>, so asking "is it within 2?" has a guaranteed answer and is evidence of nothing at all — it tests the arithmetic of the penalty, not the data. Do not let students report a $\Delta\text{AIC} &lt; 2$ set as if it were a finding. Report the coefficient and its CI, and argue from the size and uncertainty of the effect. This is the same identity used in <a href="lab.html#ex-10">lab Exercise A4</a>, where the "winning" model beats the intercept-only model purely because its $\chi^2_1$ happened to land above 2.</div>
 </section>
 
 <!-- =========================== EX 8 =========================== -->
 <section id="a8">
-<h2>Exercise 8 — Type I error simulation</h2>
+<h2>Exercise A2 — Type I error simulation</h2>
 
 <p><strong>(a) Prediction.</strong> AIC will be the worst offender — its penalty (2 per parameter) is small enough that noise predictors easily slip into the top model.</p>
 
@@ -284,7 +284,7 @@ quantile(dAIC, c(0, .25, .5, .75, 1))
 <tr><td>BIC</td><td>0.162</td></tr>
 </table>
 
-<p>(From the lab's <code>set.seed(126)</code>, 500 reps, $n = 50$ — matches the table in <a href="lab.html#ex-8">lab Exercise 8</a>.) AIC and AICc keep a noise predictor in the top model about 40–45% of the time. BIC and the naive $p$-value column are both far lower and, on this seed, <strong>exactly tied at 0.162</strong> — BIC because its $\ln n = \ln 50 \approx 3.9$ penalty is nearly double AIC's fixed 2, and $p$ because it is not doing model selection at all, just testing each coefficient once (family-wise rate $1 - 0.95^3 \approx 0.14$). BIC is not "the most conservative" here — it is about as strict as the $p$-value screen, and the real outlier is AIC's penalty of 2 being too small to keep junk out.</p>
+<p>(From the lab's <code>set.seed(126)</code>, 500 reps, $n = 50$ — matches the table in <a href="lab.html#ex-8">lab Exercise A2</a>.) AIC and AICc keep a noise predictor in the top model about 40–45% of the time. BIC and the naive $p$-value column are both far lower and, on this seed, <strong>exactly tied at 0.162</strong> — BIC because its $\ln n = \ln 50 \approx 3.9$ penalty is nearly double AIC's fixed 2, and $p$ because it is not doing model selection at all, just testing each coefficient once (family-wise rate $1 - 0.95^3 \approx 0.14$). BIC is not "the most conservative" here — it is about as strict as the $p$-value screen, and the real outlier is AIC's penalty of 2 being too small to keep junk out.</p>
 
 <p><strong>(c) Why BIC outperforms here.</strong> BIC's penalty grows with $n$, so for $n = 50$ it's ≈ 3.9 per parameter — almost twice AIC's. When effects are truly zero, this extra penalty drops noise predictors. <strong>Backfires when:</strong> real effects are weak. BIC will miss them (next exercise).</p>
 
@@ -293,7 +293,7 @@ quantile(dAIC, c(0, .25, .5, .75, 1))
 
 <!-- =========================== EX 9 =========================== -->
 <section id="a9">
-<h2>Exercise 9 — Type II error simulation (weak true effects)</h2>
+<h2>Exercise A3 — Type II error simulation (weak true effects)</h2>
 
 <p><strong>(a) Average number of missed real effects (out of 3):</strong></p>
 <table>
@@ -303,7 +303,7 @@ quantile(dAIC, c(0, .25, .5, .75, 1))
 <tr><td>AICc</td><td>1.186</td></tr>
 <tr><td>BIC</td><td>1.464</td></tr>
 </table>
-<p>(From the lab's <code>set.seed(2026)</code>, 500 reps, $n = 50$ — matches the table in <a href="lab.html#ex-9">lab Exercise 9</a>.) BIC misses about 1.46 of the 3 true predictors on average — essentially <strong>tied with the p-value approach</strong> (1.51), just as it was in Exercise 8. AIC and AICc are the inclusive ones (missing ~1.11–1.19), which is what you want when the science is about small effects. The pattern across both exercises is the same: BIC and the $p$-value screen behave alike at this $n$, and AIC buys its extra power over both by paying in Type-I error.</p>
+<p>(From the lab's <code>set.seed(2026)</code>, 500 reps, $n = 50$ — matches the table in <a href="lab.html#ex-9">lab Exercise A3</a>.) BIC misses about 1.46 of the 3 true predictors on average — essentially <strong>tied with the p-value approach</strong> (1.51), just as it was in Exercise A2. AIC and AICc are the inclusive ones (missing ~1.11–1.19), which is what you want when the science is about small effects. The pattern across both exercises is the same: BIC and the $p$-value screen behave alike at this $n$, and AIC buys its extra power over both by paying in Type-I error.</p>
 
 <p><strong>(b) Implication for BIC.</strong> If your science cares about weak effects (subtle population trends, small treatment differences), BIC will under-detect them. Pick AIC/AICc — or, better, don't reduce the question to a single criterion. Look at the coefficient and its CI.</p>
 
@@ -314,7 +314,7 @@ quantile(dAIC, c(0, .25, .5, .75, 1))
 
 <!-- =========================== EX 10 =========================== -->
 <section id="a10">
-<h2>Exercise 10 — LOOCV vs AIC for noise data</h2>
+<h2>Exercise A4 — LOOCV vs AIC for noise data</h2>
 
 <p><strong>(a) Single seed (set.seed(126), n=50, y unrelated to x1, x2, x3).</strong></p>
 <pre><code>cv &lt;- sapply(forms, cvmse)
@@ -364,7 +364,7 @@ round(rowMeans(res), 2)
 
 <!-- =========================== EX 11 =========================== -->
 <section id="a11">
-<h2>Exercise 11 — LRT vs AICc for a random-slope decision</h2>
+<h2>Exercise A5 — LRT vs AICc for a random-slope decision</h2>
 
 <p><strong>(a) Why <code>refit = FALSE</code>?</strong> Both models share the same fixed-effect specification but differ in random-effect structure. REML log-likelihoods are comparable in that setting and give less-biased variance components. <code>refit = FALSE</code> tells <code>anova</code> not to refit them under ML.</p>
 
@@ -375,7 +375,7 @@ round(rowMeans(res), 2)
 </ul>
 <p>For an inference question about whether the random slope matters biologically, the LRT plus the CI on the slope variance is the cleanest evidence. For a prediction question, prefer AICc (and ideally cross-validation).</p>
 
-<p><strong>(c) Boundary-test conservatism.</strong> Testing whether a variance component is zero puts the null on the boundary of the parameter space (variances cannot be negative), so the classical $\chi^2$ null overstates uncertainty. <strong>The correction depends on how many parameters you added.</strong> Adding one variance component with no correlation term: the null is $\tfrac{1}{2}\chi^2_0 + \tfrac{1}{2}\chi^2_1$, and halving the reported $p$-value is right. Adding a random <em>slope</em>: you add a variance <em>and</em> a correlation, <code>anova()</code> reports <strong>Df = 2</strong>, and the null is $\tfrac{1}{2}\chi^2_1 + \tfrac{1}{2}\chi^2_2$ — halving is then wrong. Worked on the Exercise 2 / P2 model ($\chi^2 = 0.078$, Df 2): R gives $p = 0.962$, halving gives $0.481$, correct mixture gives $0.871$. <em>Grading note:</em> a student who reaches for "divide by 2" on the random-slope test has learned the rule without its condition. Practical fix: <code>RLRsim::exactRLRT()</code> or a parametric bootstrap.</p>
+<p><strong>(c) Boundary-test conservatism.</strong> Testing whether a variance component is zero puts the null on the boundary of the parameter space (variances cannot be negative), so the classical $\chi^2$ null overstates uncertainty. <strong>The correction depends on how many parameters you added.</strong> Adding one variance component with no correlation term: the null is $\tfrac{1}{2}\chi^2_0 + \tfrac{1}{2}\chi^2_1$, and halving the reported $p$-value is right. Adding a random <em>slope</em>: you add a variance <em>and</em> a correlation, <code>anova()</code> reports <strong>Df = 2</strong>, and the null is $\tfrac{1}{2}\chi^2_1 + \tfrac{1}{2}\chi^2_2$ — halving is then wrong. Worked on the Exercise M2 / P2 model ($\chi^2 = 0.078$, Df 2): R gives $p = 0.962$, halving gives $0.481$, correct mixture gives $0.871$. <em>Grading note:</em> a student who reaches for "divide by 2" on the random-slope test has learned the rule without its condition. Practical fix: <code>RLRsim::exactRLRT()</code> or a parametric bootstrap.</p>
 
 <div class="callout key"><strong>What to look for:</strong> students articulating the difference between "inference" and "prediction" claims; students aware of the boundary-test issue and at least mentioning the halve-the-p-value heuristic.</div>
 </section>

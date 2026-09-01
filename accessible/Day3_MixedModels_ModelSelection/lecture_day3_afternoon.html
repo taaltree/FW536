@@ -20,7 +20,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <p class="brand"><a href="../index.html">FW 536 · Day 3 Afternoon</a></p>
 <div class="subtitle">Lecture notes: Hypothesis tests and model selection</div>
 <nav aria-label="Slides in this lecture"><div class="section">Slides</div><ul>
-<li><a href="#slide-1">1. Slide 1</a></li>
+<li><a href="#slide-1">1. Likelihood Ratio Tests And Model Selection</a></li>
 <li><a href="#slide-2">2. Model selection — Why?</a></li>
 <li><a href="#slide-3">3. Inference, Estimation, Prediction</a></li>
 <li><a href="#slide-4">4. Model selection — Why?</a></li>
@@ -37,23 +37,23 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li><a href="#slide-15">15. Example-II</a></li>
 <li><a href="#slide-16">16. Slide 16</a></li>
 <li><a href="#slide-17">17. Information Theoretic Criteria for Model Selection</a></li>
-<li><a href="#slide-18">18. Slide 18</a></li>
-<li><a href="#slide-19">19. Slide 19</a></li>
-<li><a href="#slide-20">20. Slide 20</a></li>
+<li><a href="#slide-18">18. compare two models with k parameters and with k+1</a></li>
+<li><a href="#slide-19">19. If 1 parameter separate the model. AIC likes bigger models</a></li>
+<li><a href="#slide-20">20. What if 3 parameters separate the model? AIC likes bigger models</a></li>
 <li><a href="#slide-21">21. Most common mistake in ecology!</a></li>
-<li><a href="#slide-22">22. Slide 22</a></li>
+<li><a href="#slide-22">22. 3700 Citations! 72% of all papers incorrectly interpret uninformative parameters!</a></li>
 <li><a href="#slide-23">23. The Cult of AIC</a></li>
 <li><a href="#slide-24">24. Two key questions</a></li>
 <li><a href="#slide-25">25. AIC and p-values</a></li>
-<li><a href="#slide-26">26. Slide 26</a></li>
+<li><a href="#slide-26">26. Why does the cult of AIC hate p-values?</a></li>
 <li><a href="#slide-27">27. Confidence intervals and p-values</a></li>
 <li><a href="#slide-28">28. P-values should be interpreted on a continuum. Not a step function at 0.05. AIC should be interpreted in the same way!</a></li>
 <li><a href="#slide-29">29. So why use AIC?</a></li>
-<li><a href="#slide-30">30. Slide 30</a></li>
+<li><a href="#slide-30">30. Why did AIC take over wildlife science?</a></li>
 <li><a href="#slide-31">31. AIC in practice…</a></li>
 <li><a href="#slide-32">32. AIC in practice</a></li>
 <li><a href="#slide-33">33. Most common mistake in ecology!</a></li>
-<li><a href="#slide-34">34. Slide 34</a></li>
+<li><a href="#slide-34">34. 3700 Citations! 72% of all papers incorrectly interpret uninformative parameters!</a></li>
 <li><a href="#slide-35">35. Best recent paper as a resource to stop doing dumb stuff with AIC</a></li>
 <li><a href="#slide-36">36. B &amp; A recipe for modelling</a></li>
 <li><a href="#slide-37">37. Burnham and Anderson did not advocate model dredging (fitting all/many combinations of predictors)</a></li>
@@ -68,7 +68,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li><a href="#slide-46">46. Two ways to use many trees</a></li>
 <li><a href="#slide-47">47. Which one do you want?</a></li>
 <li><a href="#slide-48">48. Don’t take my word for it…</a></li>
-<li><a href="#slide-49">49. Slide 49</a></li>
+<li><a href="#slide-49">49. Don’t take my word for it…</a></li>
 <li><a href="#slide-50">50. Don’t take my word for it…</a></li>
 <li><a href="#slide-51">51. Slide 51</a></li>
 <li><a href="#slide-52">52. Recommended Readings</a></li>
@@ -81,13 +81,8 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 </header>
 <div class="callout key"><p class="callout-label">About these notes</p>Each section is one slide. Figures carry text descriptions where available. For the concepts with worked examples, also read the <a href="plain_language_summary.html">plain-language summary</a> and <a href="lab.html">lab</a> for this session.</div>
 <section aria-labelledby="slide-1-h">
-<h2 id="slide-1-h"><span id="slide-1"></span>Slide 1</h2>
+<h2 id="slide-1-h"><span id="slide-1"></span>Slide 1: Likelihood Ratio Tests And Model Selection</h2>
 <p>1</p>
-<ul>
-<li>Likelihood Ratio Tests</li>
-<li>And</li>
-<li>Model Selection</li>
-</ul>
 <details class="answer"><summary>Speaker notes for this slide</summary><div class="answer-body"><p>a</p></div></details>
 </section>
 <section aria-labelledby="slide-2-h">
@@ -287,24 +282,21 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 </ul>
 </section>
 <section aria-labelledby="slide-18-h">
-<h2 id="slide-18-h"><span id="slide-18"></span>Slide 18</h2>
-<p>compare two models with k parameters and with k+1</p>
+<h2 id="slide-18-h"><span id="slide-18"></span>Slide 18: compare two models with k parameters and with k+1</h2>
 <p>Information Theoretic Criteria for Model Selection</p>
 <figure role="group"><figcaption><strong>Figure 18.1.</strong> Figure (vector image, not machine-readable here) illustrating the difference in information criteria between models with k versus k+1 parameters. Ask instructor for details.</figcaption></figure>
 <p>LRT = −2 loge ( ℒs(θˆ) / ℒg(θˆ) )</p>
 <p>Compare to chi.sq distribution with degrees of freedom = difference in # parameters</p>
 </section>
 <section aria-labelledby="slide-19-h">
-<h2 id="slide-19-h"><span id="slide-19"></span>Slide 19</h2>
+<h2 id="slide-19-h"><span id="slide-19"></span>Slide 19: If 1 parameter separate the model. AIC likes bigger models</h2>
 <figure role="group"><figcaption><strong>Figure 19.1.</strong> Chi-square distribution table: rows are degrees of freedom, columns are upper-tail probabilities from 0.99 to 0.01, giving critical chi-square values. Used to find p-values for likelihood ratio tests.</figcaption></figure>
 <p>Convention within &lt;2 AIC units are “considered competitive”, and this is approximately the same as frequentist model selection using LRT</p>
-<p>If 1 parameter separate the model. AIC likes bigger models</p>
 <p>“the extra parameter is worth it”</p>
 </section>
 <section aria-labelledby="slide-20-h">
-<h2 id="slide-20-h"><span id="slide-20"></span>Slide 20</h2>
+<h2 id="slide-20-h"><span id="slide-20"></span>Slide 20: What if 3 parameters separate the model? AIC likes bigger models</h2>
 <figure role="group"><figcaption><strong>Figure 20.1.</strong> Chi-square distribution table: rows are degrees of freedom, columns are upper-tail probabilities from 0.99 to 0.01, giving critical chi-square values. Used to find p-values for likelihood ratio tests.</figcaption></figure>
-<p>What if 3 parameters separate the model? AIC likes bigger models</p>
 <p>(reject the null that the parameters equal 0)</p>
 <p>2 deltaAIC still equivalent to p = 0.05</p>
 </section>
@@ -320,11 +312,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <p>AICi = −2 log Li + 2 pi</p>
 </section>
 <section aria-labelledby="slide-22-h">
-<h2 id="slide-22-h"><span id="slide-22"></span>Slide 22</h2>
-<ul>
-<li>3700 Citations!</li>
-<li>72% of all papers incorrectly interpret uninformative parameters!</li>
-</ul>
+<h2 id="slide-22-h"><span id="slide-22"></span>Slide 22: 3700 Citations! 72% of all papers incorrectly interpret uninformative parameters!</h2>
 <figure role="group"><figcaption><strong>Figure 22.1.</strong> Journal of Wildlife Management article header: Arnold, &quot;Uninformative Parameters and Model Selection Using Akaike&#x27;s Information Criterion.&quot; Free Access.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-23-h">
@@ -351,7 +339,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <figure role="group"><figcaption><strong>Figure 25.1.</strong> Line plot from Murtaugh (2014, Ecology, Fig. 2) of the p-value (x-axis, 0 to 0.30) against delta-AIC (y-axis, about -1 to 15) for two models that differ by one parameter. Four curves are shown for sample sizes n = 10 (dashed), n = 20 (dotted), n = 50 (dash-dot) and n = infinity (solid). Every curve falls steeply as the p-value rises from 0, then flattens; all four cross delta-AIC = 0 at roughly p = 0.15 to 0.17 and become slightly negative by p = 0.30. The curves nearly coincide except near p = 0, where smaller samples give larger delta-AIC, illustrating that AIC differences and p-values carry essentially the same information for a one-parameter comparison.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-26-h">
-<h2 id="slide-26-h"><span id="slide-26"></span>Slide 26</h2>
+<h2 id="slide-26-h"><span id="slide-26"></span>Slide 26: Why does the cult of AIC hate p-values?</h2>
 <ul>
 <li>P &lt; 0.05 is an arbitrary threshold</li>
 <li style="margin-left:1.2em">But ⍙AIC &lt; 2 is as well</li>
@@ -362,7 +350,6 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li style="margin-left:1.2em">We always need effect sizes for inference. These are the most important part of the science!</li>
 <li style="margin-left:1.2em">But let’s remember how confidence intervals and p-values are related</li>
 </ul>
-<p>Why does the cult of AIC hate p-values?</p>
 </section>
 <section aria-labelledby="slide-27-h">
 <h2 id="slide-27-h"><span id="slide-27"></span>Slide 27: Confidence intervals and p-values</h2>
@@ -387,8 +374,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 </ul>
 </section>
 <section aria-labelledby="slide-30-h">
-<h2 id="slide-30-h"><span id="slide-30"></span>Slide 30</h2>
-<p>Why did AIC take over wildlife science?</p>
+<h2 id="slide-30-h"><span id="slide-30"></span>Slide 30: Why did AIC take over wildlife science?</h2>
 <ul>
 <li>Aggressive marketing of the method by Burnham and Anderson, who were in Fisheries and Wildlife and “wrote the book”</li>
 <li>People adopt new statistical methods, then find the holes, and then the pendulum swings back</li>
@@ -437,11 +423,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <p>AICi = −2 log Li + 2 pi</p>
 </section>
 <section aria-labelledby="slide-34-h">
-<h2 id="slide-34-h"><span id="slide-34"></span>Slide 34</h2>
-<ul>
-<li>3700 Citations!</li>
-<li>72% of all papers incorrectly interpret uninformative parameters!</li>
-</ul>
+<h2 id="slide-34-h"><span id="slide-34"></span>Slide 34: 3700 Citations! 72% of all papers incorrectly interpret uninformative parameters!</h2>
 <figure role="group"><figcaption><strong>Figure 34.1.</strong> Journal of Wildlife Management article header: Arnold, &quot;Uninformative Parameters and Model Selection Using Akaike&#x27;s Information Criterion.&quot; Free Access.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-35-h">
@@ -519,7 +501,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <h2 id="slide-43-h"><span id="slide-43"></span>Slide 43: If the goal is prediction, is a linear model the right tool?</h2>
 <ul>
 <li>Cross-validation asks the right question: how well does this model predict data it has never seen?</li>
-<li>But it can only compare the models you wrote down \u2014 and every one of them is a straight-line combination of the terms you chose.</li>
+<li>But it can only compare the models you wrote down — and every one of them is a straight-line combination of the terms you chose.</li>
 <li>Ecological responses are often nonlinear, full of thresholds, and full of interactions we would never think to write down.</li>
 <li>When prediction is the goal, there are tools built for that job. You should know they exist.</li>
 </ul>
@@ -605,10 +587,9 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <p>One way to avoid some of the problems associated with model selection is to “just say no” to data-driven model selection—in other words, ﬁt a single pre-speciﬁed model, one in which all explanatory variables are chosen prior to looking at their relationship with the response variable, and then use this model for inference (Harrell 2001, Babyak 2004, Whittingham et al. 2006, Guidice et al. 2012).</p>
 </section>
 <section aria-labelledby="slide-49-h">
-<h2 id="slide-49-h"><span id="slide-49"></span>Slide 49</h2>
+<h2 id="slide-49-h"><span id="slide-49"></span>Slide 49: Don’t take my word for it…</h2>
 <p>“If researchers want to accurately estimate the strength of multiple competing ecological processes along with reliable confidence intervals, their best hope is to use full (maximal) statistical models after making principled, a priori decisions about which predictors to include. “</p>
 <figure role="group"><figcaption><strong>Figure 49.1.</strong> Multi-panel plot of relative probability of selection versus canopy cover, distance to road, distance to water, and ruggedness, one row per species, with fitted curves and shaded confidence bands.</figcaption></figure>
-<p>Don’t take my word for it…</p>
 <p>Left as a preprint for years until Bolker finally submitted it to a journal after we chatted about this problem</p>
 </section>
 <section aria-labelledby="slide-50-h">

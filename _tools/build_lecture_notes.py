@@ -12,6 +12,7 @@ Run after build_accessible_pptx.py.
 import os, re, html as H
 from pptx import Presentation
 from pptx.oxml.ns import qn
+from pptx.enum.shapes import PP_PLACEHOLDER
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ACC = os.path.join(ROOT, "accessible")
@@ -70,9 +71,28 @@ def extract(slide):
     if slide.shapes.title is not None and slide.shapes.title.has_text_frame:
         t = slide.shapes.title.text_frame.text.strip()
         if t: title = t
+    # Fallback: several decks put the visible title in a plain text box instead of the
+    # title placeholder (or leave the placeholder holding only a vertical-tab), which
+    # otherwise renders the slide as a bare "Slide N" with no heading. Promote the first
+    # short text shape and skip it below so it is not repeated in the body.
+    title_shape = slide.shapes.title
+    if not title:
+        for shape in slide.shapes:
+            if shape == slide.shapes.title or not shape.has_text_frame: continue
+            # skip slide-number / footer placeholders and bare numerals
+            try:
+                if shape.is_placeholder and shape.placeholder_format.type in (
+                        PP_PLACEHOLDER.SLIDE_NUMBER, PP_PLACEHOLDER.FOOTER,
+                        PP_PLACEHOLDER.DATE): continue
+            except Exception: pass
+            t = shape.text_frame.text.replace("\x0b", " ").strip()
+            if re.fullmatch(r"[\d\W_]+", t or "x"): continue
+            if t and len(t) <= 120 and len(t.split()) <= 18:
+                title = " ".join(t.split()); title_shape = shape
+                break
     blocks = []; pics = 0
     for shape in slide.shapes:
-        if shape == slide.shapes.title: continue
+        if shape == slide.shapes.title or shape == title_shape: continue
         if shape.shape_type == 13:
             pics += 1; blocks.append({"type": "figure", "n": pics, "alt": alt_of(shape)})
         elif shape.has_table:

@@ -20,67 +20,67 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <p class="brand"><a href="../index.html">FW 536 · Day 4 Afternoon</a></p>
 <div class="subtitle">Lecture notes: Bayesian statistics I</div>
 <nav aria-label="Slides in this lecture"><div class="section">Slides</div><ul>
-<li><a href="#slide-1">1. Slide 1</a></li>
-<li><a href="#slide-2">2. Slide 2</a></li>
-<li><a href="#slide-3">3. Slide 3</a></li>
-<li><a href="#slide-4">4. Slide 4</a></li>
-<li><a href="#slide-5">5. Slide 5</a></li>
-<li><a href="#slide-6">6. Slide 6</a></li>
-<li><a href="#slide-7">7. Slide 7</a></li>
-<li><a href="#slide-8">8. Slide 8</a></li>
-<li><a href="#slide-9">9. Slide 9</a></li>
-<li><a href="#slide-10">10. Slide 10</a></li>
-<li><a href="#slide-11">11. Slide 11</a></li>
-<li><a href="#slide-12">12. Slide 12</a></li>
-<li><a href="#slide-13">13. Slide 13</a></li>
-<li><a href="#slide-14">14. Slide 14</a></li>
-<li><a href="#slide-15">15. Slide 15</a></li>
-<li><a href="#slide-16">16. Slide 16</a></li>
-<li><a href="#slide-17">17. Slide 17</a></li>
-<li><a href="#slide-18">18. Slide 18</a></li>
-<li><a href="#slide-19">19. Slide 19</a></li>
+<li><a href="#slide-1">1. Introduction to Bayesian Analysis</a></li>
+<li><a href="#slide-2">2. Frequentist and Bayesian inference</a></li>
+<li><a href="#slide-3">3. Remember Bayes Rule?</a></li>
+<li><a href="#slide-4">4. [c | + ] =</a></li>
+<li><a href="#slide-5">5. We had complete information about medical testing probabilities</a></li>
+<li><a href="#slide-6">6. [θ | y] =</a></li>
+<li><a href="#slide-7">7. Integrating B out of the joint distribution</a></li>
+<li><a href="#slide-8">8. [θ | y] =</a></li>
+<li><a href="#slide-9">9. P(X, Y) or [X,Y]</a></li>
+<li><a href="#slide-10">10. E.g. Number of chocolate chips observed in cookies</a></li>
+<li><a href="#slide-11">11. E.g. Number of chocolate chips observed in cookies</a></li>
+<li><a href="#slide-12">12. [y| θ] “likelihood”</a></li>
+<li><a href="#slide-13">13. How would we scale this so that it integrates to 1 and becomes a “real distribution”?</a></li>
+<li><a href="#slide-14">14. The integral is 0.077. So lets divide every number on the y-axis by 0.077</a></li>
+<li><a href="#slide-15">15. &gt; fun1&lt;-function(x){dbinom(5,12,x)} &gt; integrate(fun1,0,1) 0.07692308 with absolute error &lt; 8.5e-16</a></li>
+<li><a href="#slide-16">16. The Bayesian inferential paradigm requires subjective prior beliefs!</a></li>
+<li><a href="#slide-17">17. The integral of this thing is 0.092308</a></li>
+<li><a href="#slide-18">18. The integral of this thing is 0.010036</a></li>
+<li><a href="#slide-19">19. Think about what we just did</a></li>
 <li><a href="#slide-20">20. Slide 20</a></li>
 <li><a href="#slide-21">21. Slide 21</a></li>
 <li><a href="#slide-22">22. Slide 22</a></li>
-<li><a href="#slide-23">23. Slide 23</a></li>
+<li><a href="#slide-23">23. If we transform this into many conditional distributions, then we can sample from it</a></li>
 <li><a href="#slide-24">24. Slide 24</a></li>
 <li><a href="#slide-25">25. Slide 25</a></li>
-<li><a href="#slide-26">26. Slide 26</a></li>
-<li><a href="#slide-27">27. Slide 27</a></li>
-<li><a href="#slide-28">28. Slide 28</a></li>
-<li><a href="#slide-29">29. Slide 29</a></li>
-<li><a href="#slide-30">30. Slide 30</a></li>
-<li><a href="#slide-31">31. Slide 31</a></li>
+<li><a href="#slide-26">26. But let’s start simpler! Back to coin flip problem</a></li>
+<li><a href="#slide-27">27. The integral of this thing is 0.010036</a></li>
+<li><a href="#slide-28">28. Funny thing is that the beta distribution is the “conjugate prior” to the binomial distribution.</a></li>
+<li><a href="#slide-29">29. Mean of the NEW Beta distribution is</a></li>
+<li><a href="#slide-30">30. Beta-Binomial Walkthrough</a></li>
+<li><a href="#slide-31">31. To reiterate: Conjugacy</a></li>
 <li><a href="#slide-32">32. Slide 32</a></li>
 <li><a href="#slide-33">33. Slide 33</a></li>
 <li><a href="#slide-34">34. Slide 34</a></li>
-<li><a href="#slide-35">35. Slide 35</a></li>
-<li><a href="#slide-36">36. Slide 36</a></li>
+<li><a href="#slide-35">35. Conjugacy relationships</a></li>
+<li><a href="#slide-36">36. Unfortunately…</a></li>
 <li><a href="#slide-37">37. Slide 37</a></li>
-<li><a href="#slide-38">38. Slide 38</a></li>
-<li><a href="#slide-39">39. Slide 39</a></li>
-<li><a href="#slide-40">40. Slide 40</a></li>
-<li><a href="#slide-41">41. Slide 41</a></li>
-<li><a href="#slide-42">42. Slide 42</a></li>
-<li><a href="#slide-43">43. Slide 43</a></li>
-<li><a href="#slide-44">44. Slide 44</a></li>
-<li><a href="#slide-45">45. Slide 45</a></li>
+<li><a href="#slide-38">38. Markov chain Monte Carlo (MCMC)</a></li>
+<li><a href="#slide-39">39. We’re going to sample from the numerator</a></li>
+<li><a href="#slide-40">40. For example</a></li>
+<li><a href="#slide-41">41. Time series of an MCMC</a></li>
+<li><a href="#slide-42">42. Time series of an MCMC</a></li>
+<li><a href="#slide-43">43. Time series of 3 MCMCs</a></li>
+<li><a href="#slide-44">44. count</a></li>
+<li><a href="#slide-45">45. https://mbjoseph.github.io/posts/2018-12-25-animating-the-metropolis-algorithm/</a></li>
 <li><a href="#slide-46">46. Slide 46</a></li>
-<li><a href="#slide-47">47. Slide 47</a></li>
-<li><a href="#slide-48">48. Slide 48</a></li>
-<li><a href="#slide-49">49. Slide 49</a></li>
-<li><a href="#slide-50">50. Slide 50</a></li>
-<li><a href="#slide-51">51. Slide 51</a></li>
-<li><a href="#slide-52">52. Slide 52</a></li>
-<li><a href="#slide-53">53. Slide 53</a></li>
-<li><a href="#slide-54">54. Slide 54</a></li>
-<li><a href="#slide-55">55. Slide 55</a></li>
-<li><a href="#slide-56">56. Slide 56</a></li>
-<li><a href="#slide-57">57. Slide 57</a></li>
-<li><a href="#slide-58">58. Slide 58</a></li>
-<li><a href="#slide-59">59. Slide 59</a></li>
-<li><a href="#slide-60">60. Slide 60</a></li>
-<li><a href="#slide-61">61. Slide 61</a></li>
+<li><a href="#slide-47">47. https://chi-feng.github.io/mcmc-demo/</a></li>
+<li><a href="#slide-48">48. BUGS, JAGS, Nimble, STAN, and INLA oh my!</a></li>
+<li><a href="#slide-49">49. MSY = rK/4</a></li>
+<li><a href="#slide-50">50. JAGS PRIMER estimating parameters in logistic population growth From Hobbs and Che-Castaldo’s SESYNC course</a></li>
+<li><a href="#slide-51">51. reg=lm(GrowthRate~PopulationSize,data=Logistic)</a></li>
+<li><a href="#slide-52">52. JAGS PRIMER estimating parameters in logistic population growth</a></li>
+<li><a href="#slide-53">53. “Bayesian Network” or ”Directed Acyclic Graph”</a></li>
+<li><a href="#slide-54">54. JAGS PRIMER estimating parameters in logistic population growth</a></li>
+<li><a href="#slide-55">55. Some other priors</a></li>
+<li><a href="#slide-56">56. JAGS PRIMER estimating parameters in logistic population growth</a></li>
+<li><a href="#slide-57">57. JAGS PRIMER</a></li>
+<li><a href="#slide-58">58. JAGS PRIMER – slightly different approaches for rjags, jagsUI, and R2jags packages</a></li>
+<li><a href="#slide-59">59. JAGS PRIMER</a></li>
+<li><a href="#slide-60">60. Nimble PRIMER</a></li>
+<li><a href="#slide-61">61. Logistic Growth in Nimble. Visualize and interpret the output</a></li>
 </ul></nav></aside>
 <main class="content" id="main-content" tabindex="-1">
 <header class="lab-header">
@@ -90,14 +90,13 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 </header>
 <div class="callout key"><p class="callout-label">About these notes</p>Each section is one slide. Figures carry text descriptions where available. For the concepts with worked examples, also read the <a href="plain_language_summary.html">plain-language summary</a> and <a href="lab.html">lab</a> for this session.</div>
 <section aria-labelledby="slide-1-h">
-<h2 id="slide-1-h"><span id="slide-1"></span>Slide 1</h2>
-<p>Introduction to Bayesian Analysis</p>
+<h2 id="slide-1-h"><span id="slide-1"></span>Slide 1: Introduction to Bayesian Analysis</h2>
 <figure role="group"><figcaption><strong>Figure 1.1.</strong> 3D surface plot of a bivariate normal probability density over axes x1 and x2, a bell-shaped peak rising to about 0.15, with a semi-transparent horizontal reference plane cutting through it.</figcaption></figure>
 <p>Many slides adapted from Matt Falcy ODFW, and SESYNC course by Chris Che-Castaldo, Mary B. Collins, N. Thompson Hobbs (with permission)</p>
 <figure role="group"><figcaption><strong>Figure 1.2.</strong> Portrait of Thomas Bayes over a blue background with the handwritten formula P(A|B) = P(B|A) P(A) / P(B).</figcaption></figure>
 </section>
 <section aria-labelledby="slide-2-h">
-<h2 id="slide-2-h"><span id="slide-2"></span>Slide 2</h2>
+<h2 id="slide-2-h"><span id="slide-2"></span>Slide 2: Frequentist and Bayesian inference</h2>
 <ul>
 <li>“Frequentist” or classical inference</li>
 <li>Probability is a long-run relative frequency.</li>
@@ -111,19 +110,16 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li>Parameters are unknown, therefore treated as random variables</li>
 <li>Rules of probability used to revise “prior” beliefs in light of data.</li>
 </ul>
-<p>Frequentist and Bayesian inference</p>
 </section>
 <section aria-labelledby="slide-3-h">
-<h2 id="slide-3-h"><span id="slide-3"></span>Slide 3</h2>
+<h2 id="slide-3-h"><span id="slide-3"></span>Slide 3: Remember Bayes Rule?</h2>
 <figure role="group"><figcaption><strong>Figure 3.1.</strong> Portrait of Thomas Bayes over a blue background with the handwritten formula P(A|B) = P(B|A) P(A) / P(B).</figcaption></figure>
-<p>Remember Bayes Rule?</p>
 <p>We derived this from simple rules of conditional probability</p>
 <p>P(A,B) = P(A|B)P(B)</p>
 </section>
 <section aria-labelledby="slide-4-h">
-<h2 id="slide-4-h"><span id="slide-4"></span>Slide 4</h2>
+<h2 id="slide-4-h"><span id="slide-4"></span>Slide 4: [c | + ] =</h2>
 <p>1% of women at age forty who participate in routine screening have breast cancer.  80% of women with breast cancer will get positive mammographies.  9.6% of women without breast cancer will also get positive mammographies.  A woman in this age group had a positive mammography in a routine screening.  What is the probability that she actually has breast cancer?</p>
-<p>[c | + ] =</p>
 <p>[ +|c ] * [c]</p>
 <p>[ + ]</p>
 <p>[+ |c ] * [c]</p>
@@ -135,13 +131,11 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <p>95 out of 100 doctors put it at 0.70 to 0.80 (Eddy 1982, with replicated results)!!</p>
 </section>
 <section aria-labelledby="slide-5-h">
-<h2 id="slide-5-h"><span id="slide-5"></span>Slide 5</h2>
-<p>We had complete information about medical testing probabilities</p>
+<h2 id="slide-5-h"><span id="slide-5"></span>Slide 5: We had complete information about medical testing probabilities</h2>
 <p>In almost all practical scenarios, we will just have data, y, and then want to make inference about parameters, θ.</p>
 </section>
 <section aria-labelledby="slide-6-h">
-<h2 id="slide-6-h"><span id="slide-6"></span>Slide 6</h2>
-<p>[θ | y] =</p>
+<h2 id="slide-6-h"><span id="slide-6"></span>Slide 6: [θ | y] =</h2>
 <p>[y | θ] [θ]</p>
 <p>[y]</p>
 <p>What is the marginal probability of the data?</p>
@@ -151,13 +145,11 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <p>Posterior</p>
 </section>
 <section aria-labelledby="slide-7-h">
-<h2 id="slide-7-h"><span id="slide-7"></span>Slide 7</h2>
+<h2 id="slide-7-h"><span id="slide-7"></span>Slide 7: Integrating B out of the joint distribution</h2>
 <figure role="group"><figcaption><strong>Figure 7.1.</strong> Slide &#x27;What is [y]?&#x27; showing a Venn-style diagram partitioning a region into events B1, B2, B3 overlapping event A, illustrating the law of total probability: [A] = sum over i of [A|Bi][Bi], and the continuous form as an integral.</figcaption></figure>
-<p>Integrating B out of the joint distribution</p>
 </section>
 <section aria-labelledby="slide-8-h">
-<h2 id="slide-8-h"><span id="slide-8"></span>Slide 8</h2>
-<p>[θ | y] =</p>
+<h2 id="slide-8-h"><span id="slide-8"></span>Slide 8: [θ | y] =</h2>
 <p>[y | θ] [θ]</p>
 <p>[y]</p>
 <p>What is the marginal probability of the data?</p>
@@ -172,10 +164,9 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <p>We call this a normalizing constant</p>
 </section>
 <section aria-labelledby="slide-9-h">
-<h2 id="slide-9-h"><span id="slide-9"></span>Slide 9</h2>
+<h2 id="slide-9-h"><span id="slide-9"></span>Slide 9: P(X, Y) or [X,Y]</h2>
 <figure role="group"><figcaption><strong>Figure 9.1.</strong> Slide titled &#x27;Joint Distribution of Continuous Random Variables&#x27; showing a 3D surface of a multivariate normal density, a bell-shaped peak over two axes X and Y.</figcaption></figure>
 <figure role="group"><figcaption><strong>Figure 9.2.</strong> Slide &#x27;Marginal Distribution of Continuous Random Variables&#x27;: a scatter of a bivariate cloud with its two marginal densities, p(X) and p(Y), plotted along the top and right margins as histograms/curves.</figcaption></figure>
-<p>P(X, Y) or [X,Y]</p>
 <p>P(X) or [X], and P(Y) or [Y]</p>
 <ul>
 <li>Sum or integrate over all values of the random variable you DON’T care about</li>
@@ -183,16 +174,14 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 </ul>
 </section>
 <section aria-labelledby="slide-10-h">
-<h2 id="slide-10-h"><span id="slide-10"></span>Slide 10</h2>
+<h2 id="slide-10-h"><span id="slide-10"></span>Slide 10: E.g. Number of chocolate chips observed in cookies</h2>
 <figure role="group"><figcaption><strong>Figure 10.1.</strong> Slide &#x27;[y] is critical to Bayes&#x27; with Poisson likelihood and gamma-prior posterior formulas, plus two small curves: Likelihood versus theta (peak near 9) and Posterior versus theta (peak near 9).</figcaption></figure>
-<p>E.g. Number of chocolate chips observed in cookies</p>
 <p>For simple problem, can use numerical integration (what would we integrate)</p>
 <figure role="group"><figcaption><strong>Figure 10.2.</strong> R plot of a gamma(0.0001, 0.0001) prior density versus x from 0 to 20; the curve is extremely high near x=0 and drops steeply toward zero, showing a vague prior.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-11-h">
-<h2 id="slide-11-h"><span id="slide-11"></span>Slide 11</h2>
+<h2 id="slide-11-h"><span id="slide-11"></span>Slide 11: E.g. Number of chocolate chips observed in cookies</h2>
 <figure role="group"><figcaption><strong>Figure 11.1.</strong> Slide &#x27;[y] is critical to Bayes&#x27; with Poisson likelihood and gamma-prior posterior formulas, plus small Likelihood and Posterior curves versus theta, both peaking near theta = 9.</figcaption></figure>
-<p>E.g. Number of chocolate chips observed in cookies</p>
 <p>For simple problem, can use numerical integration (what would we integrate)</p>
 <figure role="group"><figcaption><strong>Figure 11.2.</strong> R plot of a gamma(0.0001, 0.0001) prior density versus x from 0 to 20; density is very high near zero then drops sharply, illustrating a vague prior.</figcaption></figure>
 <ul>
@@ -207,8 +196,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 </ul>
 </section>
 <section aria-labelledby="slide-12-h">
-<h2 id="slide-12-h"><span id="slide-12"></span>Slide 12</h2>
-<p>[y| θ] “likelihood”</p>
+<h2 id="slide-12-h"><span id="slide-12"></span>Slide 12: [y| θ] “likelihood”</h2>
 <figure role="group"><figcaption><strong>Figure 12.1.</strong> Likelihood curve versus p from 0 to 1 (blue), a bell shape peaking at about 0.23 near p = 0.42, for 5 heads out of 12 flips.</figcaption></figure>
 <ul>
 <li>Data: We get 5 heads out of 12 flips. Binomial process. Make inference on p.</li>
@@ -223,31 +211,21 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <p>Binomial Example</p>
 </section>
 <section aria-labelledby="slide-13-h">
-<h2 id="slide-13-h"><span id="slide-13"></span>Slide 13</h2>
+<h2 id="slide-13-h"><span id="slide-13"></span>Slide 13: How would we scale this so that it integrates to 1 and becomes a “real distribution”?</h2>
 <figure role="group"><figcaption><strong>Figure 13.1.</strong> Curve of the product [y|theta][theta] versus p (orange), a bell shape peaking at about 0.23 near p = 0.42; the unnormalized prior times likelihood.</figcaption></figure>
-<p>How would we scale this so that it integrates to 1 and becomes a “real distribution”?</p>
 <p>[y|θ][θ] Still doesn’t integrate to 1</p>
 </section>
 <section aria-labelledby="slide-14-h">
-<h2 id="slide-14-h"><span id="slide-14"></span>Slide 14</h2>
+<h2 id="slide-14-h"><span id="slide-14"></span>Slide 14: The integral is 0.077. So lets divide every number on the y-axis by 0.077</h2>
 <figure role="group"><figcaption><strong>Figure 14.1.</strong> Curve of the product [y|theta][theta] versus p (orange), peaking at about 0.23 near p = 0.42, before normalizing to a distribution.</figcaption></figure>
-<ul>
-<li>The integral is 0.077.</li>
-<li>So lets divide every number on the y-axis by 0.077</li>
-</ul>
 <ul>
 <li>Divide [y|θ][θ] by the are under it’s curve ([y])</li>
 <li>AKA “integral”</li>
 </ul>
 </section>
 <section aria-labelledby="slide-15-h">
-<h2 id="slide-15-h"><span id="slide-15"></span>Slide 15</h2>
+<h2 id="slide-15-h"><span id="slide-15"></span>Slide 15: &gt; fun1&lt;-function(x){dbinom(5,12,x)} &gt; integrate(fun1,0,1) 0.07692308 with absolute error &lt; 8.5e-16</h2>
 <figure role="group"><figcaption><strong>Figure 15.1.</strong> Posterior curve versus p (orange), a bell shape peaking near 3.0 at about p = 0.42, now integrating to 1; note the rescaled y-axis.</figcaption></figure>
-<ul>
-<li>&gt; fun1&lt;-function(x){dbinom(5,12,x)}</li>
-<li>&gt; integrate(fun1,0,1)</li>
-<li>0.07692308 with absolute error &lt; 8.5e-16</li>
-</ul>
 <ul>
 <li>&gt; fun2&lt;-function(x){dbinom(5,12,x)*dbeta(x,1,1)/0.07692308}</li>
 <li>&gt; integrate(fun2,0,1)</li>
@@ -260,16 +238,14 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 </ul>
 </section>
 <section aria-labelledby="slide-16-h">
-<h2 id="slide-16-h"><span id="slide-16"></span>Slide 16</h2>
+<h2 id="slide-16-h"><span id="slide-16"></span>Slide 16: The Bayesian inferential paradigm requires subjective prior beliefs!</h2>
 <figure role="group"><figcaption><strong>Figure 16.1.</strong> Vintage black-and-white photo of one young girl whispering into the ear of another, who looks surprised.</figcaption></figure>
-<p>The Bayesian inferential paradigm requires subjective prior beliefs!</p>
 </section>
 <section aria-labelledby="slide-17-h">
-<h2 id="slide-17-h"><span id="slide-17"></span>Slide 17</h2>
+<h2 id="slide-17-h"><span id="slide-17"></span>Slide 17: The integral of this thing is 0.092308</h2>
 <figure role="group"><figcaption><strong>Figure 17.1.</strong> Posterior curve versus p (red), a bell peaking near 3.0 around p = 0.42 (vague Beta(1,1) prior case).</figcaption></figure>
 <figure role="group"><figcaption><strong>Figure 17.2.</strong> Two posteriors versus p: magenta curve peaking near 3.9 around p = 0.47 and a low cyan curve, comparing informative Beta(3,2) versus vague priors.</figcaption></figure>
 <figure role="group"><figcaption><strong>Figure 17.3.</strong> Curve versus p (blue) with legend Likelihood; a low bell peaking near 0.24 at p = 0.42, shown against the Beta(3,2) prior on the companion plot.</figcaption></figure>
-<p>The integral of this thing is 0.092308</p>
 <p>The integral of this thing is 1</p>
 <p>We have 5 heads out of 12 flips – 5/12 = 0.417.  Now let’s use an informative prior, Beta(3,2).</p>
 <p>Why is posterior mean larger than 0.417?</p>
@@ -278,11 +254,10 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <p>var[X] = αβ / ((α + β)² (α + β + 1))</p>
 </section>
 <section aria-labelledby="slide-18-h">
-<h2 id="slide-18-h"><span id="slide-18"></span>Slide 18</h2>
+<h2 id="slide-18-h"><span id="slide-18"></span>Slide 18: The integral of this thing is 0.010036</h2>
 <figure role="group"><figcaption><strong>Figure 18.1.</strong> Posterior curve versus p (magenta), a tall narrow bell peaking near 11 around p = 0.42, from 50 heads out of 120 flips; a low cyan curve lies near zero.</figcaption></figure>
 <figure role="group"><figcaption><strong>Figure 18.2.</strong> Product [y|theta][theta] curve versus p (cyan), a narrow bell peaking near 0.09 around p = 0.42, for 50 out of 120 flips (much lower than for 5 of 12).</figcaption></figure>
 <p>Instead of 5 heads out of 12 flips, lets see what happens with 50 heads out of 120 flips (50/120 = 0.417)</p>
-<p>The integral of this thing is 0.010036</p>
 <p>The integral of this thing is 1</p>
 <figure role="group"><figcaption><strong>Figure 18.3.</strong> Plot versus p with legend: Likelihood (blue, nearly flat near zero) and Prior Beta(3,2) (red), a skewed bell peaking near 1.8 around p = 0.67.</figcaption></figure>
 <ul>
@@ -294,8 +269,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <p>Much closer to data mean than posterior mean now</p>
 </section>
 <section aria-labelledby="slide-19-h">
-<h2 id="slide-19-h"><span id="slide-19"></span>Slide 19</h2>
-<p>Think about what we just did</p>
+<h2 id="slide-19-h"><span id="slide-19"></span>Slide 19: Think about what we just did</h2>
 <ul>
 <li>We multiplied the prior and likelihood</li>
 <li>Each value was divided by the integral of the prior*likelihood, to “normalize” or scale so that it integrates to 1 (thereby satisfying a definition of probability).</li>
@@ -319,9 +293,8 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <figure role="group"><figcaption><strong>Figure 22.1.</strong> Slide &#x27;So what?&#x27; with equation 15 for [theta|y] and a plot over theta from -6 to 6 of the prior PDF (green), observed likelihood (red), and their product/numerator (dashed blue); prior peaks left of the likelihood.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-23-h">
-<h2 id="slide-23-h"><span id="slide-23"></span>Slide 23</h2>
+<h2 id="slide-23-h"><span id="slide-23"></span>Slide 23: If we transform this into many conditional distributions, then we can sample from it</h2>
 <figure role="group"><figcaption><strong>Figure 23.1.</strong> Slide &#x27;So what?&#x27; with equation 17 (posterior = likelihood times prior over normalization) and a plot of prior PDF (green), likelihood (red), and posterior (blue) versus theta; the posterior sits between prior and likelihood.</figcaption></figure>
-<p>If we transform this into many conditional distributions, then we can sample from it</p>
 </section>
 <section aria-labelledby="slide-24-h">
 <h2 id="slide-24-h"><span id="slide-24"></span>Slide 24</h2>
@@ -338,18 +311,14 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <figure role="group"><figcaption><strong>Figure 25.1.</strong> Directed acyclic graph (DAG) of a hybrid gSMR + SCR model: parameter boxes and photos (trap, camera, GPS collar, tracks) connect by solid and dashed arrows to detection-data ovals for marking, genetics, resight, and telemetry.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-26-h">
-<h2 id="slide-26-h"><span id="slide-26"></span>Slide 26</h2>
-<ul>
-<li>But let’s start simpler!</li>
-<li>Back to coin flip problem</li>
-</ul>
+<h2 id="slide-26-h"><span id="slide-26"></span>Slide 26: But let’s start simpler! Back to coin flip problem</h2>
+<p><em>(No text on this slide.)</em></p>
 </section>
 <section aria-labelledby="slide-27-h">
-<h2 id="slide-27-h"><span id="slide-27"></span>Slide 27</h2>
+<h2 id="slide-27-h"><span id="slide-27"></span>Slide 27: The integral of this thing is 0.010036</h2>
 <figure role="group"><figcaption><strong>Figure 27.1.</strong> Posterior curve versus p (magenta), a tall narrow bell peaking near 11 around p = 0.42, from 50 heads out of 120 flips.</figcaption></figure>
 <figure role="group"><figcaption><strong>Figure 27.2.</strong> Product [y|theta][theta] curve versus p (cyan), a narrow bell peaking near 0.09 around p = 0.42, for 50 out of 120 flips.</figcaption></figure>
 <p>Instead of 5 heads out of 12 flips, lets see what happens with 50 heads out of 120 flips.</p>
-<p>The integral of this thing is 0.010036</p>
 <p>The integral of this thing is 1</p>
 <figure role="group"><figcaption><strong>Figure 27.3.</strong> Plot versus p with legend: Likelihood (blue, near zero) and Prior Beta(3,2) (red), a skewed bell peaking near 1.8 around p = 0.67.</figcaption></figure>
 <ul>
@@ -361,15 +330,13 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <p>Much closer to data mean than posterior mean now</p>
 </section>
 <section aria-labelledby="slide-28-h">
-<h2 id="slide-28-h"><span id="slide-28"></span>Slide 28</h2>
-<p>Funny thing is that the beta distribution is the “conjugate prior” to the binomial distribution.</p>
+<h2 id="slide-28-h"><span id="slide-28"></span>Slide 28: Funny thing is that the beta distribution is the “conjugate prior” to the binomial distribution.</h2>
 <figure role="group"><figcaption><strong>Figure 28.1.</strong> Laughing cartoon smiley-face emoji pointing outward.</figcaption></figure>
 <p>Note: 3 and 2 come from the beta prior</p>
 <p>“conjugate priors” have the special property that the posterior follows the same distribution as the prior. This gives us a ‘closed-form’ solution for the posterior</p>
 </section>
 <section aria-labelledby="slide-29-h">
-<h2 id="slide-29-h"><span id="slide-29"></span>Slide 29</h2>
-<p>Mean of the NEW Beta distribution is</p>
+<h2 id="slide-29-h"><span id="slide-29"></span>Slide 29: Mean of the NEW Beta distribution is</h2>
 <p>The new Beta distribution for the posterior of p</p>
 <ul>
 <li>Now we can see precisely how much information the prior adds!</li>
@@ -383,13 +350,12 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <p>αnew / (αnew + βnew)  =  (y + α) / (α + β + n)</p>
 </section>
 <section aria-labelledby="slide-30-h">
-<h2 id="slide-30-h"><span id="slide-30"></span>Slide 30</h2>
-<p>Beta-Binomial Walkthrough</p>
+<h2 id="slide-30-h"><span id="slide-30"></span>Slide 30: Beta-Binomial Walkthrough</h2>
+<p><em>(No text on this slide.)</em></p>
 </section>
 <section aria-labelledby="slide-31-h">
-<h2 id="slide-31-h"><span id="slide-31"></span>Slide 31</h2>
-<figure role="group"><figcaption><strong>Figure 31.1.</strong> Slide &#x27;The components of Bayes theorem&#x27; showing equation 12: posterior equals likelihood times prior over the marginal (integral of likelihood times prior over theta).</figcaption></figure>
-<p>To reiterate: Conjugacy</p>
+<h2 id="slide-31-h"><span id="slide-31"></span>Slide 31: To reiterate: Conjugacy</h2>
+<figure role="group"><figcaption><strong>Figure 31.1.</strong> Slide “Conjugacy”: in special cases the posterior [theta | y] has the same distributional form as the prior [theta] — for example a gamma(alpha, beta) prior gives a gamma(alpha_new, beta_new) posterior. In these cases the prior and posterior are said to be conjugate. (Che-Castaldo, Collins &amp; Hobbs, More About Priors I.)</figcaption></figure>
 <ul>
 <li>“The beta is the conjugate prior for the binomial distribution”</li>
 <li>“The gamma is the conjugate prior for the Poisson distribution”</li>
@@ -407,16 +373,15 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 </section>
 <section aria-labelledby="slide-34-h">
 <h2 id="slide-34-h"><span id="slide-34"></span>Slide 34</h2>
-<figure role="group"><figcaption><strong>Figure 34.1.</strong> Slide &#x27;So what?&#x27; with equation 18 factoring a complex joint distribution into conditional distributions, plus a components-of-Bayes-theorem diagram.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 34.1.</strong> Slide “Conjugacy is important for two reasons”: 1. conjugacy minimises computational work and, in more complicated cases, lets us break calculations into manageable chunks; 2. conjugacy plays an important role in Markov chain Monte Carlo. (Che-Castaldo, Collins &amp; Hobbs, More About Priors I.)</figcaption></figure>
 </section>
 <section aria-labelledby="slide-35-h">
-<h2 id="slide-35-h"><span id="slide-35"></span>Slide 35</h2>
+<h2 id="slide-35-h"><span id="slide-35"></span>Slide 35: Conjugacy relationships</h2>
 <figure role="group"><figcaption><strong>Figure 35.1.</strong> Conjugacy relationships diagram: arrows from Geometric, Negative Binomial, Binomial, and Bernoulli into Beta (labeled p); and from Exponential, Lognormal, Poisson, Normal into Gamma (labeled lambda, tau, mu).</figcaption></figure>
-<p>Conjugacy relationships</p>
 <p>Note this is the “precision” or inverse of the variance</p>
 </section>
 <section aria-labelledby="slide-36-h">
-<h2 id="slide-36-h"><span id="slide-36"></span>Slide 36</h2>
+<h2 id="slide-36-h"><span id="slide-36"></span>Slide 36: Unfortunately…</h2>
 <ul>
 <li>The elegance of conjugate priors is not available except for simple models.</li>
 <li>Symbolic calculus usually not possible when extended into multiple dimensions (models with many parameters) and more complex probability distributions.</li>
@@ -426,7 +391,6 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li style="margin-left:1.2em">https://en.wikipedia.org/wiki/Numerical_integration</li>
 </ul>
 <figure role="group"><figcaption><strong>Figure 36.1.</strong> Sad-face emoji with downturned mouth and teary blue eyes.</figcaption></figure>
-<p>Unfortunately…</p>
 <ul>
 <li>&gt; fun1&lt;-function(x){dbinom(5,12,x)}</li>
 <li>&gt; integrate(fun1,0,1)</li>
@@ -442,19 +406,17 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 </ul>
 </section>
 <section aria-labelledby="slide-38-h">
-<h2 id="slide-38-h"><span id="slide-38"></span>Slide 38</h2>
+<h2 id="slide-38-h"><span id="slide-38"></span>Slide 38: Markov chain Monte Carlo (MCMC)</h2>
 <figure role="group"><figcaption><strong>Figure 38.1.</strong> Photograph of Monte Carlo, Monaco: a hillside city on a Mediterranean coastline.</figcaption></figure>
 <figure role="group"><figcaption><strong>Figure 38.2.</strong> Historical black-and-white portrait of mathematician Andrey Markov.</figcaption></figure>
 <figure role="group"><figcaption><strong>Figure 38.3.</strong> Photograph of a metal chain of linked steel loops, a visual pun on &#x27;Markov chain&#x27;.</figcaption></figure>
-<p>Markov chain Monte Carlo (MCMC)</p>
 <p>Then comes WWII and some mathematical physicists at Los Alamos needed to evaluate high dimensional integrals.</p>
 <p>Note:  like Newton’s invention of calculus to study gravity/orbits</p>
 <p>“Markov” means dependence only on the previous sample</p>
 <p>“Monte Carlo” means estimation of properties of a distribution by random sampling from the distribution. Apparently named for the Grand Casino in Monte Carlo</p>
 </section>
 <section aria-labelledby="slide-39-h">
-<h2 id="slide-39-h"><span id="slide-39"></span>Slide 39</h2>
-<p>We’re going to sample from the numerator</p>
+<h2 id="slide-39-h"><span id="slide-39"></span>Slide 39: We’re going to sample from the numerator</h2>
 <figure role="group"><figcaption><strong>Figure 39.1.</strong> Product/numerator curve [y|theta][theta] versus p from 0 to 1 (cyan), a bell shape peaking near 0.30 at about p = 0.47; the unnormalized posterior we sample from.</figcaption></figure>
 <p>Pick values of p. Keep them in the chain at a rate proportional to the relative value on the y-axis.</p>
 <p>The Metropolis Algorithm</p>
@@ -466,8 +428,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <p>We say: ”The posterior is proportional to the likelihood times the prior”</p>
 </section>
 <section aria-labelledby="slide-40-h">
-<h2 id="slide-40-h"><span id="slide-40"></span>Slide 40</h2>
-<p>For example</p>
+<h2 id="slide-40-h"><span id="slide-40"></span>Slide 40: For example</h2>
 <p>The symmetry requirement can be problematic if θ is constrained (e.g. standard deviations and proportions must be positive).</p>
 <p>If this is too big, then you propose lots of values that don’t get accepted, which is inefficient. If too small there is too much autocorrelation and it takes forever to sample the full posterior</p>
 <p>The Metropolis Algorithm</p>
@@ -482,41 +443,33 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 </ul>
 </section>
 <section aria-labelledby="slide-41-h">
-<h2 id="slide-41-h"><span id="slide-41"></span>Slide 41</h2>
+<h2 id="slide-41-h"><span id="slide-41"></span>Slide 41: Time series of an MCMC</h2>
 <figure role="group"><figcaption><strong>Figure 41.1.</strong> Scatter plot of MCMC draws, sig.K versus mu.K for 100 iterations; early points trace a path from the corner then cluster around mu near 9.7 and sigma near 0.8.</figcaption></figure>
-<p>Time series of an MCMC</p>
 </section>
 <section aria-labelledby="slide-42-h">
-<h2 id="slide-42-h"><span id="slide-42"></span>Slide 42</h2>
+<h2 id="slide-42-h"><span id="slide-42"></span>Slide 42: Time series of an MCMC</h2>
 <figure role="group"><figcaption><strong>Figure 42.1.</strong> Scatter plot of MCMC draws, sig.K versus mu.K for 1000 iterations; points form a dense cloud centered near mu = 9.8, sigma = 0.9 after the initial burn-in path.</figcaption></figure>
-<p>Time series of an MCMC</p>
 </section>
 <section aria-labelledby="slide-43-h">
-<h2 id="slide-43-h"><span id="slide-43"></span>Slide 43</h2>
+<h2 id="slide-43-h"><span id="slide-43"></span>Slide 43: Time series of 3 MCMCs</h2>
 <figure role="group"><figcaption><strong>Figure 43.1.</strong> Scatter plot of three MCMC chains (blue, green, red), sig.K versus mu.K over 1000 iterations; all three overlap in one dense cloud near mu = 9.8, sigma = 0.9, showing convergence.</figcaption></figure>
-<p>Time series of 3 MCMCs</p>
 </section>
 <section aria-labelledby="slide-44-h">
-<h2 id="slide-44-h"><span id="slide-44"></span>Slide 44</h2>
-<p>count</p>
+<h2 id="slide-44-h"><span id="slide-44"></span>Slide 44: count</h2>
 <figure role="group"><figcaption><strong>Figure 44.1.</strong> 3D histogram of the joint posterior over parameters Mu and Sigma; counts (color-scaled to about 4000) form a tall spike over the high-density region, near-zero elsewhere.</figcaption></figure>
 <p>count</p>
 <p>Here is the posterior of the joint distribution (both parameters) from which we also have the marginal distribution for each</p>
 </section>
 <section aria-labelledby="slide-45-h">
-<h2 id="slide-45-h"><span id="slide-45"></span>Slide 45</h2>
+<h2 id="slide-45-h"><span id="slide-45"></span>Slide 45: https://mbjoseph.github.io/posts/2018-12-25-animating-the-metropolis-algorithm/</h2>
 <figure role="group"><figcaption><strong>Figure 45.1.</strong> Two-panel animation still: left, an empty &#x27;Markov chains&#x27; plane of sigma versus mu labeled Iteration 1; right, a flat &#x27;Posterior density&#x27; surface over mu and sigma before sampling begins.</figcaption></figure>
-<p>https://mbjoseph.github.io/posts/2018-12-25-animating-the-metropolis-algorithm/</p>
 </section>
 <section aria-labelledby="slide-46-h">
 <h2 id="slide-46-h"><span id="slide-46"></span>Slide 46</h2>
-<figure role="group"><figcaption><strong>Figure 46.1.</strong> Slide &#x27;So what?&#x27; with six small DAG examples (I-VI) of two- and three-node directed graphs, each with the corresponding joint-probability factorization using the chain rule.</figcaption></figure>
+<figure role="group"><figcaption><strong>Figure 46.1.</strong> Slide “Sampling from the posterior”: a trace plot of the last 20,000 MCMC iterations for a parameter ranging about 0 to 0.8, dense and stationary with no drift, with three red horizontal lines marking the posterior median near 0.28 and the credible bounds near 0.10 and 0.50. A rotated histogram on the left shows the matching unimodal posterior peaking around 0.25. Caption: the chain has converged when adding more samples does not change the shape of the posterior; samples accumulated before convergence (burn-in) are discarded.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-47-h">
-<h2 id="slide-47-h"><span id="slide-47"></span>Slide 47</h2>
-<ul>
-<li style="margin-left:1.2em">https://chi-feng.github.io/mcmc-demo/</li>
-</ul>
+<h2 id="slide-47-h"><span id="slide-47"></span>Slide 47: https://chi-feng.github.io/mcmc-demo/</h2>
 <p>There are now many algorithms to solve this problem</p>
 <ul>
 <li>Click on an algorithm below to view interactive demo:</li>
@@ -532,8 +485,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 </ul>
 </section>
 <section aria-labelledby="slide-48-h">
-<h2 id="slide-48-h"><span id="slide-48"></span>Slide 48</h2>
-<p>BUGS, JAGS, Nimble, STAN, and INLA oh my!</p>
+<h2 id="slide-48-h"><span id="slide-48"></span>Slide 48: BUGS, JAGS, Nimble, STAN, and INLA oh my!</h2>
 <ul>
 <li>In 2008, my first Bayesian professor, Herbie Lee, thought WinBUGS shouldn’t be taught because it would make it too easy so that incompetent people would implement poorly specified models</li>
 <li>Now BUGS (Bayesian Analysis Using Gibbs Sampling) is very common</li>
@@ -545,8 +497,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 </ul>
 </section>
 <section aria-labelledby="slide-49-h">
-<h2 id="slide-49-h"><span id="slide-49"></span>Slide 49</h2>
-<p>MSY = rK/4</p>
+<h2 id="slide-49-h"><span id="slide-49"></span>Slide 49: MSY = rK/4</h2>
 <p>Greatest population growth rate</p>
 <p>r</p>
 <p>K</p>
@@ -559,12 +510,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <p>N</p>
 </section>
 <section aria-labelledby="slide-50-h">
-<h2 id="slide-50-h"><span id="slide-50"></span>Slide 50</h2>
-<ul>
-<li>JAGS PRIMER</li>
-<li>estimating parameters in logistic population growth</li>
-<li>From Hobbs and Che-Castaldo’s SESYNC course</li>
-</ul>
+<h2 id="slide-50-h"><span id="slide-50"></span>Slide 50: JAGS PRIMER estimating parameters in logistic population growth From Hobbs and Che-Castaldo’s SESYNC course</h2>
 <figure role="group"><figcaption><strong>Figure 50.1.</strong> Line graph of per-capita growth rate dN/(N dt) versus population size N: a straight red line starting at r on the y-axis and declining with slope -r/K to zero at N = K.</figcaption></figure>
 <ul>
 <li>Observations of per-capita growth rate paired with population size</li>
@@ -574,8 +520,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <p>(1/N)(dN/dt) = r − (r/K) N</p>
 </section>
 <section aria-labelledby="slide-51-h">
-<h2 id="slide-51-h"><span id="slide-51"></span>Slide 51</h2>
-<p>reg=lm(GrowthRate~PopulationSize,data=Logistic)</p>
+<h2 id="slide-51-h"><span id="slide-51"></span>Slide 51: reg=lm(GrowthRate~PopulationSize,data=Logistic)</h2>
 <p>Good Ole Regression Approach</p>
 <figure role="group"><figcaption><strong>Figure 51.1.</strong> R lm() summary for GrowthRate ~ PopulationSize: intercept 0.2018, slope -1.647e-04 (both p &lt; 2e-16), residual SE 0.02789, R-squared 0.744.</figcaption></figure>
 <figure role="group"><figcaption><strong>Figure 51.2.</strong> R console output: coef(reg) gives intercept 0.2018 and slope -0.0001647; derived rmax = 0.2018 and K = 1224.99.</figcaption></figure>
@@ -583,11 +528,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <p>(1/N)(dN/dt) = r − (r/K) N</p>
 </section>
 <section aria-labelledby="slide-52-h">
-<h2 id="slide-52-h"><span id="slide-52"></span>Slide 52</h2>
-<ul>
-<li>JAGS PRIMER</li>
-<li>estimating parameters in logistic population growth</li>
-</ul>
+<h2 id="slide-52-h"><span id="slide-52"></span>Slide 52: JAGS PRIMER estimating parameters in logistic population growth</h2>
 <ul>
 <li>Joint posterior distribution of parameters is proportional to likelihood*prior</li>
 <li>We want positive continuous values for r and K. Bring on the gamma!</li>
@@ -601,20 +542,12 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 </ul>
 </section>
 <section aria-labelledby="slide-53-h">
-<h2 id="slide-53-h"><span id="slide-53"></span>Slide 53</h2>
+<h2 id="slide-53-h"><span id="slide-53"></span>Slide 53: “Bayesian Network” or ”Directed Acyclic Graph”</h2>
 <figure role="group"><figcaption><strong>Figure 53.1.</strong> Bayesian network / DAG for the logistic model: x_i points (dashed) to y_i, with parameters r, K and tau pointing into y_i; the joint factors as [y|r,K,tau][r][K][tau], with rules for reading a DAG.</figcaption></figure>
-<ul>
-<li>“Bayesian Network” or</li>
-<li>”Directed Acyclic Graph”</li>
-</ul>
 </section>
 <section aria-labelledby="slide-54-h">
-<h2 id="slide-54-h"><span id="slide-54"></span>Slide 54</h2>
-<ul>
-<li>JAGS PRIMER</li>
-<li>estimating parameters in logistic population growth</li>
-</ul>
-<figure role="group"><figcaption><strong>Figure 54.1.</strong> Equations: mu_i = r - r x_i / K and tau = 1/sigma^2, with the joint posterior proportional to product of normal likelihoods times uniform priors K~U(0,4000), sigma~U(0,5), r~U(0,2).</figcaption></figure>
+<h2 id="slide-54-h"><span id="slide-54"></span>Slide 54: JAGS PRIMER estimating parameters in logistic population growth</h2>
+<figure role="group"><figcaption><strong>Figure 54.1.</strong> JAGS model block for the logistic growth model, written with GAMMA priors: model{ # priors  K ~ dgamma(.001, .001); r ~ dgamma(.001, .001); tau ~ dgamma(.001, .001) # precision; sigma &lt;- 1/sqrt(tau) # calculate sd from precision; # likelihood  for (i in 1:n){ mu[i] &lt;- r - r/K * x[i]; y[i] ~ dnorm(mu[i], tau) } }</figcaption></figure>
 <p>JAGS parses this code to set up MCMC sampling, including proposal distribution, tuning parameters, and returns MCMC chain for each parameter so we can approximate posterior distributions and find associated statistics (e.g., means, medians, standard deviations, quantiles).</p>
 <figure role="group"><figcaption><strong>Figure 54.2.</strong> Numbered list of the three parts of a JAGS model: 1. code for priors, 2. code for the deterministic model, 3. code for the likelihood(s).</figcaption></figure>
 <p>In general, we always need</p>
@@ -622,8 +555,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <p>Normal distribution in JAGS is parameterized with precision, not variance or standard deviation</p>
 </section>
 <section aria-labelledby="slide-55-h">
-<h2 id="slide-55-h"><span id="slide-55"></span>Slide 55</h2>
-<p>Some other priors</p>
+<h2 id="slide-55-h"><span id="slide-55"></span>Slide 55: Some other priors</h2>
 <ul>
 <li>sink(&quot;LogisticJAGS.R&quot;)</li>
 <li>cat(&quot;</li>
@@ -631,7 +563,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li># priors</li>
 <li style="margin-left:1.2em">K ~ dunif(0, 4000)</li>
 <li style="margin-left:1.2em">r ~ dunif (0, 2)</li>
-<li style="margin-left:1.2em">sigma ~ dunif(0, 50)</li>
+<li style="margin-left:1.2em">sigma ~ dunif(0, 2)</li>
 <li style="margin-left:1.2em">tau &lt;- 1/sigma^2</li>
 <li># likelihood</li>
 <li>for(i in 1:n) {</li>
@@ -646,15 +578,11 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <ul>
 <li>μi = r − r xi / K</li>
 <li>τ = 1 / σ²</li>
-<li>[r, K, σ | y] ∝ ∏i=1n normal(yi | μi, τ) · uniform(K | 0, 4000) · uniform(σ | 0, 5) · uniform(r | 0, 2)</li>
+<li>[r, K, σ | y] ∝ ∏i=1n normal(yi | μi, τ) · uniform(K | 0, 4000) · uniform(σ | 0, 2) · uniform(r | 0, 2)</li>
 </ul>
 </section>
 <section aria-labelledby="slide-56-h">
-<h2 id="slide-56-h"><span id="slide-56"></span>Slide 56</h2>
-<ul>
-<li>JAGS PRIMER</li>
-<li>estimating parameters in logistic population growth</li>
-</ul>
+<h2 id="slide-56-h"><span id="slide-56"></span>Slide 56: JAGS PRIMER estimating parameters in logistic population growth</h2>
 <ul>
 <li>Unlike with least squares or maximum likelihood, with Bayesian statistics it is easy to derive chains for other quantities of interest and their posterior distributions.</li>
 <li>These are called “derived quantities”</li>
@@ -663,8 +591,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <p>This is a BFD!</p>
 </section>
 <section aria-labelledby="slide-57-h">
-<h2 id="slide-57-h"><span id="slide-57"></span>Slide 57</h2>
-<p>JAGS PRIMER</p>
+<h2 id="slide-57-h"><span id="slide-57"></span>Slide 57: JAGS PRIMER</h2>
 <figure role="group"><figcaption><strong>Figure 57.1.</strong> R code screenshot using sink() to write a JAGS logistic model file: uniform priors K~dunif(0,4000), r~dunif(0,2), sigma~dunif(0,50), tau=1/sigma^2, and a likelihood loop with y[i]~dnorm(mu[i],tau).</figcaption></figure>
 <p>For small models, use the sink() function to write your JAGS model to file for input</p>
 <figure role="group"><figcaption><strong>Figure 57.2.</strong> Text: &#x27;Notice that the for loop replaces the product from i=1 to n in the likelihood.&#x27;</figcaption></figure>
@@ -673,8 +600,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <p>fill = TRUE to print on separate lines</p>
 </section>
 <section aria-labelledby="slide-58-h">
-<h2 id="slide-58-h"><span id="slide-58"></span>Slide 58</h2>
-<p>JAGS PRIMER – slightly different approaches for rjags, jagsUI, and R2jags packages</p>
+<h2 id="slide-58-h"><span id="slide-58"></span>Slide 58: JAGS PRIMER – slightly different approaches for rjags, jagsUI, and R2jags packages</h2>
 <figure role="group"><figcaption><strong>Figure 58.1.</strong> R code screenshot: sorting the Logistic data, three lists of initial values for K, r, sigma, the data list, MCMC settings (n.adapt, n.update, n.iter = 1000/10000/10000), and the jags.model() call.</figcaption></figure>
 <figure role="group"><figcaption><strong>Figure 58.2.</strong> R code screenshot: update(jm, n.iter = n.update); zm = coda.samples(jm, variable.names = c(&#x27;K&#x27;,&#x27;r&#x27;,&#x27;sigma&#x27;,&#x27;tau&#x27;), n.iter, n.thin = 1); MCMCsummary(zm).</figcaption></figure>
 <p>Use jags.model() to run JAGS. Specify the data, initial values, and MCMC parameters</p>
@@ -686,8 +612,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <p>The samples</p>
 </section>
 <section aria-labelledby="slide-59-h">
-<h2 id="slide-59-h"><span id="slide-59"></span>Slide 59</h2>
-<p>JAGS PRIMER</p>
+<h2 id="slide-59-h"><span id="slide-59"></span>Slide 59: JAGS PRIMER</h2>
 <figure role="group"><figcaption><strong>Figure 59.1.</strong> R code screenshot: update(jm, n.iter = n.update); zm = coda.samples(jm, variable.names = c(&#x27;K&#x27;,&#x27;r&#x27;,&#x27;sigma&#x27;,&#x27;tau&#x27;), n.iter, n.thin = 1); MCMCsummary(zm).</figcaption></figure>
 <ul>
 <li>Use update() to add iterations to an existing model. Use coda.samples() to access the MCMC chains.</li>
@@ -697,8 +622,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <p>Note that Rhat near 1 means that there is good convergence. This is for model diagnostics.</p>
 </section>
 <section aria-labelledby="slide-60-h">
-<h2 id="slide-60-h"><span id="slide-60"></span>Slide 60</h2>
-<p>Nimble PRIMER</p>
+<h2 id="slide-60-h"><span id="slide-60"></span>Slide 60: Nimble PRIMER</h2>
 <figure role="group"><figcaption><strong>Figure 60.1.</strong> Nimble model code screenshot: nimbleCode with uniform priors K~dunif(0,4000), r~dunif(0,2), sigma~dunif(0,2), tau=1/sigma^2, and a likelihood loop y[i]~dnorm(mu[i],tau).</figcaption></figure>
 <ul>
 <li>BUGS Code is written in a nimbleCode() function.</li>
@@ -711,8 +635,8 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <figure role="group"><figcaption><strong>Figure 60.2.</strong> R code: samples = nimbleMCMC(code=logistic, constants=data, inits=inits, monitors=c(&#x27;K&#x27;,&#x27;r&#x27;,&#x27;sigma&#x27;,&#x27;tau&#x27;,&#x27;mu&#x27;), nchains=3, nburnin=1000).</figcaption></figure>
 </section>
 <section aria-labelledby="slide-61-h">
-<h2 id="slide-61-h"><span id="slide-61"></span>Slide 61</h2>
-<p>Logistic Growth in Nimble. Visualize and interpret the output</p>
+<h2 id="slide-61-h"><span id="slide-61"></span>Slide 61: Logistic Growth in Nimble. Visualize and interpret the output</h2>
+<p><em>(No text on this slide.)</em></p>
 </section>
 </main>
 

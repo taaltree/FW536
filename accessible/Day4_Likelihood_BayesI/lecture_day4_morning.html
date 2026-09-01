@@ -20,8 +20,8 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <p class="brand"><a href="../index.html">FW 536 · Day 4 Morning</a></p>
 <div class="subtitle">Lecture notes: Maximum likelihood</div>
 <nav aria-label="Slides in this lecture"><div class="section">Slides</div><ul>
-<li><a href="#slide-1">1. Slide 1</a></li>
-<li><a href="#slide-2">2. Slide 2</a></li>
+<li><a href="#slide-1">1. Nonlinear Models Maximum Likelihood Primer</a></li>
+<li><a href="#slide-2">2. What is Maximum Likelihood-I?</a></li>
 <li><a href="#slide-3">3. What is Maximum Likelihood-II?</a></li>
 <li><a href="#slide-4">4. What is Maximum Likelihood-II?</a></li>
 <li><a href="#slide-5">5. What is Maximum Likelihood-III?</a></li>
@@ -30,25 +30,25 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li><a href="#slide-8">8. Further Likelihood Considerations-II</a></li>
 <li><a href="#slide-9">9. Back to our original problem</a></li>
 <li><a href="#slide-10">10. Overview</a></li>
-<li><a href="#slide-11">11. Slide 11</a></li>
-<li><a href="#slide-12">12. Slide 12</a></li>
-<li><a href="#slide-13">13. Slide 13</a></li>
+<li><a href="#slide-11">11. We’ll explore numerical methods later For now, let’s apply this to a simpler problem</a></li>
+<li><a href="#slide-12">12. Is something missing? Why is this ok?</a></li>
+<li><a href="#slide-13">13. In R: Prob &lt;- seq(from=0.01,to=0.99,by=0.01) Like &lt;- Prob^30*(1-Prob)^20 plot(Prob,Like)</a></li>
 <li><a href="#slide-14">14. Negative log-likelihoods</a></li>
 <li><a href="#slide-15">15. A Poisson mixture problem</a></li>
-<li><a href="#slide-16">16. Slide 16</a></li>
+<li><a href="#slide-16">16. The Poisson distribution is:</a></li>
 <li><a href="#slide-17">17. Slide 17</a></li>
-<li><a href="#slide-18">18. Slide 18</a></li>
+<li><a href="#slide-18">18. The likelihood function is then:</a></li>
 <li><a href="#slide-19">19. Start by assuming we know Propn We now have a three dimensional likelihood surface</a></li>
 <li><a href="#slide-20">20. Slide 20</a></li>
-<li><a href="#slide-21">21. Slide 21</a></li>
-<li><a href="#slide-22">22. Slide 22</a></li>
+<li><a href="#slide-21">21. This is a plot of the negative log-likelihood surface</a></li>
+<li><a href="#slide-22">22. Notice anything interesting about this likelihood surface?</a></li>
 <li><a href="#slide-23">23. The Optim/MLE routines</a></li>
 <li><a href="#slide-24">24. Some options for MLE-I</a></li>
 <li><a href="#slide-25">25. Question-1</a></li>
 <li><a href="#slide-26">26. Example 1 - revisited</a></li>
 <li><a href="#slide-27">27. Example 2 - revisited</a></li>
-<li><a href="#slide-28">28. Slide 28</a></li>
-<li><a href="#slide-29">29. Slide 29</a></li>
+<li><a href="#slide-28">28. The Poisson distribution is:</a></li>
+<li><a href="#slide-29">29. Example 2 - revisited</a></li>
 <li><a href="#slide-30">30. Example 2 - revisited</a></li>
 <li><a href="#slide-31">31. Dissecting Example 2-I</a></li>
 <li><a href="#slide-32">32. Dissecting Example 2-II</a></li>
@@ -66,16 +66,12 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 </header>
 <div class="callout key"><p class="callout-label">About these notes</p>Each section is one slide. Figures carry text descriptions where available. For the concepts with worked examples, also read the <a href="plain_language_summary.html">plain-language summary</a> and <a href="lab.html">lab</a> for this session.</div>
 <section aria-labelledby="slide-1-h">
-<h2 id="slide-1-h"><span id="slide-1"></span>Slide 1</h2>
-<ul>
-<li>Nonlinear Models</li>
-<li>Maximum Likelihood Primer</li>
-</ul>
+<h2 id="slide-1-h"><span id="slide-1"></span>Slide 1: Nonlinear Models Maximum Likelihood Primer</h2>
+<p><em>(No text on this slide.)</em></p>
 <details class="answer"><summary>Speaker notes for this slide</summary><div class="answer-body"><p>a</p></div></details>
 </section>
 <section aria-labelledby="slide-2-h">
-<h2 id="slide-2-h"><span id="slide-2"></span>Slide 2</h2>
-<p>What is Maximum Likelihood-I?</p>
+<h2 id="slide-2-h"><span id="slide-2"></span>Slide 2: What is Maximum Likelihood-I?</h2>
 <ul>
 <li>Maximum likelihood is a method for fitting a mathematical model to some data. “Fitting” involves estimating the values for the parameters of the model. This is what is happening under the hood when you fit a glm, lmer, glmer, etc.</li>
 <li>For some problems, you may not have canned functions, but this has become increasingly uncommon.</li>
@@ -185,7 +181,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 </ul>
 </section>
 <section aria-labelledby="slide-11-h">
-<h2 id="slide-11-h"><span id="slide-11"></span>Slide 11</h2>
+<h2 id="slide-11-h"><span id="slide-11"></span>Slide 11: We’ll explore numerical methods later For now, let’s apply this to a simpler problem</h2>
 <ul>
 <li>You monitor an intersection for cars that run the</li>
 <li>red light. Based on 50 days of observation, you detect</li>
@@ -196,13 +192,9 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li>What is the probability of “light running” before the camera was installed?</li>
 <li>2.	Has the probability of “light running” changed significantly?</li>
 </ul>
-<ul>
-<li>We’ll explore numerical methods later</li>
-<li>For now, let’s apply this to a simpler problem</li>
-</ul>
 </section>
 <section aria-labelledby="slide-12-h">
-<h2 id="slide-12-h"><span id="slide-12"></span>Slide 12</h2>
+<h2 id="slide-12-h"><span id="slide-12"></span>Slide 12: Is something missing? Why is this ok?</h2>
 <ul>
 <li>Let the probability of “running” be p (and hence the</li>
 <li>probability of not “running” be (1-p)). The probability of</li>
@@ -211,22 +203,15 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li>This leads to the following likelihood function from the Binomial:</li>
 </ul>
 <p>We refer to the value for p that maximizes the likelihood function as the maximum likelihood estimate and denote it as p̂.</p>
-<p>Is something missing? Why is this ok?</p>
 <p>L(p) = p30 (1 − p)20</p>
 </section>
 <section aria-labelledby="slide-13-h">
-<h2 id="slide-13-h"><span id="slide-13"></span>Slide 13</h2>
+<h2 id="slide-13-h"><span id="slide-13"></span>Slide 13: In R: Prob &lt;- seq(from=0.01,to=0.99,by=0.01) Like &lt;- Prob^30*(1-Prob)^20 plot(Prob,Like)</h2>
 <figure role="group"><figcaption><strong>Figure 13.1.</strong> Line plot, probability p (x, 0.2 to 0.8) versus Likelihood (y, 0 to about 2e-15). The binomial likelihood peaks near p = 0.6, the maximum likelihood estimate.</figcaption></figure>
-<ul>
-<li>In R:</li>
-<li>Prob &lt;- seq(from=0.01,to=0.99,by=0.01)</li>
-<li>Like &lt;- Probs^30*(1-Probs)^20</li>
-<li>plot(Prob,Like)</li>
-</ul>
 <ul>
 <li>We can find the MLE in R:</li>
 <li>Ibest &lt;- which(Like==max(Like),arr.ind=T)</li>
-<li>print(Probs[Ibest])</li>
+<li>print(Prob[Ibest])</li>
 </ul>
 <p>See why normalizing constant doesn’t matter here?</p>
 </section>
@@ -251,13 +236,12 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 </ul>
 </section>
 <section aria-labelledby="slide-16-h">
-<h2 id="slide-16-h"><span id="slide-16"></span>Slide 16</h2>
+<h2 id="slide-16-h"><span id="slide-16"></span>Slide 16: The Poisson distribution is:</h2>
 <ul>
 <li>Now, an animal is either male or female and letting the</li>
 <li>mean blow rate for males be  λ1 and that for females be λ2,</li>
 <li>and assuming that the proportion of males is p:</li>
 </ul>
-<p>The Poisson distribution is:</p>
 <p>16</p>
 <figure role="group"><figcaption><strong>Figure 16.1.</strong> Histogram of whale blow counts, Blows (x, 0 to 50) versus density (y, 0.00 to 0.04), bimodal, suggesting two overlapping Poisson blow-rate distributions.</figcaption></figure>
 <p>How would you do this with linear models?</p>
@@ -275,8 +259,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <p>17</p>
 </section>
 <section aria-labelledby="slide-18-h">
-<h2 id="slide-18-h"><span id="slide-18"></span>Slide 18</h2>
-<p>The likelihood function is then:</p>
+<h2 id="slide-18-h"><span id="slide-18"></span>Slide 18: The likelihood function is then:</h2>
 <ul>
 <li>This looks pretty complicated but R is there to help us:</li>
 <li>dpois(x,lambda)  =</li>
@@ -322,9 +305,8 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <p>20</p>
 </section>
 <section aria-labelledby="slide-21-h">
-<h2 id="slide-21-h"><span id="slide-21"></span>Slide 21</h2>
+<h2 id="slide-21-h"><span id="slide-21"></span>Slide 21: This is a plot of the negative log-likelihood surface</h2>
 <figure role="group"><figcaption><strong>Figure 21.1.</strong> Three-dimensional perspective mesh of the negative log-likelihood surface over the two mean blow rates, axes Blow1 and Blow2 with height Likes; a single minimum.</figcaption></figure>
-<p>This is a plot of the negative log-likelihood surface</p>
 <ul>
 <li>The minimum negative</li>
 <li>log-likelihood</li>
@@ -332,10 +314,9 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <p>21</p>
 </section>
 <section aria-labelledby="slide-22-h">
-<h2 id="slide-22-h"><span id="slide-22"></span>Slide 22</h2>
+<h2 id="slide-22-h"><span id="slide-22"></span>Slide 22: Notice anything interesting about this likelihood surface?</h2>
 <p>22</p>
 <figure role="group"><figcaption><strong>Figure 22.1.</strong> Three-dimensional perspective wireframe of the negative log-likelihood, axes Blow1 (0 to 40) and Blow2 (0 to 60), vertical Likes axis, showing a curved valley.</figcaption></figure>
-<p>Notice anything interesting about this likelihood surface?</p>
 </section>
 <section aria-labelledby="slide-23-h">
 <h2 id="slide-23-h"><span id="slide-23"></span>Slide 23: The Optim/MLE routines</h2>
@@ -419,13 +400,12 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <p>27</p>
 </section>
 <section aria-labelledby="slide-28-h">
-<h2 id="slide-28-h"><span id="slide-28"></span>Slide 28</h2>
+<h2 id="slide-28-h"><span id="slide-28"></span>Slide 28: The Poisson distribution is:</h2>
 <ul>
 <li>Now, an animal is either male or female and letting the</li>
 <li>mean blow rate for males be  λ1 and that for females be λ2,</li>
 <li>and assuming that the proportion of males is p:</li>
 </ul>
-<p>The Poisson distribution is:</p>
 <p>28</p>
 <p>Example 2 - revisited</p>
 <p>The likelihood function is then:</p>
@@ -434,9 +414,8 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <p>P(x | p, λ1, λ2) = ∏i ( p λ1xᵢ exp(−λ1) / xi! + (1 − p) λ2xᵢ exp(−λ2) / xi! )</p>
 </section>
 <section aria-labelledby="slide-29-h">
-<h2 id="slide-29-h"><span id="slide-29"></span>Slide 29</h2>
+<h2 id="slide-29-h"><span id="slide-29"></span>Slide 29: Example 2 - revisited</h2>
 <p>29</p>
-<p>Example 2 - revisited</p>
 <p>The likelihood function is then:</p>
 <p>Question: What are we solving for here with optimization?</p>
 <p>P(x | p, λ1, λ2) = ∏i ( p λ1xᵢ exp(−λ1) / xi! + (1 − p) λ2xᵢ exp(−λ2) / xi! )</p>

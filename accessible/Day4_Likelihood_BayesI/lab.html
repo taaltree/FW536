@@ -52,7 +52,8 @@ MathJax = {
  </ul>
  <div class="section">Exercises</div>
  <ul>
- <li><a href="#exercises">All exercises</a></li>
+ <li><a href="#exercises-morning">Morning exercises</a></li>
+ <li><a href="#exercises">Afternoon exercises</a></li>
  </ul>
  <div class="section">Other docs</div>
  <ul>
@@ -489,6 +490,97 @@ The point of this example is not the ZIP per se — it is that mixture likelihoo
 </section>
 
 <!-- ================================================================== -->
+<!-- ================================================================== -->
+<!-- ==================== MORNING EXERCISES =========================== -->
+<!-- ================================================================== -->
+
+<section id="exercises-morning">
+<h2>Morning exercises</h2>
+<p>Four exercises on the likelihood half of the day. Work them with a partner; check the answer key only after you have tried. You are not expected to finish these during the session.</p>
+
+<!-- Exercise 1 -->
+<div class="exercise" id="ex-1">
+<span class="ex-tag">Exercise 1</span><span class="difficulty easy"> · 15 min · MLE by hand</span>
+<h3>Bernoulli MLE from scratch</h3>
+<p>You observe $y_1, \dots, y_n$ independent Bernoulli($p$) trials with $s = \sum y_i$ successes.</p>
+<ol type="a">
+<li>Write the joint likelihood $L(p)$ as a function of $p$, $s$, and $n$.</li>
+<li>Take the log and the derivative; show that the MLE is $\hat p = s/n$.</li>
+<li>Take the second derivative of $\ell(p)$ at $\hat p$. Show that the Fisher information is $I(\hat p) = n / [\hat p(1-\hat p)]$ and hence the Wald SE is $\sqrt{\hat p(1-\hat p)/n}$.</li>
+<li>Compute the MLE, its Wald SE, and a 95% profile-likelihood CI for the red-light data: $s = 30, n = 50$. (Use <code>mle()</code> for the profile.)</li>
+</ol>
+<details class="answer"><summary>Reveal solution</summary><div class="answer-body">
+<p>(a) $L(p) = p^s(1-p)^{n-s}$. (b) $\ell'(p) = s/p - (n-s)/(1-p) = 0 \Rightarrow \hat p = s/n$.</p>
+<p>(c) $\ell''(p) = -s/p^2 - (n-s)/(1-p)^2$, so $-\ell''(\hat p) = n/[\hat p(1-\hat p)]$.</p>
+<p>(d) $\hat p = 0.6$, Wald SE $= \sqrt{0.6 \cdot 0.4/50} \approx 0.069$. Profile CI from <code>confint(mle(...))</code> ≈ (0.462, 0.728).</p>
+<pre><code><span class="kw">library</span>(stats4)
+nll &lt;- <span class="kw">function</span>(p) -(<span class="nu">30</span> * <span class="fn">log</span>(p) + <span class="nu">20</span> * <span class="fn">log</span>(<span class="nu">1</span> - p))
+fit &lt;- <span class="fn">mle</span>(nll, start = <span class="kw">list</span>(p = <span class="nu">0.5</span>),
+ method = <span class="st">"L-BFGS-B"</span>, lower = <span class="nu">0.001</span>, upper = <span class="nu">0.999</span>)
+<span class="fn">summary</span>(fit); <span class="fn">confint</span>(fit)</code></pre>
+</div></details>
+</div>
+
+<!-- Exercise 2 -->
+<div class="exercise" id="ex-2">
+<span class="ex-tag">Exercise 2</span><span class="difficulty medium"> · 25 min · Vonbert</span>
+<h3>Profile likelihood for κ</h3>
+<p>Using the full Vonbert dataset (both sexes pooled) and the three-parameter model, compute and plot the <em>profile likelihood</em> for $\kappa$. For each $\kappa$ in a grid, optimize <em>over</em> $L_\infty$ and $\sigma$; record the minimum negative log-likelihood. Plot $-\Delta\ell$ vs $\kappa$; mark the 95% CI at the 1.92 line.</p>
+<details class="answer"><summary>Reveal solution</summary><div class="answer-body">
+<pre><code><span class="kw">library</span>(stats4)
+TheData &lt;- <span class="fn">read.csv</span>(<span class="st">"data/vonbert.csv"</span>)
+Age &lt;- TheData$age; Len &lt;- TheData$length
+
+profile_kappa &lt;- <span class="kw">function</span>(k) {
+ nll &lt;- <span class="kw">function</span>(Linf, sigma) {
+ pred &lt;- Linf * (<span class="nu">1</span> - <span class="fn">exp</span>(-k * Age))
+ -<span class="fn">sum</span>(<span class="fn">dnorm</span>(Len, pred, sigma, log = <span class="kw">TRUE</span>))
+ }
+ fit &lt;- <span class="fn">mle</span>(nll, start = <span class="kw">list</span>(Linf = <span class="nu">100</span>, sigma = <span class="nu">10</span>),
+ method = <span class="st">"L-BFGS-B"</span>, lower = <span class="kw">c</span>(<span class="nu">10</span>, <span class="nu">0.01</span>))
+ -<span class="fn">logLik</span>(fit)[<span class="nu">1</span>]
+}
+grid &lt;- <span class="fn">seq</span>(<span class="nu">0.05</span>, <span class="nu">0.45</span>, by = <span class="nu">0.005</span>)
+prof &lt;- <span class="fn">sapply</span>(grid, profile_kappa)
+best &lt;- <span class="fn">min</span>(prof)
+<span class="fn">plot</span>(grid, prof - best, type = <span class="st">"l"</span>, lwd = <span class="nu">2</span>, xlab = expression(kappa),
+ ylab = expression(-Delta * <span class="fn">log</span>~L))
+<span class="fn">abline</span>(h = <span class="nu">1.92</span>, lty = <span class="nu">2</span>, col = <span class="st">"red"</span>)</code></pre>
+<p>Read 95% CI off where the profile crosses 1.92. The CI is asymmetric — Wald would have lied.</p>
+</div></details>
+</div>
+
+<!-- Exercise 3 -->
+<div class="exercise" id="ex-3">
+<span class="ex-tag">Exercise 3</span><span class="difficulty medium"> · 20 min · LRT + AIC</span>
+<h3>Sex-specific VBGF revisited</h3>
+<p>Use the LRT code from the walk-through above. Report (a) the LRT statistic and p-value, (b) AIC for both models, (c) your conclusion. Then refit Model B with $L_\infty$ shared but $\kappa$ sex-specific (4 parameters) and run a second LRT against the same null. Comment on what you learn.</p>
+<details class="answer"><summary>Reveal worked solution (actual R run)</summary><div class="answer-body">
+<p><em>Deterministic MLE fit (<code>stats4::mle</code>, L-BFGS-B) on the full <code>data/vonbert.csv</code> ($n = 100$, 50 per sex), model $L_a = L_\infty(1 - e^{-\kappa a})$ — no seed needed.</em></p>
+<p>(a) <strong>Full (Model B, 5 param) vs null (Model A, 3 param), 2 df:</strong> $\Lambda = 2(\ell_B - \ell_A) = 75.4$, $p \approx 4\times10^{-17}$ — the null of a single shared growth curve is decisively rejected.</p>
+<p>(b) <strong>AIC (lower is better):</strong> Model A (pooled, 3p) $= 798.0$; intermediate (shared $L_\infty$, sex-specific $\kappa$, 4p) $= 767.1$; Model B (full sex-specific $L_\infty$ and $\kappa$, 5p) $= \mathbf{726.6}$. The full model wins by ~40 AIC over the intermediate and ~71 over the null — far beyond the 2-unit rule of thumb. AIC and the LRT agree.</p>
+<p>(c) <strong>Second LRT — intermediate (4p) vs null (3p), 1 df:</strong> $\Lambda = 32.9$, $p \approx 9.7\times10^{-9}$. A single sex-specific $\kappa$ already helps a lot, but it is <em>not</em> where the action is: fitting Model B shows the sex difference is concentrated in asymptotic length $L_\infty$ ($\hat L_{\infty,1} \approx 82.6$ for sex 1 vs $\hat L_{\infty,2} \approx 102.5$ for sex 2) far more than in growth coefficient $\kappa$ ($0.259$ vs $0.284$). When the intermediate model is forced to share $L_\infty$, it can only compensate by splaying the two $\kappa$'s apart ($0.167$ for sex 1 vs $0.335$ for sex 2) — and still lands ~40 AIC units short of the full model.</p>
+<p><strong>Conclusion:</strong> the sexes differ mainly in asymptotic size $L_\infty$ (sex 2 reaches a substantially larger maximum length; the file does not record which code is male and which is female, so report the result by code) and only modestly in $\kappa$; the fully sex-specific model is preferred by both criteria. Remember the division of labor — the LRT needs nesting and returns a p-value; AIC needs no nesting and returns a ranking.</p>
+</div></details>
+</div>
+
+<!-- Exercise 4 -->
+<div class="exercise" id="ex-4">
+<span class="ex-tag">Exercise 4</span><span class="difficulty medium"> · 25 min · ZIP</span>
+<h3>Zero-inflated Poisson — diagnostics</h3>
+<p>Using the ZIP walk-through code, simulate three datasets with $\pi = 0.35$ and $\lambda \in \{1, 2.5, 8\}$. For each:</p>
+<ol type="a">
+<li>Fit a plain Poisson and a ZIP. Compare AIC.</li>
+<li>Compute and report the proportion of zeros under each fitted model and compare to the observed proportion.</li>
+<li>Why is the gap between Poisson and ZIP largest at small $\lambda$?</li>
+</ol>
+<details class="answer"><summary>Reveal</summary><div class="answer-body">
+<p>(c) When $\lambda$ is small, the Poisson already produces many zeros, so the extra zero inflation looks like "Poisson with smaller mean." The ZIP and Poisson likelihoods become hard to distinguish, and you need a lot of data to detect the inflation. When $\lambda$ is large, the Poisson predicts essentially no zeros, so any zero inflation jumps out.</p>
+</div></details>
+</div>
+
+</section>
+
 <!-- ====================== AFTERNOON: BAYES =========================== -->
 <!-- ================================================================== -->
 
@@ -974,89 +1066,8 @@ The recipe is always the same three steps: <strong>(1)</strong> simulate fake da
 <!-- ================================================================== -->
 
 <section id="exercises">
-<h2>Exercises</h2>
-<p>Eight numbered exercises spanning the day. Work them with a partner; check the answer key only after you've drafted your own solution. Difficulty pills indicate rough time commitment.</p>
-
-<!-- Exercise 1 -->
-<div class="exercise" id="ex-1">
-<span class="ex-tag">Exercise 1</span><span class="difficulty easy"> · 15 min · MLE by hand</span>
-<h3>Bernoulli MLE from scratch</h3>
-<p>You observe $y_1, \dots, y_n$ independent Bernoulli($p$) trials with $s = \sum y_i$ successes.</p>
-<ol type="a">
-<li>Write the joint likelihood $L(p)$ as a function of $p$, $s$, and $n$.</li>
-<li>Take the log and the derivative; show that the MLE is $\hat p = s/n$.</li>
-<li>Take the second derivative of $\ell(p)$ at $\hat p$. Show that the Fisher information is $I(\hat p) = n / [\hat p(1-\hat p)]$ and hence the Wald SE is $\sqrt{\hat p(1-\hat p)/n}$.</li>
-<li>Compute the MLE, its Wald SE, and a 95% profile-likelihood CI for the red-light data: $s = 30, n = 50$. (Use <code>mle()</code> for the profile.)</li>
-</ol>
-<details class="answer"><summary>Reveal solution</summary><div class="answer-body">
-<p>(a) $L(p) = p^s(1-p)^{n-s}$. (b) $\ell'(p) = s/p - (n-s)/(1-p) = 0 \Rightarrow \hat p = s/n$.</p>
-<p>(c) $\ell''(p) = -s/p^2 - (n-s)/(1-p)^2$, so $-\ell''(\hat p) = n/[\hat p(1-\hat p)]$.</p>
-<p>(d) $\hat p = 0.6$, Wald SE $= \sqrt{0.6 \cdot 0.4/50} \approx 0.069$. Profile CI from <code>confint(mle(...))</code> ≈ (0.462, 0.728).</p>
-<pre><code><span class="kw">library</span>(stats4)
-nll &lt;- <span class="kw">function</span>(p) -(<span class="nu">30</span> * <span class="fn">log</span>(p) + <span class="nu">20</span> * <span class="fn">log</span>(<span class="nu">1</span> - p))
-fit &lt;- <span class="fn">mle</span>(nll, start = <span class="kw">list</span>(p = <span class="nu">0.5</span>),
- method = <span class="st">"L-BFGS-B"</span>, lower = <span class="nu">0.001</span>, upper = <span class="nu">0.999</span>)
-<span class="fn">summary</span>(fit); <span class="fn">confint</span>(fit)</code></pre>
-</div></details>
-</div>
-
-<!-- Exercise 2 -->
-<div class="exercise" id="ex-2">
-<span class="ex-tag">Exercise 2</span><span class="difficulty medium"> · 25 min · Vonbert</span>
-<h3>Profile likelihood for κ</h3>
-<p>Using the full Vonbert dataset (both sexes pooled) and the three-parameter model, compute and plot the <em>profile likelihood</em> for $\kappa$. For each $\kappa$ in a grid, optimize <em>over</em> $L_\infty$ and $\sigma$; record the minimum negative log-likelihood. Plot $-\Delta\ell$ vs $\kappa$; mark the 95% CI at the 1.92 line.</p>
-<details class="answer"><summary>Reveal solution</summary><div class="answer-body">
-<pre><code><span class="kw">library</span>(stats4)
-TheData &lt;- <span class="fn">read.csv</span>(<span class="st">"data/vonbert.csv"</span>)
-Age &lt;- TheData$age; Len &lt;- TheData$length
-
-profile_kappa &lt;- <span class="kw">function</span>(k) {
- nll &lt;- <span class="kw">function</span>(Linf, sigma) {
- pred &lt;- Linf * (<span class="nu">1</span> - <span class="fn">exp</span>(-k * Age))
- -<span class="fn">sum</span>(<span class="fn">dnorm</span>(Len, pred, sigma, log = <span class="kw">TRUE</span>))
- }
- fit &lt;- <span class="fn">mle</span>(nll, start = <span class="kw">list</span>(Linf = <span class="nu">100</span>, sigma = <span class="nu">10</span>),
- method = <span class="st">"L-BFGS-B"</span>, lower = <span class="kw">c</span>(<span class="nu">10</span>, <span class="nu">0.01</span>))
- -<span class="fn">logLik</span>(fit)[<span class="nu">1</span>]
-}
-grid &lt;- <span class="fn">seq</span>(<span class="nu">0.05</span>, <span class="nu">0.45</span>, by = <span class="nu">0.005</span>)
-prof &lt;- <span class="fn">sapply</span>(grid, profile_kappa)
-best &lt;- <span class="fn">min</span>(prof)
-<span class="fn">plot</span>(grid, prof - best, type = <span class="st">"l"</span>, lwd = <span class="nu">2</span>, xlab = expression(kappa),
- ylab = expression(-Delta * <span class="fn">log</span>~L))
-<span class="fn">abline</span>(h = <span class="nu">1.92</span>, lty = <span class="nu">2</span>, col = <span class="st">"red"</span>)</code></pre>
-<p>Read 95% CI off where the profile crosses 1.92. The CI is asymmetric — Wald would have lied.</p>
-</div></details>
-</div>
-
-<!-- Exercise 3 -->
-<div class="exercise" id="ex-3">
-<span class="ex-tag">Exercise 3</span><span class="difficulty medium"> · 20 min · LRT + AIC</span>
-<h3>Sex-specific VBGF revisited</h3>
-<p>Use the LRT code from the walk-through above. Report (a) the LRT statistic and p-value, (b) AIC for both models, (c) your conclusion. Then refit Model B with $L_\infty$ shared but $\kappa$ sex-specific (4 parameters) and run a second LRT against the same null. Comment on what you learn.</p>
-<details class="answer"><summary>Reveal worked solution (actual R run)</summary><div class="answer-body">
-<p><em>Deterministic MLE fit (<code>stats4::mle</code>, L-BFGS-B) on the full <code>data/vonbert.csv</code> ($n = 100$, 50 per sex), model $L_a = L_\infty(1 - e^{-\kappa a})$ — no seed needed.</em></p>
-<p>(a) <strong>Full (Model B, 5 param) vs null (Model A, 3 param), 2 df:</strong> $\Lambda = 2(\ell_B - \ell_A) = 75.4$, $p \approx 4\times10^{-17}$ — the null of a single shared growth curve is decisively rejected.</p>
-<p>(b) <strong>AIC (lower is better):</strong> Model A (pooled, 3p) $= 798.0$; intermediate (shared $L_\infty$, sex-specific $\kappa$, 4p) $= 767.1$; Model B (full sex-specific $L_\infty$ and $\kappa$, 5p) $= \mathbf{726.6}$. The full model wins by ~40 AIC over the intermediate and ~71 over the null — far beyond the 2-unit rule of thumb. AIC and the LRT agree.</p>
-<p>(c) <strong>Second LRT — intermediate (4p) vs null (3p), 1 df:</strong> $\Lambda = 32.9$, $p \approx 9.7\times10^{-9}$. A single sex-specific $\kappa$ already helps a lot, but it is <em>not</em> where the action is: fitting Model B shows the sex difference is concentrated in asymptotic length $L_\infty$ ($\hat L_{\infty,1} \approx 82.6$ for sex 1 vs $\hat L_{\infty,2} \approx 102.5$ for sex 2) far more than in growth coefficient $\kappa$ ($0.259$ vs $0.284$). When the intermediate model is forced to share $L_\infty$, it can only compensate by splaying the two $\kappa$'s apart ($0.167$ for sex 1 vs $0.335$ for sex 2) — and still lands ~40 AIC units short of the full model.</p>
-<p><strong>Conclusion:</strong> the sexes differ mainly in asymptotic size $L_\infty$ (sex 2 reaches a substantially larger maximum length; the file does not record which code is male and which is female, so report the result by code) and only modestly in $\kappa$; the fully sex-specific model is preferred by both criteria. Remember the division of labor — the LRT needs nesting and returns a p-value; AIC needs no nesting and returns a ranking.</p>
-</div></details>
-</div>
-
-<!-- Exercise 4 -->
-<div class="exercise" id="ex-4">
-<span class="ex-tag">Exercise 4</span><span class="difficulty medium"> · 25 min · ZIP</span>
-<h3>Zero-inflated Poisson — diagnostics</h3>
-<p>Using the ZIP walk-through code, simulate three datasets with $\pi = 0.35$ and $\lambda \in \{1, 2.5, 8\}$. For each:</p>
-<ol type="a">
-<li>Fit a plain Poisson and a ZIP. Compare AIC.</li>
-<li>Compute and report the proportion of zeros under each fitted model and compare to the observed proportion.</li>
-<li>Why is the gap between Poisson and ZIP largest at small $\lambda$?</li>
-</ol>
-<details class="answer"><summary>Reveal</summary><div class="answer-body">
-<p>(c) When $\lambda$ is small, the Poisson already produces many zeros, so the extra zero inflation looks like "Poisson with smaller mean." The ZIP and Poisson likelihoods become hard to distinguish, and you need a lot of data to detect the inflation. When $\lambda$ is large, the Poisson predicts essentially no zeros, so any zero inflation jumps out.</p>
-</div></details>
-</div>
+<h2>Afternoon exercises</h2>
+<p>Four exercises on the Bayesian half of the day &mdash; conjugacy, Metropolis, and two Nimble fits. Work them with a partner; check the answer key only after you have tried. You are not expected to finish these during the session.</p>
 
 <!-- Exercise 5 -->
 <div class="exercise" id="ex-5">

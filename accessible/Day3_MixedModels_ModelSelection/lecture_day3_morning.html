@@ -20,7 +20,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <p class="brand"><a href="../index.html">FW 536 · Day 3 Morning</a></p>
 <div class="subtitle">Lecture notes: Mixed effects models</div>
 <nav aria-label="Slides in this lecture"><div class="section">Slides</div><ul>
-<li><a href="#slide-1">1. Slide 1</a></li>
+<li><a href="#slide-1">1. Mixed Effects Modeling</a></li>
 <li><a href="#slide-2">2. What are Fixed and Random Effects?</a></li>
 <li><a href="#slide-3">3. Mixed Effects Models</a></li>
 <li><a href="#slide-4">4. A Simple Example</a></li>
@@ -61,12 +61,12 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li><a href="#slide-39">39. Labeling matters!Remove ambiguity with distinct labelling</a></li>
 <li><a href="#slide-40">40. Glmer ExampleProportions are Rarely Proportions</a></li>
 <li><a href="#slide-41">41. White Stork Example</a></li>
-<li><a href="#slide-42">42. Slide 42</a></li>
-<li><a href="#slide-43">43. Slide 43</a></li>
+<li><a href="#slide-42">42. White stork: Is breeding success affected by weather conditions?</a></li>
+<li><a href="#slide-43">43. Standard GLM on proportions</a></li>
 <li><a href="#slide-44">44. What if we have substantial additional interannual variation not explained by weather?</a></li>
-<li><a href="#slide-45">45. Slide 45</a></li>
-<li><a href="#slide-46">46. Slide 46</a></li>
-<li><a href="#slide-47">47. Slide 47</a></li>
+<li><a href="#slide-45">45. GLMM on proportions with year as a random effect</a></li>
+<li><a href="#slide-46">46. GLMM on proportions with year as a random effect in R</a></li>
+<li><a href="#slide-47">47. GLMM on proportions with year as a random effect in R</a></li>
 <li><a href="#slide-48">48. Slide 48</a></li>
 <li><a href="#slide-49">49. Example 2 – Nonlinear mixed model for length and age</a></li>
 <li><a href="#slide-50">50. Example – length and age</a></li>
@@ -91,8 +91,8 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 </header>
 <div class="callout key"><p class="callout-label">About these notes</p>Each section is one slide. Figures carry text descriptions where available. For the concepts with worked examples, also read the <a href="plain_language_summary.html">plain-language summary</a> and <a href="lab.html">lab</a> for this session.</div>
 <section aria-labelledby="slide-1-h">
-<h2 id="slide-1-h"><span id="slide-1"></span>Slide 1</h2>
-<p>Mixed Effects Modeling</p>
+<h2 id="slide-1-h"><span id="slide-1"></span>Slide 1: Mixed Effects Modeling</h2>
+<p><em>(No text on this slide.)</em></p>
 <details class="answer"><summary>Speaker notes for this slide</summary><div class="answer-body"><p>a</p></div></details>
 </section>
 <section aria-labelledby="slide-2-h">
@@ -492,8 +492,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <p>Oliver Gimenez’s Example</p>
 </section>
 <section aria-labelledby="slide-42-h">
-<h2 id="slide-42-h"><span id="slide-42"></span>Slide 42</h2>
-<p>White stork: Is breeding success affected by weather conditions?</p>
+<h2 id="slide-42-h"><span id="slide-42"></span>Slide 42: White stork: Is breeding success affected by weather conditions?</h2>
 <ul>
 <li>nbchicks = c(151,105,73,107,113,87,77,108,118,122,112,120,122,89,69,71,</li>
 <li>53,41,53,31,35,14,18)</li>
@@ -508,8 +507,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <p>286</p>
 </section>
 <section aria-labelledby="slide-43-h">
-<h2 id="slide-43-h"><span id="slide-43"></span>Slide 43</h2>
-<p>Standard GLM on proportions</p>
+<h2 id="slide-43-h"><span id="slide-43"></span>Slide 43: Standard GLM on proportions</h2>
 <ul>
 <li>nbchicksi ∼ Binomial(nbpairsi, pi)</li>
 <li>logit(pi) = β0 + β1 tempi + β2 rainfalli</li>
@@ -533,8 +531,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <p>288</p>
 </section>
 <section aria-labelledby="slide-45-h">
-<h2 id="slide-45-h"><span id="slide-45"></span>Slide 45</h2>
-<p>GLMM on proportions with year as a random effect</p>
+<h2 id="slide-45-h"><span id="slide-45"></span>Slide 45: GLMM on proportions with year as a random effect</h2>
 <ul>
 <li>nbchicksi ∼ Binomial(nbpairsi, pi)</li>
 <li>logit(pi) = β0i + β1 tempi + β2 rainfalli</li>
@@ -543,8 +540,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <p>289</p>
 </section>
 <section aria-labelledby="slide-46-h">
-<h2 id="slide-46-h"><span id="slide-46"></span>Slide 46</h2>
-<p>GLMM on proportions with year as a random effect in R</p>
+<h2 id="slide-46-h"><span id="slide-46"></span>Slide 46: GLMM on proportions with year as a random effect in R</h2>
 <ul>
 <li>m &lt;- glmer(cbind(nbchicks,nbpairs-nbchicks) ~ temp + rainfall</li>
 <li>+ (1 | year), family = binomial)</li>
@@ -552,8 +548,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <p>290</p>
 </section>
 <section aria-labelledby="slide-47-h">
-<h2 id="slide-47-h"><span id="slide-47"></span>Slide 47</h2>
-<p>GLMM on proportions with year as a random effect in R</p>
+<h2 id="slide-47-h"><span id="slide-47"></span>Slide 47: GLMM on proportions with year as a random effect in R</h2>
 <ul>
 <li>#&gt; Generalized linear mixed model fit by maximum likelihood (Laplace</li>
 <li>#&gt;   Approximation) [glmerMod]</li>
@@ -671,7 +666,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <ul>
 <li>lm2 &lt;- nlme(model=Length~Linf*(1-exp(-1*Kappa*(Age-Tzero))), data=AgeLen,</li>
 <li>random=Linf~1, fixed=Linf+Kappa+Tzero~1,start=c(Linf=100,Kappa=0.2,Tzero=0))</li>
-<li>Print(lm1$modelStruct)</li>
+<li>print(lm2$modelStruct)</li>
 </ul>
 <ul>
 <li>Random effect:</li>

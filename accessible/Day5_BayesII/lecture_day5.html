@@ -20,29 +20,29 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <p class="brand"><a href="../index.html">FW 536 · Day 5</a></p>
 <div class="subtitle">Lecture notes: Bayesian statistics II</div>
 <nav aria-label="Slides in this lecture"><div class="section">Slides</div><ul>
-<li><a href="#slide-1">1. Slide 1</a></li>
+<li><a href="#slide-1">1. Introduction to Bayesian Analysis Part Deux</a></li>
 <li><a href="#slide-2">2. Where to go from here</a></li>
 <li><a href="#slide-3">3. Where to go from here</a></li>
 <li><a href="#slide-4">4. This course is just a jumping off point</a></li>
 <li><a href="#slide-5">5. Slide 5</a></li>
-<li><a href="#slide-6">6. Slide 6</a></li>
-<li><a href="#slide-7">7. Slide 7</a></li>
-<li><a href="#slide-8">8. Slide 8</a></li>
-<li><a href="#slide-9">9. Slide 9</a></li>
-<li><a href="#slide-10">10. Slide 10</a></li>
-<li><a href="#slide-11">11. Slide 11</a></li>
+<li><a href="#slide-6">6. Unlike with lm() and glm() this easily extends to nonlinear functional forms (e.g. Spawner-Recruit Lab)</a></li>
+<li><a href="#slide-7">7. Spawner-Recruit Lab Another Example with Derived Quantities</a></li>
+<li><a href="#slide-8">8. Wrong→</a></li>
+<li><a href="#slide-9">9. Ant Species Richness: Beware of Vague Priors with Link Functions</a></li>
+<li><a href="#slide-10">10. Lizard Occurrence on Islands</a></li>
+<li><a href="#slide-11">11. Hierarchical Models</a></li>
 <li><a href="#slide-12">12. Slide 12</a></li>
-<li><a href="#slide-13">13. Slide 13</a></li>
-<li><a href="#slide-14">14. Slide 14</a></li>
-<li><a href="#slide-15">15. Slide 15</a></li>
-<li><a href="#slide-16">16. Slide 16</a></li>
-<li><a href="#slide-17">17. Slide 17</a></li>
-<li><a href="#slide-18">18. Slide 18</a></li>
-<li><a href="#slide-19">19. Slide 19</a></li>
-<li><a href="#slide-20">20. Slide 20</a></li>
+<li><a href="#slide-13">13. Gamma is the conjugate prior and flexible/non-negative. Good choice here</a></li>
+<li><a href="#slide-14">14. Gamma is the conjugate prior and flexible/non-negative. Good choice here</a></li>
+<li><a href="#slide-15">15. MULTILEVEL MODELING</a></li>
+<li><a href="#slide-16">16. Complete pooling</a></li>
+<li><a href="#slide-17">17. No pooling</a></li>
+<li><a href="#slide-18">18. Random intercept Partial pooling</a></li>
+<li><a href="#slide-19">19. Random intercept Partial pooling, but also attempt to EXPLAIN site-level differences</a></li>
+<li><a href="#slide-20">20. Latent Variable Modeling I - Occupancy</a></li>
 <li><a href="#slide-21">21. Slide 21</a></li>
-<li><a href="#slide-22">22. Slide 22</a></li>
-<li><a href="#slide-23">23. Slide 23</a></li>
+<li><a href="#slide-22">22. DYNAMIC OCCUPANCY MODELING LAB</a></li>
+<li><a href="#slide-23">23. N-mixture Models Separating Process and Observation Error</a></li>
 </ul></nav></aside>
 <main class="content" id="main-content" tabindex="-1">
 <header class="lab-header">
@@ -52,8 +52,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 </header>
 <div class="callout key"><p class="callout-label">About these notes</p>Each section is one slide. Figures carry text descriptions where available. For the concepts with worked examples, also read the <a href="plain_language_summary.html">plain-language summary</a> and <a href="lab.html">lab</a> for this session.</div>
 <section aria-labelledby="slide-1-h">
-<h2 id="slide-1-h"><span id="slide-1"></span>Slide 1</h2>
-<p>Introduction to Bayesian Analysis Part Deux</p>
+<h2 id="slide-1-h"><span id="slide-1"></span>Slide 1: Introduction to Bayesian Analysis Part Deux</h2>
 <figure role="group"><figcaption><strong>Figure 1.1.</strong> 3D surface plot of a bivariate normal probability density over axes x1 and x2, showing a bell-shaped peak (~0.15) at the origin, with a semi-transparent horizontal reference plane.</figcaption></figure>
 <p>Many slides adapted from Matt Falcy ODFW, and SESYNC course by Chris Che-Castaldo, Mary B. Collins, N. Thompson Hobbs (with permission)</p>
 <figure role="group"><figcaption><strong>Figure 1.2.</strong> Portrait of Thomas Bayes with Bayes&#x27; theorem overlaid. Equation: P(A|B) = P(B|A) P(A) / P(B).</figcaption></figure>
@@ -91,20 +90,11 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <figure role="group"><figcaption><strong>Figure 5.1.</strong> [β0, β1, σ | y]  ∝  ∏i=1N normal(yi | g(β0, β1, xi), σ²)         × normal(β0 | 0, 1000) normal(β1 | 0, 1000)         × uniform(σ | 0, 100) g(β0, β1, xi)  =  β0 + β1 xi  b0 ~ dnorm(0, .001) b1 ~ dnorm(0, .001) sigma ~ dunif(0, 100) tau &lt;- 1/sigma^2 for (i in 1:length(y)){   mu[i] &lt;- b0 + b1 * x[i]   y[i] ~ dnorm(mu[i], tau) }</figcaption></figure>
 </section>
 <section aria-labelledby="slide-6-h">
-<h2 id="slide-6-h"><span id="slide-6"></span>Slide 6</h2>
+<h2 id="slide-6-h"><span id="slide-6"></span>Slide 6: Unlike with lm() and glm() this easily extends to nonlinear functional forms (e.g. Spawner-Recruit Lab)</h2>
 <figure role="group"><figcaption><strong>Figure 6.1.</strong> Slide titled &#x27;Nonlinear regression&#x27;; the embedded figure did not render, only a citation to Bolker 2008, Ecological Models and Data in R.</figcaption></figure>
-<ul>
-<li>Unlike with lm() and glm()</li>
-<li>this easily extends to nonlinear functional forms</li>
-<li>(e.g. Spawner-Recruit Lab)</li>
-</ul>
 </section>
 <section aria-labelledby="slide-7-h">
-<h2 id="slide-7-h"><span id="slide-7"></span>Slide 7</h2>
-<ul>
-<li>Spawner-Recruit Lab</li>
-<li>Another Example with Derived Quantities</li>
-</ul>
+<h2 id="slide-7-h"><span id="slide-7"></span>Slide 7: Spawner-Recruit Lab Another Example with Derived Quantities</h2>
 <ul>
 <li>Spawner-recruit problem. We want to estimate</li>
 <li style="margin-left:1.2em">equilibrium number of spawners without harvest, Neq</li>
@@ -123,26 +113,19 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <p>How would you estimate these with uncertainty in frequentist framework?</p>
 </section>
 <section aria-labelledby="slide-8-h">
-<h2 id="slide-8-h"><span id="slide-8"></span>Slide 8</h2>
+<h2 id="slide-8-h"><span id="slide-8"></span>Slide 8: Wrong→</h2>
 <figure role="group"><figcaption><strong>Figure 8.1.</strong> Table &#x27;You don&#x27;t have to be normal!&#x27; mapping data types to distribution, mean function, and link: continuous/normal (identity), discrete-positive/Poisson (log), 0-or-1/Bernoulli (logit), [0,1]/beta (logit), positive/lognormal and gamma (log).</figcaption></figure>
-<p>Wrong→</p>
 </section>
 <section aria-labelledby="slide-9-h">
-<h2 id="slide-9-h"><span id="slide-9"></span>Slide 9</h2>
+<h2 id="slide-9-h"><span id="slide-9"></span>Slide 9: Ant Species Richness: Beware of Vague Priors with Link Functions</h2>
 <figure role="group"><figcaption><strong>Figure 9.1.</strong> [β0, β1 | y]  ∝  ∏i=1N Poisson(yi | g(β0, β1, xi))         × normal(β0 | 0, 1000) normal(β1 | 0, 1000) g(β0, β1, xi)  =  exp(β0 + β1 xi)  b0 ~ dnorm(0, .001) b1 ~ dnorm(0, .001) for(i in 1:length(y)){   log(mu[i]) &lt;- b0 + b1 * x[i]   y[i] ~ dpois(mu[i]) } or mu[i] &lt;- exp(b0 + b1 * x[i]) y[i] ~ dpois(mu[i])</figcaption></figure>
-<ul>
-<li>Ant Species Richness:</li>
-<li>Beware of Vague Priors with Link Functions</li>
-</ul>
 </section>
 <section aria-labelledby="slide-10-h">
-<h2 id="slide-10-h"><span id="slide-10"></span>Slide 10</h2>
+<h2 id="slide-10-h"><span id="slide-10"></span>Slide 10: Lizard Occurrence on Islands</h2>
 <figure role="group"><figcaption><strong>Figure 10.1.</strong> Bernoulli, 0 or 1 (aka logistic)   [β0, β1 | y]  ∝  ∏i=1N Bernoulli(yi | g(β0, β1, xi))         × normal(β0 | 0, 2.7) normal(β1 | 0, 2.7) g(β0, β1, xi)  =  exp(β0 + β1 xi) / (exp(β0 + β1 xi) + 1)  b0 ~ dnorm(0, .37) b1 ~ dnorm(0, .37) for(i in 1:length(y)){   logit(p[i]) &lt;- b0 + b1 * x[i]   y[i] ~ dbern(p[i]) } or p[i] &lt;- inv.logit(b0 + b1 * x[i]) y[i] ~ dbern(p[i])</figcaption></figure>
-<p>Lizard Occurrence on Islands</p>
 </section>
 <section aria-labelledby="slide-11-h">
-<h2 id="slide-11-h"><span id="slide-11"></span>Slide 11</h2>
-<p>Hierarchical Models</p>
+<h2 id="slide-11-h"><span id="slide-11"></span>Slide 11: Hierarchical Models</h2>
 <ul>
 <li>From Wikipedia:</li>
 <li>Multilevel models (also known as hierarchical linear models, linear mixed-effect model, mixed models, nested data models, random coefficient, random-effects models, random parameter models, or split-plot designs)</li>
@@ -154,9 +137,8 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <figure role="group"><figcaption><strong>Figure 12.1.</strong> Slide text: Clark 2003 modeled fecundity of spotted owls and its implications for population growth; data were offspring counts per pair of owls, sample size n=197.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-13-h">
-<h2 id="slide-13-h"><span id="slide-13"></span>Slide 13</h2>
+<h2 id="slide-13-h"><span id="slide-13"></span>Slide 13: Gamma is the conjugate prior and flexible/non-negative. Good choice here</h2>
 <figure role="group"><figcaption><strong>Figure 13.1.</strong> Directed graph with arrows from alpha and beta pointing to lambda_i. Equation: [lambda,alpha,beta|y] proportional to product Poisson(y_i|lambda_i) gamma(lambda_i|alpha,beta) times gamma(alpha|.001,.001) gamma(beta|.001,.001).</figcaption></figure>
-<p>Gamma is the conjugate prior and flexible/non-negative. Good choice here</p>
 <ul>
 <li>These are called hyperpriors.</li>
 <li>What is going on here? Is this possible in glmer()</li>
@@ -168,9 +150,8 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 </ul>
 </section>
 <section aria-labelledby="slide-14-h">
-<h2 id="slide-14-h"><span id="slide-14"></span>Slide 14</h2>
+<h2 id="slide-14-h"><span id="slide-14"></span>Slide 14: Gamma is the conjugate prior and flexible/non-negative. Good choice here</h2>
 <figure role="group"><figcaption><strong>Figure 14.1.</strong> Directed graph with arrows from alpha and beta pointing to lambda_i. Equation: [lambda,alpha,beta|y] proportional to product Poisson(y_i|lambda_i) gamma(lambda_i|alpha,beta) times gamma(alpha|.001,.001) gamma(beta|.001,.001).</figcaption></figure>
-<p>Gamma is the conjugate prior and flexible/non-negative. Good choice here</p>
 <ul>
 <li>These are called hyperpriors.</li>
 <li>What is going on here?</li>
@@ -183,8 +164,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <p>But they arise from a common distribution</p>
 </section>
 <section aria-labelledby="slide-15-h">
-<h2 id="slide-15-h"><span id="slide-15"></span>Slide 15</h2>
-<p>MULTILEVEL MODELING</p>
+<h2 id="slide-15-h"><span id="slide-15"></span>Slide 15: MULTILEVEL MODELING</h2>
 <p>Soil nitrous-oxide emissions are measured at multiple sites across the world. Each site has multiple measurements of (nitrogen input, emission). Different sites have wildly different soil organic carbon, climate, and microbial communities — so we expect site-level structure.</p>
 <ul>
 <li>Build complexity incrementally!</li>
@@ -192,16 +172,14 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 </ul>
 </section>
 <section aria-labelledby="slide-16-h">
-<h2 id="slide-16-h"><span id="slide-16"></span>Slide 16</h2>
-<p>Complete pooling</p>
+<h2 id="slide-16-h"><span id="slide-16"></span>Slide 16: Complete pooling</h2>
 <figure role="group"><figcaption><strong>Figure 16.1.</strong> JAGS complete-pooling model code: single alpha and beta priors, sigma, and one likelihood loop regressing log.emission on centered log nitrogen input, plus a loop deriving predicted emissions.</figcaption></figure>
 <p>Iterate likelihood over the data</p>
 <p>Only one alpha and beta</p>
 <p>Only one alpha and beta</p>
 </section>
 <section aria-labelledby="slide-17-h">
-<h2 id="slide-17-h"><span id="slide-17"></span>Slide 17</h2>
-<p>No pooling</p>
+<h2 id="slide-17-h"><span id="slide-17"></span>Slide 17: No pooling</h2>
 <figure role="group"><figcaption><strong>Figure 17.1.</strong> JAGS no-pooling model code: a separate alpha[j] prior for each of n.sites, shared beta and sigma; likelihood uses alpha[group[i]], with nested loops for site-level predicted emissions.</figcaption></figure>
 <p>Every site gets its own alpha</p>
 <ul>
@@ -210,21 +188,13 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 </ul>
 </section>
 <section aria-labelledby="slide-18-h">
-<h2 id="slide-18-h"><span id="slide-18"></span>Slide 18</h2>
-<ul>
-<li>Random intercept</li>
-<li>Partial pooling</li>
-</ul>
+<h2 id="slide-18-h"><span id="slide-18"></span>Slide 18: Random intercept Partial pooling</h2>
 <figure role="group"><figcaption><strong>Figure 18.1.</strong> Directed acyclic graph for a partial-pooling random-intercept model: y_ij depends on beta, alpha_j, sigma, and covariate x_ij; alpha_j depends on hyperparameters mu_alpha and varsigma_alpha.</figcaption></figure>
 <figure role="group"><figcaption><strong>Figure 18.2.</strong> JAGS partial-pooling model code: hyperpriors mu.alpha and sigma.alpha, site intercepts alpha[j] drawn from dnorm(mu.alpha, tau.alpha), shared beta/sigma, likelihood, and predicted emissions loops.</figcaption></figure>
 <p>Alpha varies by site but within shared distribution</p>
 </section>
 <section aria-labelledby="slide-19-h">
-<h2 id="slide-19-h"><span id="slide-19"></span>Slide 19</h2>
-<ul>
-<li>Random intercept</li>
-<li>Partial pooling, but also attempt to EXPLAIN site-level differences</li>
-</ul>
+<h2 id="slide-19-h"><span id="slide-19"></span>Slide 19: Random intercept Partial pooling, but also attempt to EXPLAIN site-level differences</h2>
 <figure role="group"><figcaption><strong>Figure 19.1.</strong> JAGS model code adding a site-level carbon covariate: mu.alpha[j] &lt;- kappa + eta*w[j] and alpha[j] ~ dnorm(mu.alpha[j], tau.alpha), explaining variation in intercepts among sites, plus predicted emissions.</figcaption></figure>
 <p>Every site gets its own alpha</p>
 <figure role="group"><figcaption><strong>Figure 19.2.</strong> Directed acyclic graph: y_ij depends on alpha_j, beta, sigma, and covariate x_ij; alpha_j depends on kappa, eta, varsigma_alpha, and site covariate w_j feeds into alpha_j.</figcaption></figure>
@@ -233,8 +203,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <p>Flexibility! Intercepts can depend on soil carbon</p>
 </section>
 <section aria-labelledby="slide-20-h">
-<h2 id="slide-20-h"><span id="slide-20"></span>Slide 20</h2>
-<p>Latent Variable Modeling I - Occupancy</p>
+<h2 id="slide-20-h"><span id="slide-20"></span>Slide 20: Latent Variable Modeling I - Occupancy</h2>
 <figure role="group"><figcaption><strong>Figure 20.1.</strong> Tree diagram of occupancy detection: surveying an area leads to not seeing the species (y=0), which means either absent (z=0) or present but undetected (z=1); or seeing it (y=1), meaning present (z=1).</figcaption></figure>
 <p>“Latent variable” inferred rather than observed</p>
 <p>What should the priors be?</p>
@@ -254,16 +223,11 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 </ul>
 </section>
 <section aria-labelledby="slide-22-h">
-<h2 id="slide-22-h"><span id="slide-22"></span>Slide 22</h2>
-<p>DYNAMIC OCCUPANCY MODELING LAB</p>
+<h2 id="slide-22-h"><span id="slide-22"></span>Slide 22: DYNAMIC OCCUPANCY MODELING LAB</h2>
 <figure role="group"><figcaption><strong>Figure 22.1.</strong> Diagram of dynamic occupancy transitions from year t-1 to year t between states z=0 (absent) and z=1 (present), with rates: colonization gamma, persistence phi, and complements 1-gamma and 1-phi.</figcaption></figure>
 </section>
 <section aria-labelledby="slide-23-h">
-<h2 id="slide-23-h"><span id="slide-23"></span>Slide 23</h2>
-<ul>
-<li>N-mixture Models</li>
-<li>Separating Process and Observation Error</li>
-</ul>
+<h2 id="slide-23-h"><span id="slide-23"></span>Slide 23: N-mixture Models Separating Process and Observation Error</h2>
 <ul>
 <li>Imperfect detection is also a problem when estimating abundance</li>
 <li>N-mixture models can account for imperfect detection of individuals within a species</li>

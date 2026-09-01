@@ -26,22 +26,22 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li><a href="#slide-4">4. Binomial Experiments-II(Notation)</a></li>
 <li><a href="#slide-5">5. Binomial Probabilities-I</a></li>
 <li><a href="#slide-6">6. One Binomial Trial: The Bernoulli Distribution</a></li>
-<li><a href="#slide-7">7. Slide 7</a></li>
-<li><a href="#slide-8">8. Slide 8</a></li>
-<li><a href="#slide-9">9. Slide 9</a></li>
-<li><a href="#slide-10">10. Slide 10</a></li>
+<li><a href="#slide-7">7. Concept Question</a></li>
+<li><a href="#slide-8">8. Concept Question</a></li>
+<li><a href="#slide-9">9. Group Work</a></li>
+<li><a href="#slide-10">10. Solution</a></li>
 <li><a href="#slide-11">11. Binomial Probabilities-II</a></li>
 <li><a href="#slide-12">12. The Binomial Distribution</a></li>
 <li><a href="#slide-13">13. Examples of the Binomial Distribution-I</a></li>
 <li><a href="#slide-14">14. Examples of the Binomial Distribution-III</a></li>
 <li><a href="#slide-15">15. Sneak peak: Maximum likelihood is just doing this in reverse!!!</a></li>
-<li><a href="#slide-16">16. Slide 16</a></li>
+<li><a href="#slide-16">16. This is among the easiest possible likelihood problems</a></li>
 <li><a href="#slide-17">17. Sneak peak: Maximum Likelihood is just doing this in reverse!!!</a></li>
 <li><a href="#slide-18">18. Sneak peak: Maximum likelihood is just doing this in reverse!!!</a></li>
-<li><a href="#slide-19">19. Slide 19</a></li>
-<li><a href="#slide-20">20. Slide 20</a></li>
+<li><a href="#slide-19">19. How do we find the “maximum likelihood estimate” (MLE) for p? Enter Calculus! Find the MLE for p</a></li>
+<li><a href="#slide-20">20. Sneak peak: Maximum likelihood is just doing this in reverse!!!</a></li>
 <li><a href="#slide-21">21. Back to distributions</a></li>
-<li><a href="#slide-22">22. Slide 22</a></li>
+<li><a href="#slide-22">22. The multinomial distribution: more than one kind of success</a></li>
 <li><a href="#slide-23">23. The Poisson Distribution-I</a></li>
 <li><a href="#slide-24">24. The Poisson Distribution-I</a></li>
 <li><a href="#slide-25">25. The Poisson Distribution - pmf</a></li>
@@ -59,7 +59,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <li><a href="#slide-37">37. The Poisson Distribution - Caveat</a></li>
 <li><a href="#slide-38">38. But first: MLE for the Poisson Distribution</a></li>
 <li><a href="#slide-39">39. The Negative Binomial Distribution(1) # failures/trials before fixed number of successes</a></li>
-<li><a href="#slide-40">40. Slide 40</a></li>
+<li><a href="#slide-40">40. Try to derive it based on this argument</a></li>
 <li><a href="#slide-41">41. The Negative Binomial Distribution(2) Poisson with a variable rate parameter</a></li>
 <li><a href="#slide-42">42. Quick note on Gamma function</a></li>
 <li><a href="#slide-43">43. The Negative Binomial Distribution(2) Poisson with a variable rate parameter</a></li>
@@ -135,8 +135,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <p>P(x) = nCx px qn−x = n! / ((n − x)! x!) · px qn−x</p>
 </section>
 <section aria-labelledby="slide-7-h">
-<h2 id="slide-7-h"><span id="slide-7"></span>Slide 7</h2>
-<p>Concept Question</p>
+<h2 id="slide-7-h"><span id="slide-7"></span>Slide 7: Concept Question</h2>
 <p>1. Let X ~ binom(n, p) and Y ~ binom(m, p) be independent. Then X + Y follows:</p>
 <ul>
 <li>(a) binom(n + m, p)        (b) binom(nm, p)</li>
@@ -149,8 +148,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 </ul>
 </section>
 <section aria-labelledby="slide-8-h">
-<h2 id="slide-8-h"><span id="slide-8"></span>Slide 8</h2>
-<p>Concept Question</p>
+<h2 id="slide-8-h"><span id="slide-8"></span>Slide 8: Concept Question</h2>
 <p>1. Let X ~ binom(n, p) and Y ~ binom(m, p) be independent. Then X + Y follows:</p>
 <ul>
 <li>(a) binom(n + m, p)        (b) binom(nm, p)</li>
@@ -165,20 +163,18 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <p>2. answer: (d) This is different from problem 1 because we are combining Bernoulli(p) r.v.&#x27;s with Bernoulli(q) r.v.&#x27;s. This is not one of the named random variables we know about.</p>
 </section>
 <section aria-labelledby="slide-9-h">
-<h2 id="slide-9-h"><span id="slide-9"></span>Slide 9</h2>
+<h2 id="slide-9-h"><span id="slide-9"></span>Slide 9: Group Work</h2>
 <ul>
 <li>Hints:</li>
 <li>Make a table with X, p(x), and (X - µ )2. Remember µ = E[X]</li>
 <li>Remember that variances of independent random variables add</li>
 <li style="margin-left:1.2em">Var(X + Y) = Var(X) + Var(Y)</li>
 </ul>
-<p>Group Work</p>
 <p>1. Prove: if X ~ Bernoulli(p)  then  Var(X) = p(1 − p).</p>
 <p>2. Prove: if X ~ bin(n, p)  then  Var(X) = n p(1 − p).</p>
 </section>
 <section aria-labelledby="slide-10-h">
-<h2 id="slide-10-h"><span id="slide-10"></span>Slide 10</h2>
-<p>Solution</p>
+<h2 id="slide-10-h"><span id="slide-10"></span>Slide 10: Solution</h2>
 <p>1. For X ~ Bernoulli(p) we use a table. (We know E(X) = p.)</p>
 <table><thead><tr><th scope="col">X</th><th scope="col">0</th><th scope="col">1</th></tr></thead>
 <tbody>
@@ -254,12 +250,11 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 </ul>
 </section>
 <section aria-labelledby="slide-16-h">
-<h2 id="slide-16-h"><span id="slide-16"></span>Slide 16</h2>
+<h2 id="slide-16-h"><span id="slide-16"></span>Slide 16: This is among the easiest possible likelihood problems</h2>
 <ul>
 <li>Instead of knowing N and p, we often collect data, k #successes, to determine p and/or N</li>
 <li>Let’s assume that N is known. Say we conduct N trials, observe k successes, and want to make inference about p, given k and N</li>
 </ul>
-<p>This is among the easiest possible likelihood problems</p>
 <p>Sneak peak: Maximum likelihood is just doing this in reverse!!!</p>
 <p>ℒ(p | k, N) = (N choose k) pk (1 − p)N − k</p>
 </section>
@@ -285,23 +280,17 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <p>L(p | k, N) = log(N choose k) + k log(p) + (N − k) log(1 − p)</p>
 </section>
 <section aria-labelledby="slide-19-h">
-<h2 id="slide-19-h"><span id="slide-19"></span>Slide 19</h2>
-<ul>
-<li>How do we find the “maximum likelihood estimate” (MLE) for p?</li>
-<li>Enter Calculus!</li>
-<li>Find the MLE for p</li>
-</ul>
+<h2 id="slide-19-h"><span id="slide-19"></span>Slide 19: How do we find the “maximum likelihood estimate” (MLE) for p? Enter Calculus! Find the MLE for p</h2>
 <p>Sneak peak: Maximum likelihood is just doing this in reverse!!!</p>
 <p>L(p | k, N) = log(N choose k) + k log(p) + (N − k) log(1 − p)</p>
 </section>
 <section aria-labelledby="slide-20-h">
-<h2 id="slide-20-h"><span id="slide-20"></span>Slide 20</h2>
+<h2 id="slide-20-h"><span id="slide-20"></span>Slide 20: Sneak peak: Maximum likelihood is just doing this in reverse!!!</h2>
 <figure role="group"><figcaption><strong>Figure 20.1.</strong> Two log-likelihood curves for p (binomial, constant term dropped). Panel a: 4 successes in 10 trials, wide peak near p=0.4. Panel b: 40 in 100, much narrower peak near 0.4. Larger samples give sharper likelihoods.</figcaption></figure>
 <ul>
 <li>Hudson (1971) showed that an approximate 95% CI for a single peaked likelihood function occurs 2 log-likelihood units below the peak.</li>
 <li>Can you see why sample size is so important based on these shapes?</li>
 </ul>
-<p>Sneak peak: Maximum likelihood is just doing this in reverse!!!</p>
 </section>
 <section aria-labelledby="slide-21-h">
 <h2 id="slide-21-h"><span id="slide-21"></span>Slide 21: Back to distributions</h2>
@@ -311,8 +300,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 </ul>
 </section>
 <section aria-labelledby="slide-22-h">
-<h2 id="slide-22-h"><span id="slide-22"></span>Slide 22</h2>
-<p>The multinomial distribution: more than one kind of success</p>
+<h2 id="slide-22-h"><span id="slide-22"></span>Slide 22: The multinomial distribution: more than one kind of success</h2>
 <p>The multinomial distribution is an extension of the binomial distribution to the case of more than two (we shall assume n) kinds of outcomes, in which a single trial has probability pi of ending in category i. In a total of N trials, we assume that ki of the outcomes end in category i.</p>
 <p>Pr{k | N, p} = N! / (∏i=1n ki!) · ∏i=1n pikᵢ</p>
 </section>
@@ -500,8 +488,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 </ul>
 </section>
 <section aria-labelledby="slide-40-h">
-<h2 id="slide-40-h"><span id="slide-40"></span>Slide 40</h2>
-<p>Try to derive it based on this argument</p>
+<h2 id="slide-40-h"><span id="slide-40"></span>Slide 40: Try to derive it based on this argument</h2>
 <p>How do we turn this into “failures”, now k, until r successes? k-&gt;r; N-&gt; k+r;</p>
 <p>The Negative Binomial Distribution(1) # failures/trials before fixed number of successes</p>
 <p>Pr{N = n | k, p} = Probability that the kth success occurs on trial n</p>

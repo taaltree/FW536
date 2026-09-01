@@ -402,7 +402,7 @@ fit_with_x &lt;- <span class="fn">lmer</span>(Z_TP ~ Z_Length + (<span class="nu
 <h3>2. AIC, AICc, BIC</h3>
 <table>
 <tr><th scope="col">Criterion</th><th scope="col">Formula</th><th scope="col">Philosophy</th></tr>
-<tr><td>AIC</td><td>$-2\ell + 2k$</td><td>Estimates how far a model sits from the truth, so it targets <strong>prediction</strong>: which of these models will forecast best on new data.</td></tr>
+<tr><td>AIC</td><td>$-2\ell + 2k$</td><td>Estimates how far a model sits from the truth, so it targets <strong>prediction</strong>: which of these models will forecast best on new data. The "distance" here is the Kullback&ndash;Leibler (K&ndash;L) distance, which measures how much information about the real process you lose by using the model in its place. Nobody can compute it, since it needs the truth, but differences in AIC estimate differences in it, which is all a comparison needs.</td></tr>
 <tr><td>AICc</td><td>$\text{AIC} + \dfrac{2k(k+1)}{n-k-1}$</td><td>Small-sample correction. Recommended whenever $n/k &lt; 40$.</td></tr>
 <tr><td>BIC</td><td>$-2\ell + k\ln n$</td><td>Penalises complexity by $\ln n$ rather than 2, so it favours simpler models ever more aggressively as the sample grows. It targets <strong>inference</strong>: which model is the true one.</td></tr>
 </table>
@@ -425,7 +425,7 @@ fit_with_x &lt;- <span class="fn">lmer</span>(Z_TP ~ Z_Length + (<span class="nu
 <p>where $\hat{f}_{-i}$ is the model fit with the $i$-th observation withheld. Models that overfit will perform well on the training data but poorly on the held-out fold; CV exposes this directly.</p>
 
 <h3>4. Multimodel inference (Burnham &amp; Anderson, briefly)</h3>
-<p>If several models are close in AIC, the "best" is poorly determined and any one of them might be the K-L closest in a different sample. Akaike weights<br>
+<p>If several models are close in AIC, the "best" is poorly determined and any one of them might be the closest to the truth in a different sample. Akaike weights<br>
 $w_i = \exp(-\tfrac{1}{2}\Delta_i) / \sum_j \exp(-\tfrac{1}{2}\Delta_j)$<br>
 weight each model's predictions and can be used for model-averaged effect estimates. We will show this only briefly today; the deeper conversation is whether the question you're asking is best answered by averaging at all.</p>
 </section>

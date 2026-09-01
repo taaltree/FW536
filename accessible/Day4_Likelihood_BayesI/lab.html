@@ -994,7 +994,11 @@ surv_samps &lt;- <span class="fn">nimbleMCMC</span>(
 <span class="nu">1</span> - <span class="fn">pbeta</span>(<span class="nu">0.5</span>, alpha1, beta1)</code></pre>
 
 <div class="callout bio"><p class="callout-label">Biological intuition</p>
-A common student question: "If I had no prior information, would I get the MLE?" Yes — Beta(1,1) (Uniform) prior gives posterior mode = MLE = $y/n = 0.72$. The prior we used here (Beta(9,11)) <em>shrinks</em> the estimate from 0.72 toward 0.45. The closer your prior pseudo-sample size to your actual data, the more shrinkage you get. With $n=25$ and prior "sample size" 20, you can see almost 50% shrinkage.
+A common student question: "If I had no prior information, would I get the MLE?" Almost — and the gap is worth understanding. A Beta(1,1) (Uniform) prior gives a posterior whose <strong>mode</strong> is exactly the MLE, $y/n = 0.72$. But the number <code>MCMCsummary()</code> prints is the posterior <strong>mean</strong>, and that is $19/27 = 0.704$ — not 0.72. Students who compare the two and find them different have not made a mistake.
+<p>The reason is that Beta(1,1) is not "no information": it is one pseudo-success and one pseudo-failure, a pseudo-sample size of 2. Those two cancel at the peak, so the mode is untouched, but they still count in the average:</p>
+<div class="eq-block">$\text{posterior mean} = \dfrac{\alpha_0 + y}{\alpha_0 + \beta_0 + n} = \underbrace{\tfrac{2}{27}}_{\text{prior}} \times 0.5 \;+\; \underbrace{\tfrac{25}{27}}_{\text{data}} \times 0.72 \;=\; 0.704,$</div>
+<p>so the mean is dragged slightly toward the prior mean of 0.5, while the mode is not. The pull fades as data accumulate: the gap is 0.016 at $n = 25$, 0.004 at $n = 100$, and 0.0002 at $n = 2000$. If you want the Bayesian summary that reproduces the MLE, report the posterior mode; if you report the mean — as almost everyone does — expect it to sit a little toward the prior.</p>
+<p>The prior we used here (Beta(9,11)) <em>shrinks</em> the estimate much harder, from 0.72 toward 0.45. The closer your prior pseudo-sample size to your actual data, the more shrinkage you get. With $n=25$ and prior "sample size" 20, you can see almost 50% shrinkage.</p>
 </div>
 </section>
 

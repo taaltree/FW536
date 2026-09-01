@@ -719,31 +719,74 @@ lam &lt;- <span class="fn">seq</span>(<span class="nu">0</span>, <span class="nu
 <li>Draw $u \sim \text{Uniform}(0,1)$. If $u < \alpha$, accept; otherwise stay.</li>
 </ol>
 
-<div class="code-label">R · homemade Metropolis for Beta–Binomial</div>
+<p>We will write it twice. First <em>exactly</em> as the recipe above reads — densities multiplied, ratio taken, compared with a uniform draw. Then again on the log scale, which is how every real sampler is written — once you have seen why.</p>
+
+<div class="code-label">R · Metropolis, written exactly as the recipe reads</div>
 <pre><code>y &lt;- <span class="nu">9</span>; n &lt;- <span class="nu">12</span>; alpha0 &lt;- <span class="nu">2</span>; beta0 &lt;- <span class="nu">2</span>
 
-log_post &lt;- <span class="kw">function</span>(p) {
- <span class="kw">if</span> (p &lt;= <span class="nu">0</span> || p &gt;= <span class="nu">1</span>) <span class="kw">return</span>(-<span class="kw">Inf</span>)
- <span class="fn">dbeta</span>(p, alpha0, beta0, log = <span class="kw">TRUE</span>) +
- <span class="fn">dbinom</span>(y, size = n, prob = p, log = <span class="kw">TRUE</span>)
+<span class="cm"># The posterior is proportional to prior x likelihood. That product is all</span>
+<span class="cm"># Metropolis needs: the normalising constant cancels in the ratio below.</span>
+post &lt;- <span class="kw">function</span>(p) {
+  <span class="kw">if</span> (p &lt;= <span class="nu">0</span> || p &gt;= <span class="nu">1</span>) <span class="kw">return</span>(<span class="nu">0</span>)     <span class="cm"># p is a probability; outside (0,1) it is impossible</span>
+  <span class="fn">dbeta</span>(p, alpha0, beta0) * <span class="fn">dbinom</span>(y, size = n, prob = p)
+}
+
+<span class="fn">set.seed</span>(<span class="nu">2</span>)
+niter &lt;- <span class="nu">20000</span>; chain &lt;- <span class="fn">numeric</span>(niter); chain[<span class="nu">1</span>] &lt;- <span class="nu">0.5</span>
+accept &lt;- <span class="nu">0</span>; s &lt;- <span class="nu">0.35</span>                <span class="cm"># proposal SD</span>
+
+<span class="kw">for</span> (i <span class="kw">in</span> <span class="nu">2</span>:niter) {
+  prop  &lt;- <span class="fn">rnorm</span>(<span class="nu">1</span>, mean = chain[i - <span class="nu">1</span>], sd = s)   <span class="cm"># 1. propose</span>
+  alpha &lt;- <span class="fn">post</span>(prop) / <span class="fn">post</span>(chain[i - <span class="nu">1</span>])         <span class="cm"># 2. acceptance ratio</span>
+  <span class="kw">if</span> (<span class="fn">runif</span>(<span class="nu">1</span>) &lt; alpha) {                          <span class="cm"># 3. accept w.p. min(1, alpha)</span>
+    chain[i] &lt;- prop; accept &lt;- accept + <span class="nu">1</span>
+  } <span class="kw">else</span> chain[i] &lt;- chain[i - <span class="nu">1</span>]
+}
+<span class="fn">cat</span>(<span class="st">&quot;acceptance rate =&quot;</span>, <span class="fn">round</span>(accept / niter, <span class="nu">3</span>), <span class="st">&quot;\n&quot;</span>)   <span class="cm"># 0.365</span></code></pre>
+
+<p>That runs, and its posterior mean of <strong>0.686</strong> sits right on the closed-form Beta(11, 5) mean of 0.688. Note there is no <code>min(1, ...)</code> anywhere: if <code>alpha</code> exceeds 1 then <code>runif(1) &lt; alpha</code> is certain, so the comparison already <em>is</em> the minimum.</p>
+
+<div class="callout warn">
+<p><strong>Why every real sampler does this in logs.</strong> The toy above is safe because the aggregated Binomial pmf is a single moderate number — <code>dbinom(75000, 100000, 0.75)</code> is still 0.0029. But real likelihoods are <em>products over observations</em>, and those collapse fast. Take the same 75%-success data kept one row per bird:</p>
+<pre><code><span class="fn">prod</span>(<span class="fn">dbinom</span>(y, <span class="nu">1</span>, <span class="nu">0.75</span>))   <span class="cm"># n =  200  -&gt;  1.4e-49</span>
+                           <span class="cm"># n =  700  -&gt;  1.1e-171</span>
+                           <span class="cm"># n = 1400  -&gt;  0            underflowed</span></code></pre>
+<p>The smallest positive number R can hold is about $2.2 \times 10^{-308}$. Past that the product is not merely small, it is <em>exactly zero</em> — so the acceptance ratio becomes <code>0/0</code>, which is <code>NaN</code>, and the chain dies. Normal data underflows sooner still: 400 observations is enough, and Bonus walk-through 9 below fits 120 of them. So this is not a hypothetical.</p>
+<p>Logs fix it because they turn those doomed products into sums that stay ordinary-sized — the $n = 1400$ product above is just $-1687$ in logs. There are exactly three translations:</p>
+<ul>
+<li><strong>Multiplication becomes addition.</strong> $\log(\text{prior} \times \text{likelihood}) = \log\text{prior} + \log\text{likelihood}$, so <code>dbeta(...) * dbinom(...)</code> becomes <code>dbeta(..., log = TRUE) + dbinom(..., log = TRUE)</code>. Use each density's own <code>log = TRUE</code> rather than wrapping the product in <code>log()</code>: R then works in logs throughout and never forms the doomed number at all.</li>
+<li><strong>The ratio becomes a difference.</strong> $\log(a/b) = \log a - \log b$, so <code>post(prop) / post(cur)</code> becomes <code>log_post(prop) - log_post(cur)</code>. That quantity is now $\log\alpha$, not $\alpha$.</li>
+<li><strong>The comparison moves to the log scale too.</strong> We still want $u &lt; \alpha$, and taking $\log$ of both sides preserves the inequality because $\log$ is increasing — giving $\log u &lt; \log\alpha$, i.e. <code>log(runif(1)) &lt; log_alpha</code>. Exponentiating back to compare on the original scale would re-create the underflow we just escaped.</li>
+</ul>
+<p>One consequence worth naming: impossible values now return <code>-Inf</code> instead of <code>0</code>, because $\log 0 = -\infty$. It behaves correctly — <code>-Inf</code> minus anything finite is <code>-Inf</code>, and <code>log(runif(1)) &lt; -Inf</code> is never true, so such a proposal is always rejected.</p>
+</div>
+
+<div class="code-label">R · the same sampler, on the log scale</div>
+<pre><code>log_post &lt;- <span class="kw">function</span>(p) {
+  <span class="kw">if</span> (p &lt;= <span class="nu">0</span> || p &gt;= <span class="nu">1</span>) <span class="kw">return</span>(-<span class="kw">Inf</span>)        <span class="cm"># log(0) = -Inf: impossible</span>
+  <span class="fn">dbeta</span>(p, alpha0, beta0, log = <span class="kw">TRUE</span>) +     <span class="cm"># log(prior x likelihood)</span>
+  <span class="fn">dbinom</span>(y, size = n, prob = p, log = <span class="kw">TRUE</span>) <span class="cm">#   = log prior + log likelihood</span>
 }
 
 niter &lt;- <span class="nu">20000</span>; chain &lt;- <span class="fn">numeric</span>(niter); chain[<span class="nu">1</span>] &lt;- <span class="nu">0.5</span>
-accept &lt;- <span class="nu">0</span>; s &lt;- <span class="nu">0.35</span> <span class="cm"># proposal SD</span>
+accept &lt;- <span class="nu">0</span>; s &lt;- <span class="nu">0.35</span>
 <span class="fn">set.seed</span>(<span class="nu">2</span>)
-<span class="kw">for</span> (i in <span class="nu">2</span>:niter) {
- prop &lt;- <span class="fn">rnorm</span>(<span class="nu">1</span>, mean = chain[i - <span class="nu">1</span>], sd = s)
- log_alpha &lt;- <span class="fn">log_post</span>(prop) - <span class="fn">log_post</span>(chain[i - <span class="nu">1</span>])
- <span class="kw">if</span> (<span class="fn">log</span>(<span class="fn">runif</span>(<span class="nu">1</span>)) &lt; log_alpha) { chain[i] &lt;- prop; accept &lt;- accept + <span class="nu">1</span> }
- <span class="kw">else</span> chain[i] &lt;- chain[i - <span class="nu">1</span>]
+<span class="kw">for</span> (i <span class="kw">in</span> <span class="nu">2</span>:niter) {
+  prop      &lt;- <span class="fn">rnorm</span>(<span class="nu">1</span>, mean = chain[i - <span class="nu">1</span>], sd = s)
+  log_alpha &lt;- <span class="fn">log_post</span>(prop) - <span class="fn">log_post</span>(chain[i - <span class="nu">1</span>])  <span class="cm"># ratio -&gt; difference</span>
+  <span class="kw">if</span> (<span class="fn">log</span>(<span class="fn">runif</span>(<span class="nu">1</span>)) &lt; log_alpha) {                      <span class="cm"># u &lt; alpha, both logged</span>
+    chain[i] &lt;- prop; accept &lt;- accept + <span class="nu">1</span>
+  } <span class="kw">else</span> chain[i] &lt;- chain[i - <span class="nu">1</span>]
 }
 
 burn &lt;- <span class="nu">2000</span>
-<span class="fn">cat</span>(<span class="st">"acceptance rate ="</span>, <span class="fn">round</span>(accept / niter, <span class="nu">3</span>), <span class="st">"\n"</span>)
-<span class="fn">hist</span>(chain[-(1:burn)], breaks = <span class="nu">60</span>, freq = <span class="kw">FALSE</span>, main = <span class="st">"Posterior of p"</span>,
- xlab = <span class="st">"p"</span>, col = <span class="st">"grey90"</span>, border = <span class="st">"white"</span>)
+<span class="fn">cat</span>(<span class="st">&quot;acceptance rate =&quot;</span>, <span class="fn">round</span>(accept / niter, <span class="nu">3</span>), <span class="st">&quot;\n&quot;</span>)
+<span class="fn">hist</span>(chain[-(<span class="nu">1</span>:burn)], breaks = <span class="nu">60</span>, freq = <span class="kw">FALSE</span>, main = <span class="st">&quot;Posterior of p&quot;</span>,
+     xlab = <span class="st">&quot;p&quot;</span>, col = <span class="st">&quot;grey90&quot;</span>, border = <span class="st">&quot;white&quot;</span>)
 <span class="cm"># Overlay the closed-form Beta(alpha0+y, beta0+n-y) posterior</span>
-<span class="fn">curve</span>(<span class="fn">dbeta</span>(x, alpha0 + y, beta0 + n - y), col = <span class="st">"red"</span>, lwd = <span class="nu">2</span>, add = <span class="kw">TRUE</span>)</code></pre>
+<span class="fn">curve</span>(<span class="fn">dbeta</span>(x, alpha0 + y, beta0 + n - y), col = <span class="st">&quot;red&quot;</span>, lwd = <span class="nu">2</span>, add = <span class="kw">TRUE</span>)</code></pre>
+
+<p>Run both. With the same seed they accept and reject at exactly the same steps and produce a <strong>bit-for-bit identical chain</strong>. The logs change nothing about the algorithm — they only change the arithmetic it can survive.</p>
 
 <div class="callout key">
 Tuning: acceptance rate of about 25–40% is healthy for random-walk Metropolis in moderate dimensions. Too high → tiny proposals, slow mixing. Too low → wasted iterations. Real samplers (Nimble's default) adapt the proposal scale during burn-in for you.

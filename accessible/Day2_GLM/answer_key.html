@@ -69,19 +69,12 @@ MathJax = {
 <!-- ============================================================ -->
 <section id="m1">
 <h2>Exercise M1 — Orangutan line transects (Exponential)</h2>
-<p><strong>Setup.</strong> The detection function $g(x)$ is the probability that an orangutan at perpendicular distance $x$ <em>is seen</em>. Give each animal a latent detection range $X\sim\text{Exponential}(\lambda)$, $\lambda = 0.02$ per meter, with density $f(t) = \lambda e^{-\lambda t}$; the animal is seen exactly when $X \ge x$.</p>
-<p>So the detection function is the <em>survival function</em> of $X$ (students may reach it either by integrating $f$ from $x$ outward or by complementing the standard Exponential CDF &mdash; both are on the lab page):</p>
-<div class="eq-block">$g(x) = P(X \ge x) = e^{-\lambda x}$</div>
-<p>At $x = 50$, $\lambda x = 1$, so the animal is <em>detected</em> with probability $e^{-1}$ and <em>missed</em> with the complement:</p>
-<pre><code>lambda &lt;- 0.02
-exp(-lambda * 50)      # 0.3679  detected at 50 m
-1 - exp(-lambda * 50)  # 0.6321  missed at 50 m
-log(2) / lambda        # 34.66   half-distance</code></pre>
-<p><strong>Biological interpretation.</strong> A 63% probability of missing an orangutan that is 50 m off the trackline is huge &mdash; 50 m is well past the 34.7-m half-distance, so fewer than half the animals at that distance are seen. This is exactly why distance-sampling analyses must <em>correct</em> raw counts by a fitted detection function instead of treating raw counts as abundance estimates. The "effective strip half-width" &mdash; the integral of $g(x)$ &mdash; gives you a single number to multiply transect length by to get the area effectively searched. For $\lambda = 0.02$, that effective half-width is $1/\lambda = 50$ m, even though the truncation distance might be 100 m or more.</p>
-<div class="callout key"><p class="callout-label">Key idea</p><strong>What to look for:</strong> the exponential itself is the easy part; the graded step is the <em>complement</em>. The dominant error is writing $e^{-1} = 0.368$ and calling it the probability of missing &mdash; that is the probability of <em>seeing</em>. Detection must <em>fall</em> with distance, so a student whose "miss" probability shrinks as $x$ grows has the function upside down; ask them what their answer says at $x = 0$. Accept either derivation route, but ask which one they used and why the two agree. Bonus if they connect $1/\lambda = 50$ m to the effective strip half-width, or notice that a pure exponential has no shoulder near the trackline &mdash; real detection is usually near-certain for the first few meters, which is why half-normal and hazard-rate keys are the field standard.</div>
-</section>
-
-<section id="m2">
+<p><strong>Setup.</strong> Orangutans are randomly placed in the forest, so the distance $X$ travelled before the first sighting is Exponential$(\lambda)$, with density $f(x) = \lambda e^{-\lambda x}$ on $x \ge 0$ and mean $1/\lambda$.</p>
+<p>"Not seen by distance $x$" means $X$ exceeded $x$, so the answer is the survival function. Either route is fine, and students should be able to do at least one:</p>
+<div class="eq-block">$P(X \ge x) = \int_x^\infty \lambda e^{-\lambda t}\,dt = \big[-e^{-\lambda t}\big]_x^\infty = e^{-\lambda x},$</div>
+<p>or, without integrating, as the complement of the standard Exponential CDF $F(x) = 1 - e^{-\lambda x}$:</p>
+<div class="eq-block">$P(X \ge x) = 1 - F(x) = e^{-\lambda x}.$</div>
+<p><strong>What to look for:</strong> the key step is recognising that "not yet seen" is $P(X \ge x)$ rather than a density evaluation. A student who writes $f(x) = \lambda e^{-\lambda x}$ and stops has given a density, not a probability. Accept either derivation, but ask which they used and why the two agree: Way 1 is really just deriving the CDF on the spot. Bonus if they notice the survival function decays by the constant factor $e^{-\lambda}$ per meter, so there is a half-distance $\ln(2)/\lambda$ at which half the orangutans remain unseen.</p>
 <h2>Exercise M2 — Linear transformations of Normals</h2>
 <p>Let $Z \sim \mathcal{N}(0,1)$ and $Y = \mu + \sigma Z$. Show each step and name the rule used.</p>
 <p><strong>Mean.</strong></p>

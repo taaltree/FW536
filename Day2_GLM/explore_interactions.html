@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Interactive: interaction terms | FW 536 Day 2</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../_Shared/css/lab.css" />
+<script defer src="../_Shared/js/lab.js"></script>
+<style>
+  .widget { background:#fff; border:1px solid var(--border); border-radius:10px; padding:20px 24px; margin:24px 0; }
+  .viewpick { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
+  .viewpick button { font-family:'Helvetica Neue',Arial,sans-serif; font-size:14px; font-weight:600;
+    border:2px solid var(--border); background:#fff; color:var(--osu-stone); border-radius:7px;
+    padding:7px 13px; cursor:pointer; }
+  .viewpick button.active { background:var(--osu-orange); color:#fff; border-color:var(--osu-orange); }
+  .viewpick button:focus-visible { outline:3px solid var(--osu-orange-dark); outline-offset:2px; }
+  .controls { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:14px 24px; margin-bottom:16px; }
+  .ctl label { font-family:'Helvetica Neue',Arial,sans-serif; font-size:13px; font-weight:600;
+    color:var(--osu-stone); display:block; margin-bottom:4px; }
+  .ctl input[type=range]{ width:100%; accent-color:var(--osu-orange); }
+  .ctl .val { color:var(--osu-orange-dark); font-variant-numeric:tabular-nums; }
+  .sr-readout { background:#F4FAF1; border-left:5px solid #4A8C3A; border-radius:0 8px 8px 0;
+    padding:12px 16px; margin:14px 0; font-size:15px; line-height:1.55; }
+  .sr-readout b { color:var(--osu-orange-dark); font-variant-numeric:tabular-nums; }
+  svg text { font-family:'Helvetica Neue',Arial,sans-serif; }
+  .data-table-details { margin-top:12px; }
+  .data-table-details table { border-collapse:collapse; font-size:13px; margin-top:8px; }
+  .data-table-details th, .data-table-details td { border:1px solid var(--border); padding:4px 9px;
+    font-variant-numeric:tabular-nums; text-align:right; }
+  .data-table-details th { background:#f3f3f1; }
+  .eqbar { font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; background:#f7f7f5;
+    border:1px solid var(--border); border-radius:7px; padding:9px 13px; margin-bottom:14px; font-size:14px; }
+</style>
+</head>
+<body>
+<div class="shell">
+<aside class="sidebar">
+  <p class="brand"><a href="../index.html" title="Back to course home">FW 536 · Day 2</a></p>
+  <div class="subtitle">Interaction terms</div>
+  <nav>
+    <div class="section">This page</div>
+    <ul><li><a href="#explorer">The explorer</a></li><li><a href="#try">Things to try</a></li></ul>
+    <div class="section">Day 2 docs</div>
+    <ul>
+      <li><a href="lab.html">Main lab</a></li>
+      <li><a href="explore_links.html">Link function explorer</a></li>
+      <li><a href="log_logit_intuition.html">Log &amp; logit intuition</a></li>
+    </ul>
+  </nav>
+</aside>
+
+<main class="content">
+<header class="lab-header">
+  <div class="eyebrow">Day 2 · interactive</div>
+  <h1>Interaction terms</h1>
+  <p class="lede">An interaction means the effect of one predictor depends on the value of another. Drag
+  the interaction coefficient and watch the same model change shape under four different views.</p>
+</header>
+
+<section id="explorer">
+<div class="widget">
+  <div class="eqbar" id="eqbar"></div>
+
+  <div class="viewpick" role="group" aria-label="Choose a visualisation">
+    <button data-view="lines" class="active">Lines</button>
+    <button data-view="heat">Heatmap</button>
+    <button data-view="slope">Effect of x1 vs x2</button>
+    <button data-view="contour">Contours</button>
+  </div>
+
+  <div class="controls">
+    <div class="ctl"><label for="b0">Intercept &beta;<sub>0</sub> = <span class="val" id="b0v">0.0</span></label>
+      <input type="range" id="b0" min="-3" max="3" step="0.1" value="0"></div>
+    <div class="ctl"><label for="b1">Main effect of x<sub>1</sub>: &beta;<sub>1</sub> = <span class="val" id="b1v">1.0</span></label>
+      <input type="range" id="b1" min="-3" max="3" step="0.1" value="1"></div>
+    <div class="ctl"><label for="b2">Main effect of x<sub>2</sub>: &beta;<sub>2</sub> = <span class="val" id="b2v">0.5</span></label>
+      <input type="range" id="b2" min="-3" max="3" step="0.1" value="0.5"></div>
+    <div class="ctl"><label for="b3">Interaction &beta;<sub>3</sub> = <span class="val" id="b3v">0.0</span></label>
+      <input type="range" id="b3" min="-2" max="2" step="0.05" value="0"></div>
+    <div class="ctl"><label for="link">Link / scale</label>
+      <select id="link" style="width:100%;padding:6px;border:1px solid var(--border);border-radius:6px;">
+        <option value="identity">identity (Gaussian) — plot the linear predictor</option>
+        <option value="logit">logit (binomial) — plot the probability</option>
+        <option value="log">log (Poisson) — plot the expected count</option>
+      </select></div>
+  </div>
+
+  <div class="sr-readout" id="srReadout" role="status" aria-live="polite" aria-atomic="true"></div>
+
+  <svg id="chart" viewBox="0 0 720 380" width="100%" role="img" aria-label="Interaction explorer chart"></svg>
+
+  <details class="data-table-details">
+    <summary>Show the plotted values as a table</summary>
+    <div id="tableHost"></div>
+  </details>
+</div>
+</section>
+
+<section id="try">
+<h2>Things to try</h2>
+<ol>
+  <li>Set <b>&beta;<sub>3</sub> = 0</b> and look at <em>Lines</em>: the lines are parallel. Parallel lines
+      are what "no interaction" looks like. Now switch to <em>Effect of x<sub>1</sub> vs x<sub>2</sub></em>
+      and see that the effect line is flat.</li>
+  <li>Push <b>&beta;<sub>3</sub></b> positive. The lines fan apart: the effect of x<sub>1</sub> grows as
+      x<sub>2</sub> grows. Push it negative and they cross. The slope of the "effect" view <em>is</em>
+      &beta;<sub>3</sub>.</li>
+  <li>With &beta;<sub>3</sub> = 0, switch the link from <b>identity</b> to <b>logit</b>. The lines stop
+      being parallel even though the interaction coefficient is still zero. This is the fourth lesson in
+      the lab: "is there an interaction?" depends on the scale you look at.</li>
+  <li>Switch to <b>Contours</b>. With no interaction the contour lines are parallel and straight; add an
+      interaction and the surface twists into a saddle.</li>
+</ol>
+</section>
+
+<footer>FW 536 &middot; Statistical Modeling for Ecology and Conservation &middot; Oregon State University</footer>
+</main>
+</div>
+
+<script>
+(function(){
+  var SVG="http://www.w3.org/2000/svg";
+  var view="lines";
+  var el=function(id){return document.getElementById(id);};
+
+  function pars(){
+    return {b0:+el("b0").value, b1:+el("b1").value, b2:+el("b2").value, b3:+el("b3").value,
+            link:el("link").value};
+  }
+  function eta(p,x1,x2){ return p.b0 + p.b1*x1 + p.b2*x2 + p.b3*x1*x2; }
+  function mu(p,x1,x2){
+    var e=eta(p,x1,x2);
+    if(p.link==="logit") return 1/(1+Math.exp(-e));
+    if(p.link==="log")   return Math.exp(e);
+    return e;
+  }
+  var LINKLABEL={identity:"linear predictor", logit:"probability", log:"expected count"};
+
+  function clear(s){ while(s.firstChild) s.removeChild(s.firstChild); }
+  function mk(tag,attrs,text){
+    var n=document.createElementNS(SVG,tag);
+    for(var k in attrs) n.setAttribute(k,attrs[k]);
+    if(text!==undefined) n.textContent=text;
+    return n;
+  }
+
+  var X2LEVELS=[-2,-1,0,1,2];
+  var PAD={l:64,r:18,t:18,b:46}, W=720, H=380;
+
+  function axes(svg,xlab,ylab,xmin,xmax,ymin,ymax){
+    svg.appendChild(mk("line",{x1:PAD.l,y1:H-PAD.b,x2:W-PAD.r,y2:H-PAD.b,stroke:"#444","stroke-width":1.5}));
+    svg.appendChild(mk("line",{x1:PAD.l,y1:PAD.t,x2:PAD.l,y2:H-PAD.b,stroke:"#444","stroke-width":1.5}));
+    svg.appendChild(mk("text",{x:(PAD.l+W-PAD.r)/2,y:H-10,"text-anchor":"middle","font-size":14},xlab));
+    svg.appendChild(mk("text",{x:16,y:(PAD.t+H-PAD.b)/2,"text-anchor":"middle","font-size":14,
+      transform:"rotate(-90 16 "+((PAD.t+H-PAD.b)/2)+")"},ylab));
+    [[xmin,PAD.l],[xmax,W-PAD.r]].forEach(function(d){
+      svg.appendChild(mk("text",{x:d[1],y:H-PAD.b+18,"text-anchor":"middle","font-size":12},d[0].toFixed(1)));});
+    [[ymin,H-PAD.b],[ymax,PAD.t]].forEach(function(d){
+      svg.appendChild(mk("text",{x:PAD.l-8,y:d[1]+4,"text-anchor":"end","font-size":12},d[0].toFixed(2)));});
+  }
+  var sx=function(x,xmin,xmax){ return PAD.l+(x-xmin)/(xmax-xmin)*(W-PAD.l-PAD.r); };
+  var sy=function(y,ymin,ymax){ return (H-PAD.b)-(y-ymin)/((ymax-ymin)||1)*(H-PAD.t-PAD.b); };
+
+  function grid(p,n){
+    var g=[],i,j,xs=[],v;
+    for(i=0;i<n;i++) xs.push(-3+6*i/(n-1));
+    for(i=0;i<n;i++){ g[i]=[]; for(j=0;j<n;j++) g[i][j]=mu(p,xs[j],xs[i]); }
+    return {xs:xs,z:g};
+  }
+
+  function draw(){
+    var p=pars(), svg=el("chart"); clear(svg);
+    el("b0v").textContent=p.b0.toFixed(1); el("b1v").textContent=p.b1.toFixed(1);
+    el("b2v").textContent=p.b2.toFixed(1); el("b3v").textContent=p.b3.toFixed(2);
+    el("eqbar").textContent = (p.link==="identity" ? "y = " :
+        p.link==="logit" ? "logit(p) = " : "log(mu) = ") +
+      p.b0.toFixed(1)+" + "+p.b1.toFixed(1)+"*x1 + "+p.b2.toFixed(1)+"*x2 + "+p.b3.toFixed(2)+"*x1*x2";
+
+    var rows=[], head=[], caption="";
+    if(view==="lines" || view==="contour"){
+      var xs=[],i,k; for(i=0;i<=40;i++) xs.push(-3+6*i/40);
+      var all=[]; X2LEVELS.forEach(function(x2){ xs.forEach(function(x1){ all.push(mu(p,x1,x2)); }); });
+      var ymin=Math.min.apply(null,all), ymax=Math.max.apply(null,all);
+      if(view==="lines"){
+        axes(svg,"x1",LINKLABEL[p.link],-3,3,ymin,ymax);
+        X2LEVELS.forEach(function(x2,idx){
+          var d="",col="hsl("+(18+idx*44)+",72%,45%)";
+          xs.forEach(function(x1,q){ d+=(q?"L":"M")+sx(x1,-3,3).toFixed(1)+" "+sy(mu(p,x1,x2),ymin,ymax).toFixed(1)+" "; });
+          svg.appendChild(mk("path",{d:d,fill:"none",stroke:col,"stroke-width":2.5}));
+          svg.appendChild(mk("text",{x:W-PAD.r-4,y:sy(mu(p,3,x2),ymin,ymax)+4,"text-anchor":"end",
+            "font-size":12,fill:col},"x2="+x2));
+        });
+        head=["x1"].concat(X2LEVELS.map(function(v){return "x2="+v;}));
+        [-3,-1.5,0,1.5,3].forEach(function(x1){
+          rows.push([x1.toFixed(1)].concat(X2LEVELS.map(function(x2){return mu(p,x1,x2).toFixed(3);})));});
+        caption="Response against x1 at five values of x2";
+      } else {
+        var g=grid(p,26), zmin=Infinity, zmax=-Infinity;
+        g.z.forEach(function(r){ r.forEach(function(v){ if(v<zmin)zmin=v; if(v>zmax)zmax=v; }); });
+        axes(svg,"x1","x2",-3,3,-3,3);
+        var levels=8,L;
+        for(L=1;L<levels;L++){
+          var lev=zmin+(zmax-zmin)*L/levels, col="hsl("+(200-L*18)+",65%,45%)";
+          for(i=0;i<g.xs.length-1;i++) for(var j=0;j<g.xs.length-1;j++){
+            var a=g.z[i][j],b=g.z[i][j+1],c=g.z[i+1][j];
+            if((a-lev)*(b-lev)<0){
+              svg.appendChild(mk("line",{x1:sx(g.xs[j],-3,3),y1:sy(g.xs[i],-3,3),
+                x2:sx(g.xs[j+1],-3,3),y2:sy(g.xs[i],-3,3),stroke:col,"stroke-width":2}));}
+            if((a-lev)*(c-lev)<0){
+              svg.appendChild(mk("line",{x1:sx(g.xs[j],-3,3),y1:sy(g.xs[i],-3,3),
+                x2:sx(g.xs[j],-3,3),y2:sy(g.xs[i+1],-3,3),stroke:col,"stroke-width":2}));}
+          }
+        }
+        head=["x1\\x2"].concat(X2LEVELS.map(String));
+        [-3,-1.5,0,1.5,3].forEach(function(x1){
+          rows.push([x1.toFixed(1)].concat(X2LEVELS.map(function(x2){return mu(p,x1,x2).toFixed(3);})));});
+        caption="Contours of the fitted surface over x1 and x2";
+      }
+    } else if(view==="heat"){
+      var n=32, g2=grid(p,n), zmn=Infinity, zmx=-Infinity;
+      g2.z.forEach(function(r){ r.forEach(function(v){ if(v<zmn)zmn=v; if(v>zmx)zmx=v; }); });
+      axes(svg,"x1","x2",-3,3,-3,3);
+      var cw=(W-PAD.l-PAD.r)/n, ch=(H-PAD.t-PAD.b)/n;
+      for(var r2=0;r2<n;r2++) for(var c2=0;c2<n;c2++){
+        var t=(g2.z[r2][c2]-zmn)/((zmx-zmn)||1);
+        svg.appendChild(mk("rect",{x:PAD.l+c2*cw,y:(H-PAD.b)-(r2+1)*ch,width:cw+0.6,height:ch+0.6,
+          fill:"hsl("+(220-200*t)+",70%,"+(88-42*t)+"%)"}));
+      }
+      head=["x1\\x2"].concat(X2LEVELS.map(String));
+      [-3,-1.5,0,1.5,3].forEach(function(x1){
+        rows.push([x1.toFixed(1)].concat(X2LEVELS.map(function(x2){return mu(p,x1,x2).toFixed(3);})));});
+      caption="Heatmap of the fitted surface; darker is a larger response";
+    } else {
+      var x2s=[],q; for(q=0;q<=40;q++) x2s.push(-3+6*q/40);
+      var h=0.001, eff=x2s.map(function(x2){ return (mu(p,h,x2)-mu(p,-h,x2))/(2*h); });
+      var emin=Math.min.apply(null,eff), emax=Math.max.apply(null,eff);
+      if(Math.abs(emax-emin)<1e-9){ emin-=0.5; emax+=0.5; }
+      axes(svg,"x2","d(response)/d(x1) at x1 = 0",-3,3,emin,emax);
+      var d2="";
+      x2s.forEach(function(x2,q2){ d2+=(q2?"L":"M")+sx(x2,-3,3).toFixed(1)+" "+sy(eff[q2],emin,emax).toFixed(1)+" "; });
+      svg.appendChild(mk("path",{d:d2,fill:"none",stroke:"#C8500A","stroke-width":3}));
+      head=["x2","effect of x1"];
+      [-3,-1.5,0,1.5,3].forEach(function(x2){
+        rows.push([x2.toFixed(1), ((mu(p,h,x2)-mu(p,-h,x2))/(2*h)).toFixed(3)]);});
+      caption="Slope of the response in x1, as a function of x2";
+    }
+
+    svg.setAttribute("aria-label", caption+". "+shapeWords(p));
+    var t="<table><caption>"+caption+"</caption><thead><tr>"+
+      head.map(function(h2){return "<th scope=\"col\">"+h2+"</th>";}).join("")+"</tr></thead><tbody>"+
+      rows.map(function(r3){return "<tr>"+r3.map(function(c3,ix){
+        return ix===0?"<th scope=\"row\">"+c3+"</th>":"<td>"+c3+"</td>";}).join("")+"</tr>";}).join("")+
+      "</tbody></table>";
+    el("tableHost").innerHTML=t;
+    el("srReadout").innerHTML=readout(p);
+  }
+
+  function shapeWords(p){
+    if(p.b3===0 && p.link==="identity") return "The lines are parallel: no interaction.";
+    if(p.b3===0) return "The interaction coefficient is zero, but the curves are not parallel on this scale.";
+    return "The interaction coefficient is "+(p.b3>0?"positive, so the lines fan apart":"negative, so the lines converge or cross")+".";
+  }
+
+  function readout(p){
+    var lo=mu(p,-2,-2), hi=mu(p,2,2);
+    // Probe at x2 = 0 and x2 = +2, not at -2 and +2: on the logit scale the slope
+    // p(1-p) is symmetric about p = 0.5, so symmetric x2 values can coincide by
+    // accident and hide a dependence that is really there.
+    var slopeLow=(mu(p,0.001,0)-mu(p,-0.001,0))/0.002;
+    var slopeHigh=(mu(p,0.001,2)-mu(p,-0.001,2))/0.002;
+    var s="<b>"+(p.link==="identity"?"Identity link":p.link==="logit"?"Logit link":"Log link")+"</b>. "+
+      "Model: &beta;<sub>0</sub>="+p.b0.toFixed(1)+", &beta;<sub>1</sub>="+p.b1.toFixed(1)+
+      ", &beta;<sub>2</sub>="+p.b2.toFixed(1)+", interaction &beta;<sub>3</sub>=<b>"+p.b3.toFixed(2)+"</b>. ";
+    s+="The effect of x<sub>1</sub> at x<sub>2</sub>=0 is <b>"+slopeLow.toFixed(3)+
+       "</b>; at x<sub>2</sub>=+2 it is <b>"+slopeHigh.toFixed(3)+"</b>. ";
+    var same=Math.abs(slopeHigh-slopeLow)<1e-6;
+    if(same) s+="Those are equal, so the effect of x<sub>1</sub> does not depend on x<sub>2</sub> here. ";
+    else if(p.b3===0)
+      s+="Those differ even though &beta;<sub>3</sub> is exactly zero: on this scale the dependence is produced by the link, not by an interaction term. ";
+    else s+="Those differ, so the effect of x<sub>1</sub> depends on x<sub>2</sub>. ";
+    s+="Response ranges from <b>"+Math.min(lo,hi).toFixed(3)+"</b> to <b>"+Math.max(lo,hi).toFixed(3)+
+       "</b> across the corners of the grid.";
+    return s;
+  }
+
+  ["b0","b1","b2","b3","link"].forEach(function(id){
+    el(id).addEventListener("input",draw); el(id).addEventListener("change",draw); });
+  Array.prototype.forEach.call(document.querySelectorAll(".viewpick button"),function(btn){
+    btn.addEventListener("click",function(){
+      Array.prototype.forEach.call(document.querySelectorAll(".viewpick button"),function(b){b.classList.remove("active");});
+      btn.classList.add("active"); view=btn.getAttribute("data-view"); draw();
+    });
+  });
+  draw();
+})();
+</script>
+</body>
+</html>

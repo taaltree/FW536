@@ -32,7 +32,7 @@ DAY_HTML = ["lab.html", "problem_set.html", "plain_language_summary.html",
             "answer_key.html", "log_logit_intuition.html",
             # interactive explorers — screen-reader usable, so they ship here too
             "explore_distributions.html", "explore_links.html", "explore_shrinkage.html",
-            "explore_conjugate.html", "explore_likelihood_mcmc.html", "explore_mcmc.html"]
+            "explore_interactions.html", "explore_conjugate.html", "explore_likelihood_mcmc.html", "explore_mcmc.html"]
 
 CALLOUT_LABELS = {"plain":"Plain-language summary","bio":"Biological intuition",
                   "warn":"Watch out","key":"Key idea","try":"Try it yourself"}

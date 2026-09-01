@@ -36,6 +36,7 @@
  <li><a href="answer_key.html">Answer key</a></li>
  <li><a href="problem_set.html">Graded problem set</a></li>
       <li><a href="explore_links.html">Interactive link-function &amp; logit visualizer</a></li>
+ <li><a href="explore_interactions.html">Interaction explorer</a></li>
  </ul>
  <div class="section">Course</div>
  <ul><li><a href="../index.html">All days</a></li></ul>
@@ -382,20 +383,19 @@
 <div class="exercise" id="m1">
 <span class="ex-tag">Practice Exercise M1</span><span class="difficulty easy"> · Exponential</span>
 <h3>Orangutan line transects</h3>
-<p>The detection function for orangutans on a line transect is roughly exponential, with rate $\lambda = 0.02$ per meter of perpendicular distance: $g(x)$ is the probability that an orangutan sitting $x$ meters off the trackline <em>is seen</em>. Derive $g(x)$ as a survival function and use it to compute the probability of <strong>missing</strong> an orangutan at 50 m.</p>
+<p>Suppose you conduct line transects looking for orangutans. If orangutans are randomly placed in the forest, then the time (or distance) it takes before you see an orangutan follows an exponential distribution.</p>
+<p>Recall that an exponential random variable $X \sim \text{exp}(\lambda)$ has mean $1/\lambda$ and pdf given by $f(x) = \lambda e^{-\lambda x}$ on $x \ge 0$.</p>
+<ol type="a">
+<li>What is the probability that you do not see an orangutan by distance $x$. That is, what is $P(X \ge x)$?</li>
+</ol>
 <details class="answer"><summary>Reveal</summary><div class="answer-body">
-<p><strong>Turn the detection function into a survival function &mdash; then derive it two ways.</strong> Give each animal a latent <em>detection range</em> $X$: the farthest perpendicular distance at which this observer would still have picked it up. A constant detection hazard of $\lambda$ per additional meter makes $X \sim \text{Exponential}(\lambda)$. An orangutan sitting at perpendicular distance $x$ is seen exactly when its range carries that far, $X \ge x$, so the detection function <em>is</em> the survival function of $X$: $g(x) = P(X \ge x) = S(x)$. There are two routes to $S(x)$, and it is worth seeing both.</p>
-<p><em>Way 1 — from first principles (integrate the density).</em> The Exponential$(\lambda)$ density is $f(t) = \lambda e^{-\lambda t}$ for $t \ge 0$. Accumulate all the probability beyond $x$ by integrating from $x$ outward:</p>
-<div class="eq-block">$S(x) = P(X \ge x) = \int_x^\infty \lambda e^{-\lambda t}\,dt = \big[-e^{-\lambda t}\big]_x^\infty = e^{-\lambda x}.$</div>
-<p><em>Way 2 — from the CDF you already know (no integral).</em> Once you recognize that a detection range under a constant per-meter detection hazard is an Exponential random variable, you can skip the calculus. The Exponential CDF is a standard result, $F(x) = P(X \le x) = 1 - e^{-\lambda x}$, and the survival function is simply its complement:</p>
-<div class="eq-block">$S(x) = P(X \ge x) = 1 - F(x) = 1 - \big(1 - e^{-\lambda x}\big) = e^{-\lambda x}.$</div>
-<p>Same answer, and Way 2 takes one line — the payoff for naming the distribution instead of re-integrating. (Way 1 is really just the on-the-spot derivation of that CDF; the two are the same calculation, done from different starting points.)</p>
-<p>The general rule to carry away: <strong>for any exponential process the survival function is a pure exponential decay $e^{-\lambda x}$,</strong> so the probability of detection drops by the constant factor $e^{-\lambda}$ per meter &mdash; and, exactly as in the log-link redd example, there is a "detection half-distance" $\ln(2)/\lambda$ at which detection probability has fallen to one half. Here $\ln(2)/0.02 = 34.7$ m.</p>
-<p>Now plug in $\lambda = 0.02$ per meter and $x = 50$ m, so $\lambda x = 1$:</p>
-<div class="eq-block">$g(50) = e^{-\lambda \cdot 50} = e^{-1.0} = 0.368,$</div>
-<p>so about 37% of orangutans at that distance are detected. The probability of <em>missing</em> one is the complement:</p>
-<div class="eq-block">$1 - g(50) = 1 - 0.368 = 0.632.$</div>
-<p>A 50-m-distant orangutan has about a <strong>63% chance of being missed</strong> &mdash; 50 m is well past the 34.7-m half-distance, so fewer than half of the animals out there are still being detected.</p>
+<p>"Not seen by distance $x$" means the distance you had to travel exceeded $x$, so we want $P(X \ge x)$, the survival function. There are two routes to it, and it is worth seeing both.</p>
+<p><strong>Way 1: from first principles (integrate the density).</strong> Accumulate all the probability beyond $x$ by integrating the pdf from $x$ outward:</p>
+<div class="eq-block">$P(X \ge x) = \int_x^\infty \lambda e^{-\lambda t}\,dt = \big[-e^{-\lambda t}\big]_x^\infty = e^{-\lambda x}.$</div>
+<p><strong>Way 2: from the CDF you already know (no integral).</strong> Once you have named the distribution, you can skip the calculus. The Exponential CDF is a standard result, $F(x) = P(X \le x) = 1 - e^{-\lambda x}$, and what we want is its complement:</p>
+<div class="eq-block">$P(X \ge x) = 1 - F(x) = 1 - \big(1 - e^{-\lambda x}\big) = e^{-\lambda x}.$</div>
+<p>Same answer, and Way 2 takes one line. That is the payoff for recognising the distribution instead of re-deriving it; Way 1 is really just the on-the-spot derivation of that CDF.</p>
+<p>The general result to carry away: for any exponential process the survival function is a pure exponential decay, $P(X \ge x) = e^{-\lambda x}$. The fraction still unseen falls by the constant factor $e^{-\lambda}$ per extra meter, so there is a "half-distance" $\ln(2)/\lambda$ at which half the orangutans remain unseen, exactly like a half-life.</p>
 </div></details>
 </div>
 
@@ -521,7 +521,7 @@ f_nb$deviance / f_nb$df.residual             # 48.8 / 52 = 0.94  (theta = 0.73)
 <ol type="a">
 <li>Fit <code>glm(survived ~ class, family=binomial, data=titanic_long)</code>.</li>
 <li>Fit <code>glm(cbind(Yes, No) ~ Class, family=binomial, data=titanic_prop)</code>.</li>
-<li>Confirm that the two fits agree — identical fitted probabilities, and identical coefficients once the two data frames use the same reference class. Why must they?</li>
+<li>Confirm that the two fits agree — identical fitted probabilities, and identical coefficients once the two data frames use the same reference class.</li>
 <li>Convert each class's log-odds to a probability. Compare to raw proportions.</li>
 </ol>
 <details class="answer"><summary>Reveal solution</summary><div class="answer-body">
@@ -536,15 +536,6 @@ tapply(long$survived, long$class, mean)      # exactly the same numbers
 # titanic_prop has one row per Class x Sex x Age, so aggregate to Class first:
 tapply(prop$Yes, prop$Class, sum) / tapply(prop$Yes + prop$No, prop$Class, sum)</code></pre>
 <p>Fitted probabilities per class come out crew 0.240, first 0.625, second 0.414, third 0.252 — identical to the raw proportions (a single categorical predictor gives a <em>saturated</em> model, so each group's MLE is just its empirical proportion).</p>
-<p><strong>(c) Why the two forms agree.</strong> Write $y_i\in\{0,1\}$ for each passenger and group them by class. For a group with $n$ passengers and $y=\sum y_i$ survivors, the two likelihoods are</p>
-<div class="eq-block">$\underbrace{\prod_{i=1}^{n} p^{y_i}(1-p)^{1-y_i}}_{\text{Bernoulli, one row per person}} \;=\; p^{y}(1-p)^{n-y}$ &nbsp; vs. &nbsp; $\underbrace{\binom{n}{y}\,p^{y}(1-p)^{n-y}}_{\text{Binomial, aggregated counts}}$</div>
-<p>They differ only by the factor $\binom{n}{y}$ — the number of ways to arrange $y$ survivors among $n$ people. Taking logs, the two log-likelihoods differ by the additive constant $\log\binom{n}{y}$, which <em>does not contain $p$</em>. Because the MLE and its standard errors depend only on how the log-likelihood changes with $p$ (its derivatives in $p$), a term free of $p$ drops out: the estimated coefficients, fitted probabilities, and SEs are identical. (The coefficient <em>tables</em> can still look different if the two data frames sort their factor levels differently and thus pick different reference classes — align the references and the numbers match exactly.)</p>
-<p>What the constant <em>does</em> shift is the absolute log-likelihood, and therefore the AIC. Aggregating the Titanic passengers into the class×sex×age cells of <code>titanic_prop.csv</code> gives $\sum_{\text{groups}}\log\binom{n}{y} = 1025.44$, so the Binomial log-likelihood sits exactly that far above the Bernoulli one ($-268.84$ vs $-1294.28$) and the AICs differ by $2 \times 1025.44 = 2050.87$.</p>
-<p>The <strong>residual deviance is a different story</strong>, and it is worth getting right. Deviance is $2(\ell_{\text{saturated}} - \ell_{\text{model}})$, and $\log\binom{n}{y}$ sits in <em>both</em> terms — so it cancels, and the deviance does <em>not</em> shift by that constant. The two deviances still differ (Bernoulli 2588.56 vs Binomial 491.06, a gap of 2097.49 — which is neither 1025.44 nor 2050.87), but for another reason entirely: <strong>the saturated reference model changes</strong>. The Bernoulli form's saturated model gets one parameter per <em>passenger</em> and so fits every row perfectly; the Binomial form's gets only one per <em>cell</em>. The gap is exactly the Bernoulli deviance of that cell-saturated model — the individual-level noise that aggregation simply stops measuring.</p>
-<pre><code>deviance(f1)                                                             # 2588.555  Bernoulli
-deviance(f2)                                                             #  491.061  Binomial
-deviance(glm(survived ~ class*sex*age, family = binomial, data = long))  # 2097.495  <- the gap</code></pre>
-<p>So never compare the deviance or AIC of a Bernoulli (one-row-per-individual) fit against an aggregated Binomial fit. The AIC gap is bookkeeping; the deviance gap is a change of yardstick. Neither is evidence about model fit. Within one data form, both are still perfectly good for comparing nested models.</p>
 </div></details>
 </div>
 
@@ -552,6 +543,10 @@ deviance(glm(survived ~ class*sex*age, family = binomial, data = long))  # 2097.
 <span class="ex-tag">Practice Exercise A3</span><span class="difficulty hard"> · Titanic with interactions</span>
 <h3>Sex × Class effects on survival</h3>
 <p>Fit <code>glm(survived ~ class * sex + age, family=binomial, data=titanic_long)</code>. Use <code>effects::allEffects()</code> to plot fitted probabilities, and use <code>emmeans::emmeans(fit, pairwise ~ class | sex)</code> to compare classes within each sex.</p>
+<div class="callout key">
+<p><strong>What <code>emmeans</code> does.</strong> "emmeans" is short for <em>estimated marginal means</em>. Given a fitted model it reports the model's predicted value for each level of a factor, and the differences between those levels, with correct standard errors. Two things make it worth reaching for instead of reading coefficients off <code>summary()</code>: it forms contrasts on the model's own link scale and can back-transform them for you, and it handles multiplicity when you ask for all pairwise comparisons.</p>
+<p>The syntax is a formula naming what you want compared. <code>emmeans(fit, ~ class)</code> gives one estimate per class; <code>~ class | sex</code> repeats the class comparison separately within each sex; and prefixing <code>pairwise</code>, as in <code>pairwise ~ class | sex</code>, adds every pairwise difference. Add <code>type = "response"</code> to get probabilities and odds ratios instead of log-odds. One thing to know now: any predictor you do not name is <em>averaged over</em>, so <code>emmeans</code> describes an average passenger while <code>predict(..., age = "adult")</code> describes a specific one. They give different numbers on purpose.</p>
+</div>
 <p>(Note: in this dataset <code>age</code> is a two-level factor, <code>adult</code> vs <code>child</code> — not a number in years.)</p>
 <ol type="a">
 <li>Which pairwise contrast is largest (in odds ratio)?</li>
@@ -578,12 +573,7 @@ emmeans(fit, pairwise ~ class | sex, type = "response")  # class contrasts withi
         type = "response")
 #     1st        3rd
 #  0.972      0.419</code></pre>
-<p>An adult first-class woman is modeled at $p = 0.972$ versus $p = 0.419$ for an adult third-class woman — a probability difference of about <strong>0.55</strong> (55 percentage points). On the link scale that is a log-odds gap of $3.56 - (-0.33) = 3.89$, i.e. an odds ratio of $e^{3.89} \approx 49$, matching part (a). The odds ratio and the probability difference describe the <em>same</em> effect on two scales; report both, because a huge odds ratio near the probability ceiling still corresponds to a bounded (though here still large) probability gap.</p>
-<div class="callout warn">
-<p><strong>Careful: <code>emmeans</code> and <code>predict</code> answer different questions here.</strong> Ask for the fitted probabilities with <code>emmeans(fit, ~ class | sex, type = "response")</code> instead and the same two cells come back as 0.983 and 0.550 — a difference of 0.433, not 0.55. (The graded <a href="problem_set.html#afternoon">Problem 7</a> takes that route, so expect to see both numbers today.) Neither is wrong.</p>
-<p><code>emmeans</code> <em>marginalises over</em> <code>age</code>: it averages the adult and child linear predictors <strong>on the logit scale</strong> and back-transforms once (for third-class females, $\tfrac{1}{2}(-0.33 + 0.73) = 0.20$, and $\text{plogis}(0.20) = 0.550$). <code>predict(..., age = "adult")</code> <strong>pins</strong> <code>age</code> at <code>adult</code> and reports a real, specific kind of passenger ($\text{plogis}(-0.33) = 0.419$). Since <code>agechild</code> is a big positive coefficient ($+1.05$), age-averaging pushes both probabilities up — and shrinks the gap, because first class is already pressed against the ceiling while third class still has room to move.</p>
-<p>This is the same lesson as the log link: <em>averaging on the link scale and then back-transforming is not the same as back-transforming and then averaging.</em> Say which one you did. The odds ratio (~49×) is identical either way, because it is a link-scale contrast in which the <code>age</code> term cancels.</p>
-</div>
+<p>An adult first-class woman is modeled at $p = 0.972$ versus $p = 0.419$ for an adult third-class woman.</p>
 </div></details>
 </div>
 </section>
@@ -591,7 +581,7 @@ emmeans(fit, pairwise ~ class | sex, type = "response")  # class contrasts withi
 <!-- ============================================================ -->
 <section id="interactions">
 <h2>Interaction terms: algebra meets geometry</h2>
-<p>An interaction in a linear model means "the effect of one variable depends on the value of another." The companion script <code>InteractionTerms.R</code> demonstrates this with simulated data, 2D heatmaps, and 3D <code>plotly</code> surfaces. Four lessons to leave with:</p>
+<p>An interaction in a linear model means "the effect of one variable depends on the value of another." The companion script <code>InteractionTerms.R</code> demonstrates this with simulated data, 2D heatmaps, and 3D <code>plotly</code> surfaces. Before you open it, spend a few minutes with the <a href="explore_interactions.html">interactive interaction explorer</a>: drag the interaction coefficient and watch the same model under four views &mdash; fanning lines, a heatmap, contours, and the effect of $x_1$ plotted against $x_2$. Setting its link to logit while holding the interaction at exactly zero is the quickest way to see the fourth lesson below. Four lessons to leave with:</p>
 <ol>
 <li>If the true surface is a <strong>plane</strong>, there is no interaction. A model with $y \sim x_1 \cdot x_2$ should return an interaction coefficient near zero.</li>
 <li>If the surface is <strong>twisted</strong> (saddle/warped), there is an interaction. The sign of the interaction tells you whether the effect of $x_1$ is amplified or dampened as $x_2$ grows.</li>

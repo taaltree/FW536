@@ -23,7 +23,6 @@
  <li><a href="#concepts">Core concepts</a></li>
  <li><a href="#morning">Morning · probability</a></li>
  <li><a href="#afternoon">Afternoon · distributions</a></li>
- <li><a href="#challenge">Stretch problems</a></li>
  <li><a href="#cheatsheet">R cheat sheet</a></li>
  </ul>
  <div class="section">Other docs</div>
@@ -191,14 +190,6 @@
 <p><strong>(a)</strong> "At least one girl" rules out BB. We are left with {BG, GB, GG}, three equally likely outcomes. Only GG is "both girls". So $P(\text{both} \mid \text{at least one girl}) = \tfrac{1}{3}$.</p>
 <p><strong>(b)</strong> "Older child is a girl" rules out BB and GB. We are left with {BG, GG}, two equally likely outcomes. So $P(\text{both} \mid \text{older is girl}) = \tfrac{1}{2}$.</p>
 <p><strong>(c)</strong> Knowing <em>which</em> child is a girl (a more specific piece of information) shrinks the sample space more than just knowing one of them is.</p>
-<p><strong>Check in R:</strong></p>
-<pre><code><span class="cm"># Monte Carlo check</span>
-set.seed(1)
-fams &lt;- matrix(sample(c("B","G"), 2*1e6, replace=TRUE), ncol=2)
-mean(rowSums(fams=="G")==2 &amp; rowSums(fams=="G")&gt;=1) /
- mean(rowSums(fams=="G")&gt;=1) <span class="cm"># ~ 1/3</span>
-mean(fams[,1]=="G" &amp; fams[,2]=="G") /
- mean(fams[,1]=="G") <span class="cm"># ~ 1/2</span></code></pre>
 </div></details>
 </div>
 
@@ -236,17 +227,10 @@ mean(fams[,1]=="G" &amp; fams[,2]=="G") /
 <h3>Shorter than both neighbors</h3>
 <p>$n$ people of distinct heights sit at a round table in random order. What is the expected number of people who are shorter than both of their immediate neighbors?</p>
 
-<div class="callout bio">This same indicator-variable trick gives "expected number of male-male-male triplets in an elk harem", "expected number of nests at the local maximum of a microhabitat gradient", and many other ecological counts.</div>
-
 <details class="answer"><summary>Reveal worked solution</summary><div class="answer-body">
 <p>Let $X_i$ be 1 if person $i$ is shorter than both neighbors, else 0. The total count is $X = \sum X_i$. By linearity of expectation, $E[X] = \sum E[X_i] = n \cdot P(\text{person 1 shorter than both neighbors})$.</p>
 <p>Consider person $i$ together with their two neighbors. Because everyone is seated in random order and all heights are distinct, each of the $3! = 6$ height orderings of these three people is equally likely. Person $i$ is shorter than both neighbors exactly when $i$ is the <em>smallest</em> of the three. Fixing $i$ as the smallest leaves the two neighbors free to be arranged in $2! = 2$ ways, so 2 of the 6 orderings qualify. Hence $P(\text{person } i \text{ shorter than both neighbors}) = 2/6 = 1/3$.</p>
 <p>Therefore $E[X] = n/3$.</p>
-<pre><code>n &lt;- 50; reps &lt;- 1e5
-sapply(1:reps, function(i){
- h &lt;- sample(n) <span class="cm"># distinct heights at table positions</span>
- sum(h &lt; c(h[n], h[-n]) &amp; h &lt; c(h[-1], h[1]))
-}) |&gt; mean() <span class="cm"># ~ 16.67 = 50/3</span></code></pre>
 </div></details>
 </div>
 
@@ -289,18 +273,19 @@ dbinom(0, size=4, prob=1/4) <span class="cm"># same thing</span></code></pre>
 <p>For each of the four distributions:</p>
 <ol type="a">
 <li>Draw 1000 values. Compute the empirical mean and variance.</li>
-<li>Plot a histogram and the ECDF.</li>
+<li>Plot a histogram and the ECDF. The <em>empirical cumulative distribution function</em> is just the fraction of your draws at or below each value, so it climbs from 0 to 1 and shows the whole distribution without you having to pick a bin width. Base R gives it with <code>ecdf(y)</code>; in ggplot add <code>stat_ecdf()</code>.</li>
 <li>Compute $P(Y = 0)$ and $P(Y &gt; 20)$.</li>
 <li>Which model would best describe a sample where most transects have zero whales but a few have huge counts?</li>
 </ol>
 
-<div class="callout bio">In real wildlife counts, animals cluster (schools, herds, family groups, microhabitat preferences). That clustering inflates variance above what Poisson predicts. The Negative Binomial is the "Poisson with a built-in mechanism for clustering" — and recognizing this is one of the most common diagnoses you'll do in this course.</div>
+<div class="callout bio">In real wildlife counts, animals cluster (schools, herds, family groups, microhabitat preferences). That clustering inflates variance above what Poisson predicts. The Negative Binomial is the "Poisson with a built-in mechanism for clustering".</div>
 
 <div class="code-label">Scaffolding code</div>
 <pre><code><span class="kw">library</span>(ggplot2); <span class="kw">library</span>(dplyr); <span class="kw">library</span>(tidyr)
 set.seed(2025)
 
 n &lt;- <span class="nu">1000</span>; lambda &lt;- <span class="nu">10</span>
+<span class="cm"># A tibble is the Tidyverse version of a data frame: same idea, tidier printing.</span>
 sims &lt;- <span class="kw">tibble</span>(
  pois = <span class="fn">rpois</span>(n, lambda),
  nb_k5 = <span class="fn">rnbinom</span>(n, mu=lambda, size=<span class="nu">5</span>),
@@ -308,7 +293,9 @@ sims &lt;- <span class="kw">tibble</span>(
  nb_kp5= <span class="fn">rnbinom</span>(n, mu=lambda, size=<span class="nu">0.5</span>)
 )
 
-<span class="cm"># One row per model, one column per summary: all four models stay on screen.</span>
+<span class="cm"># pivot_longer stacks the four model columns into two: a "model" label column</span>
+<span class="cm"># and a "y" value column. That long shape is what group_by() needs, and it</span>
+<span class="cm"># keeps one row per model, one column per summary, so all four stay on screen.</span>
 <span class="cm"># (Summarising the four columns side by side instead builds 16 columns, and</span>
 <span class="cm">#  the console hides most of them behind "i 9 more variables".)</span>
 sims |&gt; <span class="fn">pivot_longer</span>(<span class="fn">everything</span>(), names_to=<span class="st">"model"</span>, values_to=<span class="st">"y"</span>) |&gt;
@@ -332,7 +319,7 @@ sims |&gt; <span class="fn">pivot_longer</span>(<span class="fn">everything</spa
 <tr><td>NB(μ=10, k=1)</td><td>10.0</td><td>110</td><td>0.091</td><td>0.135</td></tr>
 <tr><td>NB(μ=10, k=0.5)</td><td>10.0</td><td>210</td><td>0.218</td><td>0.155</td></tr>
 </table>
-<p><strong>Now compare your run &mdash; and mind the gap.</strong> Your 1000 draws will <em>not</em> reproduce this table, and that mismatch is itself the lesson. With <code>set.seed(2025)</code> the NB($k=0.5$) row comes back with a sample variance of $244.63$ against the theoretical $210$, and $P(Y=0)=0.202$ against $0.218$; the Poisson row&rsquo;s sample variance, by contrast, lands almost on top of its theoretical variance ($9.49$ against $10$). Nothing has gone wrong. A sample variance is itself a random quantity, and for a heavy right tail it is a <em>very</em> noisy one &mdash; a handful of extreme transects shift it by tens of units, so 1000 draws pin it down only loosely. The rule to carry forward: the more clumped the model, the more data you need before an empirical summary can be trusted. When a real dataset's variance sits this far from what your model predicts, the first question is &ldquo;do I have enough data to tell?&rdquo;, not &ldquo;is the model wrong?&rdquo;</p>
+<p><strong>Now compare your run &mdash; and mind the gap.</strong> Your 1000 draws will <em>not</em> reproduce this table. With <code>set.seed(2025)</code> the NB($k=0.5$) row comes back with a sample variance of $244.63$ against the theoretical $210$, and $P(Y=0)=0.202$ against $0.218$; the Poisson row&rsquo;s sample variance, by contrast, lands almost on top of its theoretical variance ($9.49$ against $10$). Nothing has gone wrong. A sample variance is itself a random quantity, and for a heavy right tail it is a <em>very</em> noisy one &mdash; a handful of extreme transects shift it by tens of units, so 1000 draws pin it down only loosely. The rule to carry forward: the more clumped the model, the more data you need before an empirical summary can be trusted. When a real dataset's variance sits this far from what your model predicts, the first question is &ldquo;do I have enough data to tell?&rdquo;, not &ldquo;is the model wrong?&rdquo;</p>
 <p><strong>The variance column.</strong> Every row has mean 10 by construction; the story is entirely in the variance. Start from what the NB literally is — a Poisson whose rate is itself random (gamma-distributed) across transects, the mathematical version of "animals clump." That mixing gives the mean-variance law</p>
 <div class="eq-block">$\mathrm{Var}(Y) = \mu + \dfrac{\mu^2}{k}.$</div>
 <p>Read it as two pieces: the $\mu$ is the irreducible Poisson noise, and the $\mu^2/k$ is the <em>extra</em> variance clumping adds. That second term is the whole point — it is what a plain Poisson cannot produce. The general move is to see $k$ as a clumping dial: as $k \to \infty$ the extra term vanishes and you recover $\mathrm{Var}=\mu$ (the Poisson is just NB with the clumping turned off), and as $k$ shrinks the extra term explodes. Only now plug in, with $\mu=10$:</p>
@@ -363,11 +350,8 @@ probs &lt;- <span class="fn">dbinom</span>(k, size=<span class="nu">5</span>, pr
 <span class="fn">round</span>(probs, <span class="nu">3</span>)
 <span class="cm"># 0.002 0.028 0.132 0.309 0.360 0.168</span>
 <span class="fn">barplot</span>(probs, names.arg=k, ylab=<span class="st">"P(survivors)"</span>)</code></pre>
-<p>This is the <strong>Binomial</strong> distribution, $X \sim \text{Bin}(n=5, p=0.7)$. <code>dbinom</code> is not a black box — it evaluates the binomial pmf, and it is worth seeing where one entry comes from so you could reproduce any of them by hand:</p>
+<p>This is the <strong>Binomial</strong> distribution, $X \sim \text{Bin}(n=5, p=0.7)$. Each marten either survives or does not, independently and with the same probability, so each one is a Bernoulli($p$) trial. The number of survivors is the <em>sum of five independent Bernoulli trials</em>, and a sum of independent Bernoulli trials is exactly what Binomial means:</p>
 <div class="eq-block">$P(X=k) = \binom{n}{k}\,p^{k}(1-p)^{n-k}.$</div>
-<p>Two factors, pulling in opposite directions. The $p^{k}(1-p)^{n-k}$ is the probability of <em>one</em> specific survivor/casualty pattern; the $\binom{n}{k}$ counts how many distinct patterns give exactly $k$ survivors. Take the peak value, $k=4$:</p>
-<div class="eq-block">$P(X=4) = \binom{5}{4}\,(0.7)^{4}(0.3)^{1} = 5 \times 0.2401 \times 0.3 = 0.360.$</div>
-<p>Now the mode makes sense. Each extra survivor multiplies the probability by $\tfrac{p}{1-p}=\tfrac{0.7}{0.3}=2.33$ but by a shrinking combinatorial factor; the two forces balance and the pmf turns over at $k=\lfloor(n+1)p\rfloor=\lfloor 6\times0.7\rfloor=\lfloor 4.2\rfloor=\mathbf{4}$ — so even though each marten is more likely to live than die, "all five survive" ($p=0.168$) is less likely than "four of five" ($p=0.360$).</p>
 </div></details>
 </div>
 
@@ -381,6 +365,7 @@ probs &lt;- <span class="fn">dbinom</span>(k, size=<span class="nu">5</span>, pr
 <li>What is the probability that exactly 3 of the 24 are infected?</li>
 <li>What is the probability that 4 or fewer are infected?</li>
 <li>What is the probability that no infections are detected (and what does that say about surveillance design)?</li>
+<li>The chance of catching <em>at least one</em> case in $n$ samples is the complement of your answer to (d). Write that expression, then use it to work out how many deer you would need to sample to be 95% sure of detecting the disease at $p = 0.12$.</li>
 </ol>
 
 <details class="answer"><summary>Reveal worked solution</summary><div class="answer-body">
@@ -392,7 +377,7 @@ probs &lt;- <span class="fn">dbinom</span>(k, size=<span class="nu">5</span>, pr
 <p>(c) Cumulative rather than point: $P(Y \le 4) = \sum_{k=0}^{4} P(Y=k)$, which R adds up for you &mdash; <code>pbinom(4, 24, 0.12)</code> $= 0.847$. So at 12% prevalence, "four or fewer infected in a sample of 24" is the ordinary result: it happens about 85% of the time.</p>
 <p>(d) The zero-case probability is the one you can do in your head, because at $k=0$ the combinatorial factor is $\binom{24}{0}=1$ and the whole pmf collapses to "every single deer must dodge infection":</p>
 <div class="eq-block">$P(Y=0) = (1-p)^{n} = (0.88)^{24} = 0.0465.$</div>
-<p>That is the load-bearing quantity for surveillance, so make it general. The chance of <em>catching at least one</em> case in $n$ samples is its complement,</p>
+<p><strong>(e)</strong> That is the load-bearing quantity for surveillance, so make it general. The chance of <em>catching at least one</em> case in $n$ samples is its complement,</p>
 <div class="eq-block">$P(Y \ge 1) = 1 - (1-p)^{n},$</div>
 <p>and flipping it around tells a program how many deer to sample: to be $95\%$ sure of detecting disease at prevalence $p$, solve $1-(1-p)^n \ge 0.95$ for $n$. Here, with $p=0.12$, the inequality rearranges to $n \ge \log(0.05)/\log(0.88) = 23.44$, so $n=24$ is the smallest sample that clears the bar &mdash; and it clears it barely: $P(Y\ge1)=1-0.0465=0.9535$, against $0.9471$ at $n=23$. Even at that prevalence, a smaller sample would leave a real chance of a clean-but-wrong "no cases found." This is precisely the arithmetic behind "freedom from disease" sample-size calculations.</p>
 </div></details>
@@ -422,7 +407,7 @@ flights &lt;- <span class="fn">rmultinom</span>(<span class="nu">5000</span>, si
 <p>With $\mathbf{x}=(18,38,18,6)$, $n=80$, that is $\dfrac{80!}{18!\,38!\,18!\,6!}\,(0.20)^{18}(0.45)^{38}(0.25)^{18}(0.10)^{6}\approx 0.0011$. It reads small, but every specific outcome is small &mdash; there are thousands of plausible flights, and the probability has to be shared out among all of them. Search the whole support and the <em>modal</em> flight turns out to be $(16, 36, 20, 8)$ &mdash; exactly $n\mathbf{p}$, each category at its own expected count &mdash; and even that single most likely outcome carries only $0.001832$, under $0.2\%$ of the probability. Our $(18,38,18,6)$, at $0.00117$, is a perfectly ordinary flight.</p>
 <p><strong>(c) Why each margin is Binomial — the collapse trick.</strong> Don't take it on faith; derive it, because it is the move that lets you reason about one category at a time. Fix your attention on calves and lump the other three classes into a single "not-calf" box. Each of the 80 elk is now just calf (prob $0.25$) or not-calf (prob $0.20+0.45+0.10=0.75$), independently — and "count of successes in $n$ independent yes/no trials with fixed $p$" is the definition of the Binomial. So</p>
 <div class="eq-block">$\text{calves} \sim \text{Bin}(80,\,0.25),\qquad E=np=20,\qquad \mathrm{Var}=np(1-p)=80\cdot0.25\cdot0.75=15.$</div>
-<p>The general rule: <strong>any single category of a Multinomial$(n,\mathbf{p})$ is Binomial$(n,p_i)$</strong> — collapse the rest into "other" and the multi-box problem becomes the two-box problem you already know. (Note $\mathrm{Var}=15$ is below the mean 20: unlike the whales, a multinomial margin is <em>under</em>-dispersed, because a fixed total $n$ caps how large any one category can run.)</p>
+<p>The general rule: <strong>any single category of a Multinomial$(n,\mathbf{p})$ is Binomial$(n,p_i)$</strong> — collapse the rest into "other" and the multi-box problem becomes the two-box problem you already know. (Note $\mathrm{Var}=15$ is below the mean 20. That is not special to the multinomial: <em>any</em> Binomial$(n,p)$ has $\mathrm{Var}/\mathrm{mean} = 1-p$, which is below 1 for every $p>0$, so a Binomial is always under-dispersed relative to a Poisson of the same mean. A multinomial margin inherits it because that margin <em>is</em> a Binomial. The reason is the fixed total: with $n$ pinned at 80, a category cannot run away the way an unbounded count can.)</p>
 </div></details>
 </div>
 
@@ -446,128 +431,11 @@ sims &lt;- <span class="fn">rmultinom</span>(<span class="nu">500</span>, <span 
 </div>
 
 <!-- Problem 10 CF generalized -->
-<div class="exercise" id="ex-10">
-<span class="ex-tag">Practice Exercise A6</span><span class="difficulty medium"> · 15 min · Binomial generalization</span>
-<h3>Cystic fibrosis generalized (back to Punnett, with R)</h3>
-<p>Two Cc parents will have $n$ children. Affected = cc.</p>
-<ol type="a">
-<li>Write the data-generating model.</li>
-<li>What is the probability that <em>at least one</em> child of $n=5$ is affected?</li>
-<li>For what number of children does that probability cross 50%?</li>
-</ol>
 
-<details class="answer"><summary>Reveal worked solution</summary><div class="answer-body">
-<p>(a) $K \sim \text{Bin}(n, 0.25)$.</p>
-<pre><code><span class="nu">1</span> - <span class="fn">dbinom</span>(<span class="nu">0</span>, <span class="nu">5</span>, <span class="nu">0.25</span>) <span class="cm"># 0.7627</span>
-<span class="cm"># smallest n with P(>=1) >= 0.5</span>
-which(<span class="nu">1</span> - <span class="fn">dbinom</span>(<span class="nu">0</span>, <span class="nu">1</span>:<span class="nu">10</span>, <span class="nu">0.25</span>) &gt;= <span class="nu">0.5</span>)[<span class="nu">1</span>] <span class="cm"># 3</span></code></pre>
-<p><strong>(b) The "at least one" complement.</strong> Never sum $P(1)+P(2)+\dots+P(5)$ — go through the one outcome that's a single term. "At least one affected" is the complement of "none affected," and "none affected" needs every child to independently escape, so the messy sum collapses to</p>
-<div class="eq-block">$P(K \ge 1) = 1 - P(K=0) = 1 - (1-0.25)^{n} = 1 - (0.75)^{n}.$</div>
-<p>At $n=5$ that is $1-(0.75)^5 = 1-0.2373 = 0.763$.</p>
-<p><strong>(c) Where 3 comes from — solve it, don't scan it.</strong> The <code>which()</code> above brute-forces a list, but the threshold has a closed form. You want the smallest $n$ with $1-(0.75)^n \ge 0.5$, i.e. $(0.75)^n \le 0.5$. Take logs (the log is negative, so the inequality flips):</p>
-<div class="eq-block">$n \ge \dfrac{\ln 0.5}{\ln 0.75} = \dfrac{-0.693}{-0.288} = 2.41 \;\Rightarrow\; n = 3.$</div>
-<p>You can see the crossing by hand: $(0.75)^2 = 0.5625$ (still more than half a chance of <em>no</em> affected child) but $(0.75)^3 = 0.422$ (now under half), so the coin flips between the second and third child — <strong>3 children</strong>. The same $\ln 0.5 / \ln(1-p)$ formula gives the "how many trials until an even chance of at least one hit" threshold for any $p$: rare detections need many trials, common ones only a few.</p>
-</div></details>
-</div>
 
 </section>
 
 <!-- ================================================================== -->
-<section id="challenge">
-<h2>Stretch problems (optional)</h2>
-
-<div class="exercise" id="ex-11">
-<span class="ex-tag">Practice Stretch A7</span><span class="difficulty hard"> · 25 min · expected value + variance</span>
-<h3>Connecting Bernoulli and Binomial via expectation algebra</h3>
-<p>Let $Y_1, \dots, Y_n$ be independent Bernoulli($p$). Let $X = \sum_{i=1}^n Y_i$. Using only $E[Y_i] = p$, $\mathrm{Var}(Y_i) = p(1-p)$, and the linearity rules, prove:</p>
-<ol type="a">
-<li>$E[X] = np$.</li>
-<li>$\mathrm{Var}(X) = np(1-p)$.</li>
-<li>Why does <em>independence</em> matter for (b) but not (a)?</li>
-</ol>
-<details class="answer"><summary>Reveal solution</summary><div class="answer-body">
-<p>(a) $E[X] = E[\sum Y_i] = \sum E[Y_i] = np$. Linearity of expectation holds <em>even without independence</em>.</p>
-<p>(b) $\mathrm{Var}(X) = \mathrm{Var}(\sum Y_i)$. Under independence, variances add: $= \sum \mathrm{Var}(Y_i) = np(1-p)$.</p>
-<p>(c) If the $Y_i$ were correlated, you would pick up covariance terms: $\mathrm{Var}(\sum Y_i) = \sum \mathrm{Var}(Y_i) + 2\sum_{i&lt;j}\mathrm{Cov}(Y_i,Y_j)$. Positive correlation (the rule in ecology — birds in flocks, deer in herds) <em>inflates</em> the variance — this is exactly why over-dispersed count distributions exist.</p>
-</div></details>
-</div>
-
-<div class="exercise" id="ex-12">
-<span class="ex-tag">Practice Stretch A8</span><span class="difficulty hard"> · 25 min · Poisson</span>
-<h3>Poisson as a limit of the Binomial</h3>
-<p>Show that if $X \sim \text{Bin}(n, p)$ with $n \to \infty$ and $p \to 0$ in such a way that $np \to \lambda$, then $P(X = k) \to e^{-\lambda} \lambda^k / k!$.</p>
-<p>Then use simulation to demonstrate this with $\lambda = 4$: draw 10,000 values from each of Bin(20, 0.2), Bin(100, 0.04), Bin(1000, 0.004), and Pois(4). Compare histograms and means/variances.</p>
-
-<details class="answer"><summary>Reveal sketch</summary><div class="answer-body">
-<p><strong>Math.</strong> Start from the binomial pmf and substitute $p=\lambda/n$ (this is what "$np\to\lambda$" means — hold the rate fixed while $n$ grows):</p>
-<div class="eq-block">$P(X=k) = \binom{n}{k}\left(\dfrac{\lambda}{n}\right)^{k}\left(1-\dfrac{\lambda}{n}\right)^{n-k}.$</div>
-<p>The trick is to regroup into a $\lambda^k/k!$ that will survive, times three pieces that each have a clean limit. Expand $\binom{n}{k}=\dfrac{n!}{k!\,(n-k)!}=\dfrac{n(n-1)\cdots(n-k+1)}{k!}$ and split the last factor's exponent:</p>
-<div class="eq-block">$P(X=k) = \dfrac{\lambda^{k}}{k!}\;\underbrace{\dfrac{n(n-1)\cdots(n-k+1)}{n^{k}}}_{(1)}\;\underbrace{\left(1-\dfrac{\lambda}{n}\right)^{n}}_{(2)}\;\underbrace{\left(1-\dfrac{\lambda}{n}\right)^{-k}}_{(3)}.$</div>
-<p>Now send $n\to\infty$ with $k$ and $\lambda$ fixed, and take the three pieces in turn:</p>
-<ul>
-<li><strong>(1)</strong> is a product of $k$ fixed factors $\tfrac{n}{n}\cdot\tfrac{n-1}{n}\cdots\tfrac{n-k+1}{n} = 1\cdot(1-\tfrac1n)\cdots(1-\tfrac{k-1}{n})$, each $\to 1$, so the whole thing $\to 1$.</li>
-<li><strong>(2)</strong> is the definition of the exponential: $\left(1-\tfrac{\lambda}{n}\right)^{n}\to e^{-\lambda}$.</li>
-<li><strong>(3)</strong> has a fixed exponent $-k$ and a base $\to 1$, so it $\to 1^{-k}=1$.</li>
-</ul>
-<p>The three pieces collapse to $1\cdot e^{-\lambda}\cdot 1$, leaving</p>
-<div class="eq-block">$P(X=k) \longrightarrow \dfrac{\lambda^{k}e^{-\lambda}}{k!},$</div>
-<p>the Poisson pmf. Each piece carried one idea: (1) says "with $n$ huge, choosing $k$ of them barely dents the pool," (2) manufactures the $e^{-\lambda}$, and (3) is the correction that vanishes. Notice the mean-variance signature falls out for free: the binomial variance $np(1-p)=\lambda(1-\lambda/n)\to\lambda$, matching its mean — the equidispersion the Poisson is famous for is just the $p\to0$ limit of $np(1-p)$.</p>
-<p><strong>Conceptual takeaway.</strong> Poisson is the natural distribution for many independent <em>rare</em> events occurring in a fixed window of time/space, whose rate aggregates to $\lambda$. Whale sightings per transect, salmon redds per km, parasites per host (if independent) — all natural Poisson stories.</p>
-<pre><code><span class="kw">for</span>(<span class="kw">params</span> <span class="kw">in</span> <span class="kw">list</span>(<span class="kw">c</span>(<span class="nu">20</span>,<span class="nu">0.2</span>), <span class="kw">c</span>(<span class="nu">100</span>,<span class="nu">0.04</span>), <span class="kw">c</span>(<span class="nu">1000</span>,<span class="nu">0.004</span>))) {
- x &lt;- <span class="fn">rbinom</span>(<span class="nu">1e4</span>, params[<span class="nu">1</span>], params[<span class="nu">2</span>])
- <span class="fn">cat</span>(<span class="st">"n="</span>, params[<span class="nu">1</span>], <span class="st">" mean="</span>, mean(x), <span class="st">" var="</span>, var(x), <span class="st">"\n"</span>)
-}
-y &lt;- <span class="fn">rpois</span>(<span class="nu">1e4</span>, <span class="nu">4</span>); <span class="fn">cat</span>(<span class="st">"Pois mean="</span>, mean(y), <span class="st">" var="</span>, var(y))</code></pre>
-</div></details>
-</div>
-
-<div class="exercise" id="ex-13">
-<span class="ex-tag">Practice Stretch A9</span><span class="difficulty hard"> · 25 min · conditional probability + simulation</span>
-<h3>The Monty Hall problem (for camera-trap analogy)</h3>
-<p>Three trail cameras: a marten was photographed by exactly one of them, with equal prior probability (1/3 each). You guess Camera A. The technician (who knows which camera holds the marten) opens Camera C, which shows nothing. Should you switch to Camera B?</p>
-<ol type="a">
-<li>Reason out the answer using conditional probability.</li>
-<li>Simulate 100,000 trials to verify.</li>
-</ol>
-
-<details class="answer"><summary>Reveal solution</summary><div class="answer-body">
-<p><strong>Switch.</strong> The intuition is that your initial guess (A) was right with probability 1/3, and opening C collapses the remaining 2/3 onto B — but "collapses" is doing a lot of work, so derive the 2/3 with Bayes instead of asserting it. Let the marten's true camera be $A$, $B$, or $C$ (prior 1/3 each), and condition on the event "technician opens C." The whole subtlety lives in the likelihoods — how the technician behaves given each truth:</p>
-<ul>
-<li>$P(\text{opens C}\mid \text{marten at A}) = \tfrac12$ — your guess A is safe and the marten's A is safe, so the technician is free to open B or C, and picks C half the time.</li>
-<li>$P(\text{opens C}\mid \text{marten at B}) = 1$ — he cannot open A (your guess) or B (the marten), so he is <em>forced</em> to open C.</li>
-<li>$P(\text{opens C}\mid \text{marten at C}) = 0$ — he never opens the marten's own camera.</li>
-</ul>
-<p>Total probability of the reveal:</p>
-<div class="eq-block">$P(\text{opens C}) = \tfrac12\cdot\tfrac13 + 1\cdot\tfrac13 + 0\cdot\tfrac13 = \tfrac16+\tfrac13 = \tfrac12.$</div>
-<p>Now Bayes for the two cameras still in play:</p>
-<div class="eq-block">$P(A\mid \text{opens C}) = \dfrac{\tfrac12\cdot\tfrac13}{\tfrac12} = \tfrac13, \qquad P(B\mid \text{opens C}) = \dfrac{1\cdot\tfrac13}{\tfrac12} = \tfrac23.$</div>
-<p>There is the 2/3, and now you can see exactly where it comes from: B's likelihood is <strong>twice</strong> A's ($1$ vs $\tfrac12$), because the technician's forced move when the marten is at B pumps evidence toward B that your own guess A never receives. Switching doubles your odds.</p>
-<p>To <em>verify</em> that by simulation you have to model the technician and the switch explicitly — draw the truth and your guess, have the technician open a camera that is neither, then move to whatever remains:</p>
-<pre><code>set.seed(1)
-trials &lt;- <span class="nu">1e5</span>
-truth &lt;- <span class="fn">sample</span>(<span class="nu">1</span>:<span class="nu">3</span>, trials, replace=TRUE) <span class="cm"># camera holding the marten</span>
-guess &lt;- <span class="fn">sample</span>(<span class="nu">1</span>:<span class="nu">3</span>, trials, replace=TRUE) <span class="cm"># your initial pick</span>
-
-<span class="cm"># Technician opens a camera that is neither your pick nor the marten's</span>
-opened &lt;- <span class="fn">vapply</span>(<span class="fn">seq_len</span>(trials), function(i) {
- choices &lt;- <span class="fn">setdiff</span>(<span class="nu">1</span>:<span class="nu">3</span>, <span class="fn">c</span>(guess[i], truth[i]))
- if (<span class="fn">length</span>(choices) == <span class="nu">1</span>) choices else <span class="fn">sample</span>(choices, <span class="nu">1</span>)
-}, <span class="fn">numeric</span>(<span class="nu">1</span>))
-
-<span class="cm"># You switch to the one remaining unopened camera</span>
-switched &lt;- <span class="fn">vapply</span>(<span class="fn">seq_len</span>(trials), function(i) {
- <span class="fn">setdiff</span>(<span class="nu">1</span>:<span class="nu">3</span>, <span class="fn">c</span>(guess[i], opened[i]))
-}, <span class="fn">numeric</span>(<span class="nu">1</span>))
-
-<span class="fn">mean</span>(guess == truth) <span class="cm"># staying wins:   0.33257</span>
-<span class="fn">mean</span>(switched == truth) <span class="cm"># switching wins: 0.66743</span></code></pre>
-<p>Over 100,000 trials, staying won 0.33257 and switching won 0.66743 — matching the analytic 1/3 and 2/3.</p>
-<div class="callout warn">A tempting shortcut is to fix <code>guess &lt;- 1</code> and report <code>mean(truth != guess)</code>. That returns 2/3, but it is only P(your initial guess was wrong) — true by construction, with no technician and no switch anywhere in the code. It restates the claim rather than testing it. The simulation only has teeth once the technician is <em>constrained</em> to open a losing camera you did not pick.</div>
-</div></details>
-</div>
-
-</section>
-
 <section id="cheatsheet">
 <h2>R cheat sheet (distribution functions)</h2>
 <table>

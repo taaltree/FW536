@@ -254,7 +254,7 @@
 <p>Now ask the actual question: what happens to the expected count when you move one km further upstream, $\text{km} \to \text{km}+1$? Take the ratio of the new mean to the old so the intercept cancels:</p>
 <div class="eq-block">$\dfrac{\mathbb{E}[\text{redds}\mid \text{km}+1]}{\mathbb{E}[\text{redds}\mid \text{km}]} = \dfrac{e^{\beta_0}\,e^{\beta_1(\text{km}+1)}}{e^{\beta_0}\,e^{\beta_1\,\text{km}}} = e^{\beta_1}.$</div>
 <p>The baseline location drops out — only $e^{\beta_1}$ survives. That is the general rule worth keeping: <strong>each one-unit step in a raw predictor multiplies the mean by $e^{\beta_1}$, and a step of $d$ units multiplies it by $e^{\beta_1 d} = (e^{\beta_1})^d$.</strong> Additive on the log scale ($\beta_1$ per km), multiplicative on the count scale ($e^{\beta_1}$ per km).</p>
-<p>Only now do the numbers enter. With $\hat\beta_1 = -0.05$, $e^{-0.05} = 0.951$, so each additional km upstream drops expected redd counts by <strong>~4.9%</strong>. Over 14 km the factor compounds to $(e^{-0.05})^{14} = e^{-0.70} = 0.50$ — half as many redds as at the stream mouth.</p>
+<p>Only now do the numbers enter. With $\hat\beta_1 = -0.05$, $e^{-0.05} = 0.951$, so each additional km upstream drops expected redd counts by <strong>~4.9%</strong>. Over 14 km the factor compounds to $(e^{-0.05})^{14} = e^{-0.70} = 0.50$, half as many redds as at the stream mouth.</p>
 <p>The half-distance follows from the same rule: set $e^{\beta_1 d} = \tfrac12$ and solve, $d = \ln(2)/|\beta_1| = \ln(2)/0.05 = 13.9$ km. This "half-life" language is intuitive for biologists who already think in exponential decay.</p>
 </div></details>
 </div>
@@ -264,10 +264,10 @@
 <h3>Marine megafauna detections vs. sea state</h3>
 <p>Cetacean detections per 100 km of transect, modeled as Poisson with predictor <em>Beaufort sea state</em>. $\hat\beta = -0.41$ per unit sea state. What does this mean?</p>
 <details class="answer"><summary>Interpret</summary><div class="answer-body">
-<p>Same log link as Example 1, so the same rule applies: one Beaufort unit multiplies the expected detection rate by $e^{\hat\beta} = e^{-0.41} = 0.664$ — a ~34% drop per unit. The new twist is a jump of more than one unit, and here the $(e^\beta)^d$ half of the rule earns its keep.</p>
+<p>Same log link as Example 1, so the same rule applies: one Beaufort unit multiplies the expected detection rate by $e^{\hat\beta} = e^{-0.41} = 0.664$, a ~34% drop per unit. The new twist is a jump of more than one unit, and here the $(e^\beta)^d$ half of the rule earns its keep.</p>
 <p>Going from sea state 1 to sea state 4 is a step of $d = 3$ units. Compounding the per-unit factor three times:</p>
 <div class="eq-block">$\dfrac{\mathbb{E}[\text{count}\mid \text{Beaufort }4]}{\mathbb{E}[\text{count}\mid \text{Beaufort }1]} = (e^{\beta})^{3} = e^{3\beta} = e^{-1.23} = 0.293.$</div>
-<p>The two routes are the same arithmetic: multiply the per-unit factor three times, $0.664^3 = 0.293$, or add $3\beta = -1.23$ on the log scale and exponentiate once, $e^{-1.23} = 0.293$. Either way it's a <strong>71% drop</strong> in detections across those three sea-state units — a strong "detection-availability" effect that dominates survey logistics: a slightly rougher sea, and most of your animals stop being detectable.</p>
+<p>The two routes are the same arithmetic: multiply the per-unit factor three times, $0.664^3 = 0.293$, or add $3\beta = -1.23$ on the log scale and exponentiate once, $e^{-1.23} = 0.293$. Either way it's a <strong>71% drop</strong> in detections across those three sea-state units: a strong "detection-availability" effect that dominates survey logistics: a slightly rougher sea, and most of your animals stop being detectable.</p>
 </div></details>
 </div>
 
@@ -276,11 +276,11 @@
 <h3>Log-link Poisson with a categorical predictor (treatment)</h3>
 <p>You fit <code>glm(caterpillars ~ treatment, family=poisson)</code> where <code>treatment</code> is a factor with levels <em>control</em> and <em>fertilizer</em>. The fertilizer coefficient is $+0.85$. What does this say?</p>
 <details class="answer"><summary>Interpret</summary><div class="answer-body">
-<p>With a factor predictor R codes the level as a 0/1 dummy, so there is no "per unit" to compound — the coefficient jumps you straight from one group to the other. Write the two group means the model implies:</p>
+<p>With a factor predictor R codes the level as a 0/1 dummy, so there is no "per unit" to compound: the coefficient jumps you straight from one group to the other. Write the two group means the model implies:</p>
 <div class="eq-block">$\log \mathbb{E}[\text{control}] = \beta_0, \qquad \log \mathbb{E}[\text{fertilizer}] = \beta_0 + \beta_1,$</div>
 <p>because the dummy is $0$ for control and $1$ for fertilizer. Exponentiate and take the ratio, and the intercept (the control level) cancels:</p>
 <div class="eq-block">$\dfrac{\mathbb{E}[\text{fertilizer}]}{\mathbb{E}[\text{control}]} = \dfrac{e^{\beta_0 + \beta_1}}{e^{\beta_0}} = e^{\beta_1}.$</div>
-<p>So the general rule for a categorical log-link coefficient: <strong>$e^{\beta}$ is exactly the ratio of that level's mean to the reference level's mean</strong> — the fold change itself, no compounding involved. Plug in $\hat\beta_1 = 0.85$: $e^{0.85} = 2.34$. The fertilizer treatment more than <strong>doubles</strong> the expected caterpillar count relative to control. This is the "fold change" language ecologists already speak — they just have to remember that the raw coefficient is its logarithm.</p>
+<p>So the general rule for a categorical log-link coefficient: <strong>$e^{\beta}$ is exactly the ratio of that level's mean to the reference level's mean</strong>: the fold change itself, no compounding involved. Plug in $\hat\beta_1 = 0.85$: $e^{0.85} = 2.34$. The fertilizer treatment more than <strong>doubles</strong> the expected caterpillar count relative to control. This is the "fold change" language ecologists already speak — they just have to remember that the raw coefficient is its logarithm.</p>
 </div></details>
 </div>
 
@@ -295,11 +295,11 @@
 <details class="answer"><summary>Interpret</summary><div class="answer-body">
 <p>The interaction changes the <em>slope</em> in temp, so the trick is to collect the temp terms before exponentiating. Write the linear predictor with the trawl dummy set to its two values. For gillnet (reference, dummy $= 0$) only the main effect survives; for trawl (dummy $= 1$) the interaction term switches on:</p>
 <div class="eq-block">$\log \mathbb{E}[\text{catch}] = \beta_0 + \beta_{\text{temp}}\,\text{temp} + \beta_{\text{gear}}\,\text{trawl} + \beta_{\text{int}}\,(\text{temp}\cdot\text{trawl}).$</div>
-<p>Group the coefficients that multiply <code>temp</code>: for gillnet that is just $\beta_{\text{temp}}$; for trawl it is $\beta_{\text{temp}} + \beta_{\text{int}}$. That grouped quantity <em>is</em> the log-scale slope, and the per-degree multiplier is its exponential — the general rule being <strong>the temperature effect for any gear is $e^{(\text{sum of every coefficient attached to temp for that gear})}$.</strong></p>
+<p>Group the coefficients that multiply <code>temp</code>: for gillnet that is just $\beta_{\text{temp}}$; for trawl it is $\beta_{\text{temp}} + \beta_{\text{int}}$. That grouped quantity <em>is</em> the log-scale slope, and the per-degree multiplier is its exponential: the general rule being <strong>the temperature effect for any gear is $e^{(\text{sum of every coefficient attached to temp for that gear})}$.</strong></p>
 <p>Now the numbers:</p>
 <p>(a) Gillnet slope $= \beta_{\text{temp}} = -0.05$, so $e^{-0.05} = 0.951$ → a 4.9% drop in catch per degree of warming.</p>
 <p>(b) Trawl slope $= \beta_{\text{temp}} + \beta_{\text{int}} = -0.05 + 0.08 = +0.03$, so $e^{0.03} = 1.030$ → a 3% increase per degree.</p>
-<p>The signs are opposite: warming thins the gillnet catch but lifts the trawl catch. That reversal lives entirely in the interaction term — it is invisible in either main effect alone.</p>
+<p>The signs are opposite: warming thins the gillnet catch but lifts the trawl catch. That reversal lives entirely in the interaction term: it is invisible in either main effect alone.</p>
 </div></details>
 </div>
 
@@ -334,12 +334,12 @@
 <details class="answer"><summary>Interpret</summary><div class="answer-body">
 <p><strong>Why $e^\beta$ is an odds ratio.</strong> The logit link says the model is linear not in $p$ but in the log-odds. Start from what it literally states:</p>
 <div class="eq-block">$\log\!\dfrac{p}{1-p} = \beta_0 + \beta_1\,\text{canopy}.$</div>
-<p>Exponentiate both sides — the left side is now the odds itself:</p>
+<p>Exponentiate both sides: the left side is now the odds itself:</p>
 <div class="eq-block">$\dfrac{p}{1-p} = e^{\beta_0}\,e^{\beta_1\,\text{canopy}}.$</div>
 <p>Ask the same ratio question we used for the log link, but now it lands on the <em>odds</em>. Bump canopy by one point and divide new odds by old:</p>
 <div class="eq-block">$\dfrac{\text{odds}(\text{canopy}+1)}{\text{odds}(\text{canopy})} = \dfrac{e^{\beta_0}\,e^{\beta_1(\text{canopy}+1)}}{e^{\beta_0}\,e^{\beta_1\,\text{canopy}}} = e^{\beta_1}.$</div>
-<p>The baseline odds cancel — so the general rule is <strong>each one-unit step in $x$ multiplies the odds by $e^{\beta_1}$, and a $d$-unit step multiplies them by $(e^{\beta_1})^d = e^{\beta_1 d}$.</strong> Identical structure to the log link, except the thing being multiplied is odds, not the mean. Plug in $\hat\beta_1 = 0.06$: $e^{0.06} = 1.062$, so each canopy point multiplies occupancy odds by 1.062; a 10-point rise multiplies them by $e^{0.6} = 1.82$.</p>
-<p><strong>Connecting the scales: why the probability jump is not constant.</strong> The odds ratio $e^{\beta_1}$ is the <em>same</em> everywhere on the curve, but the probability change it buys depends on where you start, because you have to convert odds back to $p$ via $p = \text{odds}/(1+\text{odds})$. Take a site at $p = 0.3$, i.e. odds $= 0.3/0.7 = 0.43$. A 10-point canopy increase moves the odds to $0.43 \cdot 1.82 = 0.78$, which is $p = 0.78/1.78 = 0.44$ — a 14 percentage-point jump. The same $\times 1.82$ applied to a site already at $p = 0.95$ would barely move it. A constant odds ratio, a baseline-dependent probability change: that is the logit link's signature, and the reason you must state the baseline when you report an effect.</p>
+<p>The baseline odds cancel, so the general rule is <strong>each one-unit step in $x$ multiplies the odds by $e^{\beta_1}$, and a $d$-unit step multiplies them by $(e^{\beta_1})^d = e^{\beta_1 d}$.</strong> Identical structure to the log link, except the thing being multiplied is odds, not the mean. Plug in $\hat\beta_1 = 0.06$: $e^{0.06} = 1.062$, so each canopy point multiplies occupancy odds by 1.062; a 10-point rise multiplies them by $e^{0.6} = 1.82$.</p>
+<p><strong>Connecting the scales: why the probability jump is not constant.</strong> The odds ratio $e^{\beta_1}$ is the <em>same</em> everywhere on the curve, but the probability change it buys depends on where you start, because you have to convert odds back to $p$ via $p = \text{odds}/(1+\text{odds})$. Take a site at $p = 0.3$, i.e. odds $= 0.3/0.7 = 0.43$. A 10-point canopy increase moves the odds to $0.43 \cdot 1.82 = 0.78$, which is $p = 0.78/1.78 = 0.44$, a 14 percentage-point jump. The same $\times 1.82$ applied to a site already at $p = 0.95$ would barely move it. A constant odds ratio, a baseline-dependent probability change: that is the logit link's signature, and the reason you must state the baseline when you report an effect.</p>
 </div></details>
 </div>
 
@@ -353,8 +353,8 @@
 <p>with females the reference (dummy $= 0$) and males the dummy $= 1$.</p>
 <ul>
 <li><strong>Log-odds (subtract):</strong> the two equations differ by exactly $\beta$, so males have log-odds $0.4$ lower than females. This is the raw coefficient.</li>
-<li><strong>Odds ratio (exponentiate):</strong> subtracting then exponentiating gives $\dfrac{\text{odds}_m}{\text{odds}_f} = e^{\beta} = e^{-0.4} = 0.67$ — exactly the categorical-coefficient rule from Example 3, now on the odds scale. Males' odds of fledging are 67% of females'.</li>
-<li><strong>Probability (convert):</strong> the odds ratio alone doesn't give a probability — you need a baseline. If females fledge with $p_f = 0.6$, their odds are $0.6/0.4 = 1.5$, so males' odds are $0.67 \cdot 1.5 = 1.0$, i.e. $p_m = 1.0/(1+1.0) = 0.5$. A 10-percentage-point gap.</li>
+<li><strong>Odds ratio (exponentiate):</strong> subtracting then exponentiating gives $\dfrac{\text{odds}_m}{\text{odds}_f} = e^{\beta} = e^{-0.4} = 0.67$, exactly the categorical-coefficient rule from Example 3, now on the odds scale. Males' odds of fledging are 67% of females'.</li>
+<li><strong>Probability (convert):</strong> the odds ratio alone doesn't give a probability; you need a baseline. If females fledge with $p_f = 0.6$, their odds are $0.6/0.4 = 1.5$, so males' odds are $0.67 \cdot 1.5 = 1.0$, i.e. $p_m = 1.0/(1+1.0) = 0.5$. A 10-percentage-point gap.</li>
 </ul>
 <p>Same effect, three views: a fixed log-odds difference and a fixed odds ratio, but a probability gap that only exists once you name where the females sit.</p>
 </div></details>
@@ -367,8 +367,8 @@
 <details class="answer"><summary>Reveal</summary><div class="answer-body">
 <p>Make "steepness" precise by differentiating the curve. The linear predictor is $\eta = \beta_0 + \beta_1 x$, and $p(\eta) = e^\eta/(1+e^\eta)$. The probability change per unit $x$ is, by the chain rule,</p>
 <div class="eq-block">$\dfrac{dp}{dx} = \dfrac{dp}{d\eta}\cdot\dfrac{d\eta}{dx} = p(1-p)\,\cdot\,\beta_1.$</div>
-<p>(The middle factor is the tidy fact that the logistic curve's slope is $\dfrac{dp}{d\eta} = p(1-p)$.) So a <em>fixed</em> coefficient $\beta_1$ produces a probability change that is scaled by $p(1-p)$ — and that factor is not constant: it peaks at $p = 0.5$, where $p(1-p) = 0.25$, and collapses toward $0$ as $p \to 0$ or $p \to 1$. That is exactly why one unit of $x$ moves $p$ a lot in the middle and barely at the ends.</p>
-<p>The peak value $0.25$ is also where the <strong>divide-by-4 rule</strong> comes from: at the steepest point the probability change per unit $x$ is $\beta_1 \cdot 0.25 = \beta_1/4$, an upper bound on how fast the curve can move. Biologically this is the right shape — a 10-degree warming shifts survival sharply when survival is near 50%, but hardly touches it when survival is already 99% and the curve has gone flat.</p>
+<p>(The middle factor is the tidy fact that the logistic curve's slope is $\dfrac{dp}{d\eta} = p(1-p)$.) So a <em>fixed</em> coefficient $\beta_1$ produces a probability change that is scaled by $p(1-p)$, and that factor is not constant: it peaks at $p = 0.5$, where $p(1-p) = 0.25$, and collapses toward $0$ as $p \to 0$ or $p \to 1$. That is exactly why one unit of $x$ moves $p$ a lot in the middle and barely at the ends.</p>
+<p>The peak value $0.25$ is also where the <strong>divide-by-4 rule</strong> comes from: at the steepest point the probability change per unit $x$ is $\beta_1 \cdot 0.25 = \beta_1/4$, an upper bound on how fast the curve can move. Biologically this is the right shape: a 10-degree warming shifts survival sharply when survival is near 50%, but hardly touches it when survival is already 99% and the curve has gone flat.</p>
 </div></details>
 </div>
 
@@ -376,7 +376,7 @@
 </section>
 
 <!-- ============================================================ -->
-<div class="practice-banner"><div class="label">Practice — answers visible</div><h3>Morning practice problems</h3><p>The exercises below are walk-through practice. Your graded morning assignment (Continuous distributions problem set) uses a separate, novel problem set &mdash; <strong>open the graded problem set below</strong> and write your answers in <code>morning_lab_template.Rmd</code>.</p><p style="margin: 8px 0 0 0;"><a class="hand-in" href="problem_set.html#morning">Open the graded morning problem set &rarr;</a> &nbsp;&nbsp; <a class="hand-in" href="morning_lab_template.Rmd" style="background:#1C638A; color:white; border-color:#1C638A;">morning_lab_template.Rmd &darr;</a></p></div>
+<div class="practice-banner"><div class="label">Practice — answers visible</div><h3>Morning practice problems</h3><p>The exercises below are walk-through practice. Your graded morning assignment (Continuous distributions problem set) uses a separate, novel problem set — <strong>open the graded problem set below</strong> and write your answers in <code>morning_lab_template.Rmd</code>.</p><p style="margin: 8px 0 0 0;"><a class="hand-in" href="problem_set.html#morning">Open the graded morning problem set &rarr;</a> &nbsp;&nbsp; <a class="hand-in" href="morning_lab_template.Rmd" style="background:#1C638A; color:white; border-color:#1C638A;">morning_lab_template.Rmd &darr;</a></p></div>
 <section id="morning">
 <h2>Morning exercises</h2>
 
@@ -404,32 +404,32 @@
 <h3>Prove that linear transformations of Normals are Normal</h3>
 <p>Let $Z \sim \mathcal{N}(0,1)$ and $Y = \mu + \sigma Z$. Using $E[aZ + b] = a E[Z] + b$ and $\mathrm{Var}(aZ+b) = a^2 \mathrm{Var}(Z)$, show $E[Y] = \mu$ and $\mathrm{Var}(Y) = \sigma^2$.</p>
 <details class="answer"><summary>Reveal</summary><div class="answer-body">
-<p><strong>Mean — one step at a time.</strong></p>
+<p><strong>Mean: one step at a time.</strong></p>
 <p>$E[Y] = E[\mu + \sigma Z]$ &nbsp; (substitute $Y = \mu + \sigma Z$)</p>
 <p>$\quad = \mu + \sigma\,E[Z]$ &nbsp; (by <em>linearity of expectation</em>, $E[aX+b] = a\,E[X] + b$, here with $a=\sigma,\ b=\mu$)</p>
 <p>$\quad = \mu + \sigma\cdot 0$ &nbsp; (because $E[Z]=0$ for $Z\sim\mathcal N(0,1)$)</p>
 <p>$\quad = \mu.$</p>
-<p><strong>Variance — one step at a time.</strong></p>
+<p><strong>Variance: one step at a time.</strong></p>
 <p>$\mathrm{Var}(Y) = \mathrm{Var}(\mu + \sigma Z)$ &nbsp; (substitute $Y = \mu + \sigma Z$)</p>
 <p>$\quad = \mathrm{Var}(\sigma Z)$ &nbsp; (adding a constant shifts location but not spread: $\mathrm{Var}(X+b) = \mathrm{Var}(X)$)</p>
 <p>$\quad = \sigma^2\,\mathrm{Var}(Z)$ &nbsp; (by the scaling rule $\mathrm{Var}(aX+b) = a^2\,\mathrm{Var}(X)$, here $a=\sigma$)</p>
 <p>$\quad = \sigma^2\cdot 1$ &nbsp; (because $\mathrm{Var}(Z)=1$ for $Z\sim\mathcal N(0,1)$)</p>
 <p>$\quad = \sigma^2.$</p>
-<p><strong>Shape.</strong> The distribution stays Normal because a linear transformation of a Gaussian is Gaussian — the moment-generating function of $\mu+\sigma Z$, namely $e^{\mu t + \sigma^2 t^2/2}$, is exactly the MGF of a $\mathcal N(\mu,\sigma^2)$. So $Y\sim\mathcal N(\mu,\sigma^2)$.</p>
+<p><strong>Shape.</strong> The distribution stays Normal because a linear transformation of a Gaussian is Gaussian: the moment-generating function of $\mu+\sigma Z$, namely $e^{\mu t + \sigma^2 t^2/2}$, is exactly the MGF of a $\mathcal N(\mu,\sigma^2)$. So $Y\sim\mathcal N(\mu,\sigma^2)$.</p>
 </div></details>
 </div>
 
 <div class="exercise" id="m3">
 <span class="ex-tag">Practice Exercise M3</span><span class="difficulty hard"> · Beta-Binomial</span>
 <h3>Marten cameras with heterogeneous detection</h3>
-<p>Twenty trail cameras are deployed for 10 nights each &mdash; 200 camera-nights in total. Plain assumption: per-camera detection probability $p = 0.03$ each night. But cameras vary: $p_i \sim \text{Beta}(0.03 \cdot \phi, 0.97 \cdot \phi)$ with $\phi = 1$ (so beta is very spread out).</p>
+<p>Twenty trail cameras are deployed for 10 nights each, 200 camera-nights in total. Plain assumption: per-camera detection probability $p = 0.03$ each night. But cameras vary: $p_i \sim \text{Beta}(0.03 \cdot \phi, 0.97 \cdot \phi)$ with $\phi = 1$ (so beta is very spread out).</p>
 <ol type="a">
 <li>What is the mean of this Beta?</li>
 <li>Each of <strong>20 cameras</strong> runs for <strong>10 nights</strong>, and a camera's detectability $p_i$ is drawn once and reused for all 10 of its nights. Simulate 5000 deployments under a plain Binomial(200, 0.03) and under this Beta-Binomial. Compare P(all-zero) and the mean/SD.</li>
 <li>Why does the Beta-Binomial put much more mass on "all-zero"?</li>
 </ol>
 <details class="answer"><summary>Reveal</summary><div class="answer-body">
-<p><strong>(a)</strong> The Beta has mean $\dfrac{\alpha}{\alpha+\beta} = \dfrac{0.03\phi}{0.03\phi + 0.97\phi} = 0.03$ &mdash; the $\phi$ cancels, so <em>every</em> choice of $\phi$ leaves the mean at exactly the 0.03 of the plain assumption. $\phi$ sets only the spread: small $\phi$ makes cameras wildly unequal, large $\phi$ makes them nearly identical. That is why the two simulations below share a mean of ~6 and differ only in their tails.</p>
+<p><strong>(a)</strong> The Beta has mean $\dfrac{\alpha}{\alpha+\beta} = \dfrac{0.03\phi}{0.03\phi + 0.97\phi} = 0.03$: the $\phi$ cancels, so <em>every</em> choice of $\phi$ leaves the mean at exactly the 0.03 of the plain assumption. $\phi$ sets only the spread: small $\phi$ makes cameras wildly unequal, large $\phi$ makes them nearly identical. That is why the two simulations below share a mean of ~6 and differ only in their tails.</p>
 <pre><code>set.seed(1); reps &lt;- 5000
 K &lt;- 20; J &lt;- 10 # 20 cameras x 10 nights = 200 camera-nights
 
@@ -442,20 +442,20 @@ mean(bin==0); mean(betbin==0) # 0.003 vs 0.166
 mean(bin); mean(betbin) # 6.0 vs 6.0 — same mean
 sd(bin); sd(betbin) # 2.5 vs 5.6 — about 5x the variance</code></pre>
 
-<p><strong>(c)</strong> With $\phi$ this small the Beta piles $p_i$ up near 0 or 1, so most cameras are near-blind while a few are hot. A camera that draws a tiny $p_i$ contributes zero on <em>all ten</em> of its nights, so all-zero deployments become common (0.166 vs 0.003) &mdash; even though the mean is unchanged at ~6. That is overdispersion: same mean, fatter tails.</p>
+<p><strong>(c)</strong> With $\phi$ this small the Beta piles $p_i$ up near 0 or 1, so most cameras are near-blind while a few are hot. A camera that draws a tiny $p_i$ contributes zero on <em>all ten</em> of its nights, so all-zero deployments become common (0.166 vs 0.003), even though the mean is unchanged at ~6. That is overdispersion: same mean, fatter tails.</p>
 </div></details>
 </div>
 </section>
 
 <!-- ============================================================ -->
-<div class="practice-banner"><div class="label">Practice — answers visible</div><h3>Afternoon practice problems</h3><p>The exercises below are walk-through practice. Your graded afternoon assignment (Linear models problem set) uses a separate, novel problem set &mdash; <strong>open the graded problem set below</strong> and write your answers in <code>afternoon_lab_template.Rmd</code>.</p><p style="margin: 8px 0 0 0;"><a class="hand-in" href="problem_set.html#afternoon">Open the graded afternoon problem set &rarr;</a> &nbsp;&nbsp; <a class="hand-in" href="afternoon_lab_template.Rmd" style="background:#1C638A; color:white; border-color:#1C638A;">afternoon_lab_template.Rmd &darr;</a></p></div>
+<div class="practice-banner"><div class="label">Practice — answers visible</div><h3>Afternoon practice problems</h3><p>The exercises below are walk-through practice. Your graded afternoon assignment (Linear models problem set) uses a separate, novel problem set — <strong>open the graded problem set below</strong> and write your answers in <code>afternoon_lab_template.Rmd</code>.</p><p style="margin: 8px 0 0 0;"><a class="hand-in" href="problem_set.html#afternoon">Open the graded afternoon problem set &rarr;</a> &nbsp;&nbsp; <a class="hand-in" href="afternoon_lab_template.Rmd" style="background:#1C638A; color:white; border-color:#1C638A;">afternoon_lab_template.Rmd &darr;</a></p></div>
 <section id="afternoon">
 <h2>Afternoon exercises</h2>
 
 <div class="exercise" id="a1">
 <span class="ex-tag">Practice Exercise A1</span><span class="difficulty medium"> · Normal vs Poisson vs NB on eDNA counts</span>
 <h3>Sockeye eDNA — find the right distribution</h3>
-<p>Load <code>sockeye_adult.csv</code> from this Day's <code>data/</code> folder. It is in <strong>long format</strong> (one row per <code>Sockeyetype</code> per day), so first subset to adult sockeye. The response is the daily <code>Count</code> of adult sockeye; the predictor is <code>Qcorr_qPCR</code>, the <strong>flow-corrected eDNA signal</strong> &mdash; the raw qPCR eDNA concentration multiplied by stream discharge (flow). Multiplying by flow converts a concentration into a quantity proportional to the total amount of eDNA transported past the sampler, which tracks fish abundance better than concentration alone. Build a <code>Year</code> factor from <code>Date</code> and a log-transformed eDNA predictor:</p>
+<p>Load <code>sockeye_adult.csv</code> from this Day's <code>data/</code> folder. It is in <strong>long format</strong> (one row per <code>Sockeyetype</code> per day), so first subset to adult sockeye. The response is the daily <code>Count</code> of adult sockeye; the predictor is <code>Qcorr_qPCR</code>, the <strong>flow-corrected eDNA signal</strong>: the raw qPCR eDNA concentration multiplied by stream discharge (flow). Multiplying by flow converts a concentration into a quantity proportional to the total amount of eDNA transported past the sampler, which tracks fish abundance better than concentration alone. Build a <code>Year</code> factor from <code>Date</code> and a log-transformed eDNA predictor:</p>
 <pre><code>library(MASS)
 sock &lt;- read.csv("data/sockeye_adult.csv", stringsAsFactors = FALSE)
 table(sock$Sockeyetype)                            # confirm the adult level name
@@ -466,7 +466,7 @@ min_pos &lt;- min(d$Qcorr_qPCR[d$Qcorr_qPCR &gt; 0])      # small constant so lo
 d$logED &lt;- log(d$Qcorr_qPCR + min_pos)</code></pre>
 <p>Fit, in sequence:</p>
 <ol>
-<li><code>lm(log(Count + 1) ~ logED + Year, data = d)</code> — the old-school log-transform approach.</li>
+<li><code>lm(log(Count + 1) ~ logED + Year, data = d)</code>: the old-school log-transform approach.</li>
 <li><code>glm(Count ~ logED + Year, family = poisson, data = d)</code>.</li>
 <li><code>glm(Count ~ logED + Year, family = quasipoisson, data = d)</code>.</li>
 <li><code>MASS::glm.nb(Count ~ logED + Year, data = d)</code>.</li>
@@ -491,26 +491,26 @@ f_nb$deviance / f_nb$df.residual             # 48.8 / 52 = 0.94  (theta = 0.73)
 2^coef(f_nb)["logED"]                         # 1.86</code></pre>
 <table>
 <tr><th>Fit</th><th><code>logED</code> slope</th><th>SE(<code>logED</code>)</th><th>dispersion / (resid. dev ÷ df)</th></tr>
-<tr><td>1. lm(log(Count+1))</td><td>0.570</td><td>0.047</td><td>&mdash;</td></tr>
+<tr><td>1. lm(log(Count+1))</td><td>0.570</td><td>0.047</td><td>—</td></tr>
 <tr><td>2. Poisson</td><td>0.737</td><td>0.013</td><td>resid.dev/df = 2296.6/52 = <strong>44.2</strong></td></tr>
 <tr><td>3. Quasipoisson</td><td>0.737</td><td>0.095</td><td>dispersion = <strong>51.0</strong></td></tr>
 <tr><td>4. Negative binomial</td><td>0.897</td><td>0.081</td><td>resid.dev/df = 48.8/52 = <strong>0.94</strong>, $\theta = 0.73$</td></tr>
 </table>
-<p><strong>Overdispersion.</strong> The Poisson residual deviance is 44&times; its df — massive overdispersion, so its SE on <code>logED</code> (0.013) is far too small. The quasipoisson rescales that SE by $\sqrt{51}\approx 7.1$ to 0.095; the negative binomial (a proper likelihood, $\theta = 0.73$) gives 0.081 and a residual-deviance ratio near 1 (0.94) — a well-calibrated fit. Trust fits 3 and 4, not the naive Poisson.</p>
-<p><strong>Back-transform — where the ×1.86 comes from.</strong> Don't memorize the recipe; derive it, because the same three steps turn <em>any</em> log-link slope into a sentence about biology. Start from what the model literally says. With a log link and a log-transformed predictor,</p>
+<p><strong>Overdispersion.</strong> The Poisson residual deviance is 44&times; its df — massive overdispersion, so its SE on <code>logED</code> (0.013) is far too small. The quasipoisson rescales that SE by $\sqrt{51}\approx 7.1$ to 0.095; the negative binomial (a proper likelihood, $\theta = 0.73$) gives 0.081 and a residual-deviance ratio near 1 (0.94): a well-calibrated fit. Trust fits 3 and 4, not the naive Poisson.</p>
+<p><strong>Back-transform, where the ×1.86 comes from.</strong> Don't memorize the recipe; derive it, because the same three steps turn <em>any</em> log-link slope into a sentence about biology. Start from what the model literally says. With a log link and a log-transformed predictor,</p>
 <div class="eq-block">$\log \mathbb{E}[\text{Count}] = \beta_0 + \beta_1\,\log(\text{eDNA}) + (\text{Year}),$</div>
 <p>and exponentiating both sides puts it on the count scale:</p>
 <div class="eq-block">$\mathbb{E}[\text{Count}] = e^{\beta_0}\,\cdot\,(\text{eDNA})^{\beta_1}\,\cdot\,e^{(\text{Year})}.$</div>
-<p>Because we logged the predictor, eDNA enters as a <strong>power law</strong> with exponent $\beta_1$ — and that is what makes the effect multiplicative. Now ask the actual question: what happens to the expected count when the eDNA signal <em>doubles</em>, $\text{eDNA} \to 2\,\text{eDNA}$, with Year held fixed? Take the ratio of the new expected count to the old, so everything that didn't change cancels:</p>
+<p>Because we logged the predictor, eDNA enters as a <strong>power law</strong> with exponent $\beta_1$, and that is what makes the effect multiplicative. Now ask the actual question: what happens to the expected count when the eDNA signal <em>doubles</em>, $\text{eDNA} \to 2\,\text{eDNA}$, with Year held fixed? Take the ratio of the new expected count to the old, so everything that didn't change cancels:</p>
 <div class="eq-block">$\dfrac{\mathbb{E}[\text{Count}\mid 2\,\text{eDNA}]}{\mathbb{E}[\text{Count}\mid \text{eDNA}]} = \dfrac{e^{\beta_0}\,(2\,\text{eDNA})^{\beta_1}\,e^{(\text{Year})}}{e^{\beta_0}\,(\text{eDNA})^{\beta_1}\,e^{(\text{Year})}} = \dfrac{(2\,\text{eDNA})^{\beta_1}}{(\text{eDNA})^{\beta_1}} = 2^{\beta_1}.$</div>
 <p>The intercept, the Year term, and even the baseline eDNA level all cancel — only the factor you multiplied the predictor by survives, raised to $\beta_1$. That is the general result, and it is worth keeping: <strong>multiply a log-transformed predictor by any factor $c$, and the expected response multiplies by $c^{\beta_1}$</strong> (doubling is just $c = 2$; a 50% rise is $c = 1.5$, giving $1.5^{0.897}=1.44$, a 44% increase). It is the same fact seen from the link scale — doubling adds $\log 2$ to $\log(\text{eDNA})$, hence adds $\beta_1\log 2$ to the linear predictor, and $e^{\beta_1\log 2}=2^{\beta_1}$ back on the response scale. Additive on the link, multiplicative on the response.</p>
 <p>Only now do the numbers enter. Plug in the NB estimate $\hat\beta_1 = 0.897$:</p>
 <div class="eq-block">$2^{0.897} = e^{0.897\,\times\,\ln 2} = e^{0.897\,\times\,0.693} = e^{0.622} = 1.86.$</div>
-<p>So <strong>a doubling of the flow-corrected eDNA signal is associated with roughly an 86% increase (×1.86) in the expected daily adult sockeye count</strong> — matching the graded Problem 5. "The slope was 0.90 (SE 0.08)" is not a finding; "doubling the eDNA signal is associated with 86% more sockeye" is the sentence that goes in the paper.</p>
+<p>So <strong>a doubling of the flow-corrected eDNA signal is associated with roughly an 86% increase (×1.86) in the expected daily adult sockeye count</strong>, matching the graded Problem 5. "The slope was 0.90 (SE 0.08)" is not a finding; "doubling the eDNA signal is associated with 86% more sockeye" is the sentence that goes in the paper.</p>
 </div></details>
 
 <div class="callout bio">
-<strong>Where the biology lives.</strong> The NB log-link slope here is $\hat\beta = 0.897$, so $e^{0.897 \cdot \ln 2} = 2^{0.897} = 1.86$. A doubling of the flow-corrected eDNA signal is associated with an ~86% increase in expected daily sockeye. That sentence is what you put in your paper — not "the slope was 0.90 (SE 0.08)."
+<strong>Where the biology lives.</strong> The NB log-link slope here is $\hat\beta = 0.897$, so $e^{0.897 \cdot \ln 2} = 2^{0.897} = 1.86$. A doubling of the flow-corrected eDNA signal is associated with an ~86% increase in expected daily sockeye. That sentence is what you put in your paper, not "the slope was 0.90 (SE 0.08)."
 </div>
 </div>
 
@@ -547,7 +547,7 @@ tapply(prop$Yes, prop$Class, sum) / tapply(prop$Yes + prop$No, prop$Class, sum)<
 <p><strong>What <code>emmeans</code> does.</strong> "emmeans" is short for <em>estimated marginal means</em>. Given a fitted model it reports the model's predicted value for each level of a factor, and the differences between those levels, with correct standard errors. Two things make it worth reaching for instead of reading coefficients off <code>summary()</code>: it forms contrasts on the model's own link scale and can back-transform them for you, and it handles multiplicity when you ask for all pairwise comparisons.</p>
 <p>The syntax is a formula naming what you want compared. <code>emmeans(fit, ~ class)</code> gives one estimate per class; <code>~ class | sex</code> repeats the class comparison separately within each sex; and prefixing <code>pairwise</code>, as in <code>pairwise ~ class | sex</code>, adds every pairwise difference. Add <code>type = "response"</code> to get probabilities and odds ratios instead of log-odds. One thing to know now: any predictor you do not name is <em>averaged over</em>, so <code>emmeans</code> describes an average passenger while <code>predict(..., age = "adult")</code> describes a specific one. They give different numbers on purpose.</p>
 </div>
-<p>(Note: in this dataset <code>age</code> is a two-level factor, <code>adult</code> vs <code>child</code> — not a number in years.)</p>
+<p>(Note: in this dataset <code>age</code> is a two-level factor, <code>adult</code> vs <code>child</code>, not a number in years.)</p>
 <ol type="a">
 <li>Which pairwise contrast is largest (in odds ratio)?</li>
 <li>Why is the simple TukeyHSD on an aov object the wrong way to do this comparison?</li>
@@ -565,7 +565,7 @@ emmeans(fit, pairwise ~ class | sex, type = "response")  # class contrasts withi
 #  first / third        48.7    25.7    7.35   &lt;.0001
 # sex = male:
 #  first / third         2.78    0.55   5.14    &lt;.0001</code></pre>
-<p>First-class women had about <strong>49&times;</strong> the odds of survival of third-class women — the sharpest class gradient in the model. Among men the same first-vs-third contrast is only ~2.8&times;: the "women and children first" protocol compressed the class effect for men.</p>
+<p>First-class women had about <strong>49&times;</strong> the odds of survival of third-class women: the sharpest class gradient in the model. Among men the same first-vs-third contrast is only ~2.8&times;: the "women and children first" protocol compressed the class effect for men.</p>
 <p><strong>(b) Why not TukeyHSD on an aov?</strong> <code>TukeyHSD</code> operates on an <code>aov</code> object, which assumes Normal errors, constant variance, and an identity link. A survival GLM has Bernoulli errors (variance $p(1-p)$, not constant) and a logit link, so Tukey on an <code>aov</code> would use the wrong likelihood, ignore the link, and ignore the interaction. <code>emmeans</code> on the fitted GLM forms the contrasts on the correct log-odds scale (optionally back-transformed to the response scale) with proper delta-method SEs and a Tukey multiplicity adjustment.</p>
 <p><strong>(c) Female 1st-vs-3rd, adult passenger.</strong></p>
 <pre><code>predict(fit,

@@ -556,11 +556,11 @@ best &lt;- <span class="fn">min</span>(prof)
 <h3>Sex-specific VBGF revisited</h3>
 <p>Use the LRT code from the walk-through above. Report (a) the LRT statistic and p-value, (b) AIC for both models, (c) your conclusion. Then refit Model B with $L_\infty$ shared but $\kappa$ sex-specific (4 parameters) and run a second LRT against the same null. Comment on what you learn.</p>
 <details class="answer"><summary>Reveal worked solution (actual R run)</summary><div class="answer-body">
-<p><em>Deterministic MLE fit (<code>stats4::mle</code>, L-BFGS-B) on the full <code>data/vonbert.csv</code> ($n = 100$, 50 per sex), model $L_a = L_\infty(1 - e^{-\kappa a})$ — no seed needed.</em></p>
-<p>(a) <strong>Full (Model B, 5 param) vs null (Model A, 3 param), 2 df:</strong> $\Lambda = 2(\ell_B - \ell_A) = 75.4$, $p \approx 4\times10^{-17}$ — the null of a single shared growth curve is decisively rejected.</p>
-<p>(b) <strong>AIC (lower is better):</strong> Model A (pooled, 3p) $= 798.0$; intermediate (shared $L_\infty$, sex-specific $\kappa$, 4p) $= 767.1$; Model B (full sex-specific $L_\infty$ and $\kappa$, 5p) $= \mathbf{726.6}$. The full model wins by ~40 AIC over the intermediate and ~71 over the null — far beyond the 2-unit rule of thumb. AIC and the LRT agree.</p>
-<p>(c) <strong>Second LRT — intermediate (4p) vs null (3p), 1 df:</strong> $\Lambda = 32.9$, $p \approx 9.7\times10^{-9}$. A single sex-specific $\kappa$ already helps a lot, but it is <em>not</em> where the action is: fitting Model B shows the sex difference is concentrated in asymptotic length $L_\infty$ ($\hat L_{\infty,1} \approx 82.6$ for sex 1 vs $\hat L_{\infty,2} \approx 102.5$ for sex 2) far more than in growth coefficient $\kappa$ ($0.259$ vs $0.284$). When the intermediate model is forced to share $L_\infty$, it can only compensate by splaying the two $\kappa$'s apart ($0.167$ for sex 1 vs $0.335$ for sex 2) — and still lands ~40 AIC units short of the full model.</p>
-<p><strong>Conclusion:</strong> the sexes differ mainly in asymptotic size $L_\infty$ (sex 2 reaches a substantially larger maximum length; the file does not record which code is male and which is female, so report the result by code) and only modestly in $\kappa$; the fully sex-specific model is preferred by both criteria. Remember the division of labor — the LRT needs nesting and returns a p-value; AIC needs no nesting and returns a ranking.</p>
+<p><em>Deterministic MLE fit (<code>stats4::mle</code>, L-BFGS-B) on the full <code>data/vonbert.csv</code> ($n = 100$, 50 per sex), model $L_a = L_\infty(1 - e^{-\kappa a})$, no seed needed.</em></p>
+<p>(a) <strong>Full (Model B, 5 param) vs null (Model A, 3 param), 2 df:</strong> $\Lambda = 2(\ell_B - \ell_A) = 75.4$, $p \approx 4\times10^{-17}$: the null of a single shared growth curve is decisively rejected.</p>
+<p>(b) <strong>AIC (lower is better):</strong> Model A (pooled, 3p) $= 798.0$; intermediate (shared $L_\infty$, sex-specific $\kappa$, 4p) $= 767.1$; Model B (full sex-specific $L_\infty$ and $\kappa$, 5p) $= \mathbf{726.6}$. The full model wins by ~40 AIC over the intermediate and ~71 over the null, far beyond the 2-unit rule of thumb. AIC and the LRT agree.</p>
+<p>(c) <strong>Second LRT, intermediate (4p) vs null (3p), 1 df:</strong> $\Lambda = 32.9$, $p \approx 9.7\times10^{-9}$. A single sex-specific $\kappa$ already helps a lot, but it is <em>not</em> where the action is: fitting Model B shows the sex difference is concentrated in asymptotic length $L_\infty$ ($\hat L_{\infty,1} \approx 82.6$ for sex 1 vs $\hat L_{\infty,2} \approx 102.5$ for sex 2) far more than in growth coefficient $\kappa$ ($0.259$ vs $0.284$). When the intermediate model is forced to share $L_\infty$, it can only compensate by splaying the two $\kappa$'s apart ($0.167$ for sex 1 vs $0.335$ for sex 2), and still lands ~40 AIC units short of the full model.</p>
+<p><strong>Conclusion:</strong> the sexes differ mainly in asymptotic size $L_\infty$ (sex 2 reaches a substantially larger maximum length; the file does not record which code is male and which is female, so report the result by code) and only modestly in $\kappa$; the fully sex-specific model is preferred by both criteria. Remember the division of labor: the LRT needs nesting and returns a p-value; AIC needs no nesting and returns a ranking.</p>
 </div></details>
 </div>
 
@@ -585,7 +585,7 @@ best &lt;- <span class="fn">min</span>(prof)
 <!-- ================================================================== -->
 
 <a id="afternoon"></a>
-<div class="practice-banner"><div class="label">Practice — answers visible</div><h3>Afternoon practice problems</h3><p>The exercises below are walk-through practice. Your graded afternoon assignment uses a separate, novel problem set &mdash; <strong>open the graded problem set below</strong> and write your answers in <code>afternoon_lab_template.Rmd</code>.</p><p style="margin: 8px 0 0 0;"><a class="hand-in" href="problem_set.html#afternoon">Open the graded afternoon problem set &rarr;</a> &nbsp;&nbsp; <a class="hand-in" href="afternoon_lab_template.Rmd" style="background:#1C638A; color:white; border-color:#1C638A;">afternoon_lab_template.Rmd &darr;</a></p></div>
+<div class="practice-banner"><div class="label">Practice — answers visible</div><h3>Afternoon practice problems</h3><p>The exercises below are walk-through practice. Your graded afternoon assignment uses a separate, novel problem set — <strong>open the graded problem set below</strong> and write your answers in <code>afternoon_lab_template.Rmd</code>.</p><p style="margin: 8px 0 0 0;"><a class="hand-in" href="problem_set.html#afternoon">Open the graded afternoon problem set &rarr;</a> &nbsp;&nbsp; <a class="hand-in" href="afternoon_lab_template.Rmd" style="background:#1C638A; color:white; border-color:#1C638A;">afternoon_lab_template.Rmd &darr;</a></p></div>
 <section id="bayes-orient">
 <h2>Afternoon · From likelihood to posterior</h2>
 
@@ -1125,7 +1125,7 @@ The recipe is always the same three steps: <strong>(1)</strong> simulate fake da
 <li>How would your answer change if the prior had been Beta(1, 1) (flat)?</li>
 </ol>
 <details class="answer"><summary>Reveal</summary><div class="answer-body">
-<p><strong>(a) Where Beta(25, 25) comes from — derive it, don't memorize it.</strong> Start from what the two lines of the model literally say. The prior is a Beta density, which as a function of $p$ (dropping the constant $1/B(\alpha,\beta)$) is</p>
+<p><strong>(a) Where Beta(25, 25) comes from, derive it, don't memorize it.</strong> Start from what the two lines of the model literally say. The prior is a Beta density, which as a function of $p$ (dropping the constant $1/B(\alpha,\beta)$) is</p>
 <div class="eq-block">$p(p) \;\propto\; p^{\alpha-1}(1-p)^{\beta-1} \;=\; p^{2}(1-p)^{6} \qquad (\alpha=3,\ \beta=7),$</div>
 <p>and the binomial likelihood, dropping the $\binom{n}{y}$ that doesn't contain $p$, is</p>
 <div class="eq-block">$L(p) \;\propto\; p^{y}(1-p)^{n-y} \;=\; p^{22}(1-p)^{18}.$</div>
@@ -1139,7 +1139,7 @@ post &lt;- <span class="fn">rbeta</span>(<span class="nu">1e5</span>, <span clas
 <span class="fn">c</span>(mean = <span class="fn">mean</span>(post), median = <span class="fn">median</span>(post),
  <span class="fn">quantile</span>(post, <span class="kw">c</span>(<span class="nu">.025</span>, <span class="nu">.975</span>)),
  hpdi = <span class="fn">hdi</span>(post, <span class="nu">.95</span>))</code></pre>
-<p>(c) Flat prior gives Beta(23, 19); posterior mean $\approx 23/42 = 0.548$ — slightly higher and not pulled toward 0.3. With $n=40$ data, the prior matters but doesn't dominate.</p>
+<p>(c) Flat prior gives Beta(23, 19); posterior mean $\approx 23/42 = 0.548$, slightly higher and not pulled toward 0.3. With $n=40$ data, the prior matters but doesn't dominate.</p>
 </div></details>
 </div>
 
@@ -1155,9 +1155,9 @@ post &lt;- <span class="fn">rbeta</span>(<span class="nu">1e5</span>, <span clas
 </ol>
 <details class="answer"><summary>Reveal</summary><div class="answer-body">
 <p>(a) Working in $\log\lambda$ makes the proposal Normal symmetric in the unconstrained space and automatically respects $\lambda > 0$; otherwise you need a rejection step for proposals $\le 0$.</p>
-<p>There is one bookkeeping price for that reparameterization, and it is the <code>+ log_lam</code> line in the log-posterior — the <strong>Jacobian</strong>. When you sample $u=\log\lambda$ rather than $\lambda$, the change of variables stretches the density by the factor $\left|\dfrac{d\lambda}{du}\right| = \dfrac{d\,e^{u}}{du} = e^{u} = \lambda$, so the target density expressed in $u$ is $p(\lambda)\,L(\lambda)\cdot\lambda$. Take logs and that trailing factor becomes an additive term:</p>
+<p>There is one bookkeeping price for that reparameterization, and it is the <code>+ log_lam</code> line in the log-posterior: the <strong>Jacobian</strong>. When you sample $u=\log\lambda$ rather than $\lambda$, the change of variables stretches the density by the factor $\left|\dfrac{d\lambda}{du}\right| = \dfrac{d\,e^{u}}{du} = e^{u} = \lambda$, so the target density expressed in $u$ is $p(\lambda)\,L(\lambda)\cdot\lambda$. Take logs and that trailing factor becomes an additive term:</p>
 <div class="eq-block">$\log \tilde p(u) \;=\; \log p(\lambda) + \log L(\lambda) + \log\lambda, \qquad \lambda = e^{u}.$</div>
-<p>Drop the $+\log\lambda$ and the chain converges to $p(\lambda)L(\lambda)/\lambda$ — the wrong distribution. It survives into the acceptance ratio while the proposal density does not: because the random-walk proposal is <em>symmetric</em> in $u$ (a Normal step is as likely up as down), the proposal terms cancel in $\alpha = \min(1,\, \tilde p(u^\star)/\tilde p(u_{\text{current}}))$, leaving the Jacobian as the only correction you owe for the switch to log-space.</p>
+<p>Drop the $+\log\lambda$ and the chain converges to $p(\lambda)L(\lambda)/\lambda$, the wrong distribution. It survives into the acceptance ratio while the proposal density does not: because the random-walk proposal is <em>symmetric</em> in $u$ (a Normal step is as likely up as down), the proposal terms cancel in $\alpha = \min(1,\, \tilde p(u^\star)/\tilde p(u_{\text{current}}))$, leaving the Jacobian as the only correction you owe for the switch to log-space.</p>
 <p>(b) Wrap the sampler in a function of the proposal SD <code>s</code>, so that part (c) is one <code>sapply()</code> instead of five copy-pastes. <code>set.seed(3)</code> inside the function means every value of <code>s</code> is judged on the <em>same</em> stream of random numbers, and you get the acceptance rates quoted below to the digit.</p>
 <pre><code>y &lt;- <span class="kw">c</span>(<span class="nu">3</span>,<span class="nu">1</span>,<span class="nu">4</span>,<span class="nu">2</span>,<span class="nu">0</span>,<span class="nu">5</span>,<span class="nu">2</span>,<span class="nu">3</span>,<span class="nu">1</span>,<span class="nu">4</span>)
 log_post &lt;- <span class="kw">function</span>(log_lam) {
@@ -1193,14 +1193,14 @@ tuned &lt;- <span class="fn">run_mh</span>(<span class="nu">0.75</span>) <span c
 <span class="fn">c</span>(rate = tuned$rate, mean = <span class="fn">mean</span>(tuned$lam),
  <span class="fn">quantile</span>(tuned$lam, <span class="fn">c</span>(<span class="nu">.025</span>, <span class="nu">.975</span>)))</code></pre>
 
-<p>(c) The starting guess $s = 0.30$ is <strong>not</strong> the tuned answer &mdash; it accepts 58% of proposals, roughly double the target. Bigger jumps are rejected more often, so tuning <em>down</em> the acceptance rate means tuning <em>up</em> the proposal SD. With <code>set.seed(3)</code> the ladder reads:</p>
+<p>(c) The starting guess $s = 0.30$ is <strong>not</strong> the tuned answer, it accepts 58% of proposals, roughly double the target. Bigger jumps are rejected more often, so tuning <em>down</em> the acceptance rate means tuning <em>up</em> the proposal SD. With <code>set.seed(3)</code> the ladder reads:</p>
 
 <table>
 <tr><th scope="col">proposal SD $s$</th><td>0.15</td><td>0.30</td><td>0.60</td><td><strong>0.75</strong></td><td>0.90</td><td>1.20</td></tr>
 <tr><th scope="col">acceptance rate</th><td>0.764</td><td>0.579</td><td>0.365</td><td><strong>0.303</strong></td><td>0.260</td><td>0.202</td></tr>
 </table>
 
-<p>So <strong>$s \approx 0.75$</strong> is the tuned proposal SD: acceptance $0.303$, right on the ~30% target. Its posterior mean is $2.458$ with 95% BCI $(1.617,\ 3.469)$, against the exact Gamma$(27, 11)$ posterior mean $27/11 = 2.4545$ and BCI $(1.618,\ 3.463)$ &mdash; agreement to Monte Carlo noise, which is the check that the sampler is right and not merely well-tuned. Note that every $s$ in the table converges to the same posterior; tuning buys <em>efficiency</em> (effective sample size per iteration), not correctness. That is why an untuned chain can still look fine in a histogram and still be wasting most of your run.</p>
+<p>So <strong>$s \approx 0.75$</strong> is the tuned proposal SD: acceptance $0.303$, right on the ~30% target. Its posterior mean is $2.458$ with 95% BCI $(1.617,\ 3.469)$, against the exact Gamma$(27, 11)$ posterior mean $27/11 = 2.4545$ and BCI $(1.618,\ 3.463)$ — agreement to Monte Carlo noise, which is the check that the sampler is right and not merely well-tuned. Note that every $s$ in the table converges to the same posterior; tuning buys <em>efficiency</em> (effective sample size per iteration), not correctness. That is why an untuned chain can still look fine in a histogram and still be wasting most of your run.</p>
 </div></details>
 </div>
 
@@ -1227,7 +1227,7 @@ tuned &lt;- <span class="fn">run_mh</span>(<span class="nu">0.75</span>) <span c
 <tr><td>$\text{MSY}=rK/4$</td><td>62.0</td><td>(57.1, 67.1)</td><td>(57.1, 67.0)</td></tr>
 <tr><td>$\sigma$</td><td>0.0284</td><td>(0.0234, 0.0353)</td><td>(0.0229, 0.0346)</td></tr>
 </table>
-<p>(c) $\Pr(r > 0.22 \mid \text{data}) = 0.023$ — the $r$ posterior is tight ($\text{sd} \approx 0.010$), so $0.22$ sits about two SDs above the median.</p>
+<p>(c) $\Pr(r > 0.22 \mid \text{data}) = 0.023$: the $r$ posterior is tight ($\text{sd} \approx 0.010$), so $0.22$ sits about two SDs above the median.</p>
 <p>(d) $\Pr(\text{MSY} > 50 \mid \text{data}) = 1.00$ — essentially certain: the entire 95% MSY interval (~57 to 67) lies above 50.</p>
 <p>(e) <strong>$\sigma$</strong> is the parameter where BCI and HPDI noticeably separate. It is bounded below by 0 and mildly right-skewed, so its HPDI $(0.0229, 0.0346)$ sits a touch lower and is marginally shorter than the equal-tailed BCI $(0.0234, 0.0353)$: an equal-tail interval splits the 5% miss symmetrically by quantile, whereas the HPDI captures the densest 95% of mass, which for a right-skewed posterior shifts toward the lower bound. The gap is modest here because $\sigma$ is well-determined — it would be dramatic for a strongly skewed posterior ($K$ and $K/2$ show the same rightward skew). Derived-quantity plotting code ($dN/dt$ vs $N$ with median and HPDI band) is in <code>Logistic_BayesianGrowth_Nimble.R</code>.</p>
 </div></details>
@@ -1241,23 +1241,23 @@ tuned &lt;- <span class="fn">run_mh</span>(<span class="nu">0.75</span>) <span c
 <ol type="a">
 <li>Report the posterior mean and 95% BCI.</li>
 <li>Compute $\Pr(\phi > 0.5 \mid \text{data})$.</li>
-<li>Write one sentence explaining how the prior "tug" trades off with the data — i.e. how the effective sample size of the prior compares to $n=25$.</li>
+<li>Write one sentence explaining how the prior "tug" trades off with the data, i.e. how the effective sample size of the prior compares to $n=25$.</li>
 </ol>
 <details class="answer"><summary>Reveal</summary><div class="answer-body">
-<p>With $y=18$ successes in $n=25$, the data alone give $18/25 = 0.72$. Each prior pulls that toward its own mean — and "pulls" is not a metaphor here, it is arithmetic you can derive once and reuse.</p>
+<p>With $y=18$ successes in $n=25$, the data alone give $18/25 = 0.72$. Each prior pulls that toward its own mean, and "pulls" is not a metaphor here; it is arithmetic you can derive once and reuse.</p>
 <p><strong>Why the pull is a weighted average.</strong> Beta–Binomial conjugacy makes the posterior Beta$(\alpha+y,\ \beta+n-y)$ (successes onto $\alpha$, failures onto $\beta$), and a Beta$(a,b)$ has mean $a/(a+b)$. So the posterior mean is</p>
 <div class="eq-block">$\mathbb{E}[\phi\mid y] = \dfrac{\alpha+y}{\alpha+\beta+n}.$</div>
 <p>Split that one fraction into the part the prior contributes and the part the data contribute:</p>
 <div class="eq-block">$\dfrac{\alpha+y}{\alpha+\beta+n} \;=\; \underbrace{\dfrac{\alpha+\beta}{\alpha+\beta+n}}_{w}\cdot\underbrace{\dfrac{\alpha}{\alpha+\beta}}_{\text{prior mean}} \;+\; \underbrace{\dfrac{n}{\alpha+\beta+n}}_{1-w}\cdot\underbrace{\dfrac{y}{n}}_{\text{data mean}}.$</div>
-<p>The posterior mean is a <strong>weighted average of the prior mean and the data proportion, weighted by their sample sizes</strong> — the prior's pseudo-count $\alpha+\beta$ against the real $n$, with weight $w=(\alpha+\beta)/(\alpha+\beta+n)$ on the prior. That single identity produces every row below; compute $w$, and the number falls out with no further work:</p>
+<p>The posterior mean is a <strong>weighted average of the prior mean and the data proportion, weighted by their sample sizes</strong>: the prior's pseudo-count $\alpha+\beta$ against the real $n$, with weight $w=(\alpha+\beta)/(\alpha+\beta+n)$ on the prior. That single identity produces every row below; compute $w$, and the number falls out with no further work:</p>
 <ul>
-<li><strong>Beta(1,1)</strong> (flat, pseudo-$n=2$, $w=2/27=0.07$) &rarr; Beta(19,&nbsp;8), mean $0.07(0.5)+0.93(0.72)=$ <strong>0.704</strong> &mdash; barely moved; the data dominate.</li>
-<li><strong>Beta(9,11)</strong> (mean 0.45, pseudo-$n=20$, $w=20/45=0.44$) &rarr; Beta(27,&nbsp;18), mean $0.44(0.45)+0.56(0.72)=$ <strong>0.600</strong> &mdash; pulled about halfway, because pseudo-$n \approx n$.</li>
-<li><strong>Beta(50,50)</strong> (mean 0.50, pseudo-$n=100$, $w=100/125=0.80$) &rarr; Beta(68,&nbsp;57), mean $0.80(0.50)+0.20(0.72)=$ <strong>0.544</strong> &mdash; yanked most of the way to 0.50: the prior is worth four times the data.</li>
-<li><strong>Beta(50,100)</strong> (mean 0.33, pseudo-$n=150$, $w=150/175=0.86$) &rarr; Beta(68,&nbsp;107), mean $0.86(0.33)+0.14(0.72)=$ <strong>0.389</strong> &mdash; the posterior now sits closer to the prior than to the data. <em>(This fourth prior is a bonus, past the three the exercise asks for; it is here to show what happens once the prior outweighs the data by 6:1.)</em></li>
+<li><strong>Beta(1,1)</strong> (flat, pseudo-$n=2$, $w=2/27=0.07$) &rarr; Beta(19,&nbsp;8), mean $0.07(0.5)+0.93(0.72)=$ <strong>0.704</strong>, barely moved; the data dominate.</li>
+<li><strong>Beta(9,11)</strong> (mean 0.45, pseudo-$n=20$, $w=20/45=0.44$) &rarr; Beta(27,&nbsp;18), mean $0.44(0.45)+0.56(0.72)=$ <strong>0.600</strong> — pulled about halfway, because pseudo-$n \approx n$.</li>
+<li><strong>Beta(50,50)</strong> (mean 0.50, pseudo-$n=100$, $w=100/125=0.80$) &rarr; Beta(68,&nbsp;57), mean $0.80(0.50)+0.20(0.72)=$ <strong>0.544</strong>, yanked most of the way to 0.50: the prior is worth four times the data.</li>
+<li><strong>Beta(50,100)</strong> (mean 0.33, pseudo-$n=150$, $w=150/175=0.86$) &rarr; Beta(68,&nbsp;107), mean $0.86(0.33)+0.14(0.72)=$ <strong>0.389</strong>: the posterior now sits closer to the prior than to the data. <em>(This fourth prior is a bonus, past the three the exercise asks for; it is here to show what happens once the prior outweighs the data by 6:1.)</em></li>
 </ul>
 
-<p><strong>(a) &amp; (b) &mdash; the three numbers per prior.</strong> Posterior mean, 95% equal-tailed BCI, and $\Pr(\phi > 0.5 \mid y)$, all from the closed-form Beta posterior (and reproduced by the Nimble run below to three decimals):</p>
+<p><strong>(a) &amp; (b): the three numbers per prior.</strong> Posterior mean, 95% equal-tailed BCI, and $\Pr(\phi > 0.5 \mid y)$, all from the closed-form Beta posterior (and reproduced by the Nimble run below to three decimals):</p>
 
 <table>
 <tr><th scope="col">Prior</th><th scope="col">Posterior</th><th scope="col">Posterior mean</th><th scope="col">95% BCI</th><th scope="col">$\Pr(\phi > 0.5 \mid y)$</th></tr>
@@ -1267,9 +1267,9 @@ tuned &lt;- <span class="fn">run_mh</span>(<span class="nu">0.75</span>) <span c
 <tr><td><em>Beta(50, 100)</em> (bonus)</td><td>Beta(68, 107)</td><td>0.389</td><td>(0.318, 0.462)</td><td>0.002</td></tr>
 </table>
 
-<p>Read the last column top to bottom: the evidence that survival exceeds one half falls from near-certain (0.986) to strong (0.913) to merely suggestive (0.838) &mdash; on <em>identical data</em>. Nothing changed but the prior. Note also that the intervals <em>shrink</em> as the prior strengthens (width 0.335 &rarr; 0.282 &rarr; 0.174): a heavy prior does not merely move the posterior, it makes it look more precise than 25 birds can justify. That is the whole reason reviewers interrogate priors.</p>
+<p>Read the last column top to bottom: the evidence that survival exceeds one half falls from near-certain (0.986) to strong (0.913) to merely suggestive (0.838) — on <em>identical data</em>. Nothing changed but the prior. Note also that the intervals <em>shrink</em> as the prior strengthens (width 0.335 &rarr; 0.282 &rarr; 0.174): a heavy prior does not merely move the posterior, it makes it look more precise than 25 birds can justify. That is the whole reason reviewers interrogate priors.</p>
 
-<p><strong>The Nimble version</strong> (the exercise is tagged <span class="pill nimble">Nimble</span> &mdash; conjugacy gives you the exact answer to check it against, which is exactly why this is a good first Nimble model):</p>
+<p><strong>The Nimble version</strong> (the exercise is tagged <span class="pill nimble">Nimble</span> — conjugacy gives you the exact answer to check it against, which is exactly why this is a good first Nimble model):</p>
 
 <div class="code-label">R · Nimble, three priors, one loop</div>
 <pre><code><span class="kw">library</span>(nimble); <span class="kw">library</span>(MCMCvis); <span class="kw">library</span>(coda)
@@ -1302,11 +1302,11 @@ priors &lt;- <span class="kw">list</span>(<span class="fn">c</span>(<span class=
 <span class="fn">qbeta</span>(<span class="fn">c</span>(<span class="nu">.025</span>, <span class="nu">.975</span>), <span class="nu">19</span>, <span class="nu">8</span>) <span class="cm"># 0.5221 0.8567</span>
 <span class="fn">pbeta</span>(<span class="nu">0.5</span>, <span class="nu">19</span>, <span class="nu">8</span>, lower.tail = <span class="kw">FALSE</span>) <span class="cm"># 0.9855</span></code></pre>
 
-<p>All chains give $\hat R = 1.00$, and the MCMC means/BCIs match the closed form to three decimals &mdash; which is the point of running a conjugate model in Nimble at all: it is the one case where you can audit the sampler against a known answer.</p>
+<p>All chains give $\hat R = 1.00$, and the MCMC means/BCIs match the closed form to three decimals, which is the point of running a conjugate model in Nimble at all: it is the one case where you can audit the sampler against a known answer.</p>
 
-<p><strong>(c) The one-sentence answer.</strong> A Beta$(\alpha,\beta)$ prior carries an effective sample size of $\alpha+\beta$ pseudo-observations, so against $n=25$ real birds Beta(1,1) is worth 2 (weight $0.07$ &mdash; the data decide), Beta(9,11) is worth 20 (weight $0.44$ &mdash; a near-tie), and Beta(50,50) is worth 100 (weight $0.80$ &mdash; the prior decides, four to one).</p>
+<p><strong>(c) The one-sentence answer.</strong> A Beta$(\alpha,\beta)$ prior carries an effective sample size of $\alpha+\beta$ pseudo-observations, so against $n=25$ real birds Beta(1,1) is worth 2 (weight $0.07$, the data decide), Beta(9,11) is worth 20 (weight $0.44$: a near-tie), and Beta(50,50) is worth 100 (weight $0.80$: the prior decides, four to one).</p>
 
-<p>The lesson: the prior matters most when its pseudo-sample size is large relative to $n$. Beta(50,50) is not a "weak" prior just because it is centred at one half &mdash; with $n=25$ it overwhelms the data.</p>
+<p>The lesson: the prior matters most when its pseudo-sample size is large relative to $n$. Beta(50,50) is not a "weak" prior just because it is centred at one half, with $n=25$ it overwhelms the data.</p>
 </div></details>
 </div>
 

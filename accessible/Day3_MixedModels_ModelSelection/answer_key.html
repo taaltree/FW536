@@ -29,9 +29,7 @@ MathJax = {
  <li><a href="#a1">Ex M1 — streams (pooling)</a></li>
  <li><a href="#a2">Ex M2 — length-weight</a></li>
  <li><a href="#a3">Ex M3 — von Bertalanffy NL mixed</a></li>
- <li><a href="#a4">Ex M4 — trophic position</a></li>
- <li><a href="#a5">Ex M5 — ML vs REML in action</a></li>
- <li><a href="#a6">Ex M6 — mixed-model diagnostics</a></li>
+ <li><a href="#a5">Ex M4 — ML vs REML in action</a></li>
  <li><a href="#a7">Ex A1 — ΔAIC &lt; 2 myth</a></li>
  <li><a href="#a8">Ex A2 — Type I error simulation</a></li>
  <li><a href="#a9">Ex A3 — Type II error simulation</a></li>
@@ -162,49 +160,9 @@ VarCorr(m_nlme) # SD(Linf | Subject) = 8.2884  (variance 68.697)</code></pre>
 </section>
 
 <!-- =========================== EX 4 =========================== -->
-<section id="a4">
-<h2>Exercise M4 — Trophic position with crossed random effects</h2>
-
-<p><strong>(a) Random vs fixed for Lake and Fish_Species.</strong> Both are exchangeable groupings of observations (multiple fish per lake; multiple fish per species). If the goal is to generalize the length-trophic-position relationship to <em>other</em> lakes or <em>other</em> species, random effects are appropriate. Counter-argument: only 3 species and 6 lakes is on the edge of identifiability for a random-effect variance; species-specific feeding ecologies (S1 vs S2 vs S3) are biologically distinct enough that we may care about them by name — a case for fixed effects on species and possibly on lake.</p>
-
-<p><strong>(b) Bivariate Normal interpretation.</strong></p>
-<div class="eq-block">$\begin{pmatrix} b_{0,j} \\ b_{1,j} \end{pmatrix} \sim \mathcal{N}\!\left(\mathbf{0},\; \begin{pmatrix} \sigma_0^2 &amp; \rho\sigma_0\sigma_1 \\ \rho\sigma_0\sigma_1 &amp; \sigma_1^2 \end{pmatrix}\right)$</div>
-<p>Each species draws both an intercept deviation and a slope deviation from this distribution; they can be correlated.</p>
-
-<p><strong>(c) AICc table and interpretation of M8.</strong></p>
-<pre><code>aictab(list(M1=M1,M2=M2,M3=M3,M4=M4,M5=M5,M6=M6,M7=M7,M8=M8))
-#    K   AICc  Delta_AICc  AICcWt
-# M8 7   36.33       0.00    0.84
-# M2 9   39.64       3.31    0.16
-# M1 5   82.81      46.48    0.00
-# M7 7   86.44      50.11    0.00
-# M5 6  273.54     237.21    0.00
-# M3 4  281.69     245.36    0.00
-# M4 4  463.04     426.71    0.00
-# M6 6  467.21     430.88    0.00
-# Ordering: M8 &lt; M2 &lt; M1 &lt; M7 &lt; M5 &lt; M3 &lt; M4 &lt; M6
-
-summary(M8)
-Random effects:
- Groups Name Variance Std.Dev. Corr
- Lake (Intercept) 0.205 0.453
- Fish_Species (Intercept) 0.867 0.931
- Z_Length 0.025 0.157 1.00
- Residual 0.050 0.224
-Fixed effects:
- Estimate Std.Error
-(Intercept) -0.0009 0.569
-Z_Length 0.422 0.092</code></pre>
-<p>Almost all the slope variability lives across species (different feeding ecologies → different length-TP slopes). Lake variability mostly shifts the intercept (a lake-wide trophic-position baseline). <strong>Note that M8 has no lake slope at all</strong> — the <code>VarCorr</code> block lists Lake with only <code>(Intercept)</code>, so "across lakes?" is answered by the term's absence rather than by a number in the table. The ranking backs this up: M2 is M8 plus a lake slope and lands 3.31 AICc worse, and M2's own lake slope SD is 0.024 versus a species slope SD of 0.157. Within-fish residual is small. <strong>Note the slope&ndash;intercept correlation of +1.00</strong> for the species (intercept, slope) — a singular fit, unsurprising given only 3 species. That is a degenerate (boundary) estimate &mdash; lmer has run out of data to identify the correlation and has pinned it at the edge of its range. Treat it as a warning that the random-slope structure is over-specified for this dataset, not as a real biological correlation.</p>
-
-<p><strong>(d) Practical risk with few levels.</strong> Variance components are essentially unidentifiable, singular fits are common, and any inference about the variance (CIs, LRTs) is poorly calibrated. Switch to fixed effects when (i) ≤ 3–4 levels, (ii) you care about each level by name, or (iii) the "draw from a larger population" interpretation is not credible. In this dataset, a model with fixed effects for Species and an interaction Length × Species — with Lake either fixed or random depending on the science question — would be very defensible.</p>
-
-<div class="callout key"><p class="callout-label">Key idea</p><strong>What to look for:</strong> students recognizing that "random effect" is partly a choice about what to generalize to; students explicitly flagging the singular-fit correlation; students being able to defend either a fixed or random treatment for Species depending on the scientific question.</div>
-</section>
-
 <!-- =========================== EX 5 =========================== -->
 <section id="a5">
-<h2>Exercise M5 — ML vs REML for fixed-effect comparison</h2>
+<h2>Exercise M4 — ML vs REML for fixed-effect comparison</h2>
 
 <p><strong>(a) Why <code>REML = FALSE</code>?</strong> We are comparing models that differ in <em>fixed effects</em>. REML log-likelihoods are computed on data with the fixed effects partialed out — they are not comparable across different fixed-effect specifications. Use ML.</p>
 
@@ -213,7 +171,7 @@ Z_Length 0.422 0.092</code></pre>
 #            npar    AIC     BIC  logLik -2*log(L)  Chisq Df Pr(&gt;Chisq)
 # fit_no_x      4 300.84 313.61 -146.42    292.84
 # fit_with_x    5  76.96  92.92  -33.48     66.96 225.88  1  &lt; 2.2e-16 ***</code></pre>
-<p>$\Lambda = 2\big(-33.48 - (-146.42)\big) = 225.88$ on 1 df, $p = 4.7\times10^{-51}$. Body length is overwhelmingly supported as a predictor of trophic position even after accounting for lake and species — not a marginal call. The Wald view agrees: $\hat\beta = 0.4198$ with SE $0.0194$, so $t = 21.6$. Matches <a href="lab.html#ex-5">lab Exercise M5</a>.</p>
+<p>$\Lambda = 2\big(-33.48 - (-146.42)\big) = 225.88$ on 1 df, $p = 4.7\times10^{-51}$. Body length is overwhelmingly supported as a predictor of trophic position even after accounting for lake and species — not a marginal call. The Wald view agrees: $\hat\beta = 0.4198$ with SE $0.0194$, so $t = 21.6$. Matches <a href="lab.html#ex-5">lab Exercise M4</a>.</p>
 
 <p><strong>(c) Refitting with REML for reporting.</strong> Variance components estimated by ML are biased downward (they ignore the df consumed by the fixed effects). REML corrects that bias. The fixed-effect point estimates barely change, but the random-effect SDs and the SEs that depend on them are more honest under REML.</p>
 
@@ -221,31 +179,6 @@ Z_Length 0.422 0.092</code></pre>
 </section>
 
 <!-- =========================== EX 6 =========================== -->
-<section id="a6">
-<h2>Exercise M6 — Mixed-model diagnostics</h2>
-
-<p><strong>(a) What each plot checks.</strong></p>
-<table>
-<tr><th scope="col">Plot</th><th scope="col">Looking for</th><th scope="col">Problem signal</th></tr>
-<tr><td>Fitted vs Pearson residual</td><td>Random scatter around 0 with constant spread</td><td>Funnel (heteroscedasticity), curvature (mean structure missing)</td></tr>
-<tr><td>Covariate vs residual</td><td>Random scatter</td><td>Curvature ⇒ a nonlinearity is missing; trend ⇒ omitted interaction</td></tr>
-<tr><td>Residual boxplot by grouping</td><td>All boxes centered on 0, similar spread</td><td>A group sitting away from 0 ⇒ random intercept not absorbing the effect; uneven spread ⇒ group-level heteroscedasticity</td></tr>
-<tr><td>Q-Q of random effects</td><td>Random-effect BLUPs roughly Normal</td><td>Heavy tails or skew ⇒ a few groups are wildly different and the Normal assumption is bad</td></tr>
-</table>
-
-<p><strong>(b) Why Q-Q the random effects?</strong> The model explicitly assumes the random effects are Normal. The raw residuals are a mixture of within-group residuals and random-effect deviations; their distribution is harder to interpret. Q-Q-plotting the BLUPs directly checks the assumption that was made.</p>
-
-<p><strong>(c) If residual variance scales with fitted values.</strong> Options in rough order:</p>
-<ol>
-<li>Try a log-transform of the response (if it's positive).</li>
-<li>Fit a Gamma or Lognormal GLMM (<code>glmmTMB</code>, <code>lme4::glmer</code> with appropriate family).</li>
-<li>Allow a variance function: <code>nlme::lme(weights = varPower())</code> models residual SD as a power of fitted value.</li>
-<li>If the response is a count or proportion, use a distribution with a built-in mean-variance relationship (Poisson/NB or Binomial/Beta-Binomial).</li>
-</ol>
-
-<div class="callout key"><p class="callout-label">Key idea</p><strong>What to look for:</strong> students reading diagnostic plots actively, not just including them; students suggesting concrete fixes rather than just naming the problem.</div>
-</section>
-
 <!-- =========================== EX 7 =========================== -->
 <section id="a7">
 <h2>Exercise A1 — The "$\Delta\text{AIC} &lt; 2$" misconception</h2>

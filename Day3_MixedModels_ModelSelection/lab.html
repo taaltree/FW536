@@ -140,7 +140,10 @@
 
 <!-- ================================================================== -->
 <section id="concepts">
-<h2>Core concepts — mixed effects models</h2>
+<h2>Core concepts — linear mixed effects models</h2>
+<div class="callout warn">
+<p><strong>Scope.</strong> Everything in this section is about <em>linear</em> mixed models: <code>lmer()</code> and <code>lme()</code>, a Normal response with a separate residual variance $\sigma^2$. Most of it carries over to generalized mixed models (<code>glmer()</code>) unchanged, but two items below do not, and both are flagged where they appear: the REML rule in item 4, and the one-observation-per-level guidance in item 6.</p>
+</div>
 
 <h3>1. Complete pooling, no pooling, partial pooling</h3>
 <p>Three ways to handle a grouping variable like "stream":</p>
@@ -169,7 +172,7 @@
 <li>Compare models that differ in <em>fixed effects</em> (e.g., adding/removing a covariate) using <strong>ML</strong>.</li>
 <li><strong>Report</strong> the final model fit with <strong>REML</strong>.</li>
 </ul>
-<p>In <code>lme4::lmer()</code> the default is REML; pass <code>REML = FALSE</code> to switch to ML. In <code>nlme::lme()</code>, set <code>method = "ML"</code> or <code>"REML"</code>.</p>
+<p>In <code>lme4::lmer()</code> the default is REML; pass <code>REML = FALSE</code> to switch to ML. In <code>nlme::lme()</code>, set <code>method = "ML"</code> or <code>"REML"</code>. <strong>This rule is for linear mixed models only.</strong> <code>glmer()</code> has no <code>REML</code> argument at all: generalized mixed models are fit by maximum likelihood (Laplace approximation or adaptive Gauss-Hermite quadrature), so the REML-versus-ML choice does not arise there.</p>
 </div>
 <p><strong>Why?</strong> Maximum likelihood underestimates variance components (it ignores the degrees of freedom used by the fixed effects). REML "restricts" the likelihood to contrasts that don't depend on the fixed effects, giving unbiased variance estimates. But REML likelihoods from models with different fixed effects aren't directly comparable — they're computed on different reduced data.</p>
 
@@ -183,7 +186,7 @@
 <tr><th>Use a random effect when…</th><th>Don't bother when…</th></tr>
 <tr><td>You have ≥ 5 (better: 8+) levels of the grouping.</td><td>You only have 2–3 levels. Use a fixed effect.</td></tr>
 <tr><td>You don't care about each level by name; they are exchangeable samples from a larger population (streams in Oregon, deer in a herd).</td><td>Each level is biologically distinct and you specifically want its coefficient (sex, treatment).</td></tr>
-<tr><td>Observations are nested or repeated within levels.</td><td>Each level has exactly one observation — you have no within-group residual to separate from the group effect.</td></tr>
+<tr><td>Observations are nested or repeated within levels.</td><td>Each level has exactly one observation — you have no within-group residual to separate from the group effect. <em>(Linear models only: a GLMM has no separate residual variance, so a random effect with one observation per level is identifiable there. That is exactly the observation-level random effect used to absorb overdispersion in a Poisson or binomial GLMM.)</em></td></tr>
 <tr><td>Generalization to <em>other</em> levels (other streams, other years) is the goal.</td><td>The levels are the universe of interest.</td></tr>
 </table>
 </section>
@@ -225,13 +228,13 @@ lm3 &lt;- <span class="fn">lme</span>(fixed = Density ~ <span class="nu">1</span
 </ol>
 
 <details class="answer"><summary>Reveal worked solution</summary><div class="answer-body">
-<p><strong>(a)</strong> Let $y_{ij}$ be density measurement $i$ in stream $j$. <code>lm1</code>: $y_{ij} = \beta_0 + \varepsilon_{ij}$ — two parameters ($\beta_0, \sigma^2$). <code>lm2</code>: $y_{ij} = \alpha_j + \varepsilon_{ij}$ with a free mean $\alpha_j$ for each of the $j=1,\dots,100$ streams — 101 parameters (100 means $+\ \sigma^2$). <code>lm3</code>: $y_{ij} = \beta_0 + b_{0,j} + \varepsilon_{ij}$, $b_{0,j} \sim \mathcal{N}(0,\sigma_\text{stream}^2)$ — only 3 parameters ($\beta_0, \sigma_\text{stream}^2, \sigma^2$), regardless of how many streams there are.</p>
+<p><strong>(a)</strong> Let $y_{ij}$ be density measurement $i$ in stream $j$. <code>lm1</code>: $y_{ij} = \beta_0 + \varepsilon_{ij}$, two parameters ($\beta_0, \sigma^2$). <code>lm2</code>: $y_{ij} = \alpha_j + \varepsilon_{ij}$ with a free mean $\alpha_j$ for each of the $j=1,\dots,100$ streams — 101 parameters (100 means $+\ \sigma^2$). <code>lm3</code>: $y_{ij} = \beta_0 + b_{0,j} + \varepsilon_{ij}$, $b_{0,j} \sim \mathcal{N}(0,\sigma_\text{stream}^2)$ — only 3 parameters ($\beta_0, \sigma_\text{stream}^2, \sigma^2$), regardless of how many streams there are.</p>
 
-<p><strong>(b)</strong> Residuals from <code>lm1</code> cluster strongly by stream — entire streams are shifted above or below zero. This violates the independence assumption of OLS. Standard errors from <code>lm1</code> are too small (anti-conservative).</p>
+<p><strong>(b)</strong> Residuals from <code>lm1</code> cluster strongly by stream, entire streams are shifted above or below zero. This violates the independence assumption of OLS. Standard errors from <code>lm1</code> are too small (anti-conservative).</p>
 
 <p><strong>(c)</strong> Stream 11 has the lowest mean (8.9) and Stream 43 the highest (111.7); every stream has exactly 3 observations. The partially-pooled estimates from <code>lm3</code> sit slightly closer to the grand mean of 63.26 — Stream 11 moves 8.9 → 9.7, Stream 43 moves 111.7 → 111.0.</p>
-<p>What shrinkage does here is simple: every stream is pulled toward the grand mean by the <em>same percentage</em> of its distance from that mean — about 1.5%. Because it is the same fraction for all of them, a stream that starts far from the grand mean moves more in <em>absolute</em> terms — Stream 11 sits about 54 units below the mean and is nudged ~0.8, Stream 43 about 48 units above and is nudged ~0.7 — but no stream is shrunk by a larger <em>fraction</em> than any other. Each estimate keeps roughly 98.5% of its own stream average and borrows just ~1.5% from the overall mean.</p>
-<p>Two things set how big that pull is: how noisy each stream's own average is, and how different the streams genuinely are. Here the streams differ a lot relative to the noise in a 3-observation average, so the model mostly trusts each stream's own data and barely shrinks — and because every stream has the same number of observations (3), every stream gets the same small pull. Shrinkage grows when a group has few or noisy observations, or when the groups are nearly alike; it fades toward nothing when each group's own data are already precise.</p>
+<p>What shrinkage does here is simple: every stream is pulled toward the grand mean by the <em>same percentage</em> of its distance from that mean, about 1.5%. Because it is the same fraction for all of them, a stream that starts far from the grand mean moves more in <em>absolute</em> terms — Stream 11 sits about 54 units below the mean and is nudged ~0.8, Stream 43 about 48 units above and is nudged ~0.7, but no stream is shrunk by a larger <em>fraction</em> than any other. Each estimate keeps roughly 98.5% of its own stream average and borrows just ~1.5% from the overall mean.</p>
+<p>Two things set how big that pull is: how noisy each stream's own average is, and how different the streams genuinely are. Here the streams differ a lot relative to the noise in a 3-observation average, so the model mostly trusts each stream's own data and barely shrinks, and because every stream has the same number of observations (3), every stream gets the same small pull. Shrinkage grows when a group has few or noisy observations, or when the groups are nearly alike; it fades toward nothing when each group's own data are already precise.</p>
 
 <p><strong>(d)</strong> Approximate output:</p>
 <pre><code>Random effects:
@@ -275,29 +278,29 @@ m1b &lt;- <span class="fn">lmer</span>(Weight ~ Length + (<span class="nu">1</sp
 <ol type="a">
 <li>Write out the equation the model is fitting. What does each parameter mean biologically?</li>
 <li>What is the group-mean relationship between length and weight? (i.e., the fixed-effect slope and intercept.)</li>
-<li>What is the among-subject standard deviation of the intercept? Translate that into "subjects of the same length differ by ± X in expected weight." (Note the <code>Length</code>/<code>Weight</code> columns are on a transformed/index scale, so answer in those units, not grams.)</li>
+<li>What is the among-subject standard deviation of the intercept? Translate that into "subjects of the same length differ by ± X in expected weight." (Both columns are logged, so give the answer as a percentage change in weight.)</li>
 <li>What is the within-subject residual standard deviation? What is the ICC?</li>
-<li>Fit a random-slope model <code>Weight ~ Length + (1 + Length | Subject)</code>. Use <code>anova(m1b, m_slope, refit = FALSE)</code> (REML LRT) to decide whether the random slope is supported. Why <em>refit = FALSE</em>?</li>
+<li>Fit a random-slope model <code>Weight ~ Length + (1 + Length | Subject)</code>. Decide whether the random slope is supported using <em>both</em> a likelihood-ratio test, <code>anova(m1b, m_slope, refit = FALSE)</code>, and AIC. Why <em>refit = FALSE</em>, and do the two criteria agree?</li>
 </ol>
 
 <details class="answer"><summary>Reveal worked solution</summary><div class="answer-body">
 <p><strong>(a)</strong> $W_{ij} = \beta_0 + b_{0,j} + \beta_1 L_{ij} + \varepsilon_{ij}$, with $b_{0,j}\sim\mathcal{N}(0,\sigma_S^2)$ and $\varepsilon_{ij}\sim\mathcal{N}(0,\sigma^2)$. $\beta_1$ is the population-average slope of weight on length, shared across subjects. $b_{0,j}$ is the subject's intercept deviation from the population mean.</p>
 
-<p><strong>(b)</strong> Approximate output: $\hat\beta_0 \approx -0.03$, $\hat\beta_1 \approx 3.02$ — i.e., a one-unit increase in the length variable corresponds to about 3.0 units of weight on average across subjects. This file's <code>Length</code> and <code>Weight</code> columns are on a transformed/index scale (ranges $\approx 0.7$–3.0 and 1.4–9.4), <em>not</em> raw centimetres and grams, so read the slope in those units rather than attaching a gram figure to it. CIs from <code>intervals(m1)</code> exclude zero comfortably.</p>
+<p><strong>(b)</strong> Approximate output: $\hat\beta_0 \approx -0.03$, $\hat\beta_1 \approx 3.02$. Because both columns are logged, this slope is the <strong>allometric exponent</strong>: weight scales as about the cube of length, $\text{weight} \propto \text{length}^{3.02}$, which is what you expect when a fish grows without changing shape, since mass tracks volume and volume tracks length cubed. A slope near 3 is the biologically meaningful reading, not "3 units of weight per unit of length". CIs from <code>intervals(m1)</code> exclude zero comfortably, though for an allometric exponent the interesting comparison is against 3, not against 0.</p>
 
-<p><strong>(c)</strong> Among-subject SD on the intercept is around 0.211; so subjects of the same length differ in expected weight by roughly $\pm 0.21$ (1 SD) or $\pm 0.42$ (2 SD) on the weight scale, even after accounting for the length effect.</p>
+<p><strong>(c)</strong> Among-subject SD on the intercept is around 0.211, on the <em>log</em>-weight scale. A difference on a log scale is a ratio once you exponentiate: $e^{0.211} = 1.23$, so at any given length a one-SD subject is about <strong>23% heavier</strong> than the population average, and a two-SD subject about 53% heavier. That is the interpretation to report; "±0.21" alone is not in units anyone can picture.</p>
 
 <p><strong>(d)</strong> Within-subject residual SD around 0.21. ICC = $0.211^2 / (0.211^2 + 0.206^2) \approx 0.045 / 0.087 \approx 0.51$. Even after the length covariate, about half the remaining variation is between subjects: individual fish are persistently heavier or lighter than the population line predicts, so repeated measurements on one fish are far from independent. That is exactly why the random intercept is needed here.</p>
 
-<p><strong>(e)</strong> The REML LRT (use <code>refit = FALSE</code> because we are comparing random-effect structures, not fixed effects, and REML likelihoods are valid for that comparison). On this dataset the random slope adds essentially nothing: $\chi^2 = 0.0783$ on 2 df, $p = 0.9616$, with a slope SD of $0.0089$ against an intercept SD of $0.2309$. Conclusion: a random intercept suffices.</p>
-<div class="callout warn"><strong>Read the warning, don't guess it.</strong> Fitting <code>m_slope</code> does <em>not</em> print <code>boundary (singular) fit</code> here. It prints <code>Model failed to converge with max|grad| = 0.00216204 (tol = 0.002, component 1)</code> — a convergence warning. <code>isSingular(m_slope)</code> returns <code>FALSE</code>, and the third element of <code>getME(m_slope, "theta")</code> is $2.6\times10^{-4}$, small but off the boundary. What is degenerate is the slope–intercept correlation, printed as <code>-1.00</code> (exactly $-0.999982$). Same conclusion, correct diagnosis.</div>
+<p><strong>(e)</strong> Use <code>refit = FALSE</code> because we are comparing random-effect structures rather than fixed effects, and REML likelihoods are valid for exactly that comparison. Both criteria agree here, and emphatically. The LRT gives $\chi^2 = 0.078$ on 2 df, $p = 0.962$. AIC says the same in its own currency: <strong>6.73</strong> for the random-intercept model against <strong>10.65</strong> for the random-slope model, so the slope costs 3.9 AIC units and buys essentially no fit. The fitted slope SD is 0.0089 against an intercept SD of 0.231. A random intercept suffices. It is worth seeing the two tools agree here, because Day 3 afternoon is largely about the cases where they do not.</p>
+<div class="callout warn"><strong>You will see a warning here, and it is expected.</strong> Fitting <code>m_slope</code> prints <code>Model failed to converge with max|grad| = 0.00216</code>. That is a <em>warning</em>, not an error: the model still fits and the numbers above are usable. It appears because there is almost no slope variation for the optimizer to find, so it is working on a nearly flat surface. The giveaway is in the summary, where the slope&ndash;intercept correlation comes back as exactly $-1.00$, pinned to the edge of its range. Read it as "the data do not support this random slope", which is the conclusion the LRT and AIC reached too.</div>
 </div></details>
 </div>
 
 <!-- Example 3: VonB -->
 <div class="exercise" id="ex-3">
 <span class="ex-tag">Practice Exercise M3</span><span class="difficulty hard"> · 35 min · nonlinear mixed</span>
-<h3>Von Bertalanffy growth — a nonlinear mixed model</h3>
+<h3>Von Bertalanffy growth: a nonlinear mixed model</h3>
 <p>The file <code>fish_growth.csv</code> contains age and length measurements for multiple individual fish ("Subject"). Each fish should follow the von Bertalanffy growth curve:</p>
 <div class="eq-block">$L(a) = L_\infty \left(1 - e^{-\kappa (a - t_0)}\right)$</div>
 <p>where $L_\infty$ is the asymptotic length, $\kappa$ the growth rate, and $t_0$ the theoretical age at length zero.</p>
@@ -331,83 +334,23 @@ m_fixed &lt;- <span class="fn">nls</span>(Length ~ Linf*(<span class="nu">1</spa
 <details class="answer"><summary>Reveal worked solution</summary><div class="answer-body">
 <p><strong>(a)</strong> Asymptotic body size depends on genetics, food availability, and individual life history. Pooling all fish into a single $L_\infty$ ignores real biological heterogeneity.</p>
 
-<p><strong>(b)</strong> Residuals from the fixed-effects <code>nls</code> form coherent vertical clusters by subject — entire subjects are systematically above or below zero. This is the same diagnostic as in the streams example: independence is violated.</p>
+<p><strong>(b)</strong> Residuals from the fixed-effects <code>nls</code> form coherent vertical clusters by subject, entire subjects are systematically above or below zero. This is the same diagnostic as in the streams example: independence is violated.</p>
 
-<p><strong>(c)</strong> The mixed-model within-subject residual SE is much smaller than the <code>nls</code> residual SE — $0.1060$ against $5.4168$ on this file — because the random effect on $L_\infty$ absorbed the among-subject variability that <code>nls</code> was forced to dump into residuals.</p>
-<p>It is tempting to write the partition as $\sigma^2_\text{nls} \approx \sigma_{L_\infty}^2 + \sigma^2_\text{within}$, but check it before you believe it: $\text{SD}(L_\infty|\text{Subject}) = 8.2884$, so $8.2884^2 + 0.1060^2 = 68.71$, while the <code>nls</code> residual variance is only $5.4168^2 = 29.34$. The sum overshoots by more than a factor of two. What is missing is <strong>attenuation</strong>. A fish whose $L_\infty$ is $\delta$ above the population value is not $\delta$ too long at every age: the curve is $L_\infty(1 - e^{-\kappa(a - t_0)})$, so that deviation reaches the measured length scaled by $(1 - e^{-\kappa(a - t_0)})$, which is below 1 at every age we sampled. Averaging the squared scaling over the observed ages (with $\hat\kappa = 0.1996$, $\hat t_0 = -0.0045$) gives $0.4211$, and</p>
+<p><strong>(c)</strong> The mixed-model within-subject residual SE is much smaller than the <code>nls</code> residual SE: $0.1060$ against $5.4168$ on this file, because the random effect on $L_\infty$ absorbed the among-subject variability that <code>nls</code> was forced to dump into residuals.</p>
+
 <div class="eq-block">$\overline{\left(1 - e^{-\kappa(a - t_0)}\right)^2}\;\sigma_{L_\infty}^2 = 0.4211 \times 68.697 = 28.93,$</div>
 <p>which <em>is</em> the <code>nls</code> residual variance of $29.34$. The additive partition is a random-<em>intercept</em> result: it holds when the random effect enters the mean with coefficient 1. $L_\infty$ does not, so you have to carry the attenuation factor through.</p>
 
-<p><strong>(d)</strong> It returns the BLUP (best linear unbiased predictor) of each subject's $L_\infty$: population mean plus the partially-pooled random deviation. Compared with running a separate <code>nls</code> per subject, BLUPs use information from <em>other</em> subjects to stabilize estimates for subjects with sparse or noisy data. In general, subjects with few or noisy age-points get pulled hard toward the population mean while data-rich subjects stay near their own MLE — but do not go looking for that contrast in <code>fish_growth.csv</code>: all 10 fish have exactly 10 age-points each, so the design is balanced and every subject receives the same amount of pull. Seeing sparse subjects shrink harder than dense ones requires an <em>unbalanced</em> dataset.</p>
+<p><strong>(d)</strong> It returns the BLUP (best linear unbiased predictor) of each subject's $L_\infty$, population mean plus the partially-pooled random deviation. Compared with running a separate <code>nls</code> per subject, BLUPs use information from <em>other</em> subjects to stabilize estimates for subjects with sparse or noisy data. In general, subjects with few or noisy age-points get pulled hard toward the population mean while data-rich subjects stay near their own MLE, but do not go looking for that contrast in <code>fish_growth.csv</code>: all 10 fish have exactly 10 age-points each, so the design is balanced and every subject receives the same amount of pull. Seeing sparse subjects shrink harder than dense ones requires an <em>unbalanced</em> dataset.</p>
 </div></details>
 </div>
 
 <!-- Example 4: Trophic position -->
-<div class="exercise" id="ex-4">
-<span class="ex-tag">Practice Exercise M4</span><span class="difficulty hard"> · 40 min · crossed random effects + model selection preview</span>
-<h3>Fish trophic position — crossed random effects, slopes &amp; intercepts</h3>
-<p>The QCBS dataset <code>qcbs_w6_data.csv</code> has trophic position vs body length for three fish species (coded <code>S1</code>, <code>S2</code>, <code>S3</code> in the file) sampled across six lakes (<code>L1</code>–<code>L6</code>). The biological question: does trophic position increase with body length, and does that relationship differ by species and by lake?</p>
 
-<div class="code-label">Setup &amp; z-scoring</div>
-<pre><code>dat &lt;- <span class="fn">read.csv</span>(<span class="st">"data/qcbs_w6_data.csv"</span>)
-dat$Fish_Species &lt;- <span class="fn">as.factor</span>(dat$Fish_Species)
-dat$Lake &lt;- <span class="fn">as.factor</span>(dat$Lake)
-
-dat$Z_Length &lt;- <span class="fn">scale</span>(dat$Fish_Length)[,<span class="nu">1</span>] <span class="cm"># z-score for numerical stability</span>
-dat$Z_TP &lt;- <span class="fn">scale</span>(dat$Trophic_Pos)[,<span class="nu">1</span>]</code></pre>
-
-<div class="callout warn">When predictors have very different scales, the optimizer in <code>lmer</code> often returns convergence warnings or singular fits. Z-scoring continuous predictors is cheap insurance and doesn't change the structural inference.</div>
-
-<div class="code-label">Eight candidate models</div>
-<pre><code>M0 &lt;- <span class="fn">lm</span>(Z_TP ~ Z_Length, data=dat) <span class="cm"># no random effects</span>
-M1 &lt;- <span class="fn">lmer</span>(Z_TP ~ Z_Length + (<span class="nu">1</span>|Fish_Species) + (<span class="nu">1</span>|Lake), data=dat, REML=TRUE)
-M2 &lt;- <span class="fn">lmer</span>(Z_TP ~ Z_Length + (<span class="nu">1</span>+Z_Length|Fish_Species) + (<span class="nu">1</span>+Z_Length|Lake), data=dat, REML=TRUE)
-M3 &lt;- <span class="fn">lmer</span>(Z_TP ~ Z_Length + (<span class="nu">1</span>|Fish_Species), data=dat, REML=TRUE)
-M4 &lt;- <span class="fn">lmer</span>(Z_TP ~ Z_Length + (<span class="nu">1</span>|Lake), data=dat, REML=TRUE)
-M5 &lt;- <span class="fn">lmer</span>(Z_TP ~ Z_Length + (<span class="nu">1</span>+Z_Length|Fish_Species), data=dat, REML=TRUE)
-M6 &lt;- <span class="fn">lmer</span>(Z_TP ~ Z_Length + (<span class="nu">1</span>+Z_Length|Lake), data=dat, REML=TRUE)
-M7 &lt;- <span class="fn">lmer</span>(Z_TP ~ Z_Length + (<span class="nu">1</span>|Fish_Species) + (<span class="nu">1</span>+Z_Length|Lake), data=dat, REML=TRUE)
-M8 &lt;- <span class="fn">lmer</span>(Z_TP ~ Z_Length + (<span class="nu">1</span>+Z_Length|Fish_Species) + (<span class="nu">1</span>|Lake), data=dat, REML=TRUE)
-
-<span class="kw">library</span>(AICcmodavg)
-<span class="fn">aictab</span>(<span class="kw">list</span>(M1=M1,M2=M2,M3=M3,M4=M4,M5=M5,M6=M6,M7=M7,M8=M8))</code></pre>
-
-<ol type="a">
-<li>Why are <em>both</em> Lake and Fish_Species candidates for random effects (rather than fixed)? What argument might push you the other way?</li>
-<li>What does the term <code>(1 + Z_Length | Fish_Species)</code> assume about the population of slopes across species? Spell out the implied bivariate Normal.</li>
-<li>Which model has the lowest AICc? Interpret its variance components from <code>summary()</code> and <code>VarCorr()</code>. Note which random slopes the winning model carries and which it does <em>not</em> — what does that omission, plus the rank of the models that do carry a lake slope, tell you about where slope variation lives?</li>
-<li>The original lab notes that only 3 species and 6 lakes is on the edge of what we should treat as random. What is the practical risk? When would you switch to a fixed effect for species?</li>
-</ol>
-
-<details class="answer"><summary>Reveal worked solution</summary><div class="answer-body">
-<p><strong>(a)</strong> Both are grouping variables along which observations are nested (multiple fish per species, multiple fish per lake). If you'd be happy to generalize the length–TP relationship to <em>other</em> lakes or <em>other</em> species, treating them as random captures that intent. The counter-argument: with only 3 species and 6 lakes, you have very few "draws" from each random-effects population — the among-group variance is hard to estimate, and a fixed-effects model with explicit species/lake terms (and possibly an interaction) is more defensible.</p>
-
-<p><strong>(b)</strong> The model assumes:</p>
-<div class="eq-block">$\begin{pmatrix} b_{0,j} \\ b_{1,j} \end{pmatrix} \sim \mathcal{N}\!\left(\mathbf{0},\; \begin{pmatrix} \sigma_0^2 &amp; \rho\sigma_0\sigma_1 \\ \rho\sigma_0\sigma_1 &amp; \sigma_1^2 \end{pmatrix}\right)$</div>
-<p>i.e., each species has a (intercept, slope) pair drawn from a bivariate Normal centered at the fixed effects, with its own SDs and a correlation $\rho$. Species with high intercepts may also have steep slopes (or shallow, depending on $\rho$).</p>
-
-<p><strong>(c)</strong> Best AICc is typically M8 (random intercept &amp; slope on species, random intercept on lake). Approximate variance components:</p>
-<pre><code>Random effects:
- Groups Name Variance Std.Dev. Corr
- Lake (Intercept) 0.205 0.453
- Fish_Species (Intercept) 0.867 0.931
- Z_Length 0.025 0.157 1.00
- Residual 0.050 0.224
-Fixed effects:
- Estimate Std.Error
-(Intercept) -0.0009 0.569
-Z_Length 0.422 0.092
-</code></pre>
-<p>Most slope variation lives across species — different feeding ecologies. <strong>The answer to "or across lakes?" is in what M8 does not contain:</strong> the winning model has a random slope on species but only a random <em>intercept</em> on lake, so there is no lake slope term in the <code>VarCorr</code> block to interpret. That absence is the result, not an oversight. Two things confirm it. First, the ranking: M2 is M8 plus a lake slope, and it is 3.31 AICc <em>worse</em> — the extra slope does not pay for its parameters. Second, if you fit M2 anyway and look, its lake slope SD is 0.024, against a species slope SD of 0.157 — nearly an order of magnitude smaller, and next to the lake intercept SD of 0.45. So lake shifts the trophic-position baseline up or down but barely bends the length–TP relationship, while species changes both. Within-fish residual (0.22) is small relative to species variation. <em>Note</em> the perfect-correlation warning: the slope&ndash;intercept correlation comes back as <strong>+1.00</strong>, a classic singular fit. That is a degenerate (boundary) estimate &mdash; lmer has run out of data to identify the correlation and has pinned it at the edge of its range. With only 3 species this is not surprising. Treat it as a warning that the random-slope structure is over-specified for this dataset, not as a real biological correlation.</p>
-<p><em>Caveat on the AICc table:</em> <code>aictab()</code> warns that ranking models with different fixed effects needs ML, not REML. Here the fixed part (<code>Z_Length</code>) is identical across M1–M8 and only the <em>random</em> structure differs, so the REML comparison is exactly the case REML is for — the warning can be noted and set aside.</p>
-
-<p><strong>(d)</strong> With few levels, the variance components are estimated with so little information that singular fits and unstable correlations are common — and the inferential machinery (Wald CIs, LRTs) is poorly calibrated. Switch to fixed effects for species when (i) you have ≤ 3–4 levels, (ii) you care about each level by name (S1 vs S2 vs S3 is biologically meaningful), or (iii) you cannot defend a "population of species" sampling story.</p>
-</div></details>
-</div>
 
 <!-- Example 5: Choosing fixed effect basis -->
 <div class="exercise" id="ex-5">
-<span class="ex-tag">Practice Exercise M5</span><span class="difficulty medium"> · 15 min · ML vs REML in action</span>
+<span class="ex-tag">Practice Exercise M4</span><span class="difficulty medium"> · 15 min · ML vs REML in action</span>
 <h3>Comparing fixed-effect structures requires ML, not REML</h3>
 <p>Using the trophic-position dataset and the random-effect structure of <code>M1</code>:</p>
 
@@ -417,7 +360,7 @@ fit_with_x &lt;- <span class="fn">lmer</span>(Z_TP ~ Z_Length + (<span class="nu
 
 <ol type="a">
 <li>Why <code>REML = FALSE</code> here, and not above?</li>
-<li>Run the LRT. Is body length a "supported" predictor of trophic position after accounting for species and lake?</li>
+<li>Run the LRT <em>and</em> compare AIC. Is body length a "supported" predictor of trophic position after accounting for species and lake, and do the two agree?</li>
 <li>After picking the model, refit it with <code>REML = TRUE</code> for reporting. Why?</li>
 </ol>
 
@@ -426,37 +369,15 @@ fit_with_x &lt;- <span class="fn">lmer</span>(Z_TP ~ Z_Length + (<span class="nu
 
 <p><strong>(b)</strong> The LRT statistic is twice the gain in maximized log-likelihood from adding the one fixed slope: $\Lambda = 2(\ell_\text{alt} - \ell_\text{null})$. Here the ML log-likelihoods are $\ell_\text{null} = -146.4$ and $\ell_\text{alt} = -33.5$, so</p>
 <div class="eq-block">$\Lambda = 2\big(-33.5 - (-146.4)\big) = 225.9 \quad\text{on 1 df},\qquad p \approx 5\times10^{-51}.$</div>
-<p>Body length is overwhelmingly supported — this is not a marginal effect. You can sanity-check the magnitude against the Wald view: the slope is $\hat\beta = 0.420$ with SE $0.019$, so $t = 22$ and $t^2 \approx 467$; the LRT and Wald statistics are the same test asymptotically and both are astronomically far into the tail (they differ here only because $t^2$ uses the curvature at the estimate while $\Lambda$ uses the actual likelihood drop). With $n = 180$ observations spanning the length range, a standardized-length slope of 0.42 SD of trophic position per 1 SD of length is a strong, well-estimated signal, not a whisper.</p>
+<p>Body length is overwhelmingly supported, and AIC agrees: <strong>300.8</strong> without the slope against <strong>77.0</strong> with it, a drop of 224 units. Both tools point the same way, which is the ordinary case.</p>
+<div class="callout key"><p><strong>Why are we selecting models before we have covered model selection?</strong> Two reasons. First, the honest answer to "is length supported?" here is that you do not need a selection criterion at all: the slope is $0.420$ with a standard error of $0.019$, a 95% interval of $[0.382, 0.458]$ nowhere near zero. Reading the coefficient and its interval is the first thing you should do, and often the last. Second, we are running the LRT and AIC anyway because you need the mechanics in hand before this afternoon, when the whole session is about what these criteria do <em>not</em> tell you. Today they agree with the coefficient and with each other; that will not always be true.</p></div>
 
 <p><strong>(c)</strong> REML gives less-biased variance components. The point estimates of the fixed effects barely change, but the standard errors are more honest under REML.</p>
 </div></details>
 </div>
 
 <!-- Example 6: Diagnostics -->
-<div class="exercise" id="ex-6">
-<span class="ex-tag">Practice Exercise M6</span><span class="difficulty medium"> · 20 min · diagnostics</span>
-<h3>Diagnostics for the chosen mixed model</h3>
-<p>For the best-AICc model from Exercise M4 (call it <code>M8</code>):</p>
-<pre><code>E1 &lt;- <span class="fn">resid</span>(M8, type=<span class="st">"pearson"</span>)
-F1 &lt;- <span class="fn">fitted</span>(M8)
-<span class="fn">par</span>(mfrow=<span class="kw">c</span>(<span class="nu">2</span>,<span class="nu">2</span>))
-<span class="fn">plot</span>(F1, E1); <span class="fn">abline</span>(h=<span class="nu">0</span>, lty=<span class="nu">2</span>)
-<span class="fn">plot</span>(dat$Z_Length, E1); <span class="fn">abline</span>(h=<span class="nu">0</span>, lty=<span class="nu">2</span>)
-<span class="fn">boxplot</span>(E1 ~ dat$Fish_Species)
-<span class="fn">qqnorm</span>(<span class="fn">ranef</span>(M8)$Lake[,<span class="nu">1</span>]); <span class="fn">qqline</span>(<span class="fn">ranef</span>(M8)$Lake[,<span class="nu">1</span>])</code></pre>
 
-<ol type="a">
-<li>What does each of the four plots tell you, and what would a problem in each look like?</li>
-<li>Why do we Q-Q plot the random effects rather than the raw residuals?</li>
-<li>If the residual variance scales with fitted values (cone-shaped scatter), what alternatives would you consider?</li>
-</ol>
-
-<details class="answer"><summary>Reveal worked solution</summary><div class="answer-body">
-<p><strong>(a)</strong> Top-left (fitted vs Pearson residual): looking for randomness around zero with constant spread — funnel shape means heteroscedasticity. Top-right (covariate vs residual): looking for any remaining structure — curvature implies missing nonlinearity. Bottom-left (residual by species): all boxes centered on zero with similar spread — a species sitting away from zero means the random intercept didn't fully absorb the species effect. Bottom-right (Q-Q of Lake random intercepts): the assumption is that lake intercepts are Normal; serious departures from the line are a warning.</p>
-<p><strong>(b)</strong> Random effects have an explicit Normal assumption in their definition. Raw residuals are also assumed Normal, but their distribution is contaminated by the random-effect distribution and Pearson scaling — the Q-Q on random effects is a more direct check of the assumption.</p>
-<p><strong>(c)</strong> Options: log-transform the response; switch to a Gamma or Lognormal GLMM with a log link; allow a variance function in <code>nlme::lme(weights = varPower())</code>; or use a model with a built-in mean-variance relationship (Poisson/NB for counts, Beta for proportions).</p>
-</div></details>
-</div>
 
 </section>
 
@@ -467,21 +388,22 @@ F1 &lt;- <span class="fn">fitted</span>(M8)
 <h3>1. The likelihood ratio test (LRT) for nested models</h3>
 <p>If model $M_0$ is a special case of $M_1$ (e.g., one coefficient set to zero), then under the null hypothesis that $M_0$ is true,</p>
 <div class="eq-block">$2\left[\ell(M_1) - \ell(M_0)\right] \;\sim\; \chi^2_{\,k_1 - k_0}$</div>
-<p>where $\ell$ is the maximized log-likelihood and $k$ is the parameter count. The test is exact only asymptotically; for variance components on the boundary (testing whether a random-effect SD = 0) the standard $\chi^2$ is conservative. <strong>When you add exactly one variance component and no correlation term</strong> (e.g. <code>lm</code> vs <code>(1|g)</code>), the right null is a 50:50 mixture of $\chi^2_0$ and $\chi^2_1$, which amounts to halving the reported $p$-value. That shortcut does <em>not</em> generalise: adding a random <em>slope</em> adds a variance <em>and</em> a correlation, so the reference becomes $\tfrac{1}{2}\chi^2_1 + \tfrac{1}{2}\chi^2_2$ and halving is wrong. Beyond the one-component case use <code>RLRsim::exactRLRT()</code> or a parametric bootstrap.</p>
+<p>where $\ell$ is the maximized log-likelihood and $k$ is the parameter count. The test is approximate, and it is least reliable exactly where mixed-model users reach for it: when you are testing whether a variance component is zero, because zero sits on the boundary of the values a variance is allowed to take. In that situation the reported $p$-value is too large. If it matters to your conclusion, use <code>RLRsim::exactRLRT()</code> or a parametric bootstrap, which build the correct reference distribution by simulation.</p>
 
 <h3>2. AIC, AICc, BIC</h3>
 <table>
 <tr><th>Criterion</th><th>Formula</th><th>Philosophy</th></tr>
-<tr><td>AIC</td><td>$-2\ell + 2k$</td><td>Estimate of expected K-L distance to the truth (best for prediction).</td></tr>
+<tr><td>AIC</td><td>$-2\ell + 2k$</td><td>Estimates how far a model sits from the truth, so it targets <strong>prediction</strong>: which of these models will forecast best on new data.</td></tr>
 <tr><td>AICc</td><td>$\text{AIC} + \dfrac{2k(k+1)}{n-k-1}$</td><td>Small-sample correction. Recommended whenever $n/k &lt; 40$.</td></tr>
-<tr><td>BIC</td><td>$-2\ell + k\ln n$</td><td>Approximation of the marginal posterior — favors simpler "true" models more aggressively as $n$ grows.</td></tr>
+<tr><td>BIC</td><td>$-2\ell + k\ln n$</td><td>Penalises complexity by $\ln n$ rather than 2, so it favours simpler models ever more aggressively as the sample grows. It targets <strong>inference</strong>: which model is the true one.</td></tr>
 </table>
+<div class="callout key"><p><strong>The one-line version.</strong> Use <strong>AIC</strong> (or AICc) when the question is <em>which model predicts best</em>, and <strong>BIC</strong> when the question is <em>which model is true</em>. That split explains their different penalties: AIC charges a flat 2 per parameter, which never grows, while BIC charges $\ln n$, which does, so with enough data BIC will eventually reject any unnecessary parameter and AIC will not. Neither is "more correct"; they answer different questions.</p></div>
 <p>All three put models on a common scale ($-2\ell$ plus a penalty for complexity), but they have different penalty strengths. As $n$ grows, BIC's $\ln n$ penalty overtakes AIC's constant penalty.</p>
 
 <div class="callout warn">
 <strong>The $\Delta\text{AIC} &lt; 2$ misconception.</strong> A common (but problematic) rule of thumb says any model within 2 AIC units of the best is "competitive." Two important caveats:
 <ul>
-<li>This is <em>asymmetric</em>: a nested model with one extra parameter that's pure noise will have AIC about $2$ higher than the simpler model (penalty = $2 \times 1$). So $\Delta\text{AIC} \le 2$ includes models that <em>have to</em> be there by construction — they're not real evidence of an effect.</li>
+<li>This is <em>asymmetric</em>. Adding one pure-noise parameter changes AIC by exactly $\Delta\text{AIC} = 2 - \chi^2_1$, where $\chi^2_1$ is the likelihood-ratio statistic for the extra term. Since that statistic is never negative, the penalty of 2 is the <em>most</em> the complex model can ever be behind, and it is usually behind by less: on average $\chi^2_1 = 1$, so the typical gap is about 1, and roughly 16% of the time $\chi^2_1$ exceeds 2 and the noise model wins outright. So $\Delta\text{AIC} \le 2$ sweeps in models that <em>cannot</em> be further behind than that by construction; it is not evidence of an effect. Note the rule only bites in this direction. If the more complex model is 2 AIC units <em>better</em>, that is a real gap and the simpler model is not competitive.</li>
 <li>The rule conflates "predictively comparable" with "biologically supported." You'll see in the simulations below that nonsense predictors slip into the "best" model with $\Delta\text{AIC} = 0$ surprisingly often.</li>
 </ul>
 </div>
@@ -539,9 +461,9 @@ within2 &lt;- <span class="fn">replicate</span>(reps, {
 <span class="fn">mean</span>(within2) <span class="cm"># essentially 1.0 &mdash; it is always within 2</span></code></pre>
 
 <details class="answer"><summary>Reveal solution &amp; discussion</summary><div class="answer-body">
-<p>The nonsense-variable model is within 2 AIC units of the correct model <em>essentially 100% of the time &mdash; it always is</em>. This is not luck; it falls straight out of the definition of AIC. Write $\text{AIC} = -2\ell + 2k$ for each model and subtract the simpler ($k$ parameters) from the more complex ($k+1$ parameters):</p>
+<p>The nonsense-variable model is within 2 AIC units of the correct model <em>essentially 100% of the time — it always is</em>. This is not luck; it falls straight out of the definition of AIC. Write $\text{AIC} = -2\ell + 2k$ for each model and subtract the simpler ($k$ parameters) from the more complex ($k+1$ parameters):</p>
 <div class="eq-block">$\Delta\text{AIC} = \text{AIC}_{\text{big}} - \text{AIC}_{\text{small}} = -2\big(\ell_{\text{big}} - \ell_{\text{small}}\big) + 2\big[(k+1) - k\big] = 2 - \chi^2_1,$</div>
-<p>because $2(\ell_{\text{big}} - \ell_{\text{small}})$ is exactly the likelihood-ratio statistic $\chi^2_1$ for the extra term (twice the gain in maximized log-likelihood). This is the general identity worth keeping — <strong>adding one parameter moves AIC by $2 - \chi^2_1$</strong>: the penalty for a parameter is a flat $+2$, while the reward is a random $\chi^2_1$. Two consequences follow at once. Since $\chi^2_1 \ge 0$ always, $\Delta\text{AIC} \le 2$ always — a nested one-extra-parameter model is <em>within 2 by construction</em>, whatever the data say. And the junk model wins outright ($\Delta\text{AIC} &lt; 0$) exactly when $\chi^2_1 &gt; 2$, which for a true null happens with probability $P(\chi^2_1 &gt; 2) = 0.157$ — about 16% of the time. The $\Delta\text{AIC} &lt; 2$ rule does not screen out useless variables at all.</p>
+<p>because $2(\ell_{\text{big}} - \ell_{\text{small}})$ is exactly the likelihood-ratio statistic $\chi^2_1$ for the extra term (twice the gain in maximized log-likelihood). This is the general identity worth keeping — <strong>adding one parameter moves AIC by $2 - \chi^2_1$</strong>: the penalty for a parameter is a flat $+2$, while the reward is a random $\chi^2_1$. Two consequences follow at once. Since $\chi^2_1 \ge 0$ always, $\Delta\text{AIC} \le 2$ always: a nested one-extra-parameter model is <em>within 2 by construction</em>, whatever the data say. And the junk model wins outright ($\Delta\text{AIC} &lt; 0$) exactly when $\chi^2_1 &gt; 2$, which for a true null happens with probability $P(\chi^2_1 &gt; 2) = 0.157$, about 16% of the time. The $\Delta\text{AIC} &lt; 2$ rule does not screen out useless variables at all.</p>
 <p><strong>The lesson:</strong> the $\Delta\text{AIC} &lt; 2$ rule is structurally biased toward including junk. Anderson &amp; Burnham's own writing has been used selectively here; many authors (Arnold 2010 is the standard reference) push back on the "include any model within 2" practice and emphasize that the included variable's <em>coefficient and CI</em> have to do real work.</p>
 </div></details>
 </div>
@@ -594,8 +516,8 @@ pstor &lt;- AICstor &lt;- AICcstor &lt;- BICstor &lt;- <span class="fn">rep</spa
 </table>
 <p>AIC and AICc retain a noise predictor in the top model about 40&ndash;45% of the time. You can <em>predict</em> that rate rather than only reporting it, using the $\Delta\text{AIC} = 2 - \chi^2_1$ identity from Exercise A1: a single noise predictor enters the AIC-best model exactly when it clears $\chi^2_1 &gt; 2$ — probability $0.157$ each. With three near-independent noise predictors, the chance that <em>at least one</em> slips in is</p>
 <div class="eq-block">$1 - (1 - 0.157)^3 = 1 - 0.843^3 = 0.40,$</div>
-<p>in line with the simulated 40&ndash;45% (the small excess is joint selection and the mild correlation among the fitted predictors). The same reusable move explains the two conservative criteria — each just raises the bar the extra variable must clear. The family-wise p-value rate is $1 - 0.95^3 \approx 0.14$. BIC replaces AIC's flat penalty of 2 with $\ln n \approx 3.9$ for $n = 50$, so a junk predictor now needs $\chi^2_1 &gt; 3.9$ (probability $P(\chi^2_1 &gt; 3.9) \approx 0.048$ each, hence $1 - (1 - 0.048)^3 \approx 0.14$ overall) — about as strict as the p-value screen, and matching the observed $\approx 0.16$. AIC's penalty of 2 is simply too small to keep junk out.</p>
-<p><strong>When would BIC backfire?</strong> When true effects are <em>weak</em>. BIC's heavier penalty buys Type-I safety at the cost of Type-II error — see the next exercise.</p>
+<p>in line with the simulated 40&ndash;45% (the small excess is joint selection and the mild correlation among the fitted predictors). The same reusable move explains the two conservative criteria, each just raises the bar the extra variable must clear. The family-wise p-value rate is $1 - 0.95^3 \approx 0.14$. BIC replaces AIC's flat penalty of 2 with $\ln n \approx 3.9$ for $n = 50$, so a junk predictor now needs $\chi^2_1 &gt; 3.9$ (probability $P(\chi^2_1 &gt; 3.9) \approx 0.048$ each, hence $1 - (1 - 0.048)^3 \approx 0.14$ overall) — about as strict as the p-value screen, and matching the observed $\approx 0.16$. AIC's penalty of 2 is simply too small to keep junk out.</p>
+<p><strong>When would BIC backfire?</strong> When true effects are <em>weak</em>. BIC's heavier penalty buys Type-I safety at the cost of Type-II error, see the next exercise.</p>
 </div></details>
 </div>
 
@@ -603,7 +525,7 @@ pstor &lt;- AICstor &lt;- AICcstor &lt;- BICstor &lt;- <span class="fn">rep</spa
 <div class="exercise" id="ex-9">
 <span class="ex-tag">Practice Exercise A3</span><span class="difficulty medium"> · 25 min · simulated Type II error</span>
 <h3>Simulation: how often does BIC <em>drop</em> a real but weak effect?</h3>
-<p>Same harness, but now the data really do depend on $x_1, x_2, x_3$ — with effect sizes spanning orders of magnitude, and small residual SD.</p>
+<p>Same harness, but now the data really do depend on $x_1, x_2, x_3$, with effect sizes spanning orders of magnitude, and small residual SD.</p>
 
 <div class="code-label">Code</div>
 <pre><code><span class="fn">set.seed</span>(<span class="nu">2026</span>)
@@ -636,8 +558,8 @@ pstor &lt;- AICstor &lt;- AICcstor &lt;- BICstor &lt;- <span class="fn">rep</spa
 <tr><td>AICc</td><td>~1.2</td></tr>
 <tr><td>BIC</td><td>~1.5</td></tr>
 </table>
-<p>BIC misses about 1.5 of the 3 true predictors on average — essentially tied with the p-value approach. AIC and AICc are noticeably more inclusive of weak effects (missing ~1.1&ndash;1.2), which is what you want when the science is about small effects. <strong>Lesson:</strong> there is no free lunch. Whatever Type-I behavior you buy with a heavier penalty, you pay back in Type-II.</p>
-<p><strong>(c) Bigger n.</strong> Re-run both harnesses — this one (three real effects, Type II) and Exercise A2 (pure noise, Type I) — at $n = 50$ and again at $n = 500$. Averaged over 500 datasets, out of 3 predictors:</p>
+<p>BIC misses about 1.5 of the 3 true predictors on average, essentially tied with the p-value approach. AIC and AICc are noticeably more inclusive of weak effects (missing ~1.1&ndash;1.2), which is what you want when the science is about small effects. <strong>Lesson:</strong> there is no free lunch. Whatever Type-I behavior you buy with a heavier penalty, you pay back in Type-II.</p>
+<p><strong>(c) Bigger n.</strong> Re-run both harnesses: this one (three real effects, Type II) and Exercise A2 (pure noise, Type I) — at $n = 50$ and again at $n = 500$. Averaged over 500 datasets, out of 3 predictors:</p>
 <table>
 <tr><th rowspan="2">Criterion</th><th colspan="2">Type I: noise predictors <em>kept</em> (of 3)</th><th colspan="2">Type II: real predictors <em>missed</em> (of 3)</th></tr>
 <tr><th>$n = 50$</th><th>$n = 500$</th><th>$n = 50$</th><th>$n = 500$</th></tr>
@@ -645,7 +567,7 @@ pstor &lt;- AICstor &lt;- AICcstor &lt;- BICstor &lt;- <span class="fn">rep</spa
 <tr><td>AICc</td><td>0.44</td><td>0.47</td><td>1.19</td><td>0.73</td></tr>
 <tr><td>BIC</td><td><strong>0.20</strong></td><td><strong>0.05</strong></td><td>1.46</td><td>0.96</td></tr>
 </table>
-<p>Read the columns. <strong>AIC's Type-I rate barely moves</strong> with sample size (0.51 → 0.47): it keeps roughly half a noise predictor no matter how much data you give it, because its penalty ($2$ per parameter) never grows. <strong>BIC's Type-I rate collapses</strong> (0.20 → 0.05): its penalty is $\log(n)$ per parameter, which climbs with $n$, so junk gets squeezed out as data accumulate. Meanwhile <strong>every Type-II rate falls</strong> as $n$ grows — even the tiny $0.01\,x_3$ effect starts to clear the bar once there is enough data to see it. The Type-I/Type-II trade-off does not go away; it just slides: BIC keeps buying cleaner false-positive control at the price of the weakest real effects, and AIC keeps the weak effects at the price of some persistent false positives.</p>
+<p>Read the columns. <strong>AIC's Type-I rate barely moves</strong> with sample size (0.51 → 0.47): it keeps roughly half a noise predictor no matter how much data you give it, because its penalty ($2$ per parameter) never grows. <strong>BIC's Type-I rate collapses</strong> (0.20 → 0.05): its penalty is $\log(n)$ per parameter, which climbs with $n$, so junk gets squeezed out as data accumulate. Meanwhile <strong>every Type-II rate falls</strong> as $n$ grows, even the tiny $0.01\,x_3$ effect starts to clear the bar once there is enough data to see it. The Type-I/Type-II trade-off does not go away; it just slides: BIC keeps buying cleaner false-positive control at the price of the weakest real effects, and AIC keeps the weak effects at the price of some persistent false positives.</p>
 </div></details>
 </div>
 
@@ -681,7 +603,7 @@ aic &lt;- <span class="fn">sapply</span>(forms, <span class="kw">function</span>
 </ol>
 
 <details class="answer"><summary>Reveal solution &amp; discussion</summary><div class="answer-body">
-<p><strong>(a)</strong> Both criteria pick <code>m3</code> — a pure-noise predictor. They agree, and they are both wrong:</p>
+<p><strong>(a)</strong> Both criteria pick <code>m3</code>: a pure-noise predictor. They agree, and they are both wrong:</p>
 <pre><code>     LOOCV     AIC  dAIC
 m3   5.995 233.059 0.000
 m0   6.031 233.717 0.658
@@ -692,16 +614,16 @@ m2   6.239 235.715 2.655
 m123 6.286 235.389 2.330
 m12  6.309 235.939 2.880</code></pre>
 <p>The two orderings are nearly identical (Spearman correlation 0.95). This is the first hint that CV is not an independent check on AIC.</p>
-<p><strong>(b)</strong> <code>m3</code> beats the truth by $\Delta$AIC = 0.658 and by 0.036 in CV MSE — six tenths of one percent. But the interesting part is <em>why</em> the margin has that value. <code>m3</code> is <code>m0</code> with one extra junk predictor, so the identity from the core-concepts section applies exactly:</p>
+<p><strong>(b)</strong> <code>m3</code> beats the truth by $\Delta$AIC = 0.658 and by 0.036 in CV MSE, six tenths of one percent. But the interesting part is <em>why</em> the margin has that value. <code>m3</code> is <code>m0</code> with one extra junk predictor, so the identity from the core-concepts section applies exactly:</p>
 <div class="eq-block">$\Delta\text{AIC} = 2 - \chi^2_1 = 2 - 2.658 = -0.658$</div>
-<p>The entire margin is just the likelihood-ratio statistic for <code>x3</code>, which is $\chi^2_1 = 2.658$ ($p = 0.103$ — not close to significant). <code>x3</code> wins for one reason and one reason only: its $\chi^2$ landed above 2. That is exactly the event you already met when the $\Delta\text{AIC} &lt; 2$ rule was picked apart — $P(\chi^2_1 &gt; 2) = 15.7\%$, the rate at which a junk variable takes the top spot outright. Exercise A4 is not a new phenomenon; it is that same 16% event, caught in the act.</p>
+<p>The entire margin is just the likelihood-ratio statistic for <code>x3</code>, which is $\chi^2_1 = 2.658$ ($p = 0.103$, not close to significant). <code>x3</code> wins for one reason and one reason only: its $\chi^2$ landed above 2. That is exactly the event you already met when the $\Delta\text{AIC} &lt; 2$ rule was picked apart: $P(\chi^2_1 &gt; 2) = 15.7\%$, the rate at which a junk variable takes the top spot outright. Exercise A4 is not a new phenomenon; it is that same 16% event, caught in the act.</p>
 <p>So do <em>not</em> read this table by asking which models fall within 2 AIC of the winner. As you saw earlier, a nested junk model is within 2 by construction, so that question has a guaranteed answer and tells you nothing. Ask instead what <code>x3</code>'s coefficient does: $-1.914$ with a 95% CI of $[-4.292,\ 0.463]$, spanning zero. The variable that "won" cannot even sign its own effect.</p>
 <p><strong>(c)</strong> Over 2000 simulated datasets the intercept-only model wins <strong>58.4%</strong> of the time on LOOCV and <strong>57.6%</strong> on AIC. That gap of 0.8 points is smaller than the Monte Carlo error on either estimate (±2.2), so the honest reading is that the two criteria perform <em>identically</em>. They select the same model 90% of the time. Both are fooled by noise in roughly 42% of datasets.</p>
 <p>This is not a coincidence of this simulation. For a Gaussian linear model, leave-one-out CV and AIC are <strong>asymptotically equivalent</strong> — Stone (1977) proved they are the same criterion in the limit, and at $n=50$ they have already nearly converged. Holding data out does not buy you protection AIC lacks; it is a different route to the same number.</p>
-<p>That equivalence is the best reason AIC is everywhere. LOOCV is the gold-standard estimate of out-of-sample prediction error, but it costs you $n$ refits; AIC gives you the same answer in closed form from a <em>single</em> fit. So when the goal is genuinely <strong>prediction</strong> — which model will forecast best on data it has not seen — AIC is doing exactly its job, and doing it cheaply, which is why it became the standard tool. The trouble in this exercise is not that AIC predicts badly; it is that we asked a prediction criterion an <strong>inference</strong> question — "which variable is real?" — that it was never built to answer. Much of the ecology literature slips here, reading a low-$\Delta$AIC predictor as an established effect. Keep the two jobs apart: AIC (≈ LOOCV) ranks models for prediction; coefficients, intervals, and study design tell you whether an effect is real.</p>
-<p><strong>(d)</strong> Not a defect, and no. With eight candidate models and $n=50$, three noise predictors will produce spurious in-sample fit some of the time, and <em>any</em> criterion that ranks models on fit to this one dataset will sometimes rank noise first. The criteria are answering the question they were asked — "which of these eight predicts best?" — and dutifully returning an answer even though the honest answer is "none of them, and they are all the same." Selection returns a winner whether or not one deserves to win.</p>
+<p>That equivalence is the best reason AIC is everywhere. LOOCV is the gold-standard estimate of out-of-sample prediction error, but it costs you $n$ refits; AIC gives you the same answer in closed form from a <em>single</em> fit. So when the goal is genuinely <strong>prediction</strong>, which model will forecast best on data it has not seen — AIC is doing exactly its job, and doing it cheaply, which is why it became the standard tool. The trouble in this exercise is not that AIC predicts badly; it is that we asked a prediction criterion an <strong>inference</strong> question — "which variable is real?", that it was never built to answer. Much of the ecology literature slips here, reading a low-$\Delta$AIC predictor as an established effect. Keep the two jobs apart: AIC (≈ LOOCV) ranks models for prediction; coefficients, intervals, and study design tell you whether an effect is real.</p>
+<p><strong>(d)</strong> Not a defect, and no. With eight candidate models and $n=50$, three noise predictors will produce spurious in-sample fit some of the time, and <em>any</em> criterion that ranks models on fit to this one dataset will sometimes rank noise first. The criteria are answering the question they were asked — "which of these eight predicts best?", and dutifully returning an answer even though the honest answer is "none of them, and they are all the same." Selection returns a winner whether or not one deserves to win.</p>
 <p>What helps is not a cleverer criterion but a different question. Once a table is in front of you, the rank is the least informative thing in it — make the winning variable justify itself with its coefficient and interval, as in (b), where <code>x3</code>'s CI comfortably contains zero (this is Arnold's 2010 point). And upstream of that, keep the candidate set small and tied to hypotheses you held before seeing the data: the 42% failure rate is a direct consequence of dredging eight models out of pure noise. Fewer, better-motivated models is the only move here that changes the failure rate rather than relabeling it.</p>
-<p><strong>Caveat:</strong> both criteria are about prediction. If your question is "is variable X causally important," neither AIC nor CV answers it — you need a causal frame and (often) a designed experiment.</p>
+<p><strong>Caveat:</strong> both criteria are about prediction. If your question is "is variable X causally important," neither AIC nor CV answers it; you need a causal frame and (often) a designed experiment.</p>
 </div></details>
 </div>
 
@@ -726,7 +648,7 @@ m_slop &lt;- <span class="fn">lmer</span>(Z_TP ~ Z_Length + (<span class="nu">1<
 
 <details class="answer"><summary>Reveal solution</summary><div class="answer-body">
 <p><strong>(a)</strong> The two models share fixed effects but differ in random structure. We compare REML log-likelihoods because they are unbiased for variance components. Setting <code>refit = FALSE</code> prevents <code>anova</code> from refitting them under ML.</p>
-<p><strong>(b)</strong> Run them. Here the two agree emphatically — the species-level random slope is strongly supported both ways:</p>
+<p><strong>(b)</strong> Run them. Here the two agree emphatically: the species-level random slope is strongly supported both ways:</p>
 <pre><code>anova(m_int, m_slop, refit=FALSE)
 #         npar   AIC    logLik  Chisq Df  Pr(>Chisq)
 # m_int      5  82.47  -36.23
@@ -736,9 +658,9 @@ AICcmodavg::aictab(list(intercepts_only=m_int, with_species_slope=m_slop))
 #                    K   AICc  Delta_AICc  AICcWt
 # with_species_slope 7  36.33    0.00      1.00
 # intercepts_only    5  82.81   46.48      0.00</code></pre>
-<p>The LRT gives $\chi^2 = 50.8$ on 2 df, $p \approx 9\times10^{-12}$; AICc favors the random-slope model by $\Delta$AICc $= 46.5$ (Akaike weight $\approx 1.00$). This is easy territory — keep the slope. But notice <em>what each statistic claimed</em>, because they answer different questions and will not always agree. The LRT asks "is the larger model significantly better at maximizing likelihood?" — an inference question about whether the slope variance is really nonzero. AICc asks "is the larger model expected to predict better out of sample?" When they disagree (LRT says "not significant" but AICc still prefers the bigger model), let the question decide: for inference — does the random slope matter biologically? — lean on the LRT and the variance-component CI; for prediction, trust AICc (which, from Exercise A4, is ≈ LOOCV).</p>
-<p><strong>(c)</strong> One catch makes the LRT $p$-value untrustworthy in borderline cases. The null hypothesis is that the slope variance is <em>exactly zero</em> — but a variance cannot be negative, so zero sits on the very edge of the values the parameter is allowed to take. When you test a parameter at the boundary of its space, the usual $\chi^2$ reference distribution is the wrong one, and it makes the reported $p$-value <strong>too large</strong> (conservative). A genuinely important random slope can therefore come back looking "not significant."</p>
-<p>Here it does not matter — the effect is so strong ($p \approx 9\times10^{-12}$) that no correction would change the verdict. But in a borderline case the boundary correction can flip your conclusion. <strong>The practical rule:</strong> for a boundary test — "is this variance zero?" — do not trust <code>anova()</code>'s $p$-value. Use <code>RLRsim::exactRLRT()</code> or a parametric bootstrap, which build the correct reference distribution by simulation and give you an honest $p$-value.</p>
+<p>The LRT gives $\chi^2 = 50.8$ on 2 df, $p \approx 9\times10^{-12}$; AICc favors the random-slope model by $\Delta$AICc $= 46.5$ (Akaike weight $\approx 1.00$). This is easy territory, keep the slope. But notice <em>what each statistic claimed</em>, because they answer different questions and will not always agree. The LRT asks "is the larger model significantly better at maximizing likelihood?": an inference question about whether the slope variance is really nonzero. AICc asks "is the larger model expected to predict better out of sample?" When they disagree (LRT says "not significant" but AICc still prefers the bigger model), let the question decide: for inference — does the random slope matter biologically? — lean on the LRT and the variance-component CI; for prediction, trust AICc (which, from Exercise A4, is ≈ LOOCV).</p>
+<p><strong>(c)</strong> One catch makes the LRT $p$-value untrustworthy in borderline cases. The null hypothesis is that the slope variance is <em>exactly zero</em>, but a variance cannot be negative, so zero sits on the very edge of the values the parameter is allowed to take. When you test a parameter at the boundary of its space, the usual $\chi^2$ reference distribution is the wrong one, and it makes the reported $p$-value <strong>too large</strong> (conservative). A genuinely important random slope can therefore come back looking "not significant."</p>
+<p>Here it does not matter: the effect is so strong ($p \approx 9\times10^{-12}$) that no correction would change the verdict. But in a borderline case the boundary correction can flip your conclusion. <strong>The practical rule:</strong> for a boundary test — "is this variance zero?" — do not trust <code>anova()</code>'s $p$-value. Use <code>RLRsim::exactRLRT()</code> or a parametric bootstrap, which build the correct reference distribution by simulation and give you an honest $p$-value.</p>
 </div></details>
 </div>
 

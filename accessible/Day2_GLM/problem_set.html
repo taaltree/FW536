@@ -34,9 +34,9 @@ MathJax = {
  </ul>
  <div class="section">Afternoon · linear models & GLMs</div>
  <ul>
- <li><a href="#p5">5. Sockeye eDNA GLM (data)</a></li>
- <li><a href="#p6">6. Titanic: long vs aggregated (data)</a></li>
- <li><a href="#p7">7. Titanic: class × sex (data)</a></li>
+ <li><a href="#p5">5. Interactions I: additive baseline</a></li>
+ <li><a href="#p6">6. Interactions II: a slope that moves</a></li>
+ <li><a href="#p7">7. Interactions III: link vs response scale</a></li>
  <li><a href="#p8">8. Poisson log-link interpretation</a></li>
  <li><a href="#p9">9. Interaction &amp; crossover</a></li>
  <li><a href="#p10">10. Offsets &amp; effort</a></li>
@@ -67,9 +67,7 @@ MathJax = {
 <p>The analysis problems read these files from this Day's <code>data/</code> folder. All paths below are relative to the folder your <code>.Rmd</code> lives in.</p>
 <div class="data-section">
   <h3 class="data-h">Datasets</h3>
-  <div class="data-row"><a href="data/sockeye_adult.csv"><code>sockeye_adult.csv</code></a><span class="data-desc">Daily sockeye salmon counts and the flow-corrected qPCR eDNA signal (qPCR eDNA concentration &times; stream flow), 2015&ndash;2016 (Levi et al. 2019). Long format; filter to <code>Sockeyetype == "Sockeye_Adults"</code>. Used in Problems 4 and 5.</span></div>
-  <div class="data-row"><a href="data/titanic_long.csv"><code>titanic_long.csv</code></a><span class="data-desc">One row per Titanic passenger: <code>class</code>, <code>age</code>, <code>sex</code>, binary <code>survived</code>. Used in Problems 6 and 7.</span></div>
-  <div class="data-row"><a href="data/titanic_prop.csv"><code>titanic_prop.csv</code></a><span class="data-desc">Titanic survival aggregated to (<code>Yes</code>, <code>No</code>) counts per Class/Sex/Age for binomial-form GLM. Used in Problem 6.</span></div>
+  <div class="data-row"><a href="data/sockeye_adult.csv"><code>sockeye_adult.csv</code></a><span class="data-desc">Daily sockeye salmon counts and the flow-corrected qPCR eDNA signal (qPCR eDNA concentration &times; stream flow), 2015&ndash;2016 (Levi et al. 2019). Long format; filter to <code>Sockeyetype == "Sockeye_Adults"</code>. Used in Problem 4.</span></div>
 </div>
 </section>
 
@@ -84,9 +82,8 @@ MathJax = {
 <p>Click a file to download it, then put it in a <code>data/</code> subfolder beside your <code>.Rmd</code> so the <code>read.csv()</code> calls resolve.</p>
 <div class="data-section">
   <div class="data-row"><a href="data/sockeye_adult.csv" download><code>sockeye_adult.csv</code></a><span class="data-desc">Daily adult sockeye counts and flow-corrected eDNA (Qcorr_qPCR = qPCR eDNA concentration × stream flow) (Levi et al. 2019).</span></div>
-  <div class="data-row"><a href="data/titanic_long.csv" download><code>titanic_long.csv</code></a><span class="data-desc">One row per Titanic passenger (survived, class, sex, ...). Logistic regression.</span></div>
-  <div class="data-row"><a href="data/titanic_prop.csv" download><code>titanic_prop.csv</code></a><span class="data-desc">Titanic survival aggregated to (Yes, No) counts per class. Binomial-form GLM.</span></div>
 </div>
+<p style="margin-top:10px"><em>Problems 5&ndash;7 need no data file &mdash; each one generates its own data in the code block given with the problem.</em></p>
 </section>
 
 <a id="morning"></a>
@@ -164,68 +161,74 @@ mean(d$Count); var(d$Count)</code></pre>
 
 <!-- =========================== PROBLEM 5 =========================== -->
 <div class="exercise" id="p5">
-<span class="ex-tag">Problem 5</span><span class="difficulty hard"> · Normal vs Poisson vs NB, log-link interpretation · loads real data</span>
-<h3>Sockeye eDNA &rarr; daily count: pick the right model and read the slope</h3>
-<p>Do adult sockeye numbers track the flow-corrected eDNA signal? Use the same subset as Problem 4, keep only rows where both the count and the eDNA are observed, and build a <code>Year</code> factor from the date.</p>
-<pre><code>d &lt;- read.csv("data/sockeye_adult.csv", stringsAsFactors = FALSE)
-d &lt;- subset(d, Sockeyetype == "Sockeye_Adults")
-d$Year &lt;- factor(sub(".*/", "", d$Date))              # "15" or "16"
-d &lt;- d[!is.na(d$Count) &amp; !is.na(d$Qcorr_qPCR), ]
-min_pos &lt;- min(d$Qcorr_qPCR[d$Qcorr_qPCR &gt; 0])          # small constant so log() is finite
-d$logED &lt;- log(d$Qcorr_qPCR + min_pos)</code></pre>
-<p>Fit, in sequence, and compare:</p>
-<ol>
-<li><code>lm(log(Count + 1) ~ logED + Year, data = d)</code> &mdash; the old-school log-transform approach.</li>
-<li><code>glm(Count ~ logED + Year, family = poisson, data = d)</code>.</li>
-<li><code>glm(Count ~ logED + Year, family = quasipoisson, data = d)</code>.</li>
-<li><code>MASS::glm.nb(Count ~ logED + Year, data = d)</code>.</li>
-</ol>
+<span class="ex-tag">Problem 5</span><span class="difficulty easy"> · interactions I &mdash; the additive baseline</span>
+<h3>What &ldquo;no interaction&rdquo; actually buys you</h3>
+<p>Problems 5&ndash;7 build one idea in three steps: <em>an interaction means the effect of one predictor depends on the value of another</em>. Everything you need is generated in the code block, so no data file is required. Work them in order.</p>
+<div class="callout key"><p class="callout-label">Key idea</p><strong>The idea, stated once.</strong> For a two-predictor model, ask what happens to the fitted response when you nudge $x_1$ up by one unit. If the answer is the same number no matter where $x_2$ sits, the predictors act independently and the model is <em>additive</em>. If the answer changes with $x_2$, they interact. That question &mdash; take the derivative with respect to $x_1$ and look for $x_2$ in the result &mdash; is the whole of what follows.</div>
+<p>Start with data built with <em>no</em> interaction, and deliberately fit a model that allows one anyway:</p>
+<pre><code>set.seed(123)
+d5 &lt;- data.frame(x1 = runif(200, -2, 2), x2 = runif(200, -2, 2))
+d5$y &lt;- 1 + 1.5*d5$x1 - 1*d5$x2 + rnorm(200, 0, 1)   # note: no x1*x2 term
+
+m5 &lt;- lm(y ~ x1 * x2, data = d5)    # x1 * x2 expands to x1 + x2 + x1:x2
+summary(m5)</code></pre>
 <ol type="a">
-<li>For the Poisson fit, report residual deviance / residual df. Is overdispersion present? What does the quasipoisson dispersion estimate tell you, and how does the NB residual-deviance ratio compare?</li>
-<li>Compare the standard error on the <code>logED</code> coefficient across the four fits. Which models give realistically wide confidence intervals and which give unrealistically narrow ones? Why?</li>
-<li>Take the log-link slope on <code>logED</code> from your preferred model. Because the predictor is $\log(\text{eDNA})$, a <em>doubling</em> of the flow-corrected eDNA signal <em>adds</em> $\hat\beta \cdot \ln 2$ to the linear predictor, and because the link is the log, that additive shift <em>multiplies</em> the expected count by $2^{\hat\beta}$. Compute that multiplier and finish the sentence: "a doubling of the flow-corrected eDNA signal is associated with a &times;___ change in the expected daily adult count."</li>
+<li>Report the four estimated coefficients against the values used to build the data (1, 1.5, &minus;1, and no product term). What does the fitted <code>x1:x2</code> coefficient come out as, and is it distinguishable from zero?</li>
+<li>Write the full statistical model in mathematical notation &mdash; the distribution of $y_i$, its mean as a function of $x_{1i}$ and $x_{2i}$, and what each parameter is.</li>
+<li>Differentiate the fitted mean with respect to $x_1$. Show your working. Does $x_2$ appear anywhere in the result?</li>
+<li>Using your fitted coefficients, compute the slope of $y$ on $x_1$ at $x_2 = -1$ and again at $x_2 = +1$. Report both. Why are they not <em>exactly</em> equal, given that the data were built with no interaction?</li>
+<li>If you plotted the fitted surface over the $(x_1, x_2)$ plane, what shape would it be? Name it in one word, and say what the contour lines of equal $\hat y$ would look like.</li>
 </ol>
-<div class="callout bio"><p class="callout-label">Biological intuition</p>
-<strong>Where the biology lives.</strong> With the fitted log-link slope $\hat\beta \approx 0.897$, $2^{0.897} \approx 1.86$ &mdash; a doubling of the flow-corrected eDNA signal is associated with roughly an 86% increase in the expected daily count. <em>That</em> sentence is what goes in the paper, not "the slope was 0.90 (SE 0.08)."
-</div>
-<div class="callout try"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Report the overdispersion diagnostics, the SE comparison, your chosen model, and the doubling-of-eDNA multiplier as a biology sentence.</div>
+<div class="callout try"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Report the coefficient table, the model in mathematical notation, the derivative, the two slopes from (d), and the surface description.</div>
 </div>
 
 <!-- =========================== PROBLEM 6 =========================== -->
 <div class="exercise" id="p6">
-<span class="ex-tag">Problem 6</span><span class="difficulty medium"> · logistic regression, long vs aggregated · loads real data</span>
-<h3>Titanic survival: individual-level vs aggregated binomial</h3>
-<p>The same logistic regression can be fit from one-row-per-passenger data or from aggregated (successes, failures) counts. Show that they agree.</p>
-<pre><code>long &lt;- read.csv("data/titanic_long.csv", stringsAsFactors = TRUE)
-prop &lt;- read.csv("data/titanic_prop.csv", stringsAsFactors = TRUE)
-f1 &lt;- glm(survived ~ class, family = binomial, data = long)
-f2 &lt;- glm(cbind(Yes, No) ~ Class, family = binomial, data = prop)</code></pre>
+<span class="ex-tag">Problem 6</span><span class="difficulty medium"> · interactions II &mdash; a slope that moves</span>
+<h3>When the effect of one predictor rides on another</h3>
+<p>Same design, same sample size, one change: the response is now built with a genuine product term.</p>
+<pre><code>set.seed(456)
+d6 &lt;- data.frame(x1 = runif(200, -2, 2), x2 = runif(200, -2, 2))
+d6$y &lt;- 2 + 1.5*d6$x1 - 1*d6$x2 + 2*d6$x1*d6$x2 + rnorm(200, 0, 1)
+
+m6 &lt;- lm(y ~ x1 * x2, data = d6)
+summary(m6)</code></pre>
 <ol type="a">
-<li>Fit both models. The fitted survival <em>probability for each class</em> should match between the two fits and should equal the raw survival proportion in that class. Verify this with <code>predict(f1, data.frame(class = levels(long$class)), type = "response")</code> and <code>tapply(long$survived, long$class, mean)</code>. (Predicting without <code>newdata</code> would return one fitted value per passenger &mdash; all 2201 of them &mdash; rather than the four class-level probabilities you want to line up against <code>tapply</code>.) Why must the individual-level (Bernoulli) and aggregated (Binomial) likelihoods give the same fitted probabilities?</li>
-<li>The raw coefficient <em>tables</em> from <code>f1</code> and <code>f2</code> do not look identical. Explain why &mdash; think about which class each fit uses as its reference level. (Hint: <code>levels(long$class)</code> vs <code>levels(prop$Class)</code>.)</li>
-<li>Take the intercept and the first-class coefficient from <code>f1</code> and convert them, by hand, from log-odds to odds to probability. Confirm your first-class probability against the fitted value and against the raw first-class survival proportion.</li>
-<li>Express the first-class-vs-reference coefficient as an odds ratio and state, in plain English, how many times greater the odds of survival were for that class relative to the reference.</li>
+<li>Report the four coefficients against the truth (2, 1.5, &minus;1, 2).</li>
+<li>Write out the full statistical model in mathematical notation, as in Problem 5(b).</li>
+<li>Differentiate the fitted mean with respect to $x_1$ again. This time $x_2$ survives. Write the slope as a formula in $x_2$, then evaluate it at $x_2 = -1$, $x_2 = 0$ and $x_2 = +1$. Something happens between the first and the last &mdash; say what.</li>
+<li>Solve for the value of $x_2$ at which the effect of $x_1$ vanishes entirely. Compare your fitted answer to the value implied by the parameters used to build the data.</li>
+<li>Your collaborator writes: &ldquo;<em>the effect of $x_1$ on $y$ is 1.52.</em>&rdquo; Using your answer to (c), explain in two sentences why that sentence cannot be written for this model, and what it would have to say instead.</li>
+<li>What shape is the fitted surface now, and what happened to the contour lines of equal $\hat y$ compared with Problem 5(e)?</li>
 </ol>
-<div class="callout try"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Show the matching probabilities, explain the reference-level difference, and give the odds-ratio sentence.</div>
+<div class="callout try"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Report the coefficient table, the slope formula and its three evaluations, the $x_2$ where the effect vanishes, the two-sentence correction, and the surface description.</div>
 </div>
 
 <!-- =========================== PROBLEM 7 =========================== -->
 <div class="exercise" id="p7">
-<span class="ex-tag">Problem 7</span><span class="difficulty hard"> · logistic interaction, emmeans · loads real data</span>
-<h3>Titanic: does the class effect depend on sex?</h3>
-<p>Fit an interaction model and interpret it on the odds and probability scales.</p>
-<pre><code>library(effects); library(emmeans)
-long &lt;- read.csv("data/titanic_long.csv", stringsAsFactors = TRUE)
-fit &lt;- glm(survived ~ class * sex + age, family = binomial, data = long)
-plot(allEffects(fit))                                  # fitted probabilities
-emmeans(fit, pairwise ~ class | sex, type = "response")  # class contrasts within each sex</code></pre>
+<span class="ex-tag">Problem 7</span><span class="difficulty hard"> · interactions III &mdash; link scale vs response scale</span>
+<h3>The interaction you did not put in the model</h3>
+<p>Now the same structure with a binary response, which is where interactions stop being straightforward. Fit the model with the product term first:</p>
+<pre><code>set.seed(789)
+d7 &lt;- data.frame(x1 = runif(200, -2, 2), x2 = runif(200, -2, 2))
+eta &lt;- -1 + 1.2*d7$x1 - 0.8*d7$x2 + 1.5*d7$x1*d7$x2
+d7$ybin &lt;- rbinom(200, 1, plogis(eta))
+
+m7 &lt;- glm(ybin ~ x1 * x2, data = d7, family = binomial)
+summary(m7)</code></pre>
 <ol type="a">
-<li>From the <code>emmeans</code> pairwise output (on the odds-ratio scale), which class contrast within a sex is the <em>largest</em>? Report the odds ratio and say what it means in words.</li>
-<li>The model above already includes <code>age</code> (a two-level factor, <code>adult</code> vs <code>child</code>) as a main effect. Express the <code>agechild</code> coefficient as an odds ratio and interpret it, holding class and sex fixed.</li>
-<li>Using <code>emmeans(fit, ~ class | sex, type = "response")</code>, read off the fitted survival probability for first-class females and third-class females, and report the probability <em>difference</em> between them. Contrast this with what you would conclude from the odds ratio alone.</li>
-<li>Why is a <code>TukeyHSD</code> on an <code>aov</code> object the wrong tool for these class contrasts, whereas <code>emmeans</code> on the fitted GLM is correct?</li>
+<li>Report the four coefficients. Which scale are they on &mdash; probability, odds, or log-odds?</li>
+<li>Write the full model in mathematical notation, including the link function.</li>
+<li>On the log-odds scale, the slope in $x_1$ is the same kind of formula you derived in Problem 6(c). Write it down and evaluate it at $x_2 = -1$ and $x_2 = +1$.</li>
+<li>On the <em>probability</em> scale the slope is $\dfrac{\partial p}{\partial x_1} = p(1-p)\,(\beta_1 + \beta_3 x_2)$. Explain in one sentence where the extra $p(1-p)$ comes from, and why it means a single number cannot describe &ldquo;the effect of $x_1$ on the probability&rdquo; even at a fixed $x_2$.</li>
+<li>Now refit the same data with <strong>no interaction term at all</strong>:
+<pre><code>m7add &lt;- glm(ybin ~ x1 + x2, data = d7, family = binomial)   # additive on the log-odds scale
+coef(m7add)</code></pre>
+This model is additive by construction: on the log-odds scale, the effect of $x_1$ is one number that does not involve $x_2$. Using the formula in (d) with $\beta_3 = 0$, compute $\partial p/\partial x_1$ at $x_1 = 0$ for $x_2 = -1$ and for $x_2 = +1$. Report both, and their ratio.</li>
+<li>You just found that the effect of $x_1$ on the probability depends on $x_2$ in a model containing no interaction term. Explain in three or four sentences why this happens, and what it implies for a reader who wants to know whether two predictors &ldquo;interact&rdquo; in a GLM. Your answer should distinguish clearly between the two scales.</li>
 </ol>
-<div class="callout try"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Report the largest contrast, the child odds ratio, the female first-vs-third probability difference, and one sentence on why <code>emmeans</code> (not <code>TukeyHSD</code>) is appropriate.</div>
+<div class="callout warn"><p class="callout-label">Watch out</p><strong>Watch out.</strong> Part (f) is the point of the whole sequence, and it is easy to state too strongly in either direction. A nonlinear link does not create an interaction in the model &mdash; the log-odds really are additive in <code>m7add</code>. What it does is make additivity on one scale disagree with additivity on the other, so &ldquo;do these predictors interact?&rdquo; is only a well-posed question once you say which scale you mean.</div>
+<div class="callout try"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Report both coefficient tables, the log-odds slopes from (c), the two marginal effects and their ratio from (e), and your explanation in (f).</div>
 </div>
 
 <!-- =========================== PROBLEM 8 =========================== -->

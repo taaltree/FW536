@@ -214,9 +214,6 @@ rug(MSY, col = "red")
 
 HPDI <-  MCMCpstr(zm, params = c("dNdt"), func = function(x) hdi(x, .95))#Note hdi() is highest density interval
 medN <- MCMCpstr(zm, params = c("dNdt"), func = median)
-# Let the DATA set ylim. N runs to 1500, well past K, where dN/dt goes strongly
-# negative; a hard-coded ylim = c(-40, 80) clips the median and the lower HPDI and
-# hides exactly the N > K region the model has the most to say about.
 plot(N, medN$dNdt,  ylab = "Population growth rate dN/dt", xlab = "Population size N", type = "l",
      ylim = range(medN$dNdt, HPDI$dNdt))
 abline(h=0)

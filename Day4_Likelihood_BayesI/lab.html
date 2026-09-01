@@ -907,10 +907,6 @@ med_dNdt &lt;- dNdt_summary[<span class="st">"median"</span>, ]
 lo_dNdt &lt;- dNdt_summary[<span class="st">"lower"</span>, ]
 hi_dNdt &lt;- dNdt_summary[<span class="st">"upper"</span>, ]
 
-<span class="cm"># Let the DATA set ylim. The grid runs to N = 1500, well past K ~ 1235, where</span>
-<span class="cm"># dN/dt goes strongly negative (median bottoms out at -64.9, lower HPDI at</span>
-<span class="cm"># -104.2). A hard-coded ylim = c(-40, 80) would silently clip both and hide</span>
-<span class="cm"># exactly the N > K region the model has the most to say about.</span>
 <span class="fn">plot</span>(N_grid, med_dNdt, type = <span class="st">"l"</span>, lwd = <span class="nu">2</span>,
  ylim = <span class="fn">range</span>(med_dNdt, lo_dNdt, hi_dNdt),
  xlab = <span class="st">"Population size N"</span>, ylab = <span class="st">"Population growth rate dN/dt"</span>)

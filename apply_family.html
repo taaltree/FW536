@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>The apply family, visualized | FW 536</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="_Shared/css/lab.css" />
+<script defer src="_Shared/js/lab.js"></script>
+<style>
+  .widget{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:20px 22px;margin:22px 0;}
+  .fnpick{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:16px;}
+  .fnpick button{font-family:var(--mono,'SFMono-Regular',Consolas,monospace);font-size:13.5px;font-weight:600;
+    border:2px solid var(--border);background:#fff;color:var(--osu-stone);border-radius:7px;
+    padding:6px 11px;cursor:pointer;transition:background .12s,border-color .12s,color .12s;}
+  .fnpick button:hover{border-color:var(--osu-orange);}
+  .fnpick button.active{background:var(--osu-orange);color:#fff;border-color:var(--osu-orange);}
+  .fnpick button:focus-visible{outline:3px solid var(--osu-orange-dark);outline-offset:2px;}
+
+  .stage{display:grid;grid-template-columns:minmax(0,1fr) 150px minmax(0,1fr);gap:14px;align-items:start;}
+  @media(max-width:820px){.stage{grid-template-columns:1fr;}}
+  .pane{border:1px solid var(--border);border-radius:9px;padding:12px 13px;background:var(--panel-alt);min-height:120px;}
+  .pane h4{margin:0 0 9px;font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:700;}
+
+  .cells{display:flex;flex-wrap:wrap;gap:5px;}
+  .cells.col{flex-direction:column;align-items:flex-start;}
+  .cell{min-width:38px;height:34px;display:flex;align-items:center;justify-content:center;
+    border:2px solid var(--border);border-radius:6px;background:#fff;font-family:var(--mono,monospace);
+    font-size:14px;font-weight:600;color:var(--text);padding:0 7px;transition:all .2s;}
+  .cell.on{border-color:var(--osu-orange);background:#FDEDE7;color:var(--osu-orange-dark);
+    transform:translateY(-2px);box-shadow:0 3px 8px rgba(215,63,9,.22);}
+  .cell.done{border-color:var(--accent);background:#E4F0ED;color:#1c5147;}
+  .cell.ghost{opacity:.28;}
+
+  .grid{display:inline-grid;gap:5px;}
+  .rowlab,.collab{font-family:var(--mono,monospace);font-size:11px;color:var(--muted);
+    display:flex;align-items:center;justify-content:center;}
+
+  .arrow{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;padding-top:34px;}
+  .fbox{border:2px dashed var(--accent);border-radius:9px;padding:9px 11px;background:#fff;text-align:center;width:100%;}
+  .fbox .lbl{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700;}
+  .fbox .val{font-family:var(--mono,monospace);font-size:13px;color:var(--accent);font-weight:700;margin-top:3px;word-break:break-all;}
+  .chev{font-size:22px;color:var(--osu-orange);line-height:1;}
+  @media(max-width:820px){.arrow{padding-top:0;flex-direction:row;}.chev{transform:rotate(90deg);}}
+
+  .recv{border:2px solid var(--osu-orange);border-radius:9px;padding:11px 13px;background:#FFF7F4;margin:14px 0;}
+  .recv .lbl{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--osu-orange-dark);font-weight:700;margin-bottom:6px;}
+  .recv .expr{font-family:var(--mono,monospace);font-size:14.5px;color:var(--text);}
+
+  .transport{display:flex;flex-wrap:wrap;gap:9px;align-items:center;margin:14px 0 4px;}
+  .transport button{font-size:13.5px;font-weight:600;border:2px solid var(--border);background:#fff;
+    color:var(--osu-stone);border-radius:7px;padding:6px 13px;cursor:pointer;}
+  .transport button:hover:not(:disabled){border-color:var(--osu-orange);}
+  .transport button:disabled{opacity:.4;cursor:default;}
+  .transport button.primary{background:var(--accent);color:#fff;border-color:var(--accent);}
+  .transport .pos{font-family:var(--mono,monospace);font-size:13px;color:var(--muted);margin-left:auto;}
+
+  .ctlrow{display:flex;flex-wrap:wrap;gap:16px;align-items:center;margin-bottom:14px;
+    padding-bottom:13px;border-bottom:1px solid var(--border);}
+  .ctlrow label{font-size:13px;font-weight:600;color:var(--osu-stone);}
+  .ctlrow select{font-family:var(--mono,monospace);font-size:13px;padding:5px 8px;
+    border:1px solid var(--border);border-radius:6px;background:#fff;color:var(--text);}
+
+  pre.rcode{background:var(--code-bg);color:var(--code-fg);border-radius:8px;padding:12px 14px;
+    font-family:var(--mono,monospace);font-size:13.5px;overflow-x:auto;margin:12px 0 0;line-height:1.55;}
+  pre.rcode .cm{color:var(--code-comment);}
+  pre.rcode .fn{color:var(--code-fn);}
+  pre.rcode .st{color:var(--code-string);}
+  pre.rcode .nu{color:var(--code-number);}
+
+  .shape{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px;font-size:13.5px;}
+  .tag{display:inline-block;font-family:var(--mono,monospace);font-size:12px;font-weight:700;
+    padding:3px 9px;border-radius:99px;background:var(--panel-alt);border:1px solid var(--border);}
+  .tag.out{background:#E4F0ED;border-color:#9DC5BC;color:#1c5147;}
+  .tag.warnt{background:#FBF1DC;border-color:#E0C489;color:#7a5400;}
+
+  .explain{margin-top:14px;padding:13px 15px;border-left:3px solid var(--accent);
+    background:var(--panel-alt);border-radius:0 8px 8px 0;font-size:14.5px;}
+  .explain b{color:var(--text);}
+
+  table.cheat{width:100%;border-collapse:collapse;font-size:13.5px;}
+  table.cheat th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.07em;
+    color:var(--muted);border-bottom:2px solid var(--border);padding:8px 9px;}
+  table.cheat td{padding:8px 9px;border-bottom:1px solid var(--border);vertical-align:top;}
+  table.cheat code{font-size:12.5px;}
+  .scroll{overflow-x:auto;}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<aside class="sidebar">
+  <p class="brand"><a href="index.html" title="Back to course home">FW 536</a></p>
+  <div class="subtitle">The apply family</div>
+  <nav>
+    <div class="section">On this page</div>
+    <ul>
+      <li><a href="#idea">The one idea</a></li>
+      <li><a href="#viz">Watch it run</a></li>
+      <li><a href="#cheat">Which one do I want?</a></li>
+      <li><a href="#traps">Four traps</a></li>
+      <li><a href="#course">Where you'll meet these</a></li>
+      <li><a href="#check">Check yourself</a></li>
+    </ul>
+    <div class="section">Course docs</div>
+    <ul>
+      <li><a href="index.html">Course home</a></li>
+      <li><a href="rmarkdown_tutorial.html">R Markdown tutorial</a></li>
+      <li><a href="install_jags_nimble.html">Install guide</a></li>
+    </ul>
+  </nav>
+</aside>
+
+<main class="content">
+
+<h1>The apply family, visualized</h1>
+<p class="lede">Loops in R usually get written as <code>apply</code>-style calls, and almost every lab this week uses at least one. They are hard to learn for a specific reason: two things are invisible. You cannot see <em>what your function is handed on each pass</em>, and you cannot see <em>what shape comes back</em>. This page makes both visible, one step at a time.</p>
+
+<section id="idea">
+<h2>The one idea</h2>
+<p>Every function on this page does the same three things. They differ only in how they do the first and the last.</p>
+<div class="widget" style="padding:18px 22px">
+  <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:center;font-size:15px">
+    <span class="tag" style="font-size:14px;padding:7px 14px">1 · SPLIT the input into pieces</span>
+    <span class="chev">→</span>
+    <span class="tag" style="font-size:14px;padding:7px 14px">2 · APPLY your function to each piece</span>
+    <span class="chev">→</span>
+    <span class="tag" style="font-size:14px;padding:7px 14px">3 · COMBINE the results</span>
+  </div>
+</div>
+<p>Step 2 is yours and it is the easy part. The confusion is always step 1 (<em>what is a "piece"? an element? a row? a group?</em>) and step 3 (<em>do I get a list, a vector, or a matrix back?</em>). Keep those two questions in mind and the whole family collapses into one pattern.</p>
+<div class="callout key"><strong>The habit worth building.</strong> Before you write the function, say out loud what one piece looks like. If <code>x</code> is a vector of 5 counts, <code>lapply(x, f)</code> hands <code>f</code> a single number, five times. If <code>m</code> is a 4&times;3 matrix, <code>apply(m, 1, f)</code> hands <code>f</code> a vector of length 3, four times. Nearly every apply bug is a wrong answer to that one question.</div>
+</section>
+
+<section id="viz">
+<h2>Watch it run</h2>
+<p>Pick a function, pick what your function does, then step through. The orange box shows exactly what <code>f</code> receives on the current pass; the right-hand pane shows the result being assembled.</p>
+
+<div class="widget">
+  <div class="fnpick" id="fnpick" role="tablist" aria-label="apply function"></div>
+
+  <div class="ctlrow">
+    <label for="fsel">Your function <code>f</code>:</label>
+    <select id="fsel"></select>
+    <label for="spd">Speed</label>
+    <select id="spd">
+      <option value="1100">slow</option>
+      <option value="700" selected>medium</option>
+      <option value="380">fast</option>
+    </select>
+  </div>
+
+  <div class="stage">
+    <div class="pane">
+      <h4 id="inlabel">Input</h4>
+      <div id="inview"></div>
+    </div>
+    <div class="arrow">
+      <div class="chev">→</div>
+      <div class="fbox">
+        <div class="lbl">f( piece )</div>
+        <div class="val" id="fval">—</div>
+      </div>
+      <div class="chev">→</div>
+    </div>
+    <div class="pane">
+      <h4 id="outlabel">Result so far</h4>
+      <div id="outview"></div>
+    </div>
+  </div>
+
+  <div class="recv">
+    <div class="lbl">On this pass, <code>f</code> receives</div>
+    <div class="expr" id="recv">press Step or Play</div>
+  </div>
+
+  <div class="transport">
+    <button id="btnStep">Step</button>
+    <button id="btnPlay" class="primary">Play</button>
+    <button id="btnReset">Reset</button>
+    <span class="pos" id="pos">pass 0 of 0</span>
+  </div>
+
+  <pre class="rcode" id="code"></pre>
+  <div class="shape" id="shape"></div>
+  <div class="explain" id="explain"></div>
+</div>
+</section>
+
+<section id="cheat">
+<h2>Which one do I want?</h2>
+<p>Read this table as: <em>what gets split off, what your function sees, what you get back.</em></p>
+<div class="scroll">
+<table class="cheat">
+<thead><tr><th>Call</th><th>One "piece" is</th><th><code>f</code> receives</th><th>You get back</th></tr></thead>
+<tbody>
+<tr><td><code>lapply(x, f)</code></td><td>one element of <code>x</code></td><td>a single element</td><td><strong>always a list</strong>, same length as <code>x</code></td></tr>
+<tr><td><code>sapply(x, f)</code></td><td>one element of <code>x</code></td><td>a single element</td><td>a vector, a matrix, <em>or</em> a list &mdash; it depends on what <code>f</code> returns</td></tr>
+<tr><td><code>vapply(x, f, numeric(1))</code></td><td>one element of <code>x</code></td><td>a single element</td><td>exactly the shape you declared, or an error</td></tr>
+<tr><td><code>apply(m, 1, f)</code></td><td>one <strong>row</strong></td><td>a vector as long as the row</td><td>one result per row</td></tr>
+<tr><td><code>apply(m, 2, f)</code></td><td>one <strong>column</strong></td><td>a vector as long as the column</td><td>one result per column</td></tr>
+<tr><td><code>tapply(x, g, f)</code></td><td>all of <code>x</code> sharing a level of <code>g</code></td><td>a vector of that group's values</td><td>a named vector, one entry per level</td></tr>
+<tr><td><code>mapply(f, a, b)</code></td><td>the <em>i</em>-th element of each input</td><td>two arguments, in step</td><td>simplified like <code>sapply</code>; <code>Map</code> is the same but always returns a list</td></tr>
+<tr><td><code>replicate(n, expr)</code></td><td>nothing &mdash; it re-runs <code>expr</code></td><td>no argument at all</td><td>simplified like <code>sapply</code>; the workhorse for simulations</td></tr>
+<tr><td><code>split(x, g)</code> then <code>lapply</code></td><td>a whole group</td><td>the group's values</td><td>a list, one entry per level</td></tr>
+<tr><td><code>do.call(rbind, lst)</code></td><td>&mdash;</td><td>&mdash;</td><td>calls <code>rbind</code> once with every list element as an argument</td></tr>
+<tr><td><code>Reduce(f, x)</code></td><td>the running total and the next element</td><td>two arguments</td><td>a single accumulated value</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+
+<section id="traps">
+<h2>Four traps</h2>
+
+<h3>1. <code>sapply</code> changes its return type behind your back</h3>
+<p>This is the single most common apply bug, and it is why code that worked on Tuesday breaks on Wednesday with different data. <code>sapply</code> looks at the results and guesses:</p>
+<pre class="rcode"><span class="fn">sapply</span>(sites, <span class="fn">mean</span>)              <span class="cm"># every result length 1  → a vector</span>
+<span class="fn">sapply</span>(sites, <span class="fn">range</span>)             <span class="cm"># every result length 2  → a 2 x n MATRIX</span>
+<span class="fn">sapply</span>(sites, <span class="fn">function</span>(v) v[v &gt; <span class="nu">2</span>])  <span class="cm"># lengths differ       → back to a LIST</span></pre>
+<p>Nothing warns you. The fix is <code>vapply</code>, which makes you state the shape up front and fails loudly when the data disagree:</p>
+<pre class="rcode"><span class="fn">vapply</span>(sites, <span class="fn">mean</span>, <span class="fn">numeric</span>(<span class="nu">1</span>))   <span class="cm"># promises: one number each time</span></pre>
+<div class="callout warn"><strong>Use <code>vapply</code> in anything you will run more than once.</strong> The extra argument is the point, not overhead: it turns a silent shape change into an immediate error, at the line that caused it rather than three steps later.</div>
+
+<h3>2. <code>apply</code> with a multi-value function transposes what you expect</h3>
+<p>If <code>f</code> returns <em>k</em> values and you apply it down columns, you get a <em>k</em> &times; <code>ncol</code> matrix &mdash; each original column's answer is a <strong>column</strong> of the result, not a row. Day 4 uses exactly this:</p>
+<pre class="rcode">BCI &lt;- <span class="fn">apply</span>(mu_draws, <span class="nu">2</span>, <span class="fn">quantile</span>, probs = <span class="fn">c</span>(<span class="nu">.025</span>, <span class="nu">.50</span>, <span class="nu">.975</span>))
+<span class="fn">dim</span>(BCI)   <span class="cm"># 3 x n, NOT n x 3 — so BCI[1, ] is the lower bound for every column</span></pre>
+<p>Read the result with <code>dim()</code> before you index it. If you want it the other way round, <code>t()</code>.</p>
+
+<h3>3. <code>apply</code> on a data frame silently converts everything</h3>
+<p><code>apply</code> is a matrix function. Hand it a data frame with mixed types and R quietly coerces the whole thing &mdash; usually to character, because that is the only type everything fits into.</p>
+<pre class="rcode">df &lt;- <span class="fn">data.frame</span>(site = <span class="fn">c</span>(<span class="st">"A"</span>, <span class="st">"B"</span>), n = <span class="fn">c</span>(<span class="nu">3</span>, <span class="nu">5</span>))
+<span class="fn">apply</span>(df, <span class="nu">1</span>, <span class="fn">function</span>(r) r[<span class="st">"n"</span>])   <span class="cm"># "3" and "5" — character, not numeric</span></pre>
+<p>For per-column work on a data frame, use <code>sapply</code> or <code>vapply</code>, which iterate over columns and keep each column's own type.</p>
+
+<h3>4. An empty input returns something you did not plan for</h3>
+<p>Filter a dataset down to nothing and <code>sapply</code> hands back an empty <em>list</em>, not an empty numeric vector, and the next line fails somewhere confusing. <code>vapply</code> returns the right empty type. This bites in simulation loops where some replicate legitimately has no data.</p>
+</section>
+
+<section id="course">
+<h2>Where you'll meet these</h2>
+<p>These are real lines from this week's labs, so the patterns above are not hypothetical.</p>
+<div class="scroll">
+<table class="cheat">
+<thead><tr><th>Day</th><th>Line</th><th>What one piece is</th></tr></thead>
+<tbody>
+<tr><td>Day 1</td><td><code>replicate(reps, { ... })</code></td><td>nothing &mdash; the block re-runs <code>reps</code> times, once per simulated dataset</td></tr>
+<tr><td>Day 2</td><td><code>tapply(long$survived, long$class, mean)</code></td><td>all survival values for one passenger class</td></tr>
+<tr><td>Day 3</td><td><code>boxplot(split(resid(lm1), Streams$Stream))</code></td><td><code>split</code> makes one group of residuals per stream</td></tr>
+<tr><td>Day 4</td><td><code>apply(mu_draws, 2, quantile, probs = c(.025,.5,.975))</code></td><td>one column: every posterior draw at one <em>x</em> value</td></tr>
+<tr><td>Day 4</td><td><code>do.call(rbind, lapply(c(1, 2.5, 8), fit_zip_and_pois))</code></td><td><code>lapply</code> makes a list of one-row results; <code>do.call</code> stacks them into a table</td></tr>
+<tr><td>Day 5</td><td><code>Ninit &lt;- apply(y1, 1, max)</code></td><td>one row: all visits to a single site, so <code>max</code> is that site's largest count</td></tr>
+<tr><td>Day 5</td><td><code>sapply(seq_len(n.draw), function(k) { ... })</code></td><td>one posterior draw index, used to build a curve per draw</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+
+<section id="check">
+<h2>Check yourself</h2>
+<p>Shape questions only &mdash; that is where the mistakes live.</p>
+
+<div class="quiz">
+<p><strong>1.</strong> <code>x</code> is a numeric vector of length 6. What does <code>lapply(x, function(v) v * 2)</code> return?</p>
+<label><input type="radio" name="q1" /> a numeric vector of length 6</label>
+<label><input type="radio" name="q1" data-correct="true" /> a list of length 6</label>
+<label><input type="radio" name="q1" /> a 6 &times; 1 matrix</label>
+<label><input type="radio" name="q1" /> a single number</label>
+<button class="check">Check</button>
+<div class="feedback" data-correct-text="Right — <code>lapply</code> always returns a list, one entry per element, no matter what <code>f</code> gives back." data-wrong-text="No — <code>lapply</code> is the one that never simplifies. It returns a list of length 6. You are thinking of <code>sapply</code>."></div>
+</div>
+
+<div class="quiz">
+<p><strong>2.</strong> <code>m</code> is a 10 &times; 4 matrix. What is <code>dim(apply(m, 2, range))</code>?</p>
+<label><input type="radio" name="q2" /> 4 &times; 2</label>
+<label><input type="radio" name="q2" data-correct="true" /> 2 &times; 4</label>
+<label><input type="radio" name="q2" /> 10 &times; 2</label>
+<label><input type="radio" name="q2" /> it returns a list, so <code>dim</code> is <code>NULL</code></label>
+<button class="check">Check</button>
+<div class="feedback" data-correct-text="Right — <code>range</code> returns 2 values per column, and each column’s answer becomes a <em>column</em> of the result, giving 2 &times; 4." data-wrong-text="Not quite. <code>f</code> returns 2 values and there are 4 columns, and the result is 2 &times; 4, not 4 &times; 2 &mdash; each column’s answer lands as a column. That transposition is trap 2."></div>
+</div>
+
+<div class="quiz">
+<p><strong>3.</strong> <code>sapply(sites, function(v) v[v &gt; 2])</code> where the number of values above 2 differs between sites. What comes back?</p>
+<label><input type="radio" name="q3" /> a matrix, padded with <code>NA</code></label>
+<label><input type="radio" name="q3" /> an error</label>
+<label><input type="radio" name="q3" data-correct="true" /> a list, because the results cannot be simplified</label>
+<label><input type="radio" name="q3" /> a vector of all values above 2, concatenated</label>
+<button class="check">Check</button>
+<div class="feedback" data-correct-text="Right — unequal lengths cannot be simplified, so <code>sapply</code> silently falls back to a list." data-wrong-text="No. <code>sapply</code> does not pad or error; when the results have different lengths it just gives up simplifying and returns a list, which is what breaks the next line of your code."></div>
+</div>
+
+<div class="quiz">
+<p><strong>4.</strong> <code>y</code> is a 30 &times; 3 matrix of counts: 30 sites, 3 visits each. You want each site's maximum count. Which is right?</p>
+<label><input type="radio" name="q4" data-correct="true" /> <code>apply(y, 1, max)</code></label>
+<label><input type="radio" name="q4" /> <code>apply(y, 2, max)</code></label>
+<label><input type="radio" name="q4" /> <code>sapply(y, max)</code></label>
+<label><input type="radio" name="q4" /> <code>tapply(y, 1, max)</code></label>
+<button class="check">Check</button>
+<div class="feedback" data-correct-text="Right — sites are rows, so MARGIN = 1 hands <code>max</code> one site’s three visits at a time." data-wrong-text="Check which margin holds sites. Rows are sites here, so you want MARGIN = 1. MARGIN = 2 would give you the maximum across sites for each visit."></div>
+</div>
+
+<div class="quiz">
+<p><strong>5.</strong> Why prefer <code>vapply(x, f, numeric(1))</code> over <code>sapply(x, f)</code> in code you will re-run?</p>
+<label><input type="radio" name="q5" /> it is substantially faster on large inputs</label>
+<label><input type="radio" name="q5" data-correct="true" /> it fails immediately if <code>f</code> ever returns the wrong shape, instead of silently changing the return type</label>
+<label><input type="radio" name="q5" /> it can iterate over rows, which <code>sapply</code> cannot</label>
+<label><input type="radio" name="q5" /> it returns a list, which is safer to index</label>
+<button class="check">Check</button>
+<div class="feedback" data-correct-text="Right — the declared shape turns a silent type change into an error at the line that caused it." data-wrong-text="The point is not speed. <code>vapply</code> makes you declare the return shape, so it fails immediately if <code>f</code> ever returns something else instead of quietly handing back a different type."></div>
+</div>
+</section>
+
+<p style="margin-top:34px;font-size:14px;color:var(--muted)">
+FW 536 &middot; built for this course because most of the labs lean on these functions.
+Back to <a href="index.html">the course home page</a>.
+</p>
+
+</main>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------- the worked data, kept small enough to hold in your head ---------- */
+var SITES = [                                      // counts per visit at 4 sites,
+  {nm:"A", v:[3,5,4]},                             // unequal effort — the realistic case
+  {nm:"B", v:[0,1]},
+  {nm:"C", v:[7,6,9,8]},
+  {nm:"D", v:[2]}
+];
+var SIMPLE = [3, 1, 4, 1, 5];                      // plain numeric vector, for Reduce
+var MAT   = [[2,0,1],[5,4,6],[0,1,0],[3,3,2]];     // 4 sites x 3 visits
+var GVAL  = [4, 6, 3, 9, 11, 2, 1];
+var GKEY  = ["forest","forest","forest","meadow","meadow","edge","edge"];
+var PA    = [3, 7, 2, 5], PB = [10, 10, 8, 12];    // successes, trials
+
+/* ---------- the functions the student can plug in ---------- */
+var FS = {
+  mean:   {code:"mean",                       label:"mean  (one number)",
+           run:function(v){ return [round(avg(v))]; }},
+  len:    {code:"length",                     label:"length  (one number)",
+           run:function(v){ return [v.length]; }},
+  range:  {code:"range",                      label:"range  (TWO numbers)",
+           run:function(v){ return [Math.min.apply(null,v), Math.max.apply(null,v)]; }},
+  gt2:    {code:"function(v) v[v > 2]",       label:"v[v > 2]  (varying length)",
+           run:function(v){ return v.filter(function(z){ return z > 2; }); }}
+};
+function avg(v){ var s=0,i; for(i=0;i<v.length;i++) s+=v[i]; return v.length? s/v.length : NaN; }
+function round(z){ return Math.round(z*100)/100; }
+function fmt(v){
+  if(v.length===0) return "numeric(0)";
+  if(v.length===1) return String(v[0]);
+  return "c(" + v.join(", ") + ")";
+}
+
+/* ---------- specs: how each function splits and combines ---------- */
+var SPEC = {
+  lapply: {
+    name:"lapply", inputKind:"vec", allowF:["mean","len","range","gt2"],
+    inLabel:"sites — a list of 4 count vectors",
+    pieces:function(){ return SITES.map(function(s,i){ return {vals:s.v, desc:"sites[[\""+s.nm+"\"]] = "+fmt(s.v)}; }); },
+    combine:"list",
+    code:function(f){ return "lapply(sites, "+FS[f].code+")"; },
+    note:"<b>lapply always returns a list</b>, one entry per element, whatever <code>f</code> gives back. That is its virtue: the shape never surprises you. When you want a vector, either use <code>sapply</code>/<code>vapply</code>, or <code>unlist()</code> the result yourself."
+  },
+  sapply: {
+    name:"sapply", inputKind:"vec", allowF:["mean","len","range","gt2"],
+    inLabel:"sites — a list of 4 count vectors",
+    pieces:function(){ return SITES.map(function(s,i){ return {vals:s.v, desc:"sites[[\""+s.nm+"\"]] = "+fmt(s.v)}; }); },
+    combine:"simplify",
+    code:function(f){ return "sapply(sites, "+FS[f].code+")"; },
+    note:""   /* filled in dynamically — the whole point of sapply */
+  },
+  vapply: {
+    name:"vapply", inputKind:"vec", allowF:["mean","len","range","gt2"],
+    inLabel:"sites — a list of 4 count vectors",
+    pieces:function(){ return SITES.map(function(s,i){ return {vals:s.v, desc:"sites[[\""+s.nm+"\"]] = "+fmt(s.v)}; }); },
+    combine:"vapply",
+    code:function(f){ return "vapply(sites, "+FS[f].code+", numeric(1))"; },
+    note:""
+  },
+  apply1: {
+    name:"apply(m, 1, f)", inputKind:"mat", margin:1, allowF:["mean","len","range","gt2"],
+    inLabel:"m — 4 sites (rows) × 3 visits (cols)",
+    pieces:function(){ return MAT.map(function(r,i){ return {vals:r, desc:"m["+(i+1)+", ] = "+fmt(r)}; }); },
+    combine:"applyC",
+    code:function(f){ return "apply(m, 1, "+FS[f].code+")"; },
+    note:"<b>MARGIN = 1 means rows.</b> Your function is handed one whole row at a time — here, all three visits to one site. A useful mnemonic: the margin you name is the one that <em>survives</em> into the result."
+  },
+  apply2: {
+    name:"apply(m, 2, f)", inputKind:"mat", margin:2, allowF:["mean","len","range","gt2"],
+    inLabel:"m — 4 sites (rows) × 3 visits (cols)",
+    pieces:function(){
+      var out=[],j,i,c;
+      for(j=0;j<MAT[0].length;j++){ c=[]; for(i=0;i<MAT.length;i++) c.push(MAT[i][j]);
+        out.push({vals:c, desc:"m[, "+(j+1)+"] = "+fmt(c)}); }
+      return out;
+    },
+    combine:"applyC",
+    code:function(f){ return "apply(m, 2, "+FS[f].code+")"; },
+    note:"<b>MARGIN = 2 means columns</b> — here, one visit across all four sites. Note what happens when <code>f</code> returns two numbers: you get a 2 × 3 matrix, so each column's answer is a <em>column</em> of the result. That transposition is trap 2 below."
+  },
+  tapply: {
+    name:"tapply", inputKind:"grp", allowF:["mean","len","range"],
+    inLabel:"counts, grouped by habitat",
+    pieces:function(){
+      var lev=[],i; for(i=0;i<GKEY.length;i++) if(lev.indexOf(GKEY[i])<0) lev.push(GKEY[i]);
+      lev.sort();
+      return lev.map(function(L){
+        var v=[],i; for(i=0;i<GVAL.length;i++) if(GKEY[i]===L) v.push(GVAL[i]);
+        return {vals:v, desc:'group "'+L+'" = '+fmt(v), key:L};
+      });
+    },
+    combine:"named",
+    code:function(f){ return "tapply(counts, habitat, "+FS[f].code+")"; },
+    note:"<b>The pieces are groups, not elements.</b> <code>tapply</code> gathers every value sharing a level of the grouping factor and hands that whole bundle to <code>f</code>. Levels come back in sorted order, not the order they appear in the data — which is why the result is <em>named</em>."
+  },
+  mapply: {
+    name:"mapply", inputKind:"pair", allowF:["mean"],
+    inLabel:"successes (a) and trials (b)",
+    pieces:function(){
+      return PA.map(function(a,i){ return {vals:[a,PB[i]], desc:"a["+(i+1)+"]="+a+", b["+(i+1)+"]="+PB[i], pair:true}; });
+    },
+    combine:"simplify",
+    code:function(){ return "mapply(function(a, b) a / b, a, b)"; },
+    fOverride:function(v){ return [round(v[0]/v[1])]; },
+    note:"<b>Two inputs, walked in step.</b> Pass <em>i</em> takes the <em>i</em>-th element of each vector, so your function takes two arguments rather than one. <code>Map</code> does the same thing but always returns a list, exactly as <code>lapply</code> does."
+  },
+  replicate: {
+    name:"replicate", inputKind:"none", allowF:["mean"],
+    inLabel:"no input — an expression that is re-run",
+    pieces:function(){
+      var draws=[[4,2,5],[1,6,3],[5,5,2],[2,1,4],[6,3,3]];
+      return draws.map(function(d,i){ return {vals:d, desc:"pass "+(i+1)+": rpois(3, 3) gave "+fmt(d), sim:true}; });
+    },
+    combine:"simplify",
+    code:function(){ return "replicate(5, mean(rpois(3, lambda = 3)))"; },
+    fOverride:function(v){ return [round(avg(v))]; },
+    note:"<b>Nothing is being iterated over.</b> <code>replicate</code> re-evaluates the expression <em>n</em> times and collects the answers — each pass draws fresh random numbers, which is why the pieces differ. It simplifies like <code>sapply</code>, so a block returning two numbers gives you a 2 × n matrix. This is the engine behind every simulation in Days 1–3."
+  },
+  Reduce: {
+    name:"Reduce", inputKind:"simple", allowF:["mean"],
+    inLabel:"x — a plain numeric vector",
+    pieces:function(){ return SIMPLE.map(function(v,i){ return {vals:[v], desc:"next element: "+v}; }); },
+    combine:"reduce",
+    code:function(){ return "Reduce(`+`, x)   # running total"; },
+    note:"<b>Reduce folds, it does not map.</b> It carries a running value and combines it with the next element, so the result is one value rather than one-per-element. The pane on the right shows the accumulator after each pass."
+  }
+};
+var ORDER = ["lapply","sapply","vapply","apply1","apply2","tapply","mapply","replicate","Reduce"];
+
+/* ---------- state ---------- */
+var st = { fn:"lapply", f:"mean", step:0, timer:null };
+
+var elPick=document.getElementById("fnpick"), elF=document.getElementById("fsel"),
+    elSpd=document.getElementById("spd"), elIn=document.getElementById("inview"),
+    elOut=document.getElementById("outview"), elRecv=document.getElementById("recv"),
+    elFval=document.getElementById("fval"), elCode=document.getElementById("code"),
+    elShape=document.getElementById("shape"), elExp=document.getElementById("explain"),
+    elPos=document.getElementById("pos"), elInL=document.getElementById("inlabel"),
+    elOutL=document.getElementById("outlabel");
+
+ORDER.forEach(function(k){
+  var b=document.createElement("button");
+  b.textContent=SPEC[k].name; b.setAttribute("role","tab"); b.dataset.k=k;
+  b.addEventListener("click", function(){ stop(); st.fn=k; st.step=0; syncF(); render(); });
+  elPick.appendChild(b);
+});
+
+function syncF(){
+  var sp=SPEC[st.fn], allow=sp.allowF;
+  elF.innerHTML="";
+  allow.forEach(function(k){
+    var o=document.createElement("option"); o.value=k; o.textContent=FS[k].label; elF.appendChild(o);
+  });
+  if(allow.indexOf(st.f)<0) st.f=allow[0];
+  elF.value=st.f;
+  elF.disabled = allow.length===1;
+}
+elF.addEventListener("change", function(){ stop(); st.f=elF.value; st.step=0; render(); });
+
+/* ---------- evaluate ---------- */
+function results(){
+  var sp=SPEC[st.fn], pcs=sp.pieces(), fn = sp.fOverride || FS[st.f].run;
+  return pcs.map(function(p){ return fn(p.vals); });
+}
+
+function shapeOf(res, mode){
+  var lens = res.map(function(r){ return r.length; });
+  var allOne = lens.every(function(l){ return l===1; });
+  var same = lens.every(function(l){ return l===lens[0]; });
+  if(mode==="list")  return {kind:"list", label:"list of "+res.length};
+  if(mode==="named") return {kind:"vector", label:"named vector, length "+res.length};
+  if(mode==="reduce")return {kind:"scalar", label:"a single value"};
+  if(mode==="vapply"){
+    if(allOne) return {kind:"vector", label:"numeric vector, length "+res.length};
+    return {kind:"error", label:"ERROR — values must be length 1"};
+  }
+  if(allOne) return {kind:"vector", label:"vector, length "+res.length};
+  if(same)   return {kind:"matrix", label:lens[0]+" × "+res.length+" matrix", k:lens[0]};
+  return {kind:"list", label:"list of "+res.length+" (could not simplify)"};
+}
+
+/* ---------- drawing ---------- */
+function cell(txt, cls){
+  var d=document.createElement("div"); d.className="cell"+(cls?" "+cls:""); d.textContent=txt; return d;
+}
+function drawInput(){
+  var sp=SPEC[st.fn]; elIn.innerHTML=""; elInL.textContent=sp.inLabel;
+  var i,j,wrap;
+  if(sp.inputKind==="vec"){
+    SITES.forEach(function(sObj,i){
+      var row=document.createElement("div");
+      row.style.cssText="display:flex;align-items:center;gap:7px;margin-bottom:5px";
+      var lab=document.createElement("span");
+      lab.style.cssText="font-family:monospace;font-size:11.5px;color:var(--muted);min-width:22px";
+      lab.textContent=sObj.nm; row.appendChild(lab);
+      var cs=document.createElement("div"); cs.className="cells";
+      sObj.v.forEach(function(v){ cs.appendChild(cell(v, i===st.step-1?"on":(i<st.step-1?"done":""))); });
+      row.appendChild(cs); elIn.appendChild(row);
+    });
+    var hv=document.createElement("div");
+    hv.style.cssText="font-size:11.5px;color:var(--muted);margin-top:7px";
+    hv.textContent="one piece = one site's whole vector";
+    elIn.appendChild(hv);
+  } else if(sp.inputKind==="simple"){
+    wrap=document.createElement("div"); wrap.className="cells";
+    SIMPLE.forEach(function(v,i){
+      wrap.appendChild(cell(v, i===st.step-1?"on":(i<st.step-1?"done":"")));
+    });
+    elIn.appendChild(wrap);
+  } else if(sp.inputKind==="mat"){
+    var g=document.createElement("div"); g.className="grid";
+    g.style.gridTemplateColumns="repeat("+MAT[0].length+", auto)";
+    for(i=0;i<MAT.length;i++) for(j=0;j<MAT[0].length;j++){
+      var on = sp.margin===1 ? (i===st.step-1) : (j===st.step-1);
+      var dn = sp.margin===1 ? (i< st.step-1) : (j< st.step-1);
+      g.appendChild(cell(MAT[i][j], on?"on":(dn?"done":"")));
+    }
+    elIn.appendChild(g);
+    var h=document.createElement("div"); h.style.cssText="font-size:11.5px;color:var(--muted);margin-top:7px";
+    h.textContent = sp.margin===1 ? "highlighting a row → f sees 3 visits" : "highlighting a column → f sees 4 sites";
+    elIn.appendChild(h);
+  } else if(sp.inputKind==="grp"){
+    var pcs=sp.pieces();
+    pcs.forEach(function(p,i){
+      var row=document.createElement("div"); row.style.cssText="display:flex;align-items:center;gap:7px;margin-bottom:5px";
+      var lab=document.createElement("span");
+      lab.style.cssText="font-family:monospace;font-size:11.5px;color:var(--muted);min-width:52px";
+      lab.textContent=p.key;
+      row.appendChild(lab);
+      var cs=document.createElement("div"); cs.className="cells";
+      p.vals.forEach(function(v){ cs.appendChild(cell(v, i===st.step-1?"on":(i<st.step-1?"done":""))); });
+      row.appendChild(cs); elIn.appendChild(row);
+    });
+  } else if(sp.inputKind==="pair"){
+    ["a",'b'].forEach(function(nm,r){
+      var row=document.createElement("div"); row.style.cssText="display:flex;align-items:center;gap:7px;margin-bottom:5px";
+      var lab=document.createElement("span");
+      lab.style.cssText="font-family:monospace;font-size:12px;color:var(--muted);min-width:16px";
+      lab.textContent=nm; row.appendChild(lab);
+      var cs=document.createElement("div"); cs.className="cells";
+      (r===0?PA:PB).forEach(function(v,i){ cs.appendChild(cell(v, i===st.step-1?"on":(i<st.step-1?"done":""))); });
+      row.appendChild(cs); elIn.appendChild(row);
+    });
+  } else {
+    var pcs2=sp.pieces();
+    pcs2.forEach(function(p,i){
+      var row=document.createElement("div"); row.style.cssText="display:flex;align-items:center;gap:7px;margin-bottom:5px";
+      var lab=document.createElement("span");
+      lab.style.cssText="font-family:monospace;font-size:11.5px;color:var(--muted);min-width:44px";
+      lab.textContent="pass "+(i+1); row.appendChild(lab);
+      var cs=document.createElement("div"); cs.className="cells";
+      p.vals.forEach(function(v){ cs.appendChild(cell(v, i===st.step-1?"on":(i<st.step-1?"done":"ghost"))); });
+      row.appendChild(cs); elIn.appendChild(row);
+    });
+  }
+}
+
+function drawOutput(){
+  var sp=SPEC[st.fn], res=results(), shp=shapeOf(res, sp.combine), pcs=sp.pieces();
+  elOut.innerHTML="";
+  elOutL.textContent = st.step>=pcs.length ? "Result — "+shp.label : "Result so far";
+
+  if(sp.combine==="reduce"){
+    var acc=0, box=document.createElement("div"); box.className="cells col";
+    for(var i=0;i<st.step;i++){
+      acc += SIMPLE[i];
+      var d=cell(acc, i===st.step-1?"on":"done");
+      var wrap=document.createElement("div"); wrap.style.cssText="display:flex;align-items:center;gap:7px";
+      var t=document.createElement("span");
+      t.style.cssText="font-family:monospace;font-size:11px;color:var(--muted)";
+      t.textContent="after "+(i+1); wrap.appendChild(t); wrap.appendChild(d);
+      box.appendChild(wrap);
+    }
+    elOut.appendChild(box);
+    return;
+  }
+
+  if(shp.kind==="error" && st.step>0){
+    var e=document.createElement("div");
+    e.style.cssText="font-family:monospace;font-size:12.5px;color:var(--bad);line-height:1.5";
+    e.textContent="Error in vapply(): values must be length 1, but FUN(X[[1]]) result is length "+res[0].length;
+    elOut.appendChild(e);
+    return;
+  }
+
+  if(shp.kind==="matrix"){
+    var g=document.createElement("div"); g.className="grid";
+    g.style.gridTemplateColumns="repeat("+st.step+", auto)";
+    for(var r=0;r<shp.k;r++) for(var c=0;c<st.step;c++){
+      g.appendChild(cell(res[c][r], c===st.step-1?"on":"done"));
+    }
+    if(st.step>0) elOut.appendChild(g);
+    var n=document.createElement("div"); n.style.cssText="font-size:11.5px;color:var(--muted);margin-top:7px";
+    n.textContent="each pass contributes a COLUMN";
+    if(st.step>0) elOut.appendChild(n);
+    return;
+  }
+
+  var list=document.createElement("div"); list.className="cells"+(shp.kind==="list"?" col":"");
+  for(var k=0;k<st.step;k++){
+    var val=res[k], txt = shp.kind==="list" ? fmt(val) : (val.length? val[0] : "—");
+    var w=document.createElement("div"); w.style.cssText="display:flex;align-items:center;gap:6px";
+    if(shp.kind==="list" || sp.combine==="named"){
+      var tag=document.createElement("span");
+      tag.style.cssText="font-family:monospace;font-size:11px;color:var(--muted);min-width:46px";
+      tag.textContent = sp.combine==="named" ? (pcs[k].key||"") : "[["+(k+1)+"]]";
+      w.appendChild(tag);
+    }
+    w.appendChild(cell(txt, k===st.step-1?"on":"done"));
+    list.appendChild(w);
+  }
+  elOut.appendChild(list);
+}
+
+function sapplyNote(res){
+  var lens=res.map(function(r){return r.length;});
+  var allOne=lens.every(function(l){return l===1;});
+  var same=lens.every(function(l){return l===lens[0];});
+  if(allOne) return "<b>Every result had length 1</b>, so sapply collapsed the list into a plain vector. This is the case people picture when they reach for <code>sapply</code> — and the reason the other two cases catch them out.";
+  if(same)   return "<b>Every result had length "+lens[0]+"</b>, all equal, so sapply built a "+lens[0]+" × "+res.length+" <em>matrix</em> instead of a vector. Same call, same data, different shape — purely because <code>f</code> changed.";
+  return "<b>The results had different lengths</b> ("+lens.join(", ")+"), so sapply gave up simplifying and handed back a list — exactly what <code>lapply</code> would have returned. Code downstream expecting a vector now breaks, with no warning at this line.";
+}
+function vapplyNote(res){
+  var ok=res.every(function(r){ return r.length===1; });
+  return ok
+    ? "<b>Every result matched the promised <code>numeric(1)</code></b>, so you get a numeric vector — the same answer <code>sapply</code> gave, but now guaranteed rather than inferred."
+    : "<b>vapply refuses.</b> You promised <code>numeric(1)</code> and <code>f</code> returned length "+res[0].length+", so it stops at the first violation instead of quietly changing shape. Compare with <code>sapply</code> on the same setting: that one succeeds and hands you something different.";
+}
+
+function render(){
+  var sp=SPEC[st.fn], pcs=sp.pieces(), res=results(), shp=shapeOf(res, sp.combine);
+
+  Array.prototype.forEach.call(elPick.children, function(b){
+    b.classList.toggle("active", b.dataset.k===st.fn);
+    b.setAttribute("aria-selected", b.dataset.k===st.fn ? "true":"false");
+  });
+
+  drawInput(); drawOutput();
+
+  elPos.textContent="pass "+st.step+" of "+pcs.length;
+  if(st.step>0 && st.step<=pcs.length){
+    elRecv.textContent=pcs[st.step-1].desc;
+    var v=res[st.step-1];
+    elFval.textContent = (sp.combine==="reduce") ? "running total" : fmt(v);
+  } else {
+    elRecv.textContent="press Step or Play";
+    elFval.textContent="—";
+  }
+
+  elCode.textContent = sp.code(st.f);
+
+  elShape.innerHTML="";
+  var inTag=document.createElement("span"); inTag.className="tag";
+  inTag.textContent = sp.inputKind==="mat" ? "input: 4 × 3 matrix"
+                    : sp.inputKind==="grp" ? "input: vector + factor"
+                    : sp.inputKind==="pair"? "input: two vectors"
+                    : sp.inputKind==="none"? "input: none"
+                    : sp.inputKind==="simple"? "input: vector of "+SIMPLE.length
+                    : "input: list of "+SITES.length+" vectors";
+  var ar=document.createElement("span"); ar.textContent="→"; ar.style.color="var(--osu-orange)";
+  var outTag=document.createElement("span");
+  outTag.className="tag "+(shp.kind==="error"?"warnt":"out");
+  outTag.textContent="returns: "+shp.label;
+  elShape.appendChild(inTag); elShape.appendChild(ar); elShape.appendChild(outTag);
+
+  var note = sp.note;
+  if(st.fn==="sapply") note = sapplyNote(res);
+  if(st.fn==="vapply") note = vapplyNote(res);
+  elExp.innerHTML = note;
+
+  document.getElementById("btnStep").disabled = st.step>=pcs.length;
+}
+
+/* ---------- transport ---------- */
+function stepOne(){
+  var n=SPEC[st.fn].pieces().length;
+  if(st.step<n){ st.step++; render(); }
+  if(st.step>=n) stop();
+}
+function stop(){ if(st.timer){ clearInterval(st.timer); st.timer=null; }
+  document.getElementById("btnPlay").textContent="Play"; }
+document.getElementById("btnStep").addEventListener("click", function(){ stop(); stepOne(); });
+document.getElementById("btnReset").addEventListener("click", function(){ stop(); st.step=0; render(); });
+document.getElementById("btnPlay").addEventListener("click", function(){
+  if(st.timer){ stop(); return; }
+  if(st.step>=SPEC[st.fn].pieces().length) st.step=0;
+  this.textContent="Pause";
+  st.timer=setInterval(stepOne, parseInt(elSpd.value,10));
+});
+elSpd.addEventListener("change", function(){
+  if(st.timer){ clearInterval(st.timer); st.timer=setInterval(stepOne, parseInt(elSpd.value,10)); }
+});
+
+syncF(); render();
+})();
+</script>
+</body>
+</html>

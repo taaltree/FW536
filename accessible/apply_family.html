@@ -7,6 +7,27 @@
 <link rel="stylesheet" href="_Shared/css/accessible.css" />
 <script defer src="_Shared/js/accessible.js"></script>
 <style>
+  .triage{border:1px solid var(--border);border-radius:9px;background:var(--panel-alt);
+    padding:14px 18px;margin:18px 0 26px;}
+  .triage-h{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);
+    font-weight:700;margin-bottom:8px;}
+  .triage ul{margin:0;padding-left:20px;}
+  .triage li{margin-bottom:5px;font-size:14.5px;}
+
+  .fncard{border:1px solid var(--border);border-left:4px solid var(--osu-orange);border-radius:9px;
+    background:var(--panel);padding:16px 20px 14px;margin:0 0 16px;}
+  .fncard.helper{border-left-color:var(--accent);}
+  .fncard h3{margin:0 0 9px;font-size:16.5px;display:flex;flex-wrap:wrap;gap:10px;align-items:baseline;}
+  .fncard h3 code{font-size:15.5px;background:var(--panel-alt);padding:2px 7px;border-radius:5px;}
+  .fncard .purpose{font-size:13.5px;font-weight:500;color:var(--muted);font-style:italic;}
+  .fncard p{font-size:14.5px;}
+  .fncard p:last-of-type{margin-bottom:0;}
+  .fncard pre.rcode{margin:11px 0;}
+  button.goto{margin-top:11px;font-size:13px;font-weight:600;border:2px solid var(--border);
+    background:#fff;color:var(--osu-stone);border-radius:7px;padding:5px 12px;cursor:pointer;}
+  button.goto:hover{border-color:var(--osu-orange);color:var(--osu-orange-dark);}
+  button.goto:focus-visible{outline:3px solid var(--osu-orange-dark);outline-offset:2px;}
+
   .widget{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:20px 22px;margin:22px 0;}
   .fnpick{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:16px;}
   .fnpick button{font-family:var(--mono,'SFMono-Regular',Consolas,monospace);font-size:13.5px;font-weight:600;
@@ -98,8 +119,9 @@
     <div class="section">On this page</div>
     <ul>
       <li><a href="#idea">The one idea</a></li>
+      <li><a href="#ref">The functions, one by one</a></li>
       <li><a href="#viz">Watch it run</a></li>
-      <li><a href="#cheat">Which one do I want?</a></li>
+      <li><a href="#cheat">All on one screen</a></li>
       <li><a href="#traps">Four traps</a></li>
       <li><a href="#course">Where you'll meet these</a></li>
       <li><a href="#check">Check yourself</a></li>
@@ -132,6 +154,177 @@
 </div>
 <p>Step 2 is yours and it is the easy part. The confusion is always step 1 (<em>what is a "piece"? an element? a row? a group?</em>) and step 3 (<em>do I get a list, a vector, or a matrix back?</em>). Keep those two questions in mind and the whole family collapses into one pattern.</p>
 <div class="callout key"><p class="callout-label">Key idea</p><strong>The habit worth building.</strong> Before you write the function, say out loud what one piece looks like. If <code>x</code> is a vector of 5 counts, <code>lapply(x, f)</code> hands <code>f</code> a single number, five times. If <code>m</code> is a 4&times;3 matrix, <code>apply(m, 1, f)</code> hands <code>f</code> a vector of length 3, four times. Nearly every apply bug is a wrong answer to that one question.</div>
+</section>
+
+<section id="ref">
+<h2>The functions, one by one</h2>
+<p>Everything below uses the same four objects, so you can compare like with like. The step-through app in the next section uses them too.</p>
+<pre class="rcode"><span class="cm"># four sites, surveyed a different number of times each</span>
+sites   &lt;- <span class="fn">list</span>(A = <span class="fn">c</span>(<span class="nu">3</span>,<span class="nu">5</span>,<span class="nu">4</span>), B = <span class="fn">c</span>(<span class="nu">0</span>,<span class="nu">1</span>), C = <span class="fn">c</span>(<span class="nu">7</span>,<span class="nu">6</span>,<span class="nu">9</span>,<span class="nu">8</span>), D = <span class="fn">c</span>(<span class="nu">2</span>))
+
+<span class="cm"># the same idea as a matrix: 4 sites (rows) x 3 visits (cols)</span>
+m       &lt;- <span class="fn">rbind</span>(<span class="fn">c</span>(<span class="nu">2</span>,<span class="nu">0</span>,<span class="nu">1</span>), <span class="fn">c</span>(<span class="nu">5</span>,<span class="nu">4</span>,<span class="nu">6</span>), <span class="fn">c</span>(<span class="nu">0</span>,<span class="nu">1</span>,<span class="nu">0</span>), <span class="fn">c</span>(<span class="nu">3</span>,<span class="nu">3</span>,<span class="nu">2</span>))
+
+<span class="cm"># a flat vector plus a parallel factor saying which group each value is in</span>
+counts  &lt;- <span class="fn">c</span>(<span class="nu">4</span>, <span class="nu">6</span>, <span class="nu">3</span>, <span class="nu">9</span>, <span class="nu">11</span>, <span class="nu">2</span>, <span class="nu">1</span>)
+habitat &lt;- <span class="fn">c</span>(<span class="st">"forest"</span>,<span class="st">"forest"</span>,<span class="st">"forest"</span>,<span class="st">"meadow"</span>,<span class="st">"meadow"</span>,<span class="st">"edge"</span>,<span class="st">"edge"</span>)
+
+<span class="cm"># two vectors that line up element by element</span>
+eff     &lt;- <span class="fn">c</span>(<span class="nu">2</span>, <span class="nu">3</span>, <span class="nu">1</span>, <span class="nu">4</span>)      <span class="cm"># survey hours at each site</span>
+tot     &lt;- <span class="fn">c</span>(<span class="nu">12</span>, <span class="nu">20</span>, <span class="nu">6</span>, <span class="nu">25</span>)  <span class="cm"># animals seen at each site</span></pre>
+
+<div class="triage">
+  <div class="triage-h">Reach for&hellip;</div>
+  <ul>
+    <li><code>lapply</code> when each answer is a <em>complicated object</em> &mdash; a model fit, a data frame, a vector of varying length</li>
+    <li><code>vapply</code> when each answer is <em>one number</em> and this is real code (<code>sapply</code> if you are just poking at the console)</li>
+    <li><code>apply</code> when your data is a <em>matrix</em> and you want one answer per row or per column</li>
+    <li><code>tapply</code> when you have a vector plus a <em>grouping factor</em> and want one answer per group</li>
+    <li><code>mapply</code> / <code>Map</code> when your function needs an element from <em>two or more vectors at once</em></li>
+    <li><code>replicate</code> when there is <em>nothing to iterate over</em> and you just want to run something <em>n</em> times</li>
+    <li><code>Reduce</code> when you want to <em>collapse</em> a whole vector into a single accumulated value</li>
+  </ul>
+</div>
+
+<div class="fncard">
+  <h3><code>lapply(X, FUN)</code> <span class="purpose">keep every result, whatever shape it is</span></h3>
+  <p><b>Reach for it when</b> each answer is more than a single number &mdash; a fitted model, a data frame, a vector whose length you cannot predict. A list is the only container that holds those without mangling them, and <code>lapply</code> is the one function here that <em>never</em> tries to be clever about the result.</p>
+  <pre class="rcode"><span class="fn">lapply</span>(sites, <span class="fn">mean</span>)
+<span class="cm">#&gt; $A
+#&gt; [1] 4
+#&gt;
+#&gt; $B
+#&gt; [1] 0.5
+#&gt;
+#&gt; $C
+#&gt; [1] 7.5
+#&gt;
+#&gt; $D
+#&gt; [1] 2</span></pre>
+  <p>Four means, but wrapped one per list slot rather than laid out as a vector. That is verbose here and exactly right when the results are models. Day 5 builds the starting values for three MCMC chains this way, because each chain's starting values are themselves a list.</p>
+  <button class="goto" data-goto="lapply">Watch it run &#9654;</button>
+</div>
+
+<div class="fncard">
+  <h3><code>sapply(X, FUN)</code> <span class="purpose">the same, then tidy the result if it can</span></h3>
+  <p><b>Reach for it when</b> you are working interactively, expect one number per element, and want a plain named vector rather than a list to read.</p>
+  <pre class="rcode"><span class="fn">sapply</span>(sites, <span class="fn">mean</span>)
+<span class="cm">#&gt;   A   B   C   D
+#&gt; 4.0 0.5 7.5 2.0</span></pre>
+  <p>Much easier to read &mdash; and the tidying is a <em>guess</em> R makes by looking at what came back. When the guess changes, your result type changes with it and nothing warns you. That is trap 1 below, and the reason the next function exists.</p>
+  <button class="goto" data-goto="sapply">Watch it run &#9654;</button>
+</div>
+
+<div class="fncard">
+  <h3><code>vapply(X, FUN, FUN.VALUE)</code> <span class="purpose">sapply, with the answer's shape promised up front</span></h3>
+  <p><b>Reach for it when</b> the code will be run more than once &mdash; in a script, a function, a simulation. The third argument is a <em>template</em>: an example of what one answer looks like. R checks every answer against it and stops if one disagrees.</p>
+  <pre class="rcode"><span class="fn">vapply</span>(sites, <span class="fn">mean</span>, <span class="fn">numeric</span>(<span class="nu">1</span>))          <span class="cm"># promise: one number each time</span>
+<span class="cm">#&gt;   A   B   C   D
+#&gt; 4.0 0.5 7.5 2.0</span>
+
+<span class="fn">vapply</span>(sites, <span class="fn">function</span>(v) <span class="fn">if</span> (<span class="fn">mean</span>(v) &gt; <span class="nu">3</span>) <span class="st">"high"</span> <span class="fn">else</span> <span class="st">"low"</span>, <span class="fn">character</span>(<span class="nu">1</span>))
+<span class="cm">#&gt;      A      B      C      D
+#&gt; "high"  "low" "high"  "low"</span></pre>
+  <p>The templates you will use: <code>numeric(1)</code>, <code>character(1)</code>, <code>logical(1)</code>, and <code>numeric(2)</code> when the answer is genuinely a pair. Typing that extra argument is the entire benefit &mdash; it converts a silent shape change into an error on the line that caused it.</p>
+  <button class="goto" data-goto="vapply">Watch it run &#9654;</button>
+</div>
+
+<div class="fncard">
+  <h3><code>apply(m, 1, FUN)</code> <span class="purpose">one summary per row</span></h3>
+  <p><b>Reach for it when</b> your data is a matrix, the rows are your units &mdash; sites, individuals, simulated datasets &mdash; and you want a single number for each one.</p>
+  <pre class="rcode"><span class="fn">apply</span>(m, <span class="nu">1</span>, <span class="fn">max</span>)     <span class="cm"># the largest count ever seen at each site</span>
+<span class="cm">#&gt; [1] 2 6 1 3</span></pre>
+  <p>Day 5 uses precisely this line to start its N-mixture model: the most animals you ever counted at a site is a sensible lower bound for how many are really there, so <code>apply(y, 1, max)</code> becomes the initial value for that site's abundance.</p>
+  <button class="goto" data-goto="apply1">Watch it run &#9654;</button>
+</div>
+
+<div class="fncard">
+  <h3><code>apply(m, 2, FUN)</code> <span class="purpose">one summary per column</span></h3>
+  <p><b>Reach for it when</b> the columns are what you want summarised. The commonest case in this course is a matrix of MCMC draws: every row is one posterior draw, every column is one <em>x</em> value, so a summary down each column is the posterior at that <em>x</em>.</p>
+  <pre class="rcode"><span class="fn">apply</span>(m, <span class="nu">2</span>, <span class="fn">mean</span>)    <span class="cm"># mean count on each visit, across sites</span>
+<span class="cm">#&gt; [1] 2.50 2.00 2.25</span>
+
+<span class="cm"># Day 4, on a matrix of posterior draws:</span>
+<span class="fn">apply</span>(mu_draws, <span class="nu">2</span>, <span class="fn">quantile</span>, probs = <span class="fn">c</span>(<span class="nu">.025</span>, <span class="nu">.5</span>, <span class="nu">.975</span>))</pre>
+  <p>Watch the shape when <code>FUN</code> returns several numbers, as <code>quantile</code> does: you get a matrix whose <em>columns</em> are the per-column answers, not its rows. Trap 2.</p>
+  <button class="goto" data-goto="apply2">Watch it run &#9654;</button>
+</div>
+
+<div class="fncard">
+  <h3><code>tapply(X, INDEX, FUN)</code> <span class="purpose">one summary per group</span></h3>
+  <p><b>Reach for it when</b> you have a vector of values and a second, parallel vector saying which group each value belongs to. This is the "group means" function.</p>
+  <pre class="rcode"><span class="fn">tapply</span>(counts, habitat, <span class="fn">mean</span>)
+<span class="cm">#&gt;      edge    forest    meadow
+#&gt;  1.500000  4.333333 10.000000</span>
+
+<span class="fn">tapply</span>(counts, habitat, <span class="fn">length</span>)   <span class="cm"># how many sites in each habitat</span>
+<span class="cm">#&gt;   edge forest meadow
+#&gt;      2      3      2</span></pre>
+  <p>Two things to notice. The groups come back in <em>sorted</em> order, not the order they appear in your data &mdash; which is why the result is named, and why you should index it by name rather than position. And <code>FUN</code> is handed the whole group at once, so anything that summarises a vector works here.</p>
+  <p><b>Relatives:</b> <code>aggregate()</code> does this for several columns of a data frame at once; <code>split()</code> hands you the groups themselves instead of a summary.</p>
+  <button class="goto" data-goto="tapply">Watch it run &#9654;</button>
+</div>
+
+<div class="fncard">
+  <h3><code>mapply(FUN, ...)</code> and <code>Map(FUN, ...)</code> <span class="purpose">walk several vectors in step</span></h3>
+  <p><b>Reach for it when</b> your function needs the <em>i</em>-th element of two or more vectors at the same time. <code>lapply</code> and friends only ever hand your function one thing; these hand it one from each.</p>
+  <pre class="rcode"><span class="fn">mapply</span>(<span class="fn">function</span>(hours, seen) seen / hours, eff, tot)   <span class="cm"># animals per hour</span>
+<span class="cm">#&gt; [1] 6.000000 6.666667 6.000000 6.250000</span></pre>
+  <p><code>Map</code> is the same function with the simplification switched off &mdash; it always returns a list, exactly as <code>lapply</code> does. Use <code>Map</code> when the per-pair answers are complicated, <code>mapply</code> when they are single numbers.</p>
+  <button class="goto" data-goto="mapply">Watch it run &#9654;</button>
+</div>
+
+<div class="fncard">
+  <h3><code>replicate(n, expr)</code> <span class="purpose">run this n times and collect the answers</span></h3>
+  <p><b>Reach for it when</b> there is nothing to iterate over. No input is being split up: the expression is simply evaluated again from scratch <em>n</em> times, drawing fresh random numbers on each pass. This is the engine behind every simulation in Days 1&ndash;3.</p>
+  <pre class="rcode"><span class="fn">set.seed</span>(<span class="nu">1</span>)
+<span class="fn">replicate</span>(<span class="nu">6</span>, <span class="fn">mean</span>(<span class="fn">rpois</span>(<span class="nu">5</span>, lambda = <span class="nu">3</span>)))    <span class="cm"># six sample means</span>
+<span class="cm">#&gt; [1] 2.8 3.8 2.6 4.2 3.0 2.2</span>
+
+<span class="fn">set.seed</span>(<span class="nu">1</span>)
+x &lt;- <span class="fn">replicate</span>(<span class="nu">2000</span>, <span class="fn">mean</span>(<span class="fn">rpois</span>(<span class="nu">5</span>, <span class="nu">3</span>)))       <span class="cm"># now it is a sampling distribution</span>
+<span class="fn">mean</span>(x); <span class="fn">sd</span>(x)
+<span class="cm">#&gt; [1] 3.0051
+#&gt; [1] 0.7881273   &lt;- the standard error of a mean of 5 Poisson(3) draws</span></pre>
+  <p>The <code>set.seed()</code> is not decoration &mdash; seed every simulation you intend to report, or you cannot reproduce your own numbers. That second block is the whole idea of a sampling distribution, in two lines: repeat the study 2000 times, look at the spread of the answers. It simplifies like <code>sapply</code>, so a block returning two numbers gives you a 2 &times; <em>n</em> matrix.</p>
+  <button class="goto" data-goto="replicate">Watch it run &#9654;</button>
+</div>
+
+<div class="fncard">
+  <h3><code>Reduce(f, x)</code> <span class="purpose">collapse a vector to a single value</span></h3>
+  <p><b>Reach for it when</b> you want to combine elements <em>pairwise</em> until one value is left: a running total, the intersection of many sets, a series of merges. Unlike everything above, the result is one value rather than one-per-element.</p>
+  <pre class="rcode"><span class="fn">Reduce</span>(`+`, <span class="fn">c</span>(<span class="nu">3</span>,<span class="nu">1</span>,<span class="nu">4</span>,<span class="nu">1</span>,<span class="nu">5</span>))
+<span class="cm">#&gt; [1] 14</span>
+
+<span class="fn">Reduce</span>(`+`, <span class="fn">c</span>(<span class="nu">3</span>,<span class="nu">1</span>,<span class="nu">4</span>,<span class="nu">1</span>,<span class="nu">5</span>), accumulate = <span class="nu">TRUE</span>)   <span class="cm"># show the working</span>
+<span class="cm">#&gt; [1]  3  4  8  9 14</span></pre>
+  <p><code>accumulate = TRUE</code> is the version worth knowing: it returns every intermediate value, which is what the app draws when you step through it.</p>
+  <button class="goto" data-goto="Reduce">Watch it run &#9654;</button>
+</div>
+
+<div class="fncard helper">
+  <h3>Two companions that are not loops at all</h3>
+  <p><code>split(x, g)</code> makes the pieces without applying anything, which is useful when you want the groups themselves:</p>
+  <pre class="rcode"><span class="fn">split</span>(counts, habitat)
+<span class="cm">#&gt; $edge
+#&gt; [1] 2 1
+#&gt;
+#&gt; $forest
+#&gt; [1] 4 6 3
+#&gt;
+#&gt; $meadow
+#&gt; [1]  9 11</span></pre>
+  <p>That is a list, so <code>lapply</code> or <code>sapply</code> takes it straight away &mdash; and <code>sapply(split(x, g), mean)</code> is exactly what <code>tapply(x, g, mean)</code> does. Day 3 uses <code>boxplot(split(resid(lm1), Streams$Stream))</code> to get one box per stream.</p>
+  <p><code>do.call(f, list)</code> does not iterate at all. It calls <code>f</code> <strong>once</strong>, using the list's elements as its arguments &mdash; which is how you assemble a pile of pieces into one object:</p>
+  <pre class="rcode">rows &lt;- <span class="fn">lapply</span>(sites, <span class="fn">function</span>(v) <span class="fn">data.frame</span>(n = <span class="fn">length</span>(v), mean = <span class="fn">mean</span>(v)))
+<span class="fn">do.call</span>(<span class="fn">rbind</span>, rows)      <span class="cm"># rbind(rows$A, rows$B, rows$C, rows$D)</span>
+<span class="cm">#&gt;   n mean
+#&gt; A 3  4.0
+#&gt; B 2  0.5
+#&gt; C 4  7.5
+#&gt; D 1  2.0</span></pre>
+  <p>The <code>lapply</code>-then-<code>do.call(rbind, ...)</code> pair is the standard way to build a results table from a loop, and Day 4 uses it verbatim.</p>
+</div>
 </section>
 
 <section id="viz">
@@ -190,8 +383,8 @@
 </section>
 
 <section id="cheat">
-<h2>Which one do I want?</h2>
-<p>Read this table as: <em>what gets split off, what your function sees, what you get back.</em></p>
+<h2>All of them on one screen</h2>
+<p>A single view for when you know which function you want and just need to recall its shape. Read each row as: <em>what gets split off, what your function sees, what you get back.</em></p>
 <div class="scroll">
 <table class="cheat">
 <thead><tr><th scope="col">Call</th><th scope="col">One "piece" is</th><th scope="col"><code>f</code> receives</th><th scope="col">You get back</th></tr></thead>
@@ -270,7 +463,7 @@
 <label><input type="radio" name="q1" /> a 6 &times; 1 matrix</label>
 <label><input type="radio" name="q1" /> a single number</label>
 <button class="check">Check</button>
-<div class="quiz-feedback"></div>
+<div class="feedback" data-correct-text="Right — <code>lapply</code> always returns a list, one entry per element, no matter what <code>f</code> gives back." data-wrong-text="No — <code>lapply</code> is the one that never simplifies. It returns a list of length 6. You are thinking of <code>sapply</code>."></div>
 </div>
 
 <div class="quiz">
@@ -280,7 +473,7 @@
 <label><input type="radio" name="q2" /> 10 &times; 2</label>
 <label><input type="radio" name="q2" /> it returns a list, so <code>dim</code> is <code>NULL</code></label>
 <button class="check">Check</button>
-<div class="quiz-feedback"></div>
+<div class="feedback" data-correct-text="Right — <code>range</code> returns 2 values per column, and each column’s answer becomes a <em>column</em> of the result, giving 2 &times; 4." data-wrong-text="Not quite. <code>f</code> returns 2 values and there are 4 columns, and the result is 2 &times; 4, not 4 &times; 2 &mdash; each column’s answer lands as a column. That transposition is trap 2."></div>
 </div>
 
 <div class="quiz">
@@ -290,7 +483,7 @@
 <label><input type="radio" name="q3" data-correct="true" /> a list, because the results cannot be simplified</label>
 <label><input type="radio" name="q3" /> a vector of all values above 2, concatenated</label>
 <button class="check">Check</button>
-<div class="quiz-feedback"></div>
+<div class="feedback" data-correct-text="Right — unequal lengths cannot be simplified, so <code>sapply</code> silently falls back to a list." data-wrong-text="No. <code>sapply</code> does not pad or error; when the results have different lengths it just gives up simplifying and returns a list, which is what breaks the next line of your code."></div>
 </div>
 
 <div class="quiz">
@@ -300,7 +493,7 @@
 <label><input type="radio" name="q4" /> <code>sapply(y, max)</code></label>
 <label><input type="radio" name="q4" /> <code>tapply(y, 1, max)</code></label>
 <button class="check">Check</button>
-<div class="quiz-feedback"></div>
+<div class="feedback" data-correct-text="Right — sites are rows, so MARGIN = 1 hands <code>max</code> one site’s three visits at a time." data-wrong-text="Check which margin holds sites. Rows are sites here, so you want MARGIN = 1. MARGIN = 2 would give you the maximum across sites for each visit."></div>
 </div>
 
 <div class="quiz">
@@ -310,7 +503,7 @@
 <label><input type="radio" name="q5" /> it can iterate over rows, which <code>sapply</code> cannot</label>
 <label><input type="radio" name="q5" /> it returns a list, which is safer to index</label>
 <button class="check">Check</button>
-<div class="quiz-feedback"></div>
+<div class="feedback" data-correct-text="Right — the declared shape turns a silent type change into an error at the line that caused it." data-wrong-text="The point is not speed. <code>vapply</code> makes you declare the return shape, so it fails immediately if <code>f</code> ever returns something else instead of quietly handing back a different type."></div>
 </div>
 </section>
 
@@ -719,6 +912,18 @@ elSpd.addEventListener("change", function(){
 });
 
 syncF(); render();
+
+/* jump-links from the reference cards into the widget */
+document.querySelectorAll("button.goto").forEach(function(b){
+  b.addEventListener("click", function(){
+    var k=b.dataset.goto;
+    var t=[].find.call(elPick.children, function(x){ return x.dataset.k===k; });
+    if(!t) return;
+    stop(); st.fn=k; st.step=0; syncF(); render();
+    document.getElementById("viz").scrollIntoView({behavior:"smooth", block:"start"});
+    t.focus();
+  });
+});
 })();
 </script>
 </body>

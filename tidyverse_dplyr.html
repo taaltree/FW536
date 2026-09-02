@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Data manipulation with dplyr, visualized | FW 536</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="_Shared/css/lab.css" />
+<script defer src="_Shared/js/lab.js"></script>
+<style>
+  .triage{border:1px solid var(--border);border-radius:9px;background:var(--panel-alt);
+    padding:14px 18px;margin:18px 0 26px;}
+  .triage-h{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);
+    font-weight:700;margin-bottom:8px;}
+  .triage ul{margin:0;padding-left:20px;}
+  .triage li{margin-bottom:5px;font-size:14.5px;}
+
+  .fncard{border:1px solid var(--border);border-left:4px solid var(--osu-orange);border-radius:9px;
+    background:var(--panel);padding:16px 20px 14px;margin:0 0 16px;}
+  .fncard.helper{border-left-color:var(--accent);}
+  .fncard h3{margin:0 0 9px;font-size:16.5px;display:flex;flex-wrap:wrap;gap:10px;align-items:baseline;}
+  .fncard h3 code{font-size:15.5px;background:var(--panel-alt);padding:2px 7px;border-radius:5px;}
+  .fncard .purpose{font-size:13.5px;font-weight:500;color:var(--muted);font-style:italic;}
+  .fncard p{font-size:14.5px;}
+  .fncard p:last-of-type{margin-bottom:0;}
+  .fncard pre.rcode{margin:11px 0;}
+  button.goto{margin-top:11px;font-size:13px;font-weight:600;border:2px solid var(--border);
+    background:#fff;color:var(--osu-stone);border-radius:7px;padding:5px 12px;cursor:pointer;}
+  button.goto:hover{border-color:var(--osu-orange);color:var(--osu-orange-dark);}
+  button.goto:focus-visible{outline:3px solid var(--osu-orange-dark);outline-offset:2px;}
+
+  .widget{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:20px 22px;margin:22px 0;}
+  .fnpick{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:16px;}
+  .fnpick button{font-size:13.5px;font-weight:600;border:2px solid var(--border);background:#fff;
+    color:var(--osu-stone);border-radius:7px;padding:6px 11px;cursor:pointer;
+    transition:background .12s,border-color .12s,color .12s;}
+  .fnpick button:hover{border-color:var(--osu-orange);}
+  .fnpick button.active{background:var(--osu-orange);color:#fff;border-color:var(--osu-orange);}
+  .fnpick button:focus-visible{outline:3px solid var(--osu-orange-dark);outline-offset:2px;}
+
+  .pipe{background:var(--code-bg);border-radius:8px;padding:12px 14px;margin:0 0 14px;
+    font-family:var(--mono,monospace);font-size:13.5px;line-height:1.62;overflow-x:auto;}
+  .pipe .ln{color:#8FA08F;display:block;padding:1px 6px;border-radius:4px;border-left:3px solid transparent;}
+  .pipe .ln.on{color:#fff;background:rgba(215,63,9,.28);border-left-color:var(--osu-orange);}
+  .pipe .ln.past{color:#C9D6C9;}
+
+  .dwrap{overflow-x:auto;border:1px solid var(--border);border-radius:9px;background:var(--panel-alt);padding:11px;}
+  table.dtable{border-collapse:collapse;font-family:var(--mono,monospace);font-size:13px;background:#fff;}
+  table.dtable th{background:var(--panel-alt);border-bottom:2px solid var(--border);
+    padding:6px 11px;text-align:left;font-size:11.5px;letter-spacing:.05em;color:var(--muted);white-space:nowrap;}
+  table.dtable td{border-bottom:1px solid var(--border);padding:5px 11px;white-space:nowrap;}
+  table.dtable th.newcol,table.dtable td.newcol{background:#FDEDE7;color:var(--osu-orange-dark);font-weight:600;}
+  table.dtable th.dropcol,table.dtable td.dropcol{opacity:.24;text-decoration:line-through;}
+  table.dtable tr.droprow td{opacity:.24;text-decoration:line-through;}
+  table.dtable tr.keeprow td{background:#F3F9F6;}
+  table.dtable td.gcell{border-left:4px solid var(--accent);font-weight:600;}
+  table.dtable tr.g1 td.gcell{border-left-color:#B47B00;}
+  table.dtable tr.g2 td.gcell{border-left-color:#7A5BA6;}
+  .meta{font-family:var(--mono,monospace);font-size:12px;color:var(--muted);margin-top:8px;}
+  .meta b{color:var(--accent);}
+
+  .transport{display:flex;flex-wrap:wrap;gap:9px;align-items:center;margin:15px 0 4px;}
+  .transport button{font-size:13.5px;font-weight:600;border:2px solid var(--border);background:#fff;
+    color:var(--osu-stone);border-radius:7px;padding:6px 13px;cursor:pointer;}
+  .transport button:hover:not(:disabled){border-color:var(--osu-orange);}
+  .transport button:disabled{opacity:.4;cursor:default;}
+  .transport button.primary{background:var(--accent);color:#fff;border-color:var(--accent);}
+  .transport .pos{font-family:var(--mono,monospace);font-size:13px;color:var(--muted);margin-left:auto;}
+
+  .explain{margin-top:14px;padding:13px 15px;border-left:3px solid var(--accent);
+    background:var(--panel-alt);border-radius:0 8px 8px 0;font-size:14.5px;}
+  .explain b{color:var(--text);}
+
+  pre.rcode{background:var(--code-bg);color:var(--code-fg);border-radius:8px;padding:12px 14px;
+    font-family:var(--mono,monospace);font-size:13.5px;overflow-x:auto;margin:12px 0 0;line-height:1.55;}
+  pre.rcode .cm{color:var(--code-comment);} pre.rcode .fn{color:var(--code-fn);}
+  pre.rcode .st{color:var(--code-string);}  pre.rcode .nu{color:var(--code-number);}
+
+  table.cheat{width:100%;border-collapse:collapse;font-size:13.5px;}
+  table.cheat th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.07em;
+    color:var(--muted);border-bottom:2px solid var(--border);padding:8px 9px;}
+  table.cheat td{padding:8px 9px;border-bottom:1px solid var(--border);vertical-align:top;}
+  table.cheat code{font-size:12.5px;}
+  .scroll{overflow-x:auto;}
+  .pairbox{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:14px 0;}
+  @media(max-width:760px){.pairbox{grid-template-columns:1fr;}}
+  .pairbox h4{margin:0 0 6px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);}
+  .pairbox pre.rcode{margin:0;}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<aside class="sidebar">
+  <p class="brand"><a href="index.html" title="Back to course home">FW 536</a></p>
+  <div class="subtitle">dplyr &amp; the tidyverse</div>
+  <nav>
+    <div class="section">On this page</div>
+    <ul>
+      <li><a href="#idea">The one idea</a></li>
+      <li><a href="#verbs">The verbs, one by one</a></li>
+      <li><a href="#viz">Watch a pipeline run</a></li>
+      <li><a href="#base">The same job in base R</a></li>
+      <li><a href="#traps">Four traps</a></li>
+      <li><a href="#course">Where you'll meet these</a></li>
+      <li><a href="#check">Check yourself</a></li>
+    </ul>
+    <div class="section">Course docs</div>
+    <ul>
+      <li><a class="featured" href="apply_family.html">The apply family (base R)</a></li>
+      <li><a href="index.html">Course home</a></li>
+      <li><a href="rmarkdown_tutorial.html">R Markdown tutorial</a></li>
+      <li><a href="install_jags_nimble.html">Install guide</a></li>
+    </ul>
+  </nav>
+</aside>
+
+<main class="content">
+
+<h1>Data manipulation with dplyr, visualized</h1>
+<p class="lede">There are two ways to reshape data in R, and you will meet both this week. <a href="apply_family.html">The apply family</a> works on vectors, lists and matrices; dplyr works on data frames, and reads much more like a sentence. This page is the companion to that one: same idea, same worked data, different tools. Where the two do the same job, it says so.</p>
+
+<section id="idea">
+<h2>The one idea</h2>
+<p>dplyr is built on a single, strict promise: <strong>a data frame goes in, a data frame comes out.</strong> That is why the verbs chain. Each one takes the table the last one produced, changes exactly one thing about it, and passes it on.</p>
+<div class="widget" style="padding:18px 22px">
+  <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center;font-size:14.5px">
+    <span class="triage-h" style="margin:0">data frame</span>
+    <span style="color:var(--osu-orange);font-size:20px">&rarr;</span>
+    <code>filter()</code><span style="color:var(--muted)">fewer rows</span>
+    <span style="color:var(--osu-orange);font-size:20px">&rarr;</span>
+    <code>mutate()</code><span style="color:var(--muted)">more columns</span>
+    <span style="color:var(--osu-orange);font-size:20px">&rarr;</span>
+    <code>summarise()</code><span style="color:var(--muted)">fewer rows again</span>
+    <span style="color:var(--osu-orange);font-size:20px">&rarr;</span>
+    <span class="triage-h" style="margin:0">data frame</span>
+  </div>
+</div>
+<p>The <strong>pipe</strong> is what makes the chain readable. <code>x |&gt; f()</code> means <code>f(x)</code>: it takes the thing on the left and drops it in as the first argument on the right. So this</p>
+<pre class="rcode">summarise(group_by(filter(surveys, count &gt; <span class="nu">0</span>), site), mean = <span class="fn">mean</span>(count))</pre>
+<p>which you have to read inside-out, becomes this, which you read top to bottom in the order it happens:</p>
+<pre class="rcode">surveys |&gt;
+  <span class="fn">filter</span>(count &gt; <span class="nu">0</span>) |&gt;
+  <span class="fn">group_by</span>(site) |&gt;
+  <span class="fn">summarise</span>(mean = <span class="fn">mean</span>(count))</pre>
+<div class="callout key"><strong>Two pipes, same meaning.</strong> <code>|&gt;</code> is built into R (4.1 and later) and needs no packages. <code>%&gt;%</code> comes from magrittr and arrives with dplyr; you will see it in older code and in this course's Day 5 scripts. For everything in this page they are interchangeable. Prefer <code>|&gt;</code> in new work, since it always exists.</div>
+<div class="callout warn"><strong>One habit that will save you.</strong> Inside dplyr verbs you write column names <em>bare</em> &mdash; <code>count</code>, not <code>surveys$count</code> and not <code>"count"</code>. That is the convenience of dplyr and also its strangeness: those names are not objects in your workspace, and they only mean anything inside the verb. It is why a stray <code>surveys$</code> inside <code>filter()</code> so often gives a baffling result rather than an error.</div>
+</section>
+
+<section id="verbs">
+<h2>The verbs, one by one</h2>
+<p>Everything below uses one table. It is the same survey data as the <a href="apply_family.html">apply page</a>, in the shape dplyr wants: <strong>one row per observation</strong> rather than a list of vectors.</p>
+<pre class="rcode"><span class="fn">library</span>(dplyr); <span class="fn">library</span>(tidyr)
+
+surveys &lt;- <span class="fn">tibble</span>(
+  site    = <span class="fn">c</span>(<span class="st">"A"</span>,<span class="st">"A"</span>,<span class="st">"A"</span>,<span class="st">"B"</span>,<span class="st">"B"</span>,<span class="st">"C"</span>,<span class="st">"C"</span>,<span class="st">"C"</span>,<span class="st">"C"</span>,<span class="st">"D"</span>),
+  habitat = <span class="fn">c</span>(<span class="st">"forest"</span>,<span class="st">"forest"</span>,<span class="st">"forest"</span>,<span class="st">"meadow"</span>,<span class="st">"meadow"</span>,
+              <span class="st">"forest"</span>,<span class="st">"forest"</span>,<span class="st">"forest"</span>,<span class="st">"forest"</span>,<span class="st">"edge"</span>),
+  visit   = <span class="fn">c</span>(<span class="nu">1</span>,<span class="nu">2</span>,<span class="nu">3</span>,<span class="nu">1</span>,<span class="nu">2</span>,<span class="nu">1</span>,<span class="nu">2</span>,<span class="nu">3</span>,<span class="nu">4</span>,<span class="nu">1</span>),
+  count   = <span class="fn">c</span>(<span class="nu">3</span>,<span class="nu">5</span>,<span class="nu">4</span>,<span class="nu">0</span>,<span class="nu">1</span>,<span class="nu">7</span>,<span class="nu">6</span>,<span class="nu">9</span>,<span class="nu">8</span>,<span class="nu">2</span>),
+  hours   = <span class="fn">c</span>(<span class="nu">1.5</span>,<span class="nu">2</span>,<span class="nu">1</span>,<span class="nu">2</span>,<span class="nu">1.5</span>,<span class="nu">1</span>,<span class="nu">1</span>,<span class="nu">1.5</span>,<span class="nu">2</span>,<span class="nu">1</span>)
+)
+<span class="cm">#&gt; # A tibble: 10 x 5
+#&gt;    site  habitat visit count hours
+#&gt;    &lt;chr&gt; &lt;chr&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+#&gt;  1 A     forest      1     3   1.5
+#&gt;  2 A     forest      2     5   2
+#&gt;  3 A     forest      3     4   1
+#&gt;  4 B     meadow      1     0   2
+#&gt;  ... 6 more rows</span></pre>
+
+<div class="triage">
+  <div class="triage-h">Reach for&hellip;</div>
+  <ul>
+    <li><code>filter()</code> to keep <em>rows</em>, <code>select()</code> to keep <em>columns</em> &mdash; the two are constantly confused</li>
+    <li><code>mutate()</code> to add or change a column, keeping every row</li>
+    <li><code>summarise()</code> to collapse many rows into one</li>
+    <li><code>group_by()</code> before <code>summarise()</code> to collapse into <em>one row per group</em> &mdash; the workhorse</li>
+    <li><code>arrange()</code> to sort, <code>count()</code> to tally</li>
+    <li><code>across()</code> to do the same thing to several columns at once</li>
+    <li><code>pivot_longer()</code> / <code>pivot_wider()</code> when the data is the wrong shape entirely</li>
+  </ul>
+</div>
+
+<div class="fncard">
+  <h3><code>filter()</code> <span class="purpose">keep some rows, all columns</span></h3>
+  <p><b>Reach for it when</b> you want a subset of observations. The condition is evaluated for every row, and rows where it is <code>TRUE</code> survive.</p>
+  <pre class="rcode"><span class="fn">filter</span>(surveys, count &gt; <span class="nu">4</span>)
+<span class="cm">#&gt; # A tibble: 5 x 5
+#&gt;   site  habitat visit count hours
+#&gt; 1 A     forest      2     5   2
+#&gt; 2 C     forest      1     7   1
+#&gt; 3 C     forest      2     6   1
+#&gt; 4 C     forest      3     9   1.5
+#&gt; 5 C     forest      4     8   2</span></pre>
+  <p>Several conditions separated by commas are joined with AND: <code>filter(surveys, count &gt; 4, habitat == "forest")</code>. Use <code>|</code> for OR. Note <code>==</code>, not <code>=</code>.</p>
+  <p><b>Watch for <code>NA</code>.</b> <code>filter()</code> keeps only rows where the condition is definitely <code>TRUE</code>, so rows where it is <code>NA</code> are dropped &mdash; which is usually what you want, but silently loses data if you did not expect missing values.</p>
+  <button class="goto" data-goto="busy">Watch it run &#9654;</button>
+</div>
+
+<div class="fncard">
+  <h3><code>select()</code> <span class="purpose">keep some columns, all rows</span></h3>
+  <p><b>Reach for it when</b> a table has more columns than you want to look at. This is the one people mix up with <code>filter()</code>: <em>filter takes rows, select takes columns.</em></p>
+  <pre class="rcode"><span class="fn">select</span>(surveys, site, count)
+<span class="cm">#&gt; # A tibble: 10 x 2
+#&gt;    site  count
+#&gt;  1 A         3
+#&gt;  2 A         5
+#&gt;  ... 8 more rows</span>
+
+<span class="fn">select</span>(surveys, -hours)              <span class="cm"># everything EXCEPT hours</span>
+<span class="fn">select</span>(surveys, site:count)          <span class="cm"># a range of adjacent columns</span>
+<span class="fn">select</span>(surveys, <span class="fn">starts_with</span>(<span class="st">"h"</span>))    <span class="cm"># habitat and hours</span></pre>
+  <button class="goto" data-goto="busy">Watch it run &#9654;</button>
+</div>
+
+<div class="fncard">
+  <h3><code>mutate()</code> <span class="purpose">add or change a column, keep every row</span></h3>
+  <p><b>Reach for it when</b> you need a derived variable. The row count never changes &mdash; that is the difference between <code>mutate()</code> and <code>summarise()</code>, and it is the whole distinction.</p>
+  <pre class="rcode"><span class="fn">mutate</span>(surveys, rate = count / hours)
+<span class="cm">#&gt; # A tibble: 10 x 6
+#&gt;   site  habitat visit count hours  rate
+#&gt; 1 A     forest      1     3   1.5   2
+#&gt; 2 A     forest      2     5   2     2.5
+#&gt; 3 A     forest      3     4   1     4
+#&gt; ... 7 more rows</span></pre>
+  <p>The calculation is <strong>vectorised</strong>: <code>count / hours</code> divides all ten pairs at once. This is why you almost never need <code>mapply()</code> in a data frame &mdash; the parallel walk over two columns is what <code>mutate()</code> already does.</p>
+  <p>Use <code>case_when()</code> inside <code>mutate()</code> for conditional recoding, and <code>if_else()</code> for a simple two-way split.</p>
+  <button class="goto" data-goto="rate">Watch it run &#9654;</button>
+</div>
+
+<div class="fncard">
+  <h3><code>arrange()</code> <span class="purpose">reorder the rows</span></h3>
+  <p><b>Reach for it when</b> you want to see the largest or smallest first. It changes only the order &mdash; no rows or columns are gained or lost.</p>
+  <pre class="rcode"><span class="fn">arrange</span>(surveys, <span class="fn">desc</span>(count))
+<span class="cm">#&gt; # A tibble: 10 x 5
+#&gt;   site  habitat visit count hours
+#&gt; 1 C     forest      3     9   1.5
+#&gt; 2 C     forest      4     8   2
+#&gt; 3 C     forest      1     7   1
+#&gt; ... 7 more rows</span></pre>
+  <p>Default is ascending; wrap a column in <code>desc()</code> for descending. Extra columns break ties: <code>arrange(surveys, site, desc(count))</code>.</p>
+  <button class="goto" data-goto="rate">Watch it run &#9654;</button>
+</div>
+
+<div class="fncard">
+  <h3><code>summarise()</code> <span class="purpose">collapse many rows into one</span></h3>
+  <p><b>Reach for it when</b> you want a number that describes the whole table. On its own it returns a single row, which is rarely what you want &mdash; its real use is with <code>group_by()</code>, below.</p>
+  <pre class="rcode"><span class="fn">summarise</span>(surveys, n = <span class="fn">n</span>(), mean = <span class="fn">mean</span>(count))
+<span class="cm">#&gt; # A tibble: 1 x 2
+#&gt;       n  mean
+#&gt;      10   4.5</span></pre>
+  <p><code>n()</code> is special: it counts the rows in the current group and can only be used inside these verbs. <code>summarise</code> and <code>summarize</code> are the same function.</p>
+  <button class="goto" data-goto="persite">Watch it run &#9654;</button>
+</div>
+
+<div class="fncard">
+  <h3><code>group_by()</code> + <code>summarise()</code> <span class="purpose">one row per group</span></h3>
+  <p><b>Reach for it when</b> you want per-site, per-species, per-year numbers. This pairing is the single most useful thing in dplyr, and it is the direct equivalent of base R's <code>tapply()</code>.</p>
+  <pre class="rcode">surveys |&gt;
+  <span class="fn">group_by</span>(site) |&gt;
+  <span class="fn">summarise</span>(visits = <span class="fn">n</span>(), total = <span class="fn">sum</span>(count), mean = <span class="fn">mean</span>(count))
+<span class="cm">#&gt; # A tibble: 4 x 4
+#&gt;   site  visits total  mean
+#&gt; 1 A          3    12   4
+#&gt; 2 B          2     1   0.5
+#&gt; 3 C          4    30   7.5
+#&gt; 4 D          1     2   2</span></pre>
+  <p><code>group_by()</code> changes nothing you can see &mdash; it only attaches a note saying "treat these rows as belonging together." The next verb is what acts on it. In the app below, watch the table stay exactly the same at the <code>group_by</code> step and then collapse at the <code>summarise</code> step; that is the point.</p>
+  <p>Those four means &mdash; 4, 0.5, 7.5, 2 &mdash; are the same four numbers <code>sapply(sites, mean)</code> produces on the <a href="apply_family.html">apply page</a>, from the same data in a different shape.</p>
+  <button class="goto" data-goto="persite">Watch it run &#9654;</button>
+</div>
+
+<div class="fncard">
+  <h3><code>count()</code> <span class="purpose">how many rows per group</span></h3>
+  <p><b>Reach for it when</b> you only want tallies. It is shorthand for <code>group_by(x) |&gt; summarise(n = n())</code>, and it is the fastest way to check whether your data is what you think it is.</p>
+  <pre class="rcode"><span class="fn">count</span>(surveys, habitat)
+<span class="cm">#&gt; # A tibble: 3 x 2
+#&gt;   habitat     n
+#&gt; 1 edge        1
+#&gt; 2 forest      7
+#&gt; 3 meadow      2</span></pre>
+  <p>Run this on a new dataset before anything else. Unexpected group sizes are how you find duplicated rows, stray spellings and missing levels.</p>
+</div>
+
+<div class="fncard">
+  <h3><code>across()</code> <span class="purpose">the same operation on several columns</span></h3>
+  <p><b>Reach for it when</b> you would otherwise repeat yourself once per column. It lives inside <code>summarise()</code> or <code>mutate()</code> and is dplyr's answer to <code>sapply()</code> over columns.</p>
+  <pre class="rcode">surveys |&gt; <span class="fn">summarise</span>(<span class="fn">across</span>(<span class="fn">c</span>(count, hours), mean))
+<span class="cm">#&gt; # A tibble: 1 x 2
+#&gt;   count hours
+#&gt;     4.5  1.45</span>
+
+surveys |&gt; <span class="fn">group_by</span>(habitat) |&gt; <span class="fn">summarise</span>(<span class="fn">across</span>(<span class="fn">c</span>(count, hours), mean))
+<span class="cm">#&gt; # A tibble: 3 x 3
+#&gt;   habitat count hours
+#&gt; 1 edge      2   1
+#&gt; 2 forest    6   1.429
+#&gt; 3 meadow    0.5 1.75</span></pre>
+  <p>Column selection works exactly like <code>select()</code>: <code>across(where(is.numeric), mean)</code> or <code>across(everything(), mean)</code>. Day 1's answer key mentions this form.</p>
+  <button class="goto" data-goto="across">Watch it run &#9654;</button>
+</div>
+
+<div class="fncard helper">
+  <h3><code>pivot_longer()</code> and <code>pivot_wider()</code> <span class="purpose">change the shape, not the content</span></h3>
+  <p>These come from <strong>tidyr</strong>, not dplyr, and they are the ones that feel like magic until they don't. Almost every dplyr verb expects <em>long</em> data: one row per observation, one column per variable. Data collected by hand is usually <em>wide</em>: one row per site, one column per visit.</p>
+  <pre class="rcode">surveys |&gt; <span class="fn">select</span>(site, visit, count) |&gt;
+  <span class="fn">pivot_wider</span>(names_from = visit, values_from = count, names_prefix = <span class="st">"v"</span>)
+<span class="cm">#&gt; # A tibble: 4 x 5
+#&gt;   site     v1    v2    v3    v4
+#&gt; 1 A         3     5     4    NA
+#&gt; 2 B         0     1    NA    NA
+#&gt; 3 C         7     6     9     8
+#&gt; 4 D         2    NA    NA    NA</span></pre>
+  <p>Notice the <code>NA</code>s. Sites were visited a different number of times, so the wide rectangle has to invent cells that were never observed. That is the honest cost of the wide shape, and the reason the long form is the default for analysis.</p>
+  <p><code>pivot_longer()</code> goes back the other way, and is what Day 1 uses to stack four simulated models into one column before grouping:</p>
+  <pre class="rcode">sims |&gt; <span class="fn">pivot_longer</span>(<span class="fn">everything</span>(), names_to = <span class="st">"model"</span>, values_to = <span class="st">"y"</span>) |&gt;
+  <span class="fn">group_by</span>(model) |&gt;
+  <span class="fn">summarise</span>(mean = <span class="fn">mean</span>(y), var = <span class="fn">var</span>(y))</pre>
+  <button class="goto" data-goto="wide">Watch it run &#9654;</button>
+</div>
+
+<div class="fncard helper">
+  <h3><code>left_join()</code> <span class="purpose">bring columns from another table</span></h3>
+  <p><b>Reach for it when</b> the information you need lives in a second table &mdash; species traits, site coordinates, observer names &mdash; keyed by a shared column.</p>
+  <pre class="rcode">effort &lt;- <span class="fn">tibble</span>(site = <span class="fn">c</span>(<span class="st">"A"</span>,<span class="st">"B"</span>,<span class="st">"C"</span>,<span class="st">"D"</span>), observer = <span class="fn">c</span>(<span class="st">"Kim"</span>,<span class="st">"Lee"</span>,<span class="st">"Kim"</span>,<span class="st">"Ana"</span>))
+
+<span class="fn">left_join</span>(surveys, effort, by = <span class="st">"site"</span>)
+<span class="cm">#&gt; # A tibble: 10 x 6
+#&gt;   site  habitat visit count hours observer
+#&gt; 1 A     forest      1     3   1.5 Kim
+#&gt; 2 A     forest      2     5   2   Kim
+#&gt; ... 8 more rows</span></pre>
+  <p><code>left_join</code> keeps every row of the left table and fills <code>NA</code> where the right table has no match &mdash; the safe default, because your data never silently shrinks. Check <code>nrow()</code> before and after anyway: if the right table has duplicate keys, rows <em>multiply</em>, which is the most common way a join goes wrong.</p>
+</div>
+</section>
+
+<section id="viz">
+<h2>Watch a pipeline run</h2>
+<p>Pick a task, then step through it one verb at a time. The highlighted line is the verb being applied; the table shows what it did. Watch the row and column counts under the table &mdash; that is what each verb is really changing.</p>
+
+<div class="widget">
+  <div class="fnpick" id="pipepick" role="tablist" aria-label="pipeline"></div>
+  <div class="pipe" id="pipecode"></div>
+  <div class="dwrap"><div id="tableview"></div></div>
+  <div class="meta" id="meta"></div>
+  <div class="transport">
+    <button id="btnStep">Step</button>
+    <button id="btnPlay" class="primary">Play</button>
+    <button id="btnReset">Reset</button>
+    <span class="pos" id="pos"></span>
+  </div>
+  <div class="explain" id="explain"></div>
+</div>
+</section>
+
+<section id="base">
+<h2>The same job in base R</h2>
+<p>Neither idiom is more correct. dplyr reads better and is easier to chain; base R has no dependencies and works on objects that are not data frames &mdash; matrices, lists, MCMC output &mdash; which is why this course uses both. What matters is recognising the same job in either dialect.</p>
+<div class="scroll">
+<table class="cheat">
+<thead><tr><th>The job</th><th>dplyr</th><th>base R</th></tr></thead>
+<tbody>
+<tr><td>Keep some rows</td><td><code>filter(d, count &gt; 4)</code></td><td><code>d[d$count &gt; 4, ]</code></td></tr>
+<tr><td>Keep some columns</td><td><code>select(d, site, count)</code></td><td><code>d[, c("site","count")]</code></td></tr>
+<tr><td>Add a column</td><td><code>mutate(d, rate = count/hours)</code></td><td><code>d$rate &lt;- d$count / d$hours</code></td></tr>
+<tr><td>Sort</td><td><code>arrange(d, desc(count))</code></td><td><code>d[order(-d$count), ]</code></td></tr>
+<tr><td><strong>One summary per group</strong></td><td><code>d |&gt; group_by(g) |&gt; summarise(m = mean(x))</code></td><td><code>tapply(d$x, d$g, mean)</code></td></tr>
+<tr><td>Group sizes</td><td><code>count(d, g)</code></td><td><code>table(d$g)</code></td></tr>
+<tr><td>Same summary, several columns</td><td><code>summarise(across(c(x, y), mean))</code></td><td><code>sapply(d[c("x","y")], mean)</code></td></tr>
+<tr><td>Split into groups, keep the pieces</td><td><code>group_split(d, g)</code></td><td><code>split(d, d$g)</code></td></tr>
+<tr><td>Do something complicated per group</td><td><code>d |&gt; group_by(g) |&gt; group_modify(...)</code></td><td><code>do.call(rbind, lapply(split(d, d$g), f))</code></td></tr>
+<tr><td>Element-wise over two columns</td><td><code>mutate(z = f(x, y))</code> &mdash; vectorised</td><td><code>mapply(f, d$x, d$y)</code></td></tr>
+<tr><td>Bring in another table</td><td><code>left_join(d, e, by = "site")</code></td><td><code>merge(d, e, by = "site", all.x = TRUE)</code></td></tr>
+<tr><td>Long &harr; wide</td><td><code>pivot_longer()</code> / <code>pivot_wider()</code></td><td><code>reshape()</code>, or <code>as.data.frame(as.table(m))</code></td></tr>
+</tbody>
+</table>
+</div>
+
+<p style="margin-top:20px">Worth seeing side by side, because it is the row that comes up most:</p>
+<div class="pairbox">
+  <div>
+    <h4>dplyr</h4>
+    <pre class="rcode">surveys |&gt;
+  <span class="fn">group_by</span>(site) |&gt;
+  <span class="fn">summarise</span>(mean = <span class="fn">mean</span>(count))
+<span class="cm">#&gt;   site   mean
+#&gt; 1 A       4
+#&gt; 2 B       0.5
+#&gt; 3 C       7.5
+#&gt; 4 D       2</span></pre>
+  </div>
+  <div>
+    <h4>base R</h4>
+    <pre class="rcode"><span class="fn">tapply</span>(surveys$count, surveys$site, mean)
+<span class="cm">#&gt;   A   B   C   D
+#&gt; 4.0 0.5 7.5 2.0</span></pre>
+  </div>
+</div>
+<p>Same four numbers. The difference in the <em>result</em> is the thing to notice: dplyr gives you back a data frame with the grouping variable as a column, so the next verb can keep working on it. <code>tapply</code> gives you a named vector, which is compact and immediately printable but awkward to build on &mdash; you would need <code>as.data.frame()</code> and some naming before you could join or plot it.</p>
+
+<div class="callout key"><strong>When to reach for which.</strong> Use dplyr when the object is a data frame and the work is a chain of steps you want to read back later &mdash; cleaning, summarising, preparing something to plot. Use the apply family when the object is <em>not</em> a data frame: a matrix of MCMC draws, a list of model fits, a simulation you are running a thousand times. Days 4 and 5 are full of the second kind, which is why <code>apply()</code> and <code>sapply()</code> show up there and dplyr does not.</div>
+</section>
+
+<section id="traps">
+<h2>Four traps</h2>
+
+<h3>1. <code>summarise()</code> peels off one grouping level, quietly</h3>
+<p>After grouping by two variables, <code>summarise()</code> returns a result still grouped by the first. The next verb then behaves in a way that looks inexplicable.</p>
+<pre class="rcode">d |&gt; <span class="fn">group_by</span>(site, visit) |&gt; <span class="fn">summarise</span>(n = <span class="fn">n</span>())    <span class="cm"># still grouped by site!</span>
+<span class="cm">#&gt; `summarise()` has grouped output by 'site'. You can override using `.groups`.</span></pre>
+<p>That message is a warning worth reading, not noise. End the chain with <code>ungroup()</code>, or pass <code>.groups = "drop"</code>, whenever the result is going anywhere else.</p>
+
+<h3>2. <code>filter()</code> silently drops <code>NA</code> rows</h3>
+<p><code>NA &gt; 4</code> is <code>NA</code>, not <code>TRUE</code>, and <code>filter()</code> keeps only definite <code>TRUE</code>. So rows with a missing value in the tested column vanish without comment. If that matters, be explicit: <code>filter(d, count &gt; 4 | is.na(count))</code>.</p>
+
+<h3>3. <code>select()</code> and <code>filter()</code> get swapped</h3>
+<p>They sound interchangeable in English and are not. <strong>filter takes rows, select takes columns.</strong> If a call errors with "object not found", check you have not asked <code>filter()</code> for a column name. The mnemonic that sticks: you fil<em>ter</em> a liquid to remove some of what is in it (rows), and you se<em>lect</em> from a menu of names (columns).</p>
+
+<h3>4. Masking: dplyr and base R both have <code>filter()</code></h3>
+<p>Loading dplyr prints a message that <code>filter()</code> and <code>lag()</code> now mask the stats versions. Usually harmless, but if a time-series function starts misbehaving, that is why. Be explicit when it matters: <code>dplyr::filter()</code> or <code>stats::filter()</code>.</p>
+<pre class="rcode"><span class="cm">## The following objects are masked from 'package:stats':
+##     filter, lag</span></pre>
+</section>
+
+<section id="course">
+<h2>Where you'll meet these</h2>
+<p>The course leans on base R more than the tidyverse, because most of what Days 3&ndash;5 manipulate are matrices and MCMC output rather than data frames. Where dplyr does appear, it is these lines:</p>
+<div class="scroll">
+<table class="cheat">
+<thead><tr><th>Day</th><th>Line</th><th>What it does</th></tr></thead>
+<tbody>
+<tr><td>Day 1</td><td><code>sims |&gt; pivot_longer(everything(), names_to="model", values_to="y")</code></td><td>stacks four simulated model columns into one long column, so they can be grouped</td></tr>
+<tr><td>Day 1</td><td><code>group_by(model) |&gt; summarise(mean = mean(y), var = var(y))</code></td><td>one row of summary statistics per simulated model</td></tr>
+<tr><td>Day 1</td><td><code>tibble(...)</code></td><td>builds the simulation results table in the first place</td></tr>
+<tr><td>Day 2</td><td><code>select(...)</code></td><td>trims columns before fitting</td></tr>
+<tr><td>Day 5</td><td><code>N2OEmission %&gt;% group_by(group.index) %&gt;% summarise(mean = mean(carbon))</code></td><td>site-level carbon means, used as a predictor in the multilevel model</td></tr>
+<tr><td>Day 5</td><td><code>... %&gt;% arrange(group.index)</code></td><td>sorts so the summary lines up with the model's group indices &mdash; an easy thing to get wrong</td></tr>
+</tbody>
+</table>
+</div>
+<p>That last row is worth pausing on. When a summary is going to be fed into JAGS or NIMBLE as a vector, its <em>order</em> has to match the index the model expects. <code>arrange()</code> is doing real work there, not cosmetics.</p>
+</section>
+
+<section id="check">
+<h2>Check yourself</h2>
+<p>Shape questions again &mdash; how many rows and columns come back.</p>
+
+<div class="quiz">
+<p><strong>1.</strong> <code>surveys</code> has 10 rows. How many rows does <code>mutate(surveys, rate = count / hours)</code> return?</p>
+<label><input type="radio" name="t1" data-correct="true" /> 10 &mdash; <code>mutate()</code> never changes the number of rows</label>
+<label><input type="radio" name="t1" /> 1, because it computes a single value</label>
+<label><input type="radio" name="t1" /> 4, one per site</label>
+<label><input type="radio" name="t1" /> it depends on how many rows have non-missing <code>hours</code></label>
+<button class="check">Check</button>
+<div class="feedback" data-correct-text="Right — mutate adds a column and leaves every row in place. That row-preserving behaviour is exactly what separates it from summarise()." data-wrong-text="No — mutate() adds a column and returns every row it was given, all 10. You are thinking of summarise(), which collapses rows."></div>
+</div>
+
+<div class="quiz">
+<p><strong>2.</strong> Which pair does the same job?</p>
+<label><input type="radio" name="t2" data-correct="true" /> <code>group_by(site) |&gt; summarise(m = mean(count))</code> and <code>tapply(d$count, d$site, mean)</code></label>
+<label><input type="radio" name="t2" /> <code>filter()</code> and <code>select()</code></label>
+<label><input type="radio" name="t2" /> <code>mutate()</code> and <code>summarise()</code></label>
+<label><input type="radio" name="t2" /> <code>arrange()</code> and <code>group_by()</code></label>
+<button class="check">Check</button>
+<div class="feedback" data-correct-text="Right — both give one summary per group. dplyr hands back a data frame you can keep piping; tapply hands back a named vector." data-wrong-text="Not those. The grouped-summary pair is group_by() + summarise() in dplyr and tapply() in base R — both produce one number per group."></div>
+</div>
+
+<div class="quiz">
+<p><strong>3.</strong> <code>group_by(surveys, habitat)</code> on its own. What comes back?</p>
+<label><input type="radio" name="t3" /> 3 rows, one per habitat</label>
+<label><input type="radio" name="t3" data-correct="true" /> all 10 rows, unchanged apart from a note recording the grouping</label>
+<label><input type="radio" name="t3" /> a list of three data frames</label>
+<label><input type="radio" name="t3" /> an error, because no summary function was given</label>
+<button class="check">Check</button>
+<div class="feedback" data-correct-text="Right — group_by() changes nothing visible. It only marks the rows, and the next verb is what acts on that marking." data-wrong-text="No — group_by() does not summarise or split anything. It returns all 10 rows with an attached note about grouping; the verb that follows is what uses it. (group_split() is the one that gives you a list.)"></div>
+</div>
+
+<div class="quiz">
+<p><strong>4.</strong> You need the mean of every posterior draw column in a 4000 &times; 12 <em>matrix</em> of MCMC output. Which is the right tool?</p>
+<label><input type="radio" name="t4" /> <code>summarise(across(everything(), mean))</code></label>
+<label><input type="radio" name="t4" data-correct="true" /> <code>apply(draws, 2, mean)</code> or <code>colMeans(draws)</code></label>
+<label><input type="radio" name="t4" /> <code>group_by()</code> then <code>summarise()</code></label>
+<label><input type="radio" name="t4" /> <code>count()</code></label>
+<button class="check">Check</button>
+<div class="feedback" data-correct-text="Right — it is a matrix, not a data frame, so the apply family is the natural fit. This is why Days 4 and 5 use apply() rather than dplyr." data-wrong-text="dplyr verbs want a data frame. On a matrix of MCMC draws, reach for apply(draws, 2, mean) — or colMeans(), which is the same thing and faster."></div>
+</div>
+
+<div class="quiz">
+<p><strong>5.</strong> After <code>pivot_wider()</code> on these data, some cells are <code>NA</code>. Why?</p>
+<label><input type="radio" name="t5" /> a bug &mdash; <code>values_fill</code> should have been set</label>
+<label><input type="radio" name="t5" data-correct="true" /> sites were visited different numbers of times, so the rectangle has cells for visits that never happened</label>
+<label><input type="radio" name="t5" /> <code>pivot_wider()</code> always introduces <code>NA</code> in the last column</label>
+<label><input type="radio" name="t5" /> the <code>count</code> column contained <code>NA</code> already</label>
+<button class="check">Check</button>
+<div class="feedback" data-correct-text="Right — the wide shape needs a cell for every site-by-visit combination, and site D was only ever visited once. The NAs are honest bookkeeping, not an error." data-wrong-text="Look at the data: site C was visited 4 times and site D once. A wide table needs a cell for every combination, so the visits that never happened have to be filled with NA."></div>
+</div>
+</section>
+
+<p style="margin-top:34px;font-size:14px;color:var(--muted)">
+FW 536 &middot; companion to <a href="apply_family.html">the apply family page</a>.
+Back to <a href="index.html">the course home page</a>.
+</p>
+
+</main>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+var COLS=["site","habitat","visit","count","hours"];
+var ROWS=[
+ ["A","forest",1,3,1.5],["A","forest",2,5,2],["A","forest",3,4,1],
+ ["B","meadow",1,0,2],["B","meadow",2,1,1.5],
+ ["C","forest",1,7,1],["C","forest",2,6,1],["C","forest",3,9,1.5],["C","forest",4,8,2],
+ ["D","edge",1,2,1]
+];
+function base(){ return {cols:COLS.slice(), rows:ROWS.map(function(r){return r.slice();}),
+                        group:null, newCols:[], dropCols:[], dropRows:[]}; }
+function ci(t,n){ return t.cols.indexOf(n); }
+function r2(x){ return x; }                        // keep full precision through the pipeline
+function fmtNum(x){                                  // round only for display, as a tibble does
+  if(typeof x !== "number") return x;
+  if(Number.isInteger(x)) return String(x);
+  var r = Math.round(x*1000)/1000;
+  return String(r);
+}
+
+/* --- verb implementations, each returns the NEXT table plus what to highlight --- */
+var VERB = {
+  filter: function(t,a){
+    var i=ci(t,a.col), n={cols:t.cols.slice(), rows:[], group:t.group, newCols:[], dropCols:[], dropRows:[]};
+    t.rows.forEach(function(r){ if(a.test(r[i])) n.rows.push(r.slice()); });
+    // mark on the PREVIOUS table which rows are going
+    t.dropRows = t.rows.map(function(r,k){ return a.test(r[i]) ? -1 : k; }).filter(function(k){ return k>=0; });
+    return n;
+  },
+  select: function(t,a){
+    var keep=a.cols, n={cols:keep.slice(), rows:[], group:t.group, newCols:[], dropCols:[], dropRows:[]};
+    t.rows.forEach(function(r){ n.rows.push(keep.map(function(c){ return r[ci(t,c)]; })); });
+    t.dropCols = t.cols.filter(function(c){ return keep.indexOf(c)<0; });
+    return n;
+  },
+  mutate: function(t,a){
+    var n={cols:t.cols.concat([a.name]), rows:[], group:t.group, newCols:[a.name], dropCols:[], dropRows:[]};
+    t.rows.forEach(function(r){ n.rows.push(r.concat([r2(a.f(r,t))])); });
+    return n;
+  },
+  arrange: function(t,a){
+    var i=ci(t,a.col), n={cols:t.cols.slice(), rows:t.rows.map(function(r){return r.slice();}),
+                          group:t.group, newCols:[], dropCols:[], dropRows:[]};
+    n.rows.sort(function(x,y){ return a.desc ? y[i]-x[i] : x[i]-y[i]; });
+    return n;
+  },
+  group_by: function(t,a){
+    return {cols:t.cols.slice(), rows:t.rows.map(function(r){return r.slice();}),
+            group:a.col, newCols:[], dropCols:[], dropRows:[]};
+  },
+  summarise: function(t,a){
+    var gi = t.group ? ci(t,t.group) : -1, keys=[], buckets={};
+    t.rows.forEach(function(r){
+      var k = gi<0 ? "_all" : r[gi];
+      if(!(k in buckets)){ buckets[k]=[]; keys.push(k); }
+      buckets[k].push(r);
+    });
+    keys.sort();
+    var cols = (gi<0?[]:[t.group]).concat(a.specs.map(function(s){ return s.name; }));
+    var rows = keys.map(function(k){
+      var grp=buckets[k];
+      return (gi<0?[]:[k]).concat(a.specs.map(function(s){ return r2(s.f(grp,t)); }));
+    });
+    return {cols:cols, rows:rows, group:null, newCols:a.specs.map(function(s){return s.name;}),
+            dropCols:[], dropRows:[]};
+  },
+  pivot_wider: function(t,a){
+    var si=ci(t,"site"), vi=ci(t,"visit"), ni=ci(t,"count");
+    var sites=[], visits=[];
+    t.rows.forEach(function(r){
+      if(sites.indexOf(r[si])<0) sites.push(r[si]);
+      if(visits.indexOf(r[vi])<0) visits.push(r[vi]);
+    });
+    visits.sort(function(x,y){return x-y;});
+    var cols=["site"].concat(visits.map(function(v){ return "v"+v; }));
+    var rows=sites.map(function(s){
+      return [s].concat(visits.map(function(v){
+        var hit=null;
+        t.rows.forEach(function(r){ if(r[si]===s && r[vi]===v) hit=r[ni]; });
+        return hit===null ? "NA" : hit;
+      }));
+    });
+    return {cols:cols, rows:rows, group:null, newCols:[], dropCols:[], dropRows:[]};
+  }
+};
+
+function col(t,r,name){ return r[ci(t,name)]; }
+function mean(a){ var s=0,i; for(i=0;i<a.length;i++) s+=a[i]; return a.length? s/a.length : 0; }
+
+/* --- the pipelines --- */
+var PIPES = {
+  habitat: {
+    label:"Total count per habitat",
+    head:"surveys |>",
+    steps:[
+      {code:"  group_by(habitat) |>", verb:"group_by", arg:{col:"habitat"},
+       note:"<b>Nothing visible has happened.</b> The table still has all 10 rows and all 5 columns. <code>group_by()</code> only attaches a note saying which rows belong together &mdash; you can see it in the coloured bars on the left. The verb that comes next is what actually uses it."},
+      {code:"  summarise(total = sum(count))", verb:"summarise",
+       arg:{specs:[{name:"total", f:function(g,t){ return g.reduce(function(s,r){ return s+col(t,r,"count"); },0); }}]},
+       note:"<b>Now the grouping pays off.</b> Ten rows collapse to three &mdash; one per habitat &mdash; and every column that was not the grouping variable or a summary disappears, because there is no single value of <code>visit</code> or <code>hours</code> that describes a whole group. This is <code>tapply(count, habitat, sum)</code> in dplyr's dialect."}
+    ]
+  },
+  persite: {
+    label:"One row per site",
+    head:"surveys |>",
+    steps:[
+      {code:"  group_by(site) |>", verb:"group_by", arg:{col:"site"},
+       note:"Grouped by site this time: four groups rather than three. Still 10 rows &mdash; still nothing collapsed."},
+      {code:"  summarise(visits = n(), total = sum(count), mean = mean(count))", verb:"summarise",
+       arg:{specs:[
+         {name:"visits", f:function(g){ return g.length; }},
+         {name:"total",  f:function(g,t){ return g.reduce(function(s,r){ return s+col(t,r,"count"); },0); }},
+         {name:"mean",   f:function(g,t){ return mean(g.map(function(r){ return col(t,r,"count"); })); }}
+       ]},
+       note:"<b>Three summaries in one call.</b> <code>n()</code> counts rows in the group; the other two work on the group's <code>count</code> values. The four means &mdash; 4, 0.5, 7.5, 2 &mdash; are the same numbers <code>sapply(sites, mean)</code> gives on the <a href='apply_family.html'>apply page</a>, because it is the same data in a different shape."}
+    ]
+  },
+  rate: {
+    label:"Best sites by count per hour",
+    head:"surveys |>",
+    steps:[
+      {code:"  mutate(rate = count / hours) |>", verb:"mutate",
+       arg:{name:"rate", f:function(r,t){ return col(t,r,"count")/col(t,r,"hours"); }},
+       note:"<b>A new column, same ten rows.</b> The division happened for all ten rows at once &mdash; that is vectorisation, and it is why you rarely need <code>mapply()</code> when working in a data frame."},
+      {code:"  group_by(site) |>", verb:"group_by", arg:{col:"site"},
+       note:"Marked by site. The <code>rate</code> column comes along, because grouping changes nothing about the data."},
+      {code:"  summarise(mean_rate = mean(rate)) |>", verb:"summarise",
+       arg:{specs:[{name:"mean_rate", f:function(g,t){ return mean(g.map(function(r){ return col(t,r,"rate"); })); }}]},
+       note:"Collapsed to one row per site. Note that this is the mean <em>of the rates</em>, which is not the same as total count over total hours &mdash; a real distinction when effort varies, and worth deciding deliberately."},
+      {code:"  arrange(desc(mean_rate))", verb:"arrange", arg:{col:"mean_rate", desc:true},
+       note:"<b>Only the order changed.</b> Same four rows, same two columns. <code>arrange()</code> is the one verb that touches neither the rows nor the columns, just their sequence."}
+    ]
+  },
+  busy: {
+    label:"Just the busy visits",
+    head:"surveys |>",
+    steps:[
+      {code:"  filter(count > 4) |>", verb:"filter", arg:{col:"count", test:function(v){ return v>4; }},
+       note:"<b>Rows go, columns stay.</b> Five of the ten rows had a count above 4; the struck-through rows on the previous step are the ones being dropped. All five columns survive untouched."},
+      {code:"  select(site, visit, count)", verb:"select", arg:{cols:["site","visit","count"]},
+       note:"<b>Columns go, rows stay.</b> The mirror image of the step before. Together these two verbs are the pair students most often mix up: <em>filter takes rows, select takes columns</em>."}
+    ]
+  },
+  across: {
+    label:"Same summary, several columns",
+    head:"surveys |>",
+    steps:[
+      {code:"  group_by(habitat) |>", verb:"group_by", arg:{col:"habitat"},
+       note:"Grouped by habitat, ready to summarise."},
+      {code:"  summarise(across(c(count, hours), mean))", verb:"summarise",
+       arg:{specs:[
+         {name:"count", f:function(g,t){ return mean(g.map(function(r){ return col(t,r,"count"); })); }},
+         {name:"hours", f:function(g,t){ return mean(g.map(function(r){ return col(t,r,"hours"); })); }}
+       ]},
+       note:"<b><code>across()</code> saved you typing the same thing twice.</b> Written out it would be <code>summarise(count = mean(count), hours = mean(hours))</code>; with twenty columns it would be unwritable. This is the dplyr equivalent of <code>sapply(d[c('count','hours')], mean)</code>."}
+    ]
+  },
+  wide: {
+    label:"Long to wide",
+    head:"surveys |>",
+    steps:[
+      {code:"  select(site, visit, count) |>", verb:"select", arg:{cols:["site","visit","count"]},
+       note:"Trimmed to the three columns the reshape needs: an identifier, a name column, and a value column."},
+      {code:'  pivot_wider(names_from = visit, values_from = count, names_prefix = "v")',
+       verb:"pivot_wider", arg:{},
+       note:"<b>Ten rows became four; one column became four.</b> Each distinct value of <code>visit</code> turned into its own column. The <code>NA</code>s are unavoidable: site D was visited once and site C four times, so the rectangle has cells for visits that never happened. That is the cost of the wide shape, and the reason analysis usually wants the long one."}
+    ]
+  }
+};
+var ORDER=["habitat","persite","rate","busy","across","wide"];
+
+var st={p:"habitat", step:0, timer:null};
+var elPick=document.getElementById("pipepick"), elCode=document.getElementById("pipecode"),
+    elTable=document.getElementById("tableview"), elMeta=document.getElementById("meta"),
+    elExp=document.getElementById("explain"), elPos=document.getElementById("pos");
+
+ORDER.forEach(function(k){
+  var b=document.createElement("button"); b.textContent=PIPES[k].label; b.dataset.k=k;
+  b.setAttribute("role","tab");
+  b.addEventListener("click", function(){ stop(); st.p=k; st.step=0; render(); });
+  elPick.appendChild(b);
+});
+
+/* run the pipeline to step n, returning every intermediate table */
+function stages(){
+  var P=PIPES[st.p], t=base(), out=[t];
+  P.steps.forEach(function(s){
+    var prev=out[out.length-1];
+    var nxt=VERB[s.verb](prev, s.arg);
+    out.push(nxt);
+  });
+  return out;
+}
+
+function drawTable(t, highlightPrev){
+  var tbl=document.createElement("table"); tbl.className="dtable";
+  var thead=document.createElement("thead"), tr=document.createElement("tr");
+  t.cols.forEach(function(c){
+    var th=document.createElement("th"); th.textContent=c;
+    if(t.newCols.indexOf(c)>=0) th.className="newcol";
+    if(t.dropCols.indexOf(c)>=0) th.className="dropcol";
+    tr.appendChild(th);
+  });
+  thead.appendChild(tr); tbl.appendChild(thead);
+  var tb=document.createElement("tbody");
+  var gi = t.group ? ci(t,t.group) : -1;
+  var seen=[], bands={};
+  t.rows.forEach(function(r,k){
+    var row=document.createElement("tr");
+    if(t.dropRows.indexOf(k)>=0) row.className="droprow";
+    if(gi>=0){
+      var key=r[gi];
+      if(!(key in bands)){ bands[key]=seen.length % 3; seen.push(key); }
+      row.className += " g"+bands[key];
+    }
+    t.cols.forEach(function(c,j){
+      var td=document.createElement("td");
+      td.textContent = r[j]===undefined ? "" : fmtNum(r[j]);
+      if(t.newCols.indexOf(c)>=0) td.className="newcol";
+      if(t.dropCols.indexOf(c)>=0) td.className="dropcol";
+      if(gi>=0 && j===gi) td.className+=" gcell";
+      row.appendChild(td);
+    });
+    tb.appendChild(row);
+  });
+  tbl.appendChild(tb);
+  elTable.innerHTML=""; elTable.appendChild(tbl);
+}
+
+function render(){
+  var P=PIPES[st.p], all=stages(), t=all[st.step];
+
+  Array.prototype.forEach.call(elPick.children, function(b){
+    b.classList.toggle("active", b.dataset.k===st.p);
+    b.setAttribute("aria-selected", b.dataset.k===st.p ? "true":"false");
+  });
+
+  elCode.innerHTML="";
+  var h=document.createElement("span"); h.className="ln"+(st.step===0?" on":" past");
+  h.textContent=P.head; elCode.appendChild(h);
+  P.steps.forEach(function(s,i){
+    var ln=document.createElement("span");
+    ln.className="ln"+(i+1===st.step?" on":(i+1<st.step?" past":""));
+    ln.textContent=s.code; elCode.appendChild(ln);
+  });
+
+  drawTable(t);
+
+  var gtxt = t.group ? '  ·  <b>Groups: '+t.group+'</b>' : '';
+  elMeta.innerHTML = t.rows.length+" rows  ×  "+t.cols.length+" columns"+gtxt;
+
+  elExp.innerHTML = st.step===0
+    ? "The starting table: 10 rows, 5 columns, one row per visit to a site. Press <b>Step</b> to apply the first verb."
+    : P.steps[st.step-1].note;
+
+  elPos.textContent="step "+st.step+" of "+P.steps.length;
+  document.getElementById("btnStep").disabled = st.step>=P.steps.length;
+}
+
+function stepOne(){
+  var n=PIPES[st.p].steps.length;
+  if(st.step<n){ st.step++; render(); }
+  if(st.step>=n) stop();
+}
+function stop(){ if(st.timer){ clearInterval(st.timer); st.timer=null; }
+  document.getElementById("btnPlay").textContent="Play"; }
+document.getElementById("btnStep").addEventListener("click", function(){ stop(); stepOne(); });
+document.getElementById("btnReset").addEventListener("click", function(){ stop(); st.step=0; render(); });
+document.getElementById("btnPlay").addEventListener("click", function(){
+  if(st.timer){ stop(); return; }
+  if(st.step>=PIPES[st.p].steps.length) st.step=0;
+  this.textContent="Pause";
+  st.timer=setInterval(stepOne, 1500);
+});
+
+document.querySelectorAll("button.goto").forEach(function(b){
+  b.addEventListener("click", function(){
+    var k=b.dataset.goto; if(!PIPES[k]) return;
+    stop(); st.p=k; st.step=0; render();
+    document.getElementById("viz").scrollIntoView({behavior:"smooth", block:"start"});
+  });
+});
+
+render();
+})();
+</script>
+</body>
+</html>

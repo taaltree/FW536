@@ -104,6 +104,10 @@
   table.cheat td{padding:8px 9px;border-bottom:1px solid var(--border);vertical-align:top;}
   table.cheat code{font-size:12.5px;}
   .scroll{overflow-x:auto;}
+  .pairbox{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:14px 0;}
+  @media(max-width:760px){.pairbox{grid-template-columns:1fr;}}
+  .pairbox h4{margin:0 0 6px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);}
+  .pairbox pre.rcode{margin:0;}
 </style>
 </head>
 <body>
@@ -122,12 +126,14 @@
       <li><a href="#ref">The functions, one by one</a></li>
       <li><a href="#viz">Watch it run</a></li>
       <li><a href="#cheat">All on one screen</a></li>
+      <li><a href="#tidy">The same job in dplyr</a></li>
       <li><a href="#traps">Four traps</a></li>
       <li><a href="#course">Where you'll meet these</a></li>
       <li><a href="#check">Check yourself</a></li>
     </ul>
     <div class="section">Course docs</div>
     <ul>
+      <li><a class="featured" href="tidyverse_dplyr.html">dplyr &amp; the tidyverse</a></li>
       <li><a href="index.html">Course home</a></li>
       <li><a href="rmarkdown_tutorial.html">R Markdown tutorial</a></li>
       <li><a href="install_jags_nimble.html">Install guide</a></li>
@@ -138,7 +144,7 @@
 <main class="content" id="main-content" tabindex="-1">
 
 <h1>The apply family, visualized</h1>
-<p class="lede">Loops in R usually get written as <code>apply</code>-style calls, and almost every lab this week uses at least one. They are hard to learn for a specific reason: two things are invisible. You cannot see <em>what your function is handed on each pass</em>, and you cannot see <em>what shape comes back</em>. This page makes both visible, one step at a time.</p>
+<p class="lede">Loops in R usually get written as <code>apply</code>-style calls, and almost every lab this week uses at least one. They are hard to learn for a specific reason: two things are invisible. You cannot see <em>what your function is handed on each pass</em>, and you cannot see <em>what shape comes back</em>. This page makes both visible, one step at a time. Its companion, <a href="tidyverse_dplyr.html">dplyr &amp; the tidyverse</a>, does the same for data frames &mdash; and the two pages cross-reference each other wherever they do the same job.</p>
 
 <section id="idea">
 <h2>The one idea</h2>
@@ -403,6 +409,55 @@ x &lt;- <span class="fn">replicate</span>(<span class="nu">2000</span>, <span cl
 </tbody>
 </table>
 </div>
+</section>
+
+<section id="tidy">
+<h2>The same job in dplyr</h2>
+<p>Most of what is on this page has a tidyverse counterpart, and you will see both in this course. The difference is not style but <em>what the object is</em>: the apply family works on vectors, lists and matrices; dplyr works on data frames and nothing else. Choosing between them is mostly a question of what you are holding.</p>
+<div class="scroll">
+<table class="cheat">
+<thead><tr><th scope="col">The job</th><th scope="col">base R</th><th scope="col">dplyr</th></tr></thead>
+<tbody>
+<tr><td><strong>One summary per group</strong></td><td><code>tapply(d$x, d$g, mean)</code></td><td><code>d |&gt; group_by(g) |&gt; summarise(m = mean(x))</code></td></tr>
+<tr><td>Group sizes</td><td><code>table(d$g)</code></td><td><code>count(d, g)</code></td></tr>
+<tr><td>Same summary over several columns</td><td><code>sapply(d[c("x","y")], mean)</code></td><td><code>summarise(across(c(x, y), mean))</code></td></tr>
+<tr><td>Split into groups, keep the pieces</td><td><code>split(d, d$g)</code></td><td><code>group_split(d, g)</code></td></tr>
+<tr><td>Something complicated per group</td><td><code>do.call(rbind, lapply(split(d, d$g), f))</code></td><td><code>d |&gt; group_by(g) |&gt; group_modify(f)</code></td></tr>
+<tr><td>Element-wise over two vectors</td><td><code>mapply(f, d$x, d$y)</code></td><td><code>mutate(z = f(x, y))</code> &mdash; already vectorised</td></tr>
+<tr><td>Add a derived column</td><td><code>d$rate &lt;- d$count / d$hours</code></td><td><code>mutate(rate = count / hours)</code></td></tr>
+<tr><td>Keep some rows</td><td><code>d[d$x &gt; 4, ]</code></td><td><code>filter(x &gt; 4)</code></td></tr>
+<tr><td>Stack a list of results into a table</td><td><code>do.call(rbind, lst)</code></td><td><code>bind_rows(lst)</code></td></tr>
+<tr><td>Run something <em>n</em> times</td><td><code>replicate(n, expr)</code></td><td>&mdash; no dplyr equivalent; use <code>replicate()</code> or <code>purrr::map()</code></td></tr>
+<tr><td>Summarise a matrix's columns</td><td><code>apply(m, 2, mean)</code></td><td>&mdash; convert to a data frame first, or just use <code>colMeans()</code></td></tr>
+</tbody>
+</table>
+</div>
+
+<p style="margin-top:20px">The row that matters most, side by side. This is the same data as the <code>sites</code> list above, written as one row per observation:</p>
+<div class="pairbox">
+  <div>
+    <h4>base R</h4>
+    <pre class="rcode"><span class="fn">sapply</span>(sites, <span class="fn">mean</span>)
+<span class="cm">#&gt;   A   B   C   D
+#&gt; 4.0 0.5 7.5 2.0</span></pre>
+  </div>
+  <div>
+    <h4>dplyr</h4>
+    <pre class="rcode">surveys |&gt;
+  <span class="fn">group_by</span>(site) |&gt;
+  <span class="fn">summarise</span>(mean = <span class="fn">mean</span>(count))
+<span class="cm">#&gt;   site   mean
+#&gt; 1 A       4
+#&gt; 2 B       0.5
+#&gt; 3 C       7.5
+#&gt; 4 D       2</span></pre>
+  </div>
+</div>
+<p>Same four numbers. What differs is the <em>result</em>: dplyr returns a data frame carrying the grouping variable as a column, so the next verb can keep working on it. <code>sapply</code> returns a named vector &mdash; compact and instantly printable, but you would need <code>as.data.frame()</code> and some renaming before you could join it to anything or hand it to <code>ggplot</code>.</p>
+
+<div class="callout key"><p class="callout-label">Key idea</p><strong>Which to reach for.</strong> If the object is a data frame and the work is a readable chain of steps &mdash; cleaning, summarising, preparing to plot &mdash; use dplyr. If the object is <em>not</em> a data frame, the apply family is the only option: a 4000 &times; 12 matrix of MCMC draws, a list of fitted models, a simulation you are running two thousand times. Days 4 and 5 are almost entirely the second kind, which is why <code>apply()</code> and <code>sapply()</code> dominate there and dplyr barely appears.</div>
+
+<p>The full companion page is <a href="tidyverse_dplyr.html">Data manipulation with dplyr</a>, which walks the verbs the same way this page walks the apply family, and steps through pipelines on the same survey data.</p>
 </section>
 
 <section id="traps">

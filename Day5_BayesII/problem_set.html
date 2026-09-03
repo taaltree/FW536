@@ -88,19 +88,18 @@ ants$elevation &lt;- <span class="fn">as.numeric</span>(<span class="fn">scale</
 
 <!-- Problem 2 -->
 <div class="exercise" id="p2">
-<span class="ex-tag">Problem 2</span><span class="difficulty easy"> · 20 min · link-scale prior sensitivity · <code>ants.csv</code></span>
-<h3>What does a "vague" log-scale prior actually do?</h3>
-<p>Using the same <code>ants.csv</code> Poisson regression (you may drop the random effect and use the plain log-link GLM form here), investigate how the prior on the coefficients interacts with predictor scaling.</p>
+<span class="ex-tag">Problem 2</span><span class="difficulty easy"> · 15 min · what a prior actually claims</span>
+<h3>What does a "vague" log-scale prior actually assert?</h3>
+<p>The walkthrough showed you what happens to the <em>chains</em> under a vague prior with unscaled predictors. This problem asks a different question: forget the sampler, and ask what the prior is claiming about the biology before any data arrive. On a log link, a prior on $\beta$ is a prior on a multiplicative effect $e^\beta$, and that translation is where "uninformative" priors stop being uninformative.</p>
 <ol type="a">
- <li>Fit the model with RAW (unscaled) predictors and a $\mathcal{N}(0, \sigma^2{=}10000)$ prior on each $\beta$. Report what happens to chain mixing and R-hat. (You may hit <code>Inf</code> log-densities or a stuck chain &mdash; describe what you see.)</li>
- <li>Fit again with SCALED predictors and the same vague prior. Report R-hat and effective sample size, and compare the posterior medians of $(\beta_1,\beta_2,\beta_3)$ to the frequentist <code>glm()</code>.</li>
- <li>Keep the scaled predictors but tighten the prior to $\mathcal{N}(0, \sigma^2{=}4)$ (i.e. <code>dnorm(0, 1/4)</code>). Does the posterior move meaningfully? Explain in one sentence why (or why not).</li>
- <li>Draw $10^5$ values of a slope from $\mathcal{N}(0,10000)$ and report the fraction for which the implied multiplicative effect $e^{\beta}$ exceeds a million-fold. Use this to justify a weakly informative default.</li>
+ <li>Draw $10^5$ values from $\mathcal{N}(0,\ \sigma^2 = 10000)$ &mdash; the classic "vague" choice. Report the fraction for which $e^{\beta}$ exceeds a million-fold, and the fraction for which the effect exceeds a million-fold <em>in either direction</em>. State the second number in a sentence beginning "before seeing any data, this prior says&hellip;".</li>
+ <li>Repeat with $\mathcal{N}(0,\ \sigma^2 = 4)$. Report the same fraction, and also the central 95% range of multiplicative effects this prior allows (i.e. $e^{\pm 1.96 \times 2}$). Is that range wide enough for any ecological effect you have ever measured?</li>
+ <li>A reviewer objects that $\mathcal{N}(0, 4)$ is "informative" and demands $\mathcal{N}(0, 10000)$ for objectivity. Using your two numbers, write the two-sentence reply you would actually send.</li>
 </ol>
-<div class="callout try" style="margin-top: 12px;"><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
+<div class="callout try" style="margin-top: 12px;"><strong>Your answer goes in the R Markdown hand-in.</strong> Report both fractions, the multiplicative range from (b), and your reply to the reviewer.</div>
 </div>
 
-<!-- Problem 3 -->
+
 <div class="exercise" id="p3">
 <span class="ex-tag">Problem 3</span><span class="difficulty medium"> · 30 min · multilevel pooling · <code>N2OEmission.csv</code></span>
 <h3>The pooling spectrum for soil N<sub>2</sub>O emissions</h3>
@@ -191,18 +190,20 @@ R &lt;- <span class="fn">numeric</span>(Nyears)
 
 <!-- Problem 8 -->
 <div class="exercise" id="p8">
-<span class="ex-tag">Problem 8</span><span class="difficulty medium"> · 20 min · precautionary derived quantity</span>
-<h3>The 5th-percentile ("precautionary") harvest rate</h3>
-<p>Using the posterior draws of $H_\text{msy}$ from Problem 7, quantify risk-based management targets.</p>
+<span class="ex-tag">Problem 8</span><span class="difficulty medium"> · 20 min · derived quantities, done properly</span>
+<h3>Why you cannot build a derived quantity from summary numbers</h3>
+<p>You have posterior draws of $a$ and $b$ from Problem 7. Management quantities are functions of those parameters, and there are two ways to produce an interval for them &mdash; one right, one that looks reasonable and is not.</p>
 <ol type="a">
- <li>Report the 5th percentile of the $H_\text{msy}$ posterior. Interpret it in management language: the harvest rate you'd allow if you wanted only a 5% chance of exceeding the true MSY harvest rate.</li>
- <li>Refit Problem 7 with <code>Nyears = 100</code> (regenerate the data). By roughly how much does the 95% CI width of $H_\text{msy}$ shrink relative to the 25-year fit? Is the gain consistent with a $\sqrt{N}$ rule?</li>
- <li>In one sentence, contrast how a frequentist MLE fit would produce this precautionary number (bootstrap / delta method) with how Bayes produces it directly.</li>
+ <li>Compute $S_\text{msy} = b\sqrt{1/a} - b/a$ <strong>once per draw</strong>, then take the 5th, 50th and 95th percentiles of the result. Now do it the other way: take the 5th, 50th and 95th percentiles of $a$ and of $b$ separately, and substitute those numbers into the formula. Report both sets of three numbers and the percentage difference at the 5th percentile.</li>
+ <li>Explain why the two disagree. What does <code>cor(a, b)</code> across your draws have to do with it, and why does summarising each parameter first throw away exactly the information the derived quantity needs?</li>
+ <li>Now repeat the comparison for $H_\text{msy} = 1 - \sqrt{1/a}$. The two approaches agree here, to the digit. What is different about this quantity, and what does that tell you about when the shortcut is safe? State the general rule in one sentence.</li>
+ <li>In one sentence, contrast how a frequentist MLE fit would produce a precautionary interval for $S_\text{msy}$ (bootstrap or the delta method) with how Bayes produces it directly.</li>
 </ol>
-<div class="callout try" style="margin-top: 12px;"><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
+<div class="callout warn" style="margin-top:12px;"><strong>Watch out.</strong> The disagreement in (a) is not large &mdash; single-digit percentages on these data. The size is not the lesson; the reason is. A quantity built from several correlated parameters can be badly wrong this way when the correlation is strong or the function is sharply curved, and you will not get a warning.</div>
+<div class="callout try" style="margin-top: 12px;"><strong>Your answer goes in the R Markdown hand-in.</strong> Report both sets of percentiles, the percentage difference, your explanation, and the general rule from (c).</div>
 </div>
 
-<!-- Problem 9 -->
+
 <div class="exercise" id="p9">
 <span class="ex-tag">Problem 9</span><span class="difficulty hard"> · 35 min · N-mixture + Bayesian p-value</span>
 <h3>Repeat-count abundance and a goodness-of-fit check</h3>

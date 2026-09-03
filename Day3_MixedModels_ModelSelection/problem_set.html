@@ -82,74 +82,112 @@
 <h2 style="margin-top:36px;">Part 1 · Mixed models <span class="note">(morning · 20 pts)</span></h2>
 
 <div class="exercise" id="p1">
-<span class="ex-tag">Problem 1</span><span class="difficulty easy"> · real data · pooling decision</span>
-<h3>Streams: complete pooling vs no pooling vs partial pooling</h3>
-<p>The file <code>stream_density.csv</code> holds fish-density measurements from 100 streams, three replicate observations per stream. Load it with <code>read.csv()</code>:</p>
-<div class="code-label">Setup</div>
-<pre><code><span class="kw">library</span>(nlme); <span class="kw">library</span>(lme4)
+<span class="ex-tag">Problem 1</span><span class="difficulty medium"> · simulation · shrinkage and effort</span>
+<h3>Which streams get pulled hardest toward the mean?</h3>
+<p>The walkthrough used a balanced design: every stream sampled the same number of times. Real survey effort is never balanced, and the imbalance is exactly where partial pooling earns its keep. Here you simulate an unbalanced design, so you know the truth, and watch what the model does with it.</p>
+<div class="code-label">Setup &mdash; 24 streams, deliberately unequal effort</div>
+<pre><code><span class="kw">library</span>(nlme)
+<span class="fn">set.seed</span>(<span class="nu">413</span>)
 
-TheData &lt;- <span class="fn">read.csv</span>(<span class="st">"data/stream_density.csv"</span>)
-Streams &lt;- <span class="fn">data.frame</span>(TheData)
-Streams$Stream &lt;- <span class="fn">factor</span>(Streams$Stream)
+nvisit &lt;- <span class="kw">c</span>(<span class="fn">rep</span>(<span class="nu">2</span>, <span class="nu">8</span>), <span class="fn">rep</span>(<span class="nu">5</span>, <span class="nu">8</span>), <span class="fn">rep</span>(<span class="nu">30</span>, <span class="nu">8</span>))   <span class="cm"># 8 streams each at 2, 5, 30 visits</span>
+tau &lt;- <span class="nu">12</span>;  sig &lt;- <span class="nu">20</span>;  mu &lt;- <span class="nu">80</span>              <span class="cm"># TRUE among-stream SD, within SD, grand mean</span>
 
-lm1 &lt;- <span class="fn">lm</span>(Density ~ <span class="nu">1</span>, data=Streams)                 <span class="cm"># complete pooling</span>
-lm2 &lt;- <span class="fn">lm</span>(Density ~ Stream - <span class="nu">1</span>, data=Streams)        <span class="cm"># no pooling</span>
-lm3 &lt;- <span class="fn">lme</span>(fixed = Density ~ <span class="nu">1</span>, random = ~ <span class="nu">1</span> | Stream, data=Streams) <span class="cm"># partial pooling</span></code></pre>
+stream_mean &lt;- <span class="fn">rnorm</span>(<span class="fn">length</span>(nvisit), mu, tau)      <span class="cm"># each stream's real density</span>
+Streams &lt;- <span class="fn">do.call</span>(rbind, <span class="fn">lapply</span>(<span class="fn">seq_along</span>(nvisit), <span class="kw">function</span>(i)
+  <span class="fn">data.frame</span>(Stream = <span class="fn">factor</span>(i),
+             Density = <span class="fn">rnorm</span>(nvisit[i], stream_mean[i], sig))))
+
+m &lt;- <span class="fn">lme</span>(Density ~ <span class="nu">1</span>, random = ~ <span class="nu">1</span> | Stream, data = Streams)
+
+nopool  &lt;- <span class="fn">tapply</span>(Streams$Density, Streams$Stream, mean)   <span class="cm"># each stream on its own</span>
+partial &lt;- <span class="fn">coef</span>(m)[, <span class="nu">1</span>]                                    <span class="cm"># partially pooled</span>
+n_i     &lt;- <span class="fn">as.numeric</span>(<span class="fn">table</span>(Streams$Stream))</code></pre>
 <ol type="a">
-<li>Write out the equation each of the three models fits, and state how many parameters each estimates. Which model would you use if you wanted to make inferences about fish density in <em>other</em> Oregon streams not in this dataset, and why?</li>
-<li>Plot residuals from <code>lm1</code> by stream with <code>boxplot(split(resid(lm1), Streams$Stream))</code>. What do you see, and what does it tell you about the validity of <code>lm1</code>?</li>
-<li>Compare <code>coef(lm2)</code> (the 100 no-pooling stream means) with <code>coef(lm3)</code> (the 100 partially-pooled estimates). Pick the most extreme stream and describe how far it shrank toward the overall mean, and why.</li>
-<li>From <code>summary(lm3)</code> and <code>intervals(lm3)</code>, report the among-stream SD (with its 95% CI), the within-stream residual SD, and compute the ICC. Interpret the ICC in one sentence.</li>
+<li><strong>Predict before you compute.</strong> Partial pooling keeps a fraction $B_i$ of each stream's own mean and pulls the rest toward the grand mean, where
+<div class="eq-block">$B_i = \dfrac{\tau^2}{\tau^2 + \sigma^2/n_i}$</div>
+Using the <em>true</em> $\tau = 12$ and $\sigma = 20$, work out $B_i$ by hand for a stream with 2 visits and for one with 30. Which group will be pulled further, and roughly how many times further? Write the numbers down before running anything else.</li>
+<li>Now check. Extract $\hat\tau$ and $\hat\sigma$ with <code>VarCorr(m)</code>, compute $B_i$ for every stream, and tabulate the mean $|$<code>nopool</code> &minus; <code>partial</code>$|$ separately for the 2-visit, 5-visit and 30-visit streams. Did your prediction hold?</li>
+<li>Explain in two or three sentences <em>why</em> the formula behaves this way. What is $\sigma^2/n_i$ measuring, and what happens to $B_i$ as $n_i$ grows?</li>
+<li>One of the 2-visit streams will have an unusually extreme raw mean, simply because two observations are not many. Find it, report its no-pooling and partially-pooled estimates, and say which you would put in a report and why.</li>
+<li>A colleague proposes dropping every stream with fewer than 5 visits, "because those means are unreliable." Using your answer to (b), explain what partial pooling already does about unreliable means, and what dropping the streams would cost.</li>
 </ol>
-<div class="callout try" style="margin-top: 12px;"><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
+<div class="callout try" style="margin-top: 12px;"><strong>Your answer goes in the R Markdown hand-in.</strong> Report your hand-computed $B$ values, the table from (b), the extreme stream from (d), and your reasoning in (c) and (e).</div>
 </div>
 
+
 <div class="exercise" id="p2">
-<span class="ex-tag">Problem 2</span><span class="difficulty medium"> · real data · random intercepts + covariate</span>
-<h3>Length–weight: random intercepts with a fixed-effect covariate</h3>
-<p><code>length_weight.csv</code> has length and weight for individuals grouped by subject. The biological question: is there a length–weight relationship, and does the intercept vary by subject?</p>
+<span class="ex-tag">Problem 2</span><span class="difficulty medium"> · reading output · variance components</span>
+<h3>Reading a mixed model someone else fitted</h3>
+<p>Part (a) needs no computer. Most of the mixed models you meet in your career will arrive as printed output in a paper or a collaborator's email, and reading one is a different skill from fitting one.</p>
+<p>A colleague weighs nestlings in 18 broods and asks whether chicks in larger broods are lighter. They send you this and nothing else:</p>
+<pre><code>Linear mixed model fit by REML ['lmerMod']
+Formula: mass ~ broodsize + (1 | brood)
+
+Random effects:
+ Groups   Name        Variance Std.Dev.
+ brood    (Intercept) 7.218    2.687
+ Residual             2.249    1.500
+Number of obs: 74, groups:  brood, 18
+
+Fixed effects:
+            Estimate Std. Error t value
+(Intercept)  22.2315     2.0053  11.087
+broodsize    -0.6663     0.4560  -1.461</code></pre>
+<ol type="a">
+<li>From that output alone: (i) how much of the variation in chick mass is <em>between</em> broods rather than within them? Compute the ICC and say it in a sentence a field biologist would use. (ii) What is the estimated effect of one extra chick in the brood, and how confident would you be that it is real? (iii) The colleague concludes "brood size doesn't matter." Give one reason that conclusion might be premature, given the design they used.</li>
+</ol>
+<p>Now back to the length&ndash;weight data from the walkthrough, where you already have <code>m1</code> and <code>m1b</code> fitted:</p>
 <div class="code-label">Setup</div>
 <pre><code>TheData &lt;- <span class="fn">read.csv</span>(<span class="st">"data/length_weight.csv"</span>)
 LenW &lt;- <span class="fn">data.frame</span>(TheData); LenW$Subject &lt;- <span class="fn">as.factor</span>(LenW$Subject)
 
 m1  &lt;- <span class="fn">lme</span>(Weight ~ Length, data=LenW, random = ~ <span class="nu">1</span> | Subject, method=<span class="st">"REML"</span>)
 m1b &lt;- <span class="fn">lmer</span>(Weight ~ Length + (<span class="nu">1</span> | Subject), data=LenW)   <span class="cm"># same model, lme4 syntax</span></code></pre>
-<ol type="a">
-<li>Write out the equation the model fits and say what each parameter means biologically. Report the fixed-effect intercept and slope: what is the group-mean length–weight relationship?</li>
-<li>From <code>summary(m1)</code> / <code>VarCorr(m1b)</code>, report the among-subject SD of the intercept. Translate it into "subjects of the same length differ by ± X units in expected weight" (the columns are on an index scale, so keep the answer in the data's own units).</li>
-<li>Report the within-subject residual SD and compute the ICC. Contrast it with the ICC from Problem 1 and explain the difference.</li>
+<ol type="a" start="2">
+<li>Report the within-subject residual SD and compute the ICC. Contrast it with the ICC implied by Problem 1's <em>true</em> values ($\tau = 12$, $\sigma = 20$) and explain what the difference tells you about the two designs.</li>
 <li>Fit a random-slope model <code>lmer(Weight ~ Length + (1 + Length | Subject))</code> and compare it to <code>m1b</code> with <code>anova(m1b, m_slope, refit = FALSE)</code>. Is the random slope supported? Explain why <code>refit = FALSE</code> is correct here.</li>
 </ol>
-<div class="callout try" style="margin-top: 12px;"><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
+<div class="callout try" style="margin-top: 12px;"><strong>Your answer goes in the R Markdown hand-in.</strong> Report the ICC and interpretation for the nestling output, the ICC comparison in (b), and the random-slope verdict with your reasoning about <code>refit</code>.</div>
 </div>
+
 
 <div class="exercise" id="p3">
-<span class="ex-tag">Problem 3</span><span class="difficulty hard"> · real data · nonlinear mixed</span>
-<h3>Von Bertalanffy growth — a nonlinear mixed model</h3>
-<p><code>fish_growth.csv</code> contains age and length measurements for multiple individual fish (<code>Subject</code>). Each fish is expected to follow the von Bertalanffy growth curve</p>
-<div class="eq-block">$L(a) = L_\infty\left(1 - e^{-\kappa (a - t_0)}\right),$</div>
-<p>where $L_\infty$ is asymptotic length, $\kappa$ the growth rate, and $t_0$ the theoretical age at length zero.</p>
-<div class="code-label">Fixed-effect fit, then the mixed fit (random $L_\infty$)</div>
-<pre><code>TheData &lt;- <span class="fn">read.csv</span>(<span class="st">"data/fish_growth.csv"</span>)
-xx &lt;- <span class="fn">as.data.frame</span>(<span class="kw">cbind</span>(Subject=TheData$Subject, Age=TheData$Age, Length=TheData$Length))
-AgeLen &lt;- <span class="fn">groupedData</span>(Length ~ Age | Subject, data=xx)
+<span class="ex-tag">Problem 3</span><span class="difficulty hard"> · simulation · where the variance goes</span>
+<h3>What <code>nls</code> does with variation it cannot represent</h3>
+<p>The walkthrough fitted a von Bertalanffy curve two ways and compared them. Here you build the data yourself, so you know the true values, and ask a sharper question: when a fixed-effects fit has no way to represent among-individual variation, <em>where does that variation end up?</em></p>
+<div class="code-label">Simulate 12 fish whose asymptotic length genuinely differs</div>
+<pre><code><span class="kw">library</span>(nlme)
+<span class="fn">set.seed</span>(<span class="nu">77</span>)
 
-m_fixed &lt;- <span class="fn">nls</span>(Length ~ Linf*(<span class="nu">1</span>-<span class="fn">exp</span>(-Kappa*(Age - Tzero))),
- data=AgeLen, start=<span class="kw">c</span>(Linf=<span class="nu">100</span>, Kappa=<span class="nu">0.2</span>, Tzero=<span class="nu">0</span>))
+nfish &lt;- <span class="nu">12</span>; ages &lt;- <span class="nu">1</span>:<span class="nu">8</span>
+Linf_true &lt;- <span class="nu">100</span>; Kap_true &lt;- <span class="nu">0.25</span>; T0_true &lt;- <span class="nu">0</span>
+sd_Linf &lt;- <span class="nu">12</span>    <span class="cm"># TRUE among-fish SD in asymptotic length</span>
+sd_obs  &lt;- <span class="nu">3</span>     <span class="cm"># TRUE measurement error</span>
 
-m_nlme &lt;- <span class="fn">nlme</span>(Length ~ Linf*(<span class="nu">1</span>-<span class="fn">exp</span>(-Kappa*(Age - Tzero))),
- fixed = Linf + Kappa + Tzero ~ <span class="nu">1</span>,
- random = Linf ~ <span class="nu">1</span> | Subject,
- data = AgeLen,
- start = <span class="kw">c</span>(Linf=<span class="nu">100</span>, Kappa=<span class="nu">0.2</span>, Tzero=<span class="nu">0</span>))</code></pre>
+Linf_i &lt;- <span class="fn">rnorm</span>(nfish, Linf_true, sd_Linf)
+sim &lt;- <span class="fn">do.call</span>(rbind, <span class="fn">lapply</span>(<span class="nu">1</span>:nfish, <span class="kw">function</span>(i) <span class="fn">data.frame</span>(
+  Subject = <span class="fn">factor</span>(i), Age = ages,
+  Length  = Linf_i[i]*(<span class="nu">1</span>-<span class="fn">exp</span>(-Kap_true*(ages - T0_true))) + <span class="fn">rnorm</span>(<span class="fn">length</span>(ages), <span class="nu">0</span>, sd_obs))))
+gd &lt;- <span class="fn">groupedData</span>(Length ~ Age | Subject, data = sim)
+
+fit_nls  &lt;- <span class="fn">nls</span>(Length ~ Linf*(<span class="nu">1</span>-<span class="fn">exp</span>(-Kappa*(Age-Tzero))), data = sim,
+                start = <span class="kw">c</span>(Linf=<span class="nu">100</span>, Kappa=<span class="nu">.2</span>, Tzero=<span class="nu">0</span>))
+fit_nlme &lt;- <span class="fn">nlme</span>(Length ~ Linf*(<span class="nu">1</span>-<span class="fn">exp</span>(-Kappa*(Age-Tzero))),
+                 fixed = Linf + Kappa + Tzero ~ <span class="nu">1</span>, random = Linf ~ <span class="nu">1</span> | Subject,
+                 data = gd, start = <span class="kw">c</span>(Linf=<span class="nu">100</span>, Kappa=<span class="nu">.2</span>, Tzero=<span class="nu">0</span>))</code></pre>
 <ol type="a">
-<li>Why should we expect $L_\infty$ to vary by individual fish in a biological sense?</li>
-<li>Plot <code>boxplot(split(residuals(m_fixed), AgeLen$Subject))</code>. What evidence do you see that the fixed-effects residuals are <em>not</em> independent within subject?</li>
-<li>Compare the residual SE of <code>m_fixed</code> (from <code>summary(m_fixed)$sigma</code>) with the within-subject residual SE of <code>m_nlme</code>. Which is smaller, and why does that <em>have</em> to be the case?</li>
-<li>Explain what <code>m_nlme$coefficients$fixed[1] + m_nlme$coefficients$random$Subject</code> returns and why it is a better per-fish estimate of $L_\infty$ than fitting a separate <code>nls</code> to each fish.</li>
+<li>Report <code>summary(fit_nls)$sigma</code> and the two standard deviations from <code>VarCorr(fit_nlme)</code>. You built the data with a measurement error of 3. Which fit recovers it, and what number does the other one report instead?</li>
+<li><strong>Account for that number.</strong> Differentiating the growth curve with respect to $L_\infty$ gives $\partial L/\partial L_\infty = 1 - e^{-\kappa(a - t_0)}$, so a fish whose $L_\infty$ is off by $\delta$ sits $\delta\,(1 - e^{-\kappa(a-t_0)})$ away from the average curve <em>at age $a$</em>. Using the true $\kappa = 0.25$ and $t_0 = 0$, compute that shape factor at each age 1 to 8, then the implied SD at each age,
+<div class="eq-block">$\text{SD}(a) = \sqrt{\left(12 \cdot (1 - e^{-0.25 a})\right)^2 + 3^2}$</div>
+and compare the pooled value $\sqrt{\overline{\text{SD}(a)^2}}$ with what <code>nls</code> actually reported.</li>
+<li>Your answer to (b) should show that the true spread around the mean curve <em>grows with age</em>, while <code>nls</code> must describe it with a single number. Say what this means for the residual plot of <code>fit_nls</code>, and confirm it with <code>plot(fitted(fit_nls), resid(fit_nls))</code>.</li>
+<li>Look at the standard errors of <code>Kappa</code> and <code>Tzero</code> in the two fits (<code>summary(fit_nls)$coefficients</code> and <code>summary(fit_nlme)$tTable</code>). Which fit gives tighter intervals for those two parameters, and why does separating the two variance components buy you precision on parameters that were never random?</li>
+<li>Re-run the simulation with <code>nfish &lt;- 4</code> and again with <code>nfish &lt;- 20</code>, refitting <code>fit_nlme</code> each time, and report the estimated among-fish SD. It was built as 12 every time. What does the pattern tell you about how many groups you need before a variance component means anything &mdash; and how does that connect to the morning's rule about not bothering with a random effect when you have very few levels?</li>
 </ol>
-<div class="callout try" style="margin-top: 12px;"><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
+<div class="callout warn" style="margin-top:12px;"><strong>Watch out.</strong> Part (e) asks about the estimate of a <em>variance</em>, which needs far more groups to pin down than a mean does. Do not read a single small-<code>nfish</code> run as proof of anything; the point is the direction and the spread across runs, not one number.</div>
+<div class="callout try" style="margin-top: 12px;"><strong>Your answer goes in the R Markdown hand-in.</strong> Report the three SDs from (a), your arithmetic in (b) against the observed value, the residual-plot description, the SE comparison, and the small-sample pattern from (e).</div>
 </div>
+
 
 <div class="exercise" id="p4">
 <span class="ex-tag">Problem 4</span><span class="difficulty hard"> · real data · crossed random effects</span>
@@ -264,9 +302,13 @@ pstor &lt;- AICstor &lt;- AICcstor &lt;- BICstor &lt;- <span class="fn">rep</spa
 <span class="fn">data.frame</span>(p = <span class="fn">mean</span>(pstor &gt; <span class="nu">0</span>), AIC = <span class="fn">mean</span>(AICstor &gt; <span class="nu">0</span>),
            AICc = <span class="fn">mean</span>(AICcstor &gt; <span class="nu">0</span>), BIC = <span class="fn">mean</span>(BICstor &gt; <span class="nu">0</span>))</code></pre>
 <ol type="a">
-<li>Predict before you run: which criterion will pick "at least one noise variable" most often, and which least often?</li>
-<li>Run the simulation. Report the four proportions and compare to your prediction.</li>
-<li>Why does BIC avoid noise variables so much better than AIC in this $n = 50$ setting? Describe a setting in which BIC's parsimony would <em>backfire</em>.</li>
+<li><strong>Reproduce the baseline.</strong> Run the walkthrough simulation and confirm you get roughly the same four proportions: <code>p</code> ~0.16, AIC ~0.45, AICc ~0.39, BIC ~0.16. You need this loop running before the rest of the problem; if your numbers are close, move on without re-deriving why BIC wins here.</li>
+<li><strong>Now apply the rule the lecture warns about.</strong> Taking the AICc-best model is one decision rule; a stricter one is <em>only accept the winner if it beats the runner-up by more than 2 AICc units, and otherwise decline to choose</em>. Modify the loop to record both whether the top model contains a predictor and the gap <code>dd$AICc[2] - dd$AICc[1]</code>:
+<pre><code>dd  &lt;- <span class="fn">dredge</span>(<span class="fn">lm</span>(y ~ ., data=d), rank=<span class="st">"AICc"</span>)
+noise_top[i] &lt;- <span class="fn">sum</span>(!<span class="fn">is.na</span>(dd[<span class="nu">1</span>, <span class="nu">2</span>:<span class="nu">4</span>]))
+gap[i]       &lt;- dd$AICc[<span class="nu">2</span>] - dd$AICc[<span class="nu">1</span>]</code></pre>
+Report three numbers: how often the winner is more than 2 units clear; among <em>those</em> runs, how often it still contains a noise predictor; and the overall fraction of runs in which the strict rule keeps a noise predictor.</li>
+<li>The strict rule cuts the overall false-positive rate a long way. Explain <em>how</em> it does that &mdash; look at how often it declines to pick anything at all, and at the noise rate <em>conditional</em> on a clear winner existing. Is the rule choosing better models, or mostly refusing to choose? What does the median gap between best and runner-up tell you about how often a clear winner exists when nothing is real?</li>
 </ol>
 <div class="callout try" style="margin-top: 12px;"><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
 </div>

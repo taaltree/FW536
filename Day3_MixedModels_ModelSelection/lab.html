@@ -279,8 +279,6 @@ m1b &lt;- <span class="fn">lmer</span>(Weight ~ Length + (<span class="nu">1</sp
 <li>Write out the equation the model is fitting. What does each parameter mean biologically?</li>
 <li>What is the group-mean relationship between length and weight? (i.e., the fixed-effect slope and intercept.)</li>
 <li>What is the among-subject standard deviation of the intercept? Translate that into "subjects of the same length differ by ± X in expected weight." (Both columns are logged, so give the answer as a percentage change in weight.)</li>
-<li>What is the within-subject residual standard deviation? What is the ICC?</li>
-<li>Fit a random-slope model <code>Weight ~ Length + (1 + Length | Subject)</code>. Decide whether the random slope is supported using <em>both</em> a likelihood-ratio test, <code>anova(m1b, m_slope, refit = FALSE)</code>, and AIC. Why <em>refit = FALSE</em>, and do the two criteria agree?</li>
 </ol>
 
 <details class="answer"><summary>Reveal worked solution</summary><div class="answer-body">
@@ -290,10 +288,6 @@ m1b &lt;- <span class="fn">lmer</span>(Weight ~ Length + (<span class="nu">1</sp
 
 <p><strong>(c)</strong> Among-subject SD on the intercept is around 0.211, on the <em>log</em>-weight scale. A difference on a log scale is a ratio once you exponentiate: $e^{0.211} = 1.23$, so at any given length a one-SD subject is about <strong>23% heavier</strong> than the population average, and a two-SD subject about 53% heavier. That is the interpretation to report; "±0.21" alone is not in units anyone can picture.</p>
 
-<p><strong>(d)</strong> Within-subject residual SD around 0.21. ICC = $0.211^2 / (0.211^2 + 0.206^2) \approx 0.045 / 0.087 \approx 0.51$. Even after the length covariate, about half the remaining variation is between subjects: individual fish are persistently heavier or lighter than the population line predicts, so repeated measurements on one fish are far from independent. That is exactly why the random intercept is needed here.</p>
-
-<p><strong>(e)</strong> Use <code>refit = FALSE</code> because we are comparing random-effect structures rather than fixed effects, and REML likelihoods are valid for exactly that comparison. Both criteria agree here, and emphatically. The LRT gives $\chi^2 = 0.078$ on 2 df, $p = 0.962$. AIC says the same in its own currency: <strong>6.73</strong> for the random-intercept model against <strong>10.65</strong> for the random-slope model, so the slope costs 3.9 AIC units and buys essentially no fit. The fitted slope SD is 0.0089 against an intercept SD of 0.231. A random intercept suffices. It is worth seeing the two tools agree here, because Day 3 afternoon is largely about the cases where they do not.</p>
-<div class="callout warn"><strong>You will see a warning here, and it is expected.</strong> Fitting <code>m_slope</code> prints <code>Model failed to converge with max|grad| = 0.00216</code>. That is a <em>warning</em>, not an error: the model still fits and the numbers above are usable. It appears because there is almost no slope variation for the optimizer to find, so it is working on a nearly flat surface. The giveaway is in the summary, where the slope&ndash;intercept correlation comes back as exactly $-1.00$, pinned to the edge of its range. Read it as "the data do not support this random slope", which is the conclusion the LRT and AIC reached too.</div>
 </div></details>
 </div>
 

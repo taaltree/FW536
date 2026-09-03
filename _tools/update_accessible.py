@@ -30,7 +30,7 @@ ROOT_HTML = ["syllabus.html", "pre_course_exam.html",
 ROOT_RETIRED = ["post_course_exam.html", "post_course_exam.Rmd",
                 "post_course_exam_KEY.html", "post_course_exam_off.html"]
 DAY_HTML = ["lab.html", "problem_set.html", "plain_language_summary.html",
-            "answer_key.html", "answer_key_review.html", "log_logit_intuition.html",
+            "log_logit_intuition.html",
             # interactive explorers — screen-reader usable, so they ship here too
             "explore_distributions.html", "explore_links.html", "explore_shrinkage.html",
             "explore_interactions.html", "explore_conjugate.html", "explore_likelihood_mcmc.html", "explore_mcmc.html"]

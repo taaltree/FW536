@@ -152,40 +152,53 @@ m1b &lt;- <span class="fn">lmer</span>(Weight ~ Length + (<span class="nu">1</sp
 
 
 <div class="exercise" id="p3">
-<span class="ex-tag">Problem 3</span><span class="difficulty hard"> · simulation · where the variance goes</span>
-<h3>What <code>nls</code> does with variation it cannot represent</h3>
-<p>The walkthrough fitted a von Bertalanffy curve two ways and compared them. Here you build the data yourself, so you know the true values, and ask a sharper question: when a fixed-effects fit has no way to represent among-individual variation, <em>where does that variation end up?</em></p>
-<div class="code-label">Simulate 12 fish whose asymptotic length genuinely differs</div>
+<span class="ex-tag">Problem 3</span><span class="difficulty medium"> · simulation · where the variation goes</span>
+<h3>If you leave the fish out of the model, where does the fish-to-fish variation go?</h3>
+<p>Fish differ from one another, and they also get measured imperfectly. Those are two separate sources of variation, and a mixed model can tell them apart. A fixed-effects fit has only one place to put variation &mdash; the residual &mdash; so it has to blend them.</p>
+<p>Here you build the data yourself, so you know exactly how big each source really is, and then watch what each fit reports.</p>
+<div class="code-label">Simulate 12 fish, measured at ages 1 to 8</div>
 <pre><code><span class="kw">library</span>(nlme)
 <span class="fn">set.seed</span>(<span class="nu">77</span>)
 
 nfish &lt;- <span class="nu">12</span>; ages &lt;- <span class="nu">1</span>:<span class="nu">8</span>
-Linf_true &lt;- <span class="nu">100</span>; Kap_true &lt;- <span class="nu">0.25</span>; T0_true &lt;- <span class="nu">0</span>
-sd_Linf &lt;- <span class="nu">12</span>    <span class="cm"># TRUE among-fish SD in asymptotic length</span>
-sd_obs  &lt;- <span class="nu">3</span>     <span class="cm"># TRUE measurement error</span>
+Kap &lt;- <span class="nu">0.25</span>; T0 &lt;- <span class="nu">0</span>
+sd_Linf &lt;- <span class="nu">12</span>    <span class="cm"># fish really do differ: SD of 12 in asymptotic length</span>
+sd_obs  &lt;- <span class="nu">3</span>     <span class="cm"># and each measurement is off by about 3</span>
 
-Linf_i &lt;- <span class="fn">rnorm</span>(nfish, Linf_true, sd_Linf)
+Linf_i &lt;- <span class="fn">rnorm</span>(nfish, <span class="nu">100</span>, sd_Linf)      <span class="cm"># each fish's own Linf</span>
 sim &lt;- <span class="fn">do.call</span>(rbind, <span class="fn">lapply</span>(<span class="nu">1</span>:nfish, <span class="kw">function</span>(i) <span class="fn">data.frame</span>(
   Subject = <span class="fn">factor</span>(i), Age = ages,
-  Length  = Linf_i[i]*(<span class="nu">1</span>-<span class="fn">exp</span>(-Kap_true*(ages - T0_true))) + <span class="fn">rnorm</span>(<span class="fn">length</span>(ages), <span class="nu">0</span>, sd_obs))))
+  Length  = Linf_i[i]*(<span class="nu">1</span>-<span class="fn">exp</span>(-Kap*(ages - T0))) + <span class="fn">rnorm</span>(<span class="fn">length</span>(ages), <span class="nu">0</span>, sd_obs))))
 gd &lt;- <span class="fn">groupedData</span>(Length ~ Age | Subject, data = sim)
 
+<span class="cm"># Fit 1: one curve for all fish. No way to say that fish differ.</span>
 fit_nls  &lt;- <span class="fn">nls</span>(Length ~ Linf*(<span class="nu">1</span>-<span class="fn">exp</span>(-Kappa*(Age-Tzero))), data = sim,
                 start = <span class="kw">c</span>(Linf=<span class="nu">100</span>, Kappa=<span class="nu">.2</span>, Tzero=<span class="nu">0</span>))
+
+<span class="cm"># Fit 2: each fish gets its own Linf, drawn from a distribution.</span>
 fit_nlme &lt;- <span class="fn">nlme</span>(Length ~ Linf*(<span class="nu">1</span>-<span class="fn">exp</span>(-Kappa*(Age-Tzero))),
                  fixed = Linf + Kappa + Tzero ~ <span class="nu">1</span>, random = Linf ~ <span class="nu">1</span> | Subject,
                  data = gd, start = <span class="kw">c</span>(Linf=<span class="nu">100</span>, Kappa=<span class="nu">.2</span>, Tzero=<span class="nu">0</span>))</code></pre>
 <ol type="a">
-<li>Report <code>summary(fit_nls)$sigma</code> and the two standard deviations from <code>VarCorr(fit_nlme)</code>. You built the data with a measurement error of 3. Which fit recovers it, and what number does the other one report instead?</li>
-<li><strong>Account for that number.</strong> Differentiating the growth curve with respect to $L_\infty$ gives $\partial L/\partial L_\infty = 1 - e^{-\kappa(a - t_0)}$, so a fish whose $L_\infty$ is off by $\delta$ sits $\delta\,(1 - e^{-\kappa(a-t_0)})$ away from the average curve <em>at age $a$</em>. Using the true $\kappa = 0.25$ and $t_0 = 0$, compute that shape factor at each age 1 to 8, then the implied SD at each age,
-<div class="eq-block">$\text{SD}(a) = \sqrt{\left(12 \cdot (1 - e^{-0.25 a})\right)^2 + 3^2}$</div>
-and compare the pooled value $\sqrt{\overline{\text{SD}(a)^2}}$ with what <code>nls</code> actually reported.</li>
-<li>Your answer to (b) should show that the true spread around the mean curve <em>grows with age</em>, while <code>nls</code> must describe it with a single number. Say what this means for the residual plot of <code>fit_nls</code>, and confirm it with <code>plot(fitted(fit_nls), resid(fit_nls))</code>.</li>
-<li>Look at the standard errors of <code>Kappa</code> and <code>Tzero</code> in the two fits (<code>summary(fit_nls)$coefficients</code> and <code>summary(fit_nlme)$tTable</code>). Which fit gives tighter intervals for those two parameters, and why does separating the two variance components buy you precision on parameters that were never random?</li>
-<li>Re-run the simulation with <code>nfish &lt;- 4</code> and again with <code>nfish &lt;- 20</code>, refitting <code>fit_nlme</code> each time, and report the estimated among-fish SD. It was built as 12 every time. What does the pattern tell you about how many groups you need before a variance component means anything &mdash; and how does that connect to the morning's rule about not bothering with a random effect when you have very few levels?</li>
+<li><strong>What does each fit say the measurement error is?</strong> Run <code>summary(fit_nls)$sigma</code> and <code>VarCorr(fit_nlme)</code>. You built the data with a measurement error of 3 and a fish-to-fish SD of 12. Which fit recovers both numbers, and what does the other one report instead?</li>
+
+<li><strong>Work out where that wrong number came from.</strong> No calculus needed &mdash; just look at the growth equation. Length is $L_\infty$ <em>multiplied by</em> the factor $(1 - e^{-\kappa a})$, and that factor is the fraction of its final size a fish has reached by age $a$.
+<p style="margin:8px 0">So two fish whose $L_\infty$ differ by 12 are <em>not</em> 12 apart at every age. At age $a$ they are $12 \times (\text{that fraction})$ apart &mdash; close together when young, far apart when old.</p>
+<ol type="i" style="margin-bottom:6px">
+<li>Compute the fraction at each age: <code>1 - exp(-0.25 * 1:8)</code>. How far apart are two such fish at age 1? At age 8?</li>
+<li>At any age the fish are spread out by <em>both</em> that gap and the measurement error. Squares add, so the spread at age $a$ is <code>sqrt((12*fraction)^2 + 3^2)</code>. Compute all eight.</li>
+<li><code>nls</code> must describe all eight ages with one number. Take <code>sqrt(mean(SD^2))</code> of your eight values and compare it with the $\sigma$ that <code>nls</code> reported in (a). Close?</li>
+</ol></li>
+
+<li><strong>What that does to the residual plot.</strong> Your eight numbers in (b) should grow with age. But <code>nls</code> used a single $\sigma$ for all of them, so its residuals must be too small at young ages and too large at old ones. Draw <code>plot(fitted(fit_nls), resid(fit_nls))</code> and describe the shape.
+<p style="margin:8px 0">Here is the trap: that picture looks exactly like non-constant variance, and the usual fixes are a variance function or a log transform. Neither would help. Say in one or two sentences what is actually wrong with the model.</p></li>
+
+<li><strong>What you gain by separating the two.</strong> Compare the standard errors of <code>Kappa</code> and <code>Tzero</code> between the fits (<code>summary(fit_nls)$coefficients</code> and <code>summary(fit_nlme)$tTable</code>). Neither parameter was given a random effect, yet one fit gives much tighter values. Every standard error is scaled by how noisy the model thinks the data are &mdash; use that to explain the difference.</li>
+
+<li><strong>How many fish do you need?</strong> Re-run the whole thing with <code>nfish &lt;- 4</code>, then with <code>nfish &lt;- 20</code>, refitting <code>fit_nlme</code> each time, and report the estimated fish-to-fish SD. It was built as 12 in every case. What does the pattern say about how many groups you need before a random effect is worth fitting?</li>
 </ol>
-<div class="callout warn" style="margin-top:12px;"><strong>Watch out.</strong> Part (e) asks about the estimate of a <em>variance</em>, which needs far more groups to pin down than a mean does. Do not read a single small-<code>nfish</code> run as proof of anything; the point is the direction and the spread across runs, not one number.</div>
-<div class="callout try" style="margin-top: 12px;"><strong>Your answer goes in the R Markdown hand-in.</strong> Report the three SDs from (a), your arithmetic in (b) against the observed value, the residual-plot description, the SE comparison, and the small-sample pattern from (e).</div>
+<div class="callout warn" style="margin-top:12px;"><strong>Watch out.</strong> Part (e) estimates a <em>spread</em>, which needs far more groups to pin down than an average does. One run at <code>nfish = 4</code> proves nothing on its own &mdash; if you can, run each setting a few times and look at how much the answer jumps around.</div>
+<div class="callout try" style="margin-top: 12px;"><strong>Your answer goes in the R Markdown hand-in.</strong> Report the three SDs from (a), your eight numbers and the comparison in (b), the residual-plot description, the standard-error comparison, and the pattern from (e).</div>
 </div>
 
 
@@ -309,6 +322,14 @@ noise_top[i] &lt;- <span class="fn">sum</span>(!<span class="fn">is.na</span>(dd
 gap[i]       &lt;- dd$AICc[<span class="nu">2</span>] - dd$AICc[<span class="nu">1</span>]</code></pre>
 Report three numbers: how often the winner is more than 2 units clear; among <em>those</em> runs, how often it still contains a noise predictor; and the overall fraction of runs in which the strict rule keeps a noise predictor.</li>
 <li>The strict rule cuts the overall false-positive rate a long way. Explain <em>how</em> it does that &mdash; look at how often it declines to pick anything at all, and at the noise rate <em>conditional</em> on a clear winner existing. Is the rule choosing better models, or mostly refusing to choose? What does the median gap between best and runner-up tell you about how often a clear winner exists when nothing is real?</li>
+<li><strong>Is AICc uniquely bad, or is this just Type I error?</strong> Every selection rule keeps noise sometimes, so the 2-unit rule only means something next to a benchmark. Repeat the gap calculation for BIC (<code>dredge(reg, rank="BIC")</code>, gap <code>db$BIC[2] - db$BIC[1]</code>) and record the same three numbers, plus the plain <code>p &lt; 0.05</code> rate you already have. Fill in this table:
+<pre><code>                      picks noise   winner &gt;2 clear   noise GIVEN clear
+p &lt; 0.05 (any of 3)      ____%            --                 --
+AICc best                ____%          ____%              ____%
+BIC  best                ____%          ____%              ____%
+
+median gap to runner-up:  AICc ____    BIC ____</code></pre></li>
+<li>Two things in that table need explaining. (i) BIC declares a clear winner far more often than AICc does &mdash; work out why from the size of the two penalties at $n = 50$, and check your reasoning against the median gaps. (ii) BIC is wrong less often <em>when it commits</em>, yet its overall rate of "confident <em>and</em> wrong" is <em>higher</em> than AICc's. Explain how both can be true at once, and say which of the two numbers you would want to know before trusting a published model-selection result.</li>
 </ol>
 <div class="callout try" style="margin-top: 12px;"><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
 </div>

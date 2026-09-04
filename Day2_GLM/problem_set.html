@@ -46,9 +46,9 @@
 
 <main class="content">
 <header class="lab-header">
- <div class="eyebrow">Day 2 · Assessed Problem Set · 40 pts (20 morning + 20 afternoon)</div>
+ <div class="eyebrow">Day 2 · Two assessed problem sets · 20 pts each</div>
  <h1>Continuous distributions, linear models, and GLMs</h1>
- <p class="lede">Twelve problems covering continuous-distribution choice, Normal vs lognormal regression, Poisson and negative-binomial count models with the log link, and logistic regression with the logit link. Several problems load real datasets and ask you to <em>fit</em> models and <em>read the coefficients as biology</em> — the sentence you would put in a manuscript, not the raw <code>Estimate (SE)</code>.</p>
+ <p class="lede">Two separately submitted 20-point problem sets, 40 points across Day 2. Twelve problems covering continuous-distribution choice, Normal vs lognormal regression, Poisson and negative-binomial count models with the log link, and logistic regression with the logit link. Several problems load real datasets and ask you to <em>fit</em> models and <em>read the coefficients as biology</em> — the sentence you would put in a manuscript, not the raw <code>Estimate (SE)</code>.</p>
 </header>
 
 <section class="callout warn" style="margin-top:24px;"><p><strong>This is the graded problem set.</strong> Answers are <em>not</em> shown here. Write your work in the two hand-in templates: <a href="morning_lab_template.Rmd"><code>morning_lab_template.Rmd</code></a> for the morning problems (1&ndash;4) and <a href="afternoon_lab_template.Rmd"><code>afternoon_lab_template.Rmd</code></a> for the afternoon problems (5&ndash;12). Knit each to HTML and upload the <code>.html</code> to the matching Canvas assignment.</p><p>For worked-example study with <em>visible</em> answers, see <a href="lab.html">the practice problem set on the main lab page</a> and the <a href="log_logit_intuition.html">log/logit intuition guide</a>.</p></section>
@@ -155,7 +155,7 @@ mean(d$Count); var(d$Count)</code></pre>
 <span class="ex-tag">Problem 5</span><span class="difficulty easy"> · interactions I &mdash; the additive baseline</span>
 <h3>What &ldquo;no interaction&rdquo; actually buys you</h3>
 <p>Problems 5&ndash;7 build one idea in three steps: <em>an interaction means the effect of one predictor depends on the value of another</em>. Everything you need is generated in the code block, so no data file is required. Work them in order.</p>
-<div class="callout key"><strong>The idea, stated once.</strong> For a two-predictor model, ask what happens to the fitted response when you nudge $x_1$ up by one unit. If the answer is the same number no matter where $x_2$ sits, the predictors act independently and the model is <em>additive</em>. If the answer changes with $x_2$, they interact. That question &mdash; take the derivative with respect to $x_1$ and look for $x_2$ in the result &mdash; is the whole of what follows.</div>
+<div class="callout key"><strong>The idea, stated once.</strong> For a two-predictor model, ask what happens to the fitted response when you nudge $x_1$ up by one unit. If the answer is the same number no matter where $x_2$ sits, the predictors act independently and the model is <em>additive</em>. If the answer changes with $x_2$, they interact. That question &mdash; find the slope in $x_1$ and look for $x_2$ in the result &mdash; is the whole of what follows. You can get that slope by differentiating, or by factoring $x_1$ out of the fitted mean and reading off whatever multiplies it; Problem 6 shows both.</div>
 <p>Start with data built with <em>no</em> interaction, and deliberately fit a model that allows one anyway:</p>
 <pre><code>set.seed(123)
 d5 &lt;- data.frame(x1 = runif(200, -2, 2), x2 = runif(200, -2, 2))
@@ -166,7 +166,7 @@ summary(m5)</code></pre>
 <ol type="a">
 <li>Report the four estimated coefficients against the values used to build the data (1, 1.5, &minus;1, and no product term). What does the fitted <code>x1:x2</code> coefficient come out as, and is it distinguishable from zero?</li>
 <li>Write the full statistical model in mathematical notation &mdash; the distribution of $y_i$, its mean as a function of $x_{1i}$ and $x_{2i}$, and what each parameter is.</li>
-<li>Differentiate the fitted mean with respect to $x_1$. Show your working. Does $x_2$ appear anywhere in the result?</li>
+<li>Differentiate the fitted mean with respect to $x_1$, and show your working. Why that is the right thing to differentiate: the derivative <em>is</em> the change in $\hat y$ produced by a one-unit step in $x_1$, which is what anyone means by &ldquo;the effect of $x_1$.&rdquo; So asking whether $x_2$ turns up in it is asking whether that effect depends on where $x_2$ sits. Does $x_2$ appear anywhere in the result?</li>
 <li>Using your fitted coefficients, compute the slope of $y$ on $x_1$ at $x_2 = -1$ and again at $x_2 = +1$. Report both. Why are they not <em>exactly</em> equal, given that the data were built with no interaction?</li>
 <li>If you plotted the fitted surface over the $(x_1, x_2)$ plane, what shape would it be? Name it in one word, and say what the contour lines of equal $\hat y$ would look like.</li>
 </ol>
@@ -187,7 +187,7 @@ summary(m6)</code></pre>
 <ol type="a">
 <li>Report the four coefficients against the truth (2, 1.5, &minus;1, 2).</li>
 <li>Write out the full statistical model in mathematical notation, as in Problem 5(b).</li>
-<li>Differentiate the fitted mean with respect to $x_1$ again. This time $x_2$ survives. Write the slope as a formula in $x_2$, then evaluate it at $x_2 = -1$, $x_2 = 0$ and $x_2 = +1$. Something happens between the first and the last &mdash; say what.</li>
+<li>Find the slope of the fitted mean in $x_1$ again. This time $x_2$ survives. Differentiate if you are comfortable doing that, but there is a route with no calculus in it: gather the two terms containing $x_1$ and factor it out, so the fitted mean reads $\hat y = (\beta_0 + \beta_2 x_2) + (\beta_1 + \beta_3 x_2)\,x_1$. Whatever multiplies $x_1$ <em>is</em> the slope, and written that way you can read straight off it how the slope depends on $x_2$. Either way, write the slope as a formula in $x_2$, then evaluate it at $x_2 = -1$, $x_2 = 0$ and $x_2 = +1$. Something happens between the first and the last &mdash; say what.</li>
 <li>Solve for the value of $x_2$ at which the effect of $x_1$ vanishes entirely. Compare your fitted answer to the value implied by the parameters used to build the data.</li>
 <li>Your collaborator writes: &ldquo;<em>the effect of $x_1$ on $y$ is 1.52.</em>&rdquo; Using your answer to (c), explain in two sentences why that sentence cannot be written for this model, and what it would have to say instead.</li>
 <li>What shape is the fitted surface now, and what happened to the contour lines of equal $\hat y$ compared with Problem 5(e)?</li>
@@ -210,16 +210,17 @@ summary(m7)</code></pre>
 <ol type="a">
 <li>Report the four coefficients. Which scale are they on &mdash; probability, odds, or log-odds?</li>
 <li>Write the full model in mathematical notation, including the link function.</li>
-<li>On the log-odds scale, the slope in $x_1$ is the same kind of formula you derived in Problem 6(c). Write it down and evaluate it at $x_2 = -1$ and $x_2 = +1$.</li>
-<li>On the <em>probability</em> scale the slope is $\dfrac{\partial p}{\partial x_1} = p(1-p)\,(\beta_1 + \beta_3 x_2)$. Explain in one sentence where the extra $p(1-p)$ comes from, and why it means a single number cannot describe &ldquo;the effect of $x_1$ on the probability&rdquo; even at a fixed $x_2$.</li>
+<li>On the log-odds scale, the slope in $x_1$ is the same kind of formula you found in Problem 6(c). Write it down and evaluate it at $x_2 = -1$ and $x_2 = +1$.</li>
 <li>Now refit the same data with <strong>no interaction term at all</strong>:
 <pre><code>m7add &lt;- glm(ybin ~ x1 + x2, data = d7, family = binomial)   # additive on the log-odds scale
 coef(m7add)</code></pre>
-This model is additive by construction: on the log-odds scale, the effect of $x_1$ is one number that does not involve $x_2$. Using the formula in (d) with $\beta_3 = 0$, compute $\partial p/\partial x_1$ at $x_1 = 0$ for $x_2 = -1$ and for $x_2 = +1$. Report both, and their ratio.</li>
+This model is additive by construction: on the log-odds scale, the effect of $x_1$ is one number that does not involve $x_2$. On the <em>probability</em> scale it is not, and here is the formula you need &mdash; take it as given:
+$$\frac{\partial p}{\partial x_1} = p(1-p)\,(\beta_1 + \beta_3 x_2).$$
+The $p(1-p)$ factor is the logistic curve's own steepness: biggest at $p = 0.5$, shrinking toward zero at either end, so the same step on the log-odds scale moves the probability by different amounts depending on where you started. Using that formula with $\beta_3 = 0$, compute $\partial p/\partial x_1$ at $x_1 = 0$ for $x_2 = -1$ and for $x_2 = +1$. Report both, and their ratio.</li>
 <li>You just found that the effect of $x_1$ on the probability depends on $x_2$ in a model containing no interaction term. Explain in three or four sentences why this happens, and what it implies for a reader who wants to know whether two predictors &ldquo;interact&rdquo; in a GLM. Your answer should distinguish clearly between the two scales.</li>
 </ol>
-<div class="callout warn"><strong>Watch out.</strong> Part (f) is the point of the whole sequence, and it is easy to state too strongly in either direction. A nonlinear link does not create an interaction in the model &mdash; the log-odds really are additive in <code>m7add</code>. What it does is make additivity on one scale disagree with additivity on the other, so &ldquo;do these predictors interact?&rdquo; is only a well-posed question once you say which scale you mean.</div>
-<div class="callout try"><strong>Your answer goes in the R Markdown hand-in.</strong> Report both coefficient tables, the log-odds slopes from (c), the two marginal effects and their ratio from (e), and your explanation in (f).</div>
+<div class="callout warn"><strong>Watch out.</strong> Part (e) is the point of the whole sequence, and it is easy to state too strongly in either direction. A nonlinear link does not create an interaction in the model &mdash; the log-odds really are additive in <code>m7add</code>. What it does is make additivity on one scale disagree with additivity on the other, so &ldquo;do these predictors interact?&rdquo; is only a well-posed question once you say which scale you mean.</div>
+<div class="callout try"><strong>Your answer goes in the R Markdown hand-in.</strong> Report both coefficient tables, the log-odds slopes from (c), the two marginal effects and their ratio from (d), and your explanation in (e).</div>
 </div>
 
 <!-- =========================== PROBLEM 8 =========================== -->

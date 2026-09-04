@@ -46,12 +46,12 @@
 
 <main class="content">
 <header class="lab-header">
- <div class="eyebrow">Day 4 · Assessed Problem Set (40 pts)</div>
+ <div class="eyebrow">Day 4 · Two assessed problem sets · 20 pts each</div>
  <h1>Ten problems on maximum likelihood and Bayesian inference</h1>
  <p class="lede">A dataset-driven problem set that mirrors the two Day 4 lectures. The morning problems are pure <strong>maximum likelihood</strong> — grid search, numerical optimization, likelihood-ratio tests, and profile confidence intervals. The afternoon problems are your first <strong>Bayesian</strong> models, fit with <span class="pill nimble">Nimble</span>. Five problems use the three real course datasets — <code>vonbert.csv</code> (Problem 2), <code>whale.csv</code> (Problems 3 and 10), and <code>Logistic.csv</code> (Problems 4 and 7); the rest are short simulate-and-fit or conceptual questions.</p>
 </header>
 
-<section class="callout warn" style="margin-top:24px;"><p><strong>Assessed problem set &middot; worth 40 points</strong> — 20 for the morning problems (1&ndash;4) and 20 for the afternoon problems (5&ndash;10), graded as two Canvas submissions. Answers are <em>not</em> shown here. Write your work in the R Markdown templates: <a href="morning_lab_template.Rmd"><code>morning_lab_template.Rmd</code></a> for the morning (MLE) problems, <a href="afternoon_lab_template.Rmd"><code>afternoon_lab_template.Rmd</code></a> for the afternoon (Bayesian) problems. Knit each to HTML and upload to the matching Canvas assignment.</p><p>For worked examples with visible answers, see <a href="lab.html">the in-class practice lab</a>.</p></section>
+<section class="callout warn" style="margin-top:24px;"><p><strong>Two assessed problem sets &middot; 20 points each</strong> — the morning problems (1&ndash;4) and the afternoon problems (5&ndash;10), submitted separately as two Canvas assignments, for 40 points across Day 4. Answers are <em>not</em> shown here. Write your work in the R Markdown templates: <a href="morning_lab_template.Rmd"><code>morning_lab_template.Rmd</code></a> for the morning (MLE) problems, <a href="afternoon_lab_template.Rmd"><code>afternoon_lab_template.Rmd</code></a> for the afternoon (Bayesian) problems. Knit each to HTML and upload to the matching Canvas assignment.</p><p>For worked examples with visible answers, see <a href="lab.html">the in-class practice lab</a>.</p></section>
 
 <section class="callout key"><p><strong>Topic scope — read this before you start.</strong> The two sessions use two different paradigms, and you must keep them separate.</p>
 <ul>
@@ -77,7 +77,7 @@
 </section>
 
 <a id="morning"></a>
-<h2 style="margin-top:36px;">Morning — Maximum likelihood</h2>
+<h2 style="margin-top:36px;">Morning — Maximum likelihood <span style="font-weight:400;font-size:.7em;color:#5c6773;">· separate hand-in · 20 pts</span></h2>
 
 <div class="exercise" id="p1">
 <span class="ex-tag">Problem 1</span><span class="difficulty medium"> · MLE by hand · Binomial · 25 min</span>
@@ -167,7 +167,7 @@ Keep the <code>control = list(parscale = ...)</code> line. <code>optim()</code> 
 <!-- ================================================================= -->
 
 <a id="afternoon"></a>
-<h2 style="margin-top:48px;">Afternoon — Bayesian inference (Nimble)</h2>
+<h2 style="margin-top:48px;">Afternoon — Bayesian inference (Nimble) <span style="font-weight:400;font-size:.7em;color:#5c6773;">· separate hand-in · 20 pts</span></h2>
 
 <section class="callout key"><p><strong>From here on, work in the Bayesian paradigm.</strong> Every fitted model below is written in <span class="pill nimble">Nimble</span> with <code>nimbleCode()</code> and run with <code>nimbleMCMC()</code> (3 chains, a burn-in, and <code>samplesAsCodaMCMC = TRUE</code> so <code>MCMCvis</code> works directly). Report posterior summaries, and check convergence ($\hat R \approx 1$, healthy effective sample size) before interpreting.</p></section>
 

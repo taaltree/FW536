@@ -248,7 +248,7 @@ s3 &lt;- <span class="fn">replicate</span>(<span class="nu">20000</span>, <span 
 <li>Run the second. How far off is a standard deviation estimated from three points, and how often is it roughly right?</li>
 <li>Now put the two together: in two or three sentences, say why M8's correlation was the parameter that failed. Which of the two quantities can three groups say something useful about, and which one will happily return an extreme answer no matter what the truth is?</li>
 </ol>
-<p style="margin:8px 0">If you want to see it directly, plot one of the samples: <code>plot(rnorm(3), rnorm(3))</code>. Three points nearly always look like a line.</p></li>
+<p style="margin:8px 0">If you want to see it directly, plot one of the samples: <code>plot(rnorm(3), rnorm(3))</code>. Three points often look like a line.</p></li>
 
 <li><strong>Ask for less: the <code>||</code> notation.</strong> Writing a double bar instead of a single one keeps both random effects but forces their correlation to zero, so the model estimates two parameters instead of three:
 <pre><code><span class="cm"># (1 + Z_Length | Fish_Species)   intercepts, slopes, AND their correlation  — 3 parameters</span>

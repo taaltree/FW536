@@ -249,7 +249,7 @@ ants[i,<span class="nu">1</span>] ~ <span class="fn">dpois</span>(lam[i])
 </div>
 
 <div class="exercise" id="ex-1">
-<span class="ex-tag">Practice Exercise M1</span><span class="difficulty easy"> · 10 min · prior intuition</span>
+<span class="ex-tag">Practice Exercise M1</span><span class="difficulty easy"> · prior intuition</span>
 <h3>What does a "vague" log-scale prior actually look like?</h3>
 <p>You're putting a $\mathcal{N}(0,\ \sigma = 100)$ prior (that is, $\sigma^2 = 10000$; in NIMBLE, <code>dnorm(0, tau = 1/10000)</code>) on the slope of a log-link Poisson regression. Latitude in the ants data ranges from 41.97&deg; to 45.00&deg; <em>on the raw scale</em>.</p>
 <ol type="a">
@@ -280,7 +280,7 @@ eff2 &lt;- <span class="fn">exp</span>(beta * <span class="nu">1</span>) <span c
 </div>
 
 <div class="exercise" id="ex-2">
-<span class="ex-tag">Practice Exercise M2</span><span class="difficulty medium"> · 25 min · R</span>
+<span class="ex-tag">Practice Exercise M2</span><span class="difficulty medium"> · R</span>
 <h3>Fit the ant richness model twice</h3>
 <p>Using <code>ants.csv</code> and <code>ant.priors.R</code> as a starting point, fit the model:</p>
 <ol type="a">
@@ -512,7 +512,7 @@ samples &lt;- <span class="fn">nimbleMCMC</span>(lizardCode, constants=constants
 </figure>
 
 <div class="exercise" id="ex-3">
-<span class="ex-tag">Practice Exercise M3</span><span class="difficulty medium"> · 20 min · R · convergence</span>
+<span class="ex-tag">Practice Exercise M3</span><span class="difficulty medium"> · R · convergence</span>
 <h3>Lizards: run the model and read the diagnostics properly</h3>
 <p>Run the script <code>Lizards_Nimble.R</code> end to end. This exercise is about the
 <em>diagnostics</em>. The biological inference from this model &mdash; the sign of the slope, the
@@ -634,7 +634,7 @@ and neither one indicates a problem.</p>
 </div>
 
 <div class="exercise" id="ex-4">
-<span class="ex-tag">Practice Exercise M4</span><span class="difficulty medium"> · 25 min · R · core lab</span>
+<span class="ex-tag">Practice Exercise M4</span><span class="difficulty medium"> · R · core lab</span>
 <h3>Walk the pooling spectrum: the three N<sub>2</sub>O models</h3>
 <p>Open <code>Multilevel_Nimble.R</code> and walk through <strong>models 1&ndash;3</strong> in order
 &mdash; complete pooling, no pooling, partial pooling. That progression is the point of the morning,
@@ -786,7 +786,7 @@ what happens when you give the model something better to pull it toward.</p>
 </div>
 
 <div class="exercise" id="ex-5">
-<span class="ex-tag">Practice Exercise M5</span><span class="difficulty medium"> · 20 min · R</span>
+<span class="ex-tag">Practice Exercise M5</span><span class="difficulty medium"> · R</span>
 <h3>Spawner-recruit: fit the curve, then ask what it can support</h3>
 <p>Open <code>SpawnerRecruit_Nimble.R</code>. The script simulates 20 years of data from a known
 truth ($a=5$, $b=5000$, $\sigma=0.2$) and fits the Beverton-Holt curve. Fit it and interrogate the
@@ -926,7 +926,7 @@ zst &lt;- <span class="fn">matrix</span>(<span class="nu">1L</span>, Nsites, Nye
 <p>The year-3 crash ($\lambda \approx 0.5$, occupancy roughly halved) and the year-4 rebound ($\lambda \approx 2.4$) jump straight out of the <code>lambda</code> column, and turnover stays high throughout (0.5&ndash;0.94) &mdash; so this is a <em>churny</em> metapopulation, sites blinking on and off, not a stable core of occupied patches. None of that is visible in the raw per-year $\phi_t,\gamma_t$.</p>
 
 <div class="exercise" id="ex-6">
-<span class="ex-tag">Practice Exercise M6</span><span class="difficulty hard"> · 35 min · R · latent states</span>
+<span class="ex-tag">Practice Exercise M6</span><span class="difficulty hard"> · R · latent states</span>
 <h3>Dynamic occupancy: simulate and recover</h3>
 <p>Open <code>DynamicOccupancy_Nimble.R</code> and run end-to-end.</p>
 <ol type="a">
@@ -995,7 +995,7 @@ zst &lt;- <span class="fn">matrix</span>(<span class="nu">1L</span>, Nsites, Nye
 <p><strong>Reading the number.</strong> If the model fits, the real data are a typical draw, so roughly half the replicates land above it and half below: $p_B \approx 0.5$. A value near 0 means the observed statistic is larger than almost every replicate (the data are far more variable &mdash; or more clustered &mdash; than the model can generate); a value near 1 means the opposite. Either extreme is evidence of misfit, and, unlike a bare point estimate, it tells you <em>which</em> feature (whatever $T$ measured) the model gets wrong. Values from about 0.1 to 0.9 are unremarkable.</p>
 
 <div class="exercise" id="ex-7">
-<span class="ex-tag">Practice Exercise M7</span><span class="difficulty medium"> · 25 min · R</span>
+<span class="ex-tag">Practice Exercise M7</span><span class="difficulty medium"> · R</span>
 <h3>N-mixture: build up from basic to overdispersed</h3>
 <p>Open <code>NMixture_Nimble.R</code> and run all four models.</p>
 <ol type="a">
@@ -1014,7 +1014,7 @@ zst &lt;- <span class="fn">matrix</span>(<span class="nu">1L</span>, Nsites, Nye
 </div>
 
 <div class="exercise" id="ex-8">
-<span class="ex-tag">Practice Exercise M8</span><span class="difficulty hard"> · 35 min · R · synthesis</span>
+<span class="ex-tag">Practice Exercise M8</span><span class="difficulty hard"> · R · synthesis</span>
 <h3>Add a site-level random effect to the N-mixture model</h3>
 <p>Modify <code>Nmix4Code</code> to add a Poisson-lognormal structure:</p>
 <div class="eq-block">$\log \lambda_i = \beta_0 + \epsilon_i, \quad \epsilon_i \sim \mathcal{N}(0, \sigma_\epsilon^2)$</div>

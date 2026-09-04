@@ -69,7 +69,7 @@
 
 <a id="morning"></a>
 <div class="exercise" id="p1">
-<span class="ex-tag">Problem 1</span><span class="difficulty medium"> · 25 min · hierarchical Poisson · <code>ants.csv</code></span>
+<span class="ex-tag">Problem 1</span><span class="difficulty medium"> · hierarchical Poisson · <code>ants.csv</code></span>
 <h3>Overdispersed ant richness with a bog-level random effect</h3>
 <p>Load the ant-richness data and fit a Poisson regression of <em>richness</em> on the three scaled covariates, but add a <strong>bog-level (observation-level) random effect</strong> $\epsilon_i$ on the log mean to absorb overdispersion:</p>
 <div class="eq-block">$y_i \sim \text{Poisson}(\lambda_i), \quad \log \lambda_i = \beta_0 + \beta_1 \text{forest}_i + \beta_2 \text{lat}_i + \beta_3 \text{elev}_i + \epsilon_i, \quad \epsilon_i \sim \mathcal{N}(0, \sigma_\epsilon^2)$</div>
@@ -88,7 +88,7 @@ ants$elevation &lt;- <span class="fn">as.numeric</span>(<span class="fn">scale</
 
 <!-- Problem 2 -->
 <div class="exercise" id="p2">
-<span class="ex-tag">Problem 2</span><span class="difficulty easy"> · 15 min · what a prior actually claims</span>
+<span class="ex-tag">Problem 2</span><span class="difficulty easy"> · what a prior actually claims</span>
 <h3>What does a "vague" log-scale prior actually assert?</h3>
 <p>Practice Exercise M1 had you draw from a vague log-scale prior and look at the multiplicative effect it implies across the latitude range; Practice Exercise M2 showed what that same prior does to the <em>chains</em> when the predictors are unscaled. This problem picks the M1 draw back up and takes it two steps further: onto a per-unit effect you can state in a sentence, and into an argument you would actually have with a reviewer. On a log link a prior on $\beta$ is a prior on a multiplicative effect $e^\beta$, and that translation is where "uninformative" priors stop being uninformative.</p>
 <ol type="a">
@@ -101,7 +101,7 @@ ants$elevation &lt;- <span class="fn">as.numeric</span>(<span class="fn">scale</
 
 
 <div class="exercise" id="p3">
-<span class="ex-tag">Problem 3</span><span class="difficulty medium"> · 30 min · multilevel pooling · <code>N2OEmission.csv</code></span>
+<span class="ex-tag">Problem 3</span><span class="difficulty medium"> · multilevel pooling · <code>N2OEmission.csv</code></span>
 <h3>The pooling spectrum for soil N<sub>2</sub>O emissions</h3>
 <p>Load the N<sub>2</sub>O data and model $\log(\text{emission})$ as a function of centred $\log(\text{n.input})$, with sites indexed by <code>group.index</code>.</p>
 <div class="code-label">R · start from the real data</div>
@@ -120,7 +120,7 @@ nsites &lt;- <span class="fn">length</span>(<span class="fn">unique</span>(group
 
 <!-- Problem 4 -->
 <div class="exercise" id="p4">
-<span class="ex-tag">Problem 4</span><span class="difficulty hard"> · 35 min · group-level regression · <code>N2OEmission.csv</code></span>
+<span class="ex-tag">Problem 4</span><span class="difficulty hard"> · group-level regression · <code>N2OEmission.csv</code></span>
 <h3>Modeling the random intercept with a site-level covariate</h3>
 <p>Extend the partial-pooling model from Problem 3 so the per-site mean intercept is itself regressed on a <strong>site-level covariate</strong> $w_j$ (a per-site summary derived from the data), and let the N-input slope vary by fertilizer type (<code>fert.index</code>):</p>
 <div class="eq-block">$\alpha_j \sim \mathcal{N}(\kappa + \eta\, w_j,\ \sigma_\alpha^2), \qquad \beta_{k} \sim \mathcal{N}(\mu_\beta, \sigma_\beta^2)$</div>
@@ -147,7 +147,7 @@ group, which is what part (b) makes you check.</p></div>
 
 <!-- Problem 5 -->
 <div class="exercise" id="p5">
-<span class="ex-tag">Problem 5</span><span class="difficulty medium"> · 25 min · Bayesian logistic · <code>IslandsLizards.csv</code></span>
+<span class="ex-tag">Problem 5</span><span class="difficulty medium"> · Bayesian logistic · <code>IslandsLizards.csv</code></span>
 <h3>Island lizard occupancy vs. perimeter:area ratio</h3>
 <p>Load the island-lizard data and fit logistic regression of <em>presence</em> on the scaled perimeter:area ratio:</p>
 <div class="eq-block">$y_i \sim \text{Bernoulli}(p_i), \quad \text{logit}\,p_i = a + b\, x_i$</div>
@@ -165,7 +165,7 @@ y        &lt;- <span class="fn">as.integer</span>(liz$presence)</code></pre>
 
 <!-- Problem 6 -->
 <div class="exercise" id="p6">
-<span class="ex-tag">Problem 6</span><span class="difficulty medium"> · 20 min · derived quantity · <code>IslandsLizards.csv</code></span>
+<span class="ex-tag">Problem 6</span><span class="difficulty medium"> · derived quantity · <code>IslandsLizards.csv</code></span>
 <h3>A management-relevant probability difference</h3>
 <p>Building on your Problem 5 fit, compute derived quantities <em>inside</em> the model so their full posterior is delivered by MCMC. Add the deterministic nodes</p>
 <div class="eq-block">$y_{10} = \text{ilogit}(a + b\, x_{10}), \quad y_{20} = \text{ilogit}(a + b\, x_{20}), \quad \text{diff} = y_{20} - y_{10}$</div>
@@ -179,7 +179,7 @@ y        &lt;- <span class="fn">as.integer</span>(liz$presence)</code></pre>
 
 <!-- Problem 7 -->
 <div class="exercise" id="p7">
-<span class="ex-tag">Problem 7</span><span class="difficulty medium"> · 30 min · spawner-recruit + derived $S_\text{msy}$</span>
+<span class="ex-tag">Problem 7</span><span class="difficulty medium"> · spawner-recruit + derived $S_\text{msy}$</span>
 <h3>Beverton-Holt fit with management quantities</h3>
 <p>Simulate a spawner-recruit time series from a known truth, then fit the Beverton-Holt model in <span class="pill nimble">NIMBLE</span> and define the management quantities as deterministic nodes so their posteriors come for free.</p>
 <div class="eq-block">$\log R_t \sim \mathcal{N}\!\big(\log a + \log S_t - \log(1 + \tfrac{a}{b} S_t),\ \sigma^2\big)$</div>
@@ -230,7 +230,7 @@ of the parameters underneath it.</p></div>
 
 <!-- Problem 8 -->
 <div class="exercise" id="p8">
-<span class="ex-tag">Problem 8</span><span class="difficulty medium"> · 20 min · derived quantities, done properly</span>
+<span class="ex-tag">Problem 8</span><span class="difficulty medium"> · derived quantities, done properly</span>
 <h3>Why you cannot build a derived quantity from summary numbers</h3>
 <p>You have posterior draws of $a$ and $b$ from Problem 7. Management quantities are functions of those parameters, and there are two ways to produce an interval for them &mdash; one right, one that looks reasonable and is not.</p>
 <ol type="a">
@@ -245,7 +245,7 @@ of the parameters underneath it.</p></div>
 
 
 <div class="exercise" id="p9">
-<span class="ex-tag">Problem 9</span><span class="difficulty hard"> · 35 min · N-mixture + Bayesian p-value</span>
+<span class="ex-tag">Problem 9</span><span class="difficulty hard"> · N-mixture + Bayesian p-value</span>
 <h3>Repeat-count abundance and a goodness-of-fit check</h3>
 <p>An <strong>N-mixture model</strong> estimates the abundance of unmarked animals when you cannot count every individual: repeated visits to the same closed site let it separate true abundance ($\lambda$) from detection probability ($p$), which a raw count confounds. (It is the abundance analog of the occupancy model; see the practice lab for a fuller explanation.) Here you will simulate repeated counts, fit the Royle (2004) N-mixture model in <span class="pill nimble">NIMBLE</span>, and then test the Poisson-abundance assumption with a posterior-predictive Bayesian p-value.</p>
 <div class="eq-block">$N_i \sim \text{Poisson}(\lambda), \quad y_{ij} \sim \text{Binomial}(N_i, p)$</div>
@@ -266,7 +266,7 @@ y &lt;- <span class="fn">matrix</span>(<span class="kw">NA</span>, sites, reps)
 
 <!-- Problem 10 -->
 <div class="exercise" id="p10">
-<span class="ex-tag">Problem 10</span><span class="difficulty hard"> · 40 min · latent state · dynamic occupancy</span>
+<span class="ex-tag">Problem 10</span><span class="difficulty hard"> · latent state · dynamic occupancy</span>
 <h3>Multi-season occupancy: recover persistence and colonization</h3>
 <p>Simulate a dynamic (multi-season) occupancy dataset and recover the year-specific persistence $\phi_t$ and colonization $\gamma_t$ from replicated detection/non-detection data with imperfect detection.</p>
 <div class="eq-block">$z_{i,t} \sim \text{Bernoulli}\big(z_{i,t-1}\phi_{t-1} + (1-z_{i,t-1})\gamma_{t-1}\big), \quad y_{i,j,t} \sim \text{Bernoulli}(z_{i,t}\, p)$</div>

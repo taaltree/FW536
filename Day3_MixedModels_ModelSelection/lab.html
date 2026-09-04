@@ -204,7 +204,7 @@ You'll see two packages in this lab: <code>nlme</code> (Pinheiro &amp; Bates, th
 
 <!-- Example 1: Streams -->
 <div class="exercise" id="ex-1">
-<span class="ex-tag">Practice Exercise M1</span><span class="difficulty easy"> · 20 min · streams</span>
+<span class="ex-tag">Practice Exercise M1</span><span class="difficulty easy"> · streams</span>
 <h3>Streams: complete pooling vs no pooling vs partial pooling</h3>
 <p>The file <code>stream_density.csv</code> has fish density measurements from 100 streams, three observations per stream.</p>
 
@@ -259,7 +259,7 @@ intervals(lm3)$sigma
 
 <!-- Example 2: Length-Weight -->
 <div class="exercise" id="ex-2">
-<span class="ex-tag">Practice Exercise M2</span><span class="difficulty medium"> · 25 min · length-weight</span>
+<span class="ex-tag">Practice Exercise M2</span><span class="difficulty medium"> · length-weight</span>
 <h3>Length–weight: random intercepts with a fixed-effect covariate</h3>
 <p><code>length_weight.csv</code> has length and weight for individuals from multiple subjects (groups). The biological question: is there a length–weight relationship, and does the intercept vary by subject?</p>
 
@@ -293,7 +293,7 @@ m1b &lt;- <span class="fn">lmer</span>(Weight ~ Length + (<span class="nu">1</sp
 
 <!-- Example 3: VonB -->
 <div class="exercise" id="ex-3">
-<span class="ex-tag">Practice Exercise M3</span><span class="difficulty hard"> · 35 min · nonlinear mixed</span>
+<span class="ex-tag">Practice Exercise M3</span><span class="difficulty hard"> · nonlinear mixed</span>
 <h3>Von Bertalanffy growth: a nonlinear mixed model</h3>
 <p>The file <code>fish_growth.csv</code> contains age and length measurements for multiple individual fish ("Subject"). Each fish should follow the von Bertalanffy growth curve:</p>
 <div class="eq-block">$L(a) = L_\infty \left(1 - e^{-\kappa (a - t_0)}\right)$</div>
@@ -344,7 +344,7 @@ m_fixed &lt;- <span class="fn">nls</span>(Length ~ Linf*(<span class="nu">1</spa
 
 <!-- Example 5: Choosing fixed effect basis -->
 <div class="exercise" id="ex-5">
-<span class="ex-tag">Practice Exercise M4</span><span class="difficulty medium"> · 15 min · ML vs REML in action</span>
+<span class="ex-tag">Practice Exercise M4</span><span class="difficulty medium"> · ML vs REML in action</span>
 <h3>Comparing fixed-effect structures requires ML, not REML</h3>
 <p>Using the trophic-position dataset and the random-effect structure of <code>M1</code>:</p>
 
@@ -426,7 +426,7 @@ weight each model's predictions and can be used for model-averaged effect estima
 
 <!-- Selection ex 1 -->
 <div class="exercise" id="ex-7">
-<span class="ex-tag">Practice Exercise A1</span><span class="difficulty easy"> · 15 min · the "competitive model" myth</span>
+<span class="ex-tag">Practice Exercise A1</span><span class="difficulty easy"> · the "competitive model" myth</span>
 <h3>What does $\Delta\text{AIC} = 1.5$ actually mean?</h3>
 
 <div class="code-label">Code</div>
@@ -464,7 +464,7 @@ within2 &lt;- <span class="fn">replicate</span>(reps, {
 
 <!-- Selection ex 2 -->
 <div class="exercise" id="ex-8">
-<span class="ex-tag">Practice Exercise A2</span><span class="difficulty medium"> · 25 min · simulated Type I error</span>
+<span class="ex-tag">Practice Exercise A2</span><span class="difficulty medium"> · simulated Type I error</span>
 <h3>Simulation: how often does AIC pick noise as "best"?</h3>
 <p>Generate $y \sim \mathcal{N}(5, 3^2)$, completely unrelated to $x_1, x_2, x_3 \sim U(0,1)$. Fit every subset; record how many predictors the top model retains, under each criterion.</p>
 
@@ -519,7 +519,7 @@ pstor &lt;- AICstor &lt;- AICcstor &lt;- BICstor &lt;- <span class="fn">rep</spa
 
 <!-- Selection ex 4 -->
 <div class="exercise" id="ex-9">
-<span class="ex-tag">Practice Exercise A3</span><span class="difficulty medium"> · 20 min · cross-validation</span>
+<span class="ex-tag">Practice Exercise A3</span><span class="difficulty medium"> · cross-validation</span>
 <h3>LOOCV vs AIC for the noise-only case</h3>
 <p>Same setup as Exercise A2 ($y$ unrelated to predictors). It is tempting to assume that cross-validation, because it actually holds data out, is the more trustworthy criterion. Test that assumption rather than accepting it. Fit all 8 models to one realization and rank them by both LOOCV MSE and AIC.</p>
 
@@ -575,7 +575,7 @@ m12  6.309 235.939 2.880</code></pre>
 
 <!-- Selection ex 5 -->
 <div class="exercise" id="ex-10">
-<span class="ex-tag">Practice Exercise A4</span><span class="difficulty medium"> · 20 min · LRT for mixed models</span>
+<span class="ex-tag">Practice Exercise A4</span><span class="difficulty medium"> · LRT for mixed models</span>
 <h3>LRT vs AICc for a random-slope decision</h3>
 <p>Return to the trophic-position dataset. Compare two nested random-effects structures using both LRT and AICc.</p>
 

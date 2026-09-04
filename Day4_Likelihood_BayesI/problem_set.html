@@ -59,7 +59,7 @@
 <li><strong>Afternoon (Problems 5–10) — Bayesian only.</strong> Use priors, posteriors, conjugacy, and MCMC. All fitted Bayesian models must be written in <span class="pill nimble">Nimble</span> (<code>nimbleCode</code> + <code>nimbleMCMC</code>), not JAGS.</li>
 </ul></section>
 
-<section><p>Aim for roughly 5 hours total &mdash; about 145 minutes for the morning problems (1&ndash;4) and 165 for the afternoon (5&ndash;10), following the per-problem estimates on each problem&rsquo;s pill. Try each problem before checking anything. All datasets live in this Day's <a href="data/"><code>data/</code></a> folder and are loaded exactly as in <a href="lab.html">the lab</a>.</p></section>
+<section><p>The morning problems (1&ndash;4) are maximum likelihood and the afternoon problems (5&ndash;10) are Bayesian; each set is a separate hand-in. Try each problem before checking anything. All datasets live in this Day's <a href="data/"><code>data/</code></a> folder and are loaded exactly as in <a href="lab.html">the lab</a>.</p></section>
 
 <!-- ================================================================= -->
 <!-- ================ MORNING · MAXIMUM LIKELIHOOD =================== -->
@@ -80,7 +80,7 @@
 <h2 style="margin-top:36px;">Morning — Maximum likelihood <span style="font-weight:400;font-size:.7em;color:#5c6773;">· separate hand-in · 20 pts</span></h2>
 
 <div class="exercise" id="p1">
-<span class="ex-tag">Problem 1</span><span class="difficulty medium"> · MLE by hand · Binomial · 25 min</span>
+<span class="ex-tag">Problem 1</span><span class="difficulty medium"> · MLE by hand · Binomial</span>
 <h3>Post-release survival from a tagging study</h3>
 <p>You released 80 fish after barotrauma treatment and tracked them with acoustic tags; 47 were detected alive after 7 days. Treat each fish's outcome as an independent Bernoulli($\phi$), where $\phi$ is the probability of post-release survival.</p>
 <ol type="a">
@@ -97,7 +97,7 @@
 </div>
 
 <div class="exercise" id="p2">
-<span class="ex-tag">Problem 2</span><span class="difficulty hard"> · Real data · Grid search + optim + LRT · 45 min</span>
+<span class="ex-tag">Problem 2</span><span class="difficulty hard"> · Real data · Grid search + optim + LRT</span>
 <h3>Von Bertalanffy growth from length-at-age data (<code>vonbert.csv</code>)</h3>
 <p>The file <code>data/vonbert.csv</code> holds length-at-age records with three columns — <code>sex</code> (1 or 2), <code>age</code> (years), and <code>length</code>. The Von Bertalanffy growth function (VBGF) is</p>
 <div class="eq-block">$L_a = L_\infty\left(1 - e^{-\kappa a}\right) + \varepsilon, \qquad \varepsilon \sim \mathcal{N}(0, \sigma^2),$</div>
@@ -114,7 +114,7 @@ Sex &lt;- TheData$sex; Age &lt;- TheData$age; Len &lt;- TheData$length</code></p
 </div>
 
 <div class="exercise" id="p3">
-<span class="ex-tag">Problem 3</span><span class="difficulty hard"> · Real data · Numerical MLE · Mixture · 40 min</span>
+<span class="ex-tag">Problem 3</span><span class="difficulty hard"> · Real data · Numerical MLE · Mixture</span>
 <h3>Two-component Poisson mixture for whale blow counts (<code>whale.csv</code>)</h3>
 <p>The file <code>data/whale.csv</code> holds blow counts for individual whales (column <code>sex</code> codes each whale 1 or 2; column <code>blows</code> is the count). The population is a mix of <strong>males and females</strong> that blow at different average rates. Treat each whale's sex as unobserved and model the counts as a two-component mixture: males blow at rate $\lambda_1$, females at rate $\lambda_2$, and a whale is male with probability $\pi$ (the <strong>proportion of males</strong>) and female with probability $1-\pi$. Your goal is to estimate the male rate $\lambda_1$, the female rate $\lambda_2$, and the proportions $\pi$ and $1-\pi$:</p>
 <div class="eq-block">$f(y \mid \lambda_1, \lambda_2, \pi) = \pi\,\text{Pois}(y;\lambda_1) + (1-\pi)\,\text{Pois}(y;\lambda_2).$</div>
@@ -131,7 +131,7 @@ blows &lt;- TheData$blows   <span class="cm"># the mixture ignores the sex colum
 </div>
 
 <div class="exercise" id="p4">
-<span class="ex-tag">Problem 4</span><span class="difficulty medium"> · Real data · MLE / linear model · 35 min</span>
+<span class="ex-tag">Problem 4</span><span class="difficulty medium"> · Real data · MLE / linear model</span>
 <h3>Logistic (r/K) growth by maximum likelihood (<code>Logistic.csv</code>)</h3>
 <p>The file <code>data/Logistic.csv</code> has two columns: <code>PopulationSize</code> ($N$) and <code>GrowthRate</code> (the per-capita rate $\tfrac{1}{N}\tfrac{dN}{dt}$). The per-capita form of logistic growth is linear in $N$:</p>
 <div class="eq-block">$y_i = \frac{1}{N_i}\frac{dN}{dt} = r - \frac{r}{K}\,N_i + \varepsilon_i, \qquad \varepsilon_i \sim \mathcal{N}(0, \sigma^2).$</div>
@@ -172,7 +172,7 @@ Keep the <code>control = list(parscale = ...)</code> line. <code>optim()</code> 
 <section class="callout key"><p><strong>From here on, work in the Bayesian paradigm.</strong> Every fitted model below is written in <span class="pill nimble">Nimble</span> with <code>nimbleCode()</code> and run with <code>nimbleMCMC()</code> (3 chains, a burn-in, and <code>samplesAsCodaMCMC = TRUE</code> so <code>MCMCvis</code> works directly). Report posterior summaries, and check convergence ($\hat R \approx 1$, healthy effective sample size) before interpreting.</p></section>
 
 <div class="exercise" id="p5">
-<span class="ex-tag">Problem 5</span><span class="difficulty medium"> · Bayesian · Nimble + conjugacy · 30 min</span>
+<span class="ex-tag">Problem 5</span><span class="difficulty medium"> · Bayesian · Nimble + conjugacy</span>
 <h3>Bayesian survival with an informative prior</h3>
 <p>You marked 50 adult animals in spring; 38 were re-encountered alive the following year. Literature suggests adult survival is around 0.55 with moderate uncertainty, which you encode as a Beta(11, 9) prior on $\phi$ (annual survival).</p>
 <ol type="a">
@@ -184,7 +184,7 @@ Keep the <code>control = list(parscale = ...)</code> line. <code>optim()</code> 
 </div>
 
 <div class="exercise" id="p6">
-<span class="ex-tag">Problem 6</span><span class="difficulty medium"> · Bayesian · Nimble + conjugacy · 30 min</span>
+<span class="ex-tag">Problem 6</span><span class="difficulty medium"> · Bayesian · Nimble + conjugacy</span>
 <h3>Bayesian detection rate for a species of concern</h3>
 <p>You ran 25 ten-minute point counts and recorded these per-count detection numbers:</p>
 <p><code>y = c(0,1,0,2,0,1,0,0,3,1,0,0,1,2,0,1,0,1,0,0,2,0,1,1,0)</code></p>
@@ -198,7 +198,7 @@ Keep the <code>control = list(parscale = ...)</code> line. <code>optim()</code> 
 </div>
 
 <div class="exercise" id="p7">
-<span class="ex-tag">Problem 7</span><span class="difficulty hard"> · Bayesian · Nimble · Real data · 45 min</span>
+<span class="ex-tag">Problem 7</span><span class="difficulty hard"> · Bayesian · Nimble · Real data</span>
 <h3>Bayesian logistic (r/K) growth with derived quantities (<code>Logistic.csv</code>)</h3>
 <p>Return to <code>data/Logistic.csv</code> from Problem 4, but now fit the per-capita logistic model in the Bayesian framework so you get full posterior distributions for $r$, $K$, and any derived quantity. The template <a href="Logistic_BayesianGrowth_Nimble.R"><code>Logistic_BayesianGrowth_Nimble.R</code></a> in this folder is your scaffold.</p>
 <div class="code-label">R · load Logistic (same as morning)</div>
@@ -238,7 +238,7 @@ short time series were the only data you had.</li>
 </div>
 
 <div class="exercise" id="p8">
-<span class="ex-tag">Problem 8</span><span class="difficulty medium"> · Conceptual · Prior sensitivity · 20 min</span>
+<span class="ex-tag">Problem 8</span><span class="difficulty medium"> · Conceptual · Prior sensitivity</span>
 <h3>Prior sensitivity in a data-poor problem</h3>
 <p>You observed 3 detections in 20 surveys. Compare four priors on the detection probability $p$: Beta(1, 1) (flat), Beta(1, 9) (skeptical, prior mean 0.10), Beta(20, 30) (informative around 0.40), and Beta(100, 100) (very informative around 0.50).</p>
 <ol type="a">
@@ -249,7 +249,7 @@ short time series were the only data you had.</li>
 </div>
 
 <div class="exercise" id="p9">
-<span class="ex-tag">Problem 9</span><span class="difficulty easy"> · Conceptual · BCI vs HPDI · 15 min</span>
+<span class="ex-tag">Problem 9</span><span class="difficulty easy"> · Conceptual · BCI vs HPDI</span>
 <h3>BCI vs HPDI for a skewed posterior</h3>
 <p>You fit a Poisson model to clutch sizes at $n = 12$ nests. Write $y_i$ for the clutch size (number of eggs) at nest $i$; the data enter the Gamma–Poisson posterior only through their total, $\sum_{i=1}^{12} y_i$ — the total number of eggs summed across all 12 nests, here $\sum y_i = 38$. With a Gamma(2, 1) prior, the posterior on the mean clutch size $\lambda$ is Gamma$\bigl(2 + \textstyle\sum y_i,\; 1 + n\bigr)$ = Gamma$(2 + 38,\; 1 + 12)$ = Gamma(40, 13).</p>
 <ol type="a">
@@ -260,7 +260,7 @@ short time series were the only data you had.</li>
 </div>
 
 <div class="exercise" id="p10">
-<span class="ex-tag">Problem 10</span><span class="difficulty hard"> · Bayesian · Nimble · Real data · Identifiability &amp; label switching · 25 min</span>
+<span class="ex-tag">Problem 10</span><span class="difficulty hard"> · Bayesian · Nimble · Real data · Identifiability &amp; label switching</span>
 <h3>Identifiability and label switching in a Bayesian mixture</h3>
 <p>You refit the two-component whale-blow mixture from Problem 3 (males vs females) in <span class="pill nimble">Nimble</span> instead of with <code>mle()</code>. With 3 chains, no constraint on the ordering of $\lambda_1$ and $\lambda_2$, and chains started from <em>different labelings</em>, each chain locks onto its own labeling and stays there: one chain reports "$\lambda_1$" $\approx 10$ while another reports "$\lambda_1$" $\approx 30$ for the whole run. Every individual trace plot looks perfectly well mixed, but the chains disagree about what "$\lambda_1$" <em>means</em>, and $\hat R$ is enormous.</p>
 <p>The culprit is <strong>identifiability</strong>. A parameter — or a combination of parameters — is <em>non-identifiable</em> when two different parameter values produce <em>exactly the same likelihood</em>, so no amount of data can separate them. Here the mixture is invariant under relabeling: $(\lambda_1,\lambda_2,\pi)$ and $(\lambda_2,\lambda_1,\,1-\pi)$ give an identical likelihood — swapping the "male" and "female" labels changes nothing the data can see. That exchange symmetry is what breaks the sampler.</p>

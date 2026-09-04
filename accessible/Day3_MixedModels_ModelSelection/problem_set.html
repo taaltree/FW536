@@ -36,11 +36,10 @@ MathJax = {
  </ul>
  <div class="section">Afternoon · model selection</div>
  <ul>
- <li><a href="#p7">7. The ΔAIC &lt; 2 myth</a></li>
- <li><a href="#p8">8. AIC/AICc/BIC on noise</a></li>
- <li><a href="#p9">9. BIC vs AIC: weak effects</a></li>
- <li><a href="#p10">10. AIC vs cross-validation (real data)</a></li>
- <li><a href="#p11">11. Multimodel inference</a></li>
+  <li><a href="#p7">7. AIC/AICc/BIC on noise</a></li>
+ <li><a href="#p8">8. BIC vs AIC: weak effects</a></li>
+ <li><a href="#p9">9. AIC vs cross-validation (real data)</a></li>
+ <li><a href="#p10">10. Multimodel inference</a></li>
  </ul>
  <div class="section">Day 3 docs</div>
  <ul>
@@ -212,9 +211,10 @@ fit_nlme &lt;- <span class="fn">nlme</span>(Length ~ Linf*(<span class="nu">1</s
 
 
 <div class="exercise" id="p4">
-<span class="ex-tag">Problem 4</span><span class="difficulty hard"> · real data · crossed random effects</span>
-<h3>Fish trophic position — crossed random effects, slopes &amp; intercepts</h3>
-<p>The QCBS dataset <code>qcbs_w6_data.csv</code> gives trophic position vs body length for three fish species (<code>S1</code>, <code>S2</code>, <code>S3</code>) sampled across six lakes (<code>L1</code>–<code>L6</code>). The biological question: does trophic position increase with body length, and does that relationship differ by species and by lake?</p>
+<span class="ex-tag">Problem 4</span><span class="difficulty hard"> · real data · crossed random effects · when a model asks for too much</span>
+<h3>Fish trophic position — and a random-effect structure the data cannot support</h3>
+<p>The QCBS dataset <code>qcbs_w6_data.csv</code> gives trophic position vs body length for three fish species (<code>S1</code>, <code>S2</code>, <code>S3</code>) sampled across six lakes (<code>L1</code>&ndash;<code>L6</code>). The biological question: does trophic position increase with body length, and does that relationship differ by species and by lake?</p>
+<p>This problem has a second purpose. One of the candidate models below asks the data for something it cannot give, and it is the model that <em>wins</em> the model-selection table. Learning to spot that is the point.</p>
 <div class="code-label">Setup &amp; z-scoring</div>
 <pre><code>dat &lt;- <span class="fn">read.csv</span>(<span class="st">"data/qcbs_w6_data.csv"</span>)
 dat$Fish_Species &lt;- <span class="fn">as.factor</span>(dat$Fish_Species)
@@ -232,12 +232,34 @@ M8 &lt;- <span class="fn">lmer</span>(Z_TP ~ Z_Length + (<span class="nu">1</spa
 <span class="fn">aictab</span>(<span class="kw">list</span>(M1=M1,M3=M3,M4=M4,M7=M7,M8=M8))</code></pre>
 <ol type="a">
 <li>Why are <em>both</em> Lake and Fish_Species candidates for random effects rather than fixed? Give the argument that would push you the other way.</li>
-<li>What does the term <code>(1 + Z_Length | Fish_Species)</code> assume about the population of slopes across species? Write out the implied bivariate Normal for the (intercept, slope) pair.</li>
-<li>Report the AICc table. Which model has the lowest AICc? For that model, read off the variance components with <code>summary()</code> / <code>VarCorr()</code> and say whether most slope variation lives across species, across lakes, or within.</li>
-<li>Only 3 species and 6 lakes is on the edge of what we should treat as random. What is the practical risk (name the warning you are likely to see), and when would you switch species to a fixed effect?</li>
+
+<li>What does the term <code>(1 + Z_Length | Fish_Species)</code> assume about the population of slopes across species? Write out the implied bivariate Normal for the (intercept, slope) pair, and count how many parameters that costs: two variances plus what?</li>
+
+<li>Report the AICc table and name the winner. Then run <code>isSingular()</code> on all five fits:
+<pre><code><span class="fn">sapply</span>(<span class="kw">list</span>(M1=M1,M3=M3,M4=M4,M7=M7,M8=M8), lme4::isSingular)</code></pre>
+Two of them come back <code>TRUE</code>, and one of those two is the model that just won. What did R print when you fitted them, and did you notice it at the time?</li>
+
+<li><strong>Find the parameter that broke.</strong> Run <code>VarCorr(M8)</code> and look at the <code>Corr</code> column. The estimated correlation between species intercepts and species slopes is exactly $1.000$ &mdash; not "close to 1", but sitting precisely on the largest value a correlation is allowed to take. That is what <em>boundary (singular) fit</em> means.
+<p style="margin:8px 0">Now count the information available. Your answer to (b) says this term costs three parameters: a variance for the intercepts, a variance for the slopes, and a correlation between them. How many species are there? Explain in two or three sentences why estimating all three from that many groups is asking too much, and why the correlation is the first thing to fail rather than either variance.</p></li>
+
+<li><strong>Ask for less: the <code>||</code> notation.</strong> Writing a double bar instead of a single one keeps both random effects but forces their correlation to zero, so the model estimates two parameters instead of three:
+<pre><code><span class="cm"># (1 + Z_Length | Fish_Species)   intercepts, slopes, AND their correlation  — 3 parameters</span>
+<span class="cm"># (1 + Z_Length || Fish_Species)  intercepts and slopes, correlation fixed at 0 — 2 parameters</span>
+
+M8u &lt;- <span class="fn">lmer</span>(Z_TP ~ Z_Length + (<span class="nu">1</span>+Z_Length||Fish_Species) + (<span class="nu">1</span>|Lake), data=dat, REML=<span class="kw">TRUE</span>)
+lme4::<span class="fn">isSingular</span>(M8u)
+<span class="fn">VarCorr</span>(M8u)</code></pre>
+Does it converge? Compare its two standard deviations with M8's. Has dropping the correlation cost you anything you actually wanted to know?</li>
+
+<li><strong>The judgment call.</strong> Add <code>M8u</code> to the AICc table. M8 still comes out ahead by about 6 AICc units, and <code>anova(M8u, M8, refit = FALSE)</code> returns $p = 0.004$ &mdash; both criteria say the correlation parameter is "worth it". Yet that parameter is pinned at its boundary.
+<p style="margin:8px 0">Which model do you report, and why? Your answer should say what a likelihood-ratio test and an AICc difference can and cannot tell you about a parameter sitting on the edge of its allowed range.</p></li>
+
+<li>Three species and six lakes is on the edge of what should be treated as random at all. When would you switch species to a fixed effect instead, and what would you lose by doing so?</li>
 </ol>
-<div class="callout try" style="margin-top: 12px;"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
+<div class="callout key" style="margin-top:12px"><p class="callout-label">Key idea</p><strong>Carry this forward.</strong> You will meet <code>||</code> again in the afternoon walkthrough, where the same species-slope model appears in a model-comparison exercise. The habit worth forming today: after every <code>lmer</code> fit with a random slope, check <code>isSingular()</code> before you believe anything the model tells you.</div>
+<div class="callout try" style="margin-top: 12px;"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Report the AICc table, the singularity check, the correlation from <code>VarCorr(M8)</code>, the converging <code>M8u</code> fit, and your reasoning in (d), (f) and (g).</div>
 </div>
+
 
 <div class="exercise" id="p5">
 <span class="ex-tag">Problem 5</span><span class="difficulty medium"> · variance partitioning · binomial GLMM</span>
@@ -279,28 +301,7 @@ VarCorr(m)
 <h2 style="margin-top:60px;">Part 2 · Model selection <span class="note">(afternoon · 20 pts)</span></h2>
 
 <div class="exercise" id="p7">
-<span class="ex-tag">Problem 7</span><span class="difficulty easy"> · simulation · the "competitive model" myth</span>
-<h3>What does $\Delta\text{AIC} = 1.5$ actually mean?</h3>
-<p>A common rule of thumb calls any model within 2 AIC units of the best "competitive." Test what that rule really buys you when the extra variable is pure noise.</p>
-<div class="code-label">Code</div>
-<pre><code>reps &lt;- <span class="nu">1000</span>
-within2 &lt;- <span class="fn">replicate</span>(reps, {
- n &lt;- <span class="nu">1000</span>; x &lt;- <span class="fn">runif</span>(n); x2 &lt;- <span class="fn">rnorm</span>(n)   <span class="cm"># x2 is pure noise</span>
- y &lt;- <span class="nu">2</span> + <span class="nu">3</span>*x + <span class="fn">rnorm</span>(n, <span class="nu">0</span>, <span class="nu">0.2</span>)              <span class="cm"># only x matters</span>
- d &lt;- <span class="fn">AIC</span>(<span class="fn">lm</span>(y ~ x + x2)) - <span class="fn">AIC</span>(<span class="fn">lm</span>(y ~ x))
- d &lt; <span class="nu">2</span>
-})
-<span class="fn">mean</span>(within2)</code></pre>
-<ol type="a">
-<li>Before running: predict roughly what fraction of reps will have the junk model within 2 AIC units of the correct one. Explain your prediction from the size of AIC's per-parameter penalty.</li>
-<li>Run it. Report <code>mean(within2)</code>. Was your prediction right?</li>
-<li>Explain, in terms of the penalty $2k$, why the $\Delta\text{AIC} \le 2$ rule is structurally biased toward keeping noise variables. What should you report about the extra variable's <em>coefficient</em> before claiming it matters?</li>
-</ol>
-<div class="callout try" style="margin-top: 12px;"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
-</div>
-
-<div class="exercise" id="p8">
-<span class="ex-tag">Problem 8</span><span class="difficulty medium"> · simulation · Type I error of AIC/AICc/BIC</span>
+<span class="ex-tag">Problem 7</span><span class="difficulty medium"> · simulation · Type I error of AIC/AICc/BIC</span>
 <h3>How often does each criterion pick noise as "best"?</h3>
 <p>Generate a response that is completely unrelated to its predictors, fit every subset with <code>dredge()</code>, and record how often the top model retains at least one noise variable under each criterion.</p>
 <div class="code-label">Code</div>
@@ -324,7 +325,7 @@ pstor &lt;- AICstor &lt;- AICcstor &lt;- BICstor &lt;- <span class="fn">rep</spa
 <span class="fn">data.frame</span>(p = <span class="fn">mean</span>(pstor &gt; <span class="nu">0</span>), AIC = <span class="fn">mean</span>(AICstor &gt; <span class="nu">0</span>),
            AICc = <span class="fn">mean</span>(AICcstor &gt; <span class="nu">0</span>), BIC = <span class="fn">mean</span>(BICstor &gt; <span class="nu">0</span>))</code></pre>
 <ol type="a">
-<li><strong>Reproduce the baseline.</strong> Run the walkthrough simulation and confirm you get roughly the same four proportions: <code>p</code> ~0.16, AIC ~0.45, AICc ~0.39, BIC ~0.16. You need this loop running before the rest of the problem; if your numbers are close, move on without re-deriving why BIC wins here.</li>
+<li><strong>Start from the walkthrough loop.</strong> You built this simulation in the afternoon walkthrough and found roughly <code>p</code> 0.16, AIC 0.45, AICc 0.39, BIC 0.16. Bring that loop across &mdash; there is nothing new to discover in re-running it, and the rest of this problem extends it rather than repeating it.</li>
 <li><strong>Now apply the rule the lecture warns about.</strong> Taking the AICc-best model is one decision rule; a stricter one is <em>only accept the winner if it beats the runner-up by more than 2 AICc units, and otherwise decline to choose</em>. Modify the loop to record both whether the top model contains a predictor and the gap <code>dd$AICc[2] - dd$AICc[1]</code>:
 <pre><code>dd  &lt;- <span class="fn">dredge</span>(<span class="fn">lm</span>(y ~ ., data=d), rank=<span class="st">"AICc"</span>)
 noise_top[i] &lt;- <span class="fn">sum</span>(!<span class="fn">is.na</span>(dd[<span class="nu">1</span>, <span class="nu">2</span>:<span class="nu">4</span>]))
@@ -343,8 +344,8 @@ median gap to runner-up:  AICc ____    BIC ____</code></pre></li>
 <div class="callout try" style="margin-top: 12px;"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
 </div>
 
-<div class="exercise" id="p9">
-<span class="ex-tag">Problem 9</span><span class="difficulty medium"> · simulation · BIC vs AIC on weak effects</span>
+<div class="exercise" id="p8">
+<span class="ex-tag">Problem 8</span><span class="difficulty medium"> · simulation · BIC vs AIC on weak effects</span>
 <h3>When BIC misses a weak-but-real effect</h3>
 <p>Three predictors have known effect sizes: one strong, one modest, one weak. Ask which criterion keeps the weak one.</p>
 <div class="code-label">Code</div>
@@ -363,8 +364,8 @@ m &lt;- <span class="fn">lm</span>(y ~ strong + modest + weak, data=d)
 <div class="callout try" style="margin-top: 12px;"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
 </div>
 
-<div class="exercise" id="p10">
-<span class="ex-tag">Problem 10</span><span class="difficulty hard"> · real data · AIC vs cross-validation</span>
+<div class="exercise" id="p9">
+<span class="ex-tag">Problem 9</span><span class="difficulty hard"> · real data · AIC vs cross-validation</span>
 <h3>AIC vs LOOCV on the trophic-position data</h3>
 <p>Return to <code>qcbs_w6_data.csv</code> from Problem 4, but now treat species and lake as ordinary fixed factors so we can rank candidate <em>fixed-effect</em> models by both an information criterion and cross-validation. The question is predictive: which set of predictors best forecasts a fish's trophic position?</p>
 <div class="code-label">Setup &amp; candidate models</div>
@@ -395,8 +396,8 @@ aicc &lt;- <span class="fn">sapply</span>(forms, <span class="kw">function</span
 <div class="callout try" style="margin-top: 12px;"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
 </div>
 
-<div class="exercise" id="p11">
-<span class="ex-tag">Problem 11</span><span class="difficulty hard"> · multimodel inference · the "right question" trap</span>
+<div class="exercise" id="p10">
+<span class="ex-tag">Problem 10</span><span class="difficulty hard"> · multimodel inference · the "right question" trap</span>
 <h3>Model averaging, evidence ratios, and asking the right question</h3>
 <p>A size-at-age analysis is fit with four competing candidate models. M1 has a fixed temperature effect, M2 a fixed regional effect, M3 both, and M0 is intercept-only. The AICc table:</p>
 <pre><code>Model   K   AICc     deltaAICc   weight

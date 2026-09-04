@@ -627,9 +627,10 @@ m12  6.309 235.939 2.880</code></pre>
 <h3>LRT vs AICc for a random-slope decision</h3>
 <p>Return to the trophic-position dataset. Compare two nested random-effects structures using both LRT and AICc.</p>
 
+<div class="callout key"><strong>Note the double bar.</strong> <code>(1 + Z_Length || Fish_Species)</code> gives species their own intercepts <em>and</em> their own slopes, but fixes the correlation between the two at zero. With only three species there is not enough information to estimate that correlation on top of the two variances: the single-bar form <code>(1 + Z_Length | Fish_Species)</code> returns <code>boundary (singular) fit</code>, with the correlation pinned at exactly 1.000. You work through why in the morning problem set (Problem 4); here we use the version that converges.</div>
 <pre><code><span class="cm"># Both fit with REML because they share the same fixed effects</span>
 m_int &lt;- <span class="fn">lmer</span>(Z_TP ~ Z_Length + (<span class="nu">1</span>|Fish_Species) + (<span class="nu">1</span>|Lake), data=dat, REML=<span class="kw">TRUE</span>)
-m_slop &lt;- <span class="fn">lmer</span>(Z_TP ~ Z_Length + (<span class="nu">1</span>+Z_Length|Fish_Species) + (<span class="nu">1</span>|Lake), data=dat, REML=<span class="kw">TRUE</span>)
+m_slop &lt;- <span class="fn">lmer</span>(Z_TP ~ Z_Length + (<span class="nu">1</span>+Z_Length||Fish_Species) + (<span class="nu">1</span>|Lake), data=dat, REML=<span class="kw">TRUE</span>)
 
 <span class="fn">anova</span>(m_int, m_slop, refit=<span class="kw">FALSE</span>)
 <span class="fn">AICcmodavg::aictab</span>(<span class="kw">list</span>(intercepts_only=m_int, with_species_slope=m_slop))</code></pre>
@@ -646,12 +647,12 @@ m_slop &lt;- <span class="fn">lmer</span>(Z_TP ~ Z_Length + (<span class="nu">1<
 <pre><code>anova(m_int, m_slop, refit=FALSE)
 #         npar   AIC    logLik  Chisq Df  Pr(>Chisq)
 # m_int      5  82.47  -36.23
-# m_slop     7  35.68  -10.84  50.79  2   9.4e-12 ***
+# m_slop     6  41.88  -14.94  42.59  1   6.7e-11 ***
 
 AICcmodavg::aictab(list(intercepts_only=m_int, with_species_slope=m_slop))
 #                    K   AICc  Delta_AICc  AICcWt
-# with_species_slope 7  36.33    0.00      1.00
-# intercepts_only    5  82.81   46.48      0.00</code></pre>
+# with_species_slope 6  42.36    0.00      1.00
+# intercepts_only    5  82.81   40.45      0.00</code></pre>
 <p>The LRT gives $\chi^2 = 50.8$ on 2 df, $p \approx 9\times10^{-12}$; AICc favors the random-slope model by $\Delta$AICc $= 46.5$ (Akaike weight $\approx 1.00$). This is easy territory, keep the slope. But notice <em>what each statistic claimed</em>, because they answer different questions and will not always agree. The LRT asks "is the larger model significantly better at maximizing likelihood?": an inference question about whether the slope variance is really nonzero. AICc asks "is the larger model expected to predict better out of sample?" When they disagree (LRT says "not significant" but AICc still prefers the bigger model), let the question decide: for inference — does the random slope matter biologically? — lean on the LRT and the variance-component CI; for prediction, trust AICc (which, from Exercise A4, is ≈ LOOCV).</p>
 <p><strong>(c)</strong> One catch makes the LRT $p$-value untrustworthy in borderline cases. The null hypothesis is that the slope variance is <em>exactly zero</em>, but a variance cannot be negative, so zero sits on the very edge of the values the parameter is allowed to take. When you test a parameter at the boundary of its space, the usual $\chi^2$ reference distribution is the wrong one, and it makes the reported $p$-value <strong>too large</strong> (conservative). A genuinely important random slope can therefore come back looking "not significant."</p>
 <p>Here it does not matter: the effect is so strong ($p \approx 9\times10^{-12}$) that no correction would change the verdict. But in a borderline case the boundary correction can flip your conclusion. <strong>The practical rule:</strong> for a boundary test — "is this variance zero?" — do not trust <code>anova()</code>'s $p$-value. Use <code>RLRsim::exactRLRT()</code> or a parametric bootstrap, which build the correct reference distribution by simulation and give you an honest $p$-value.</p>

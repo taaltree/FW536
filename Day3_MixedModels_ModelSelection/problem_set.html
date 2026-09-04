@@ -231,7 +231,24 @@ M8 &lt;- <span class="fn">lmer</span>(Z_TP ~ Z_Length + (<span class="nu">1</spa
 Two of them come back <code>TRUE</code>, and one of those two is the model that just won. What did R print when you fitted them, and did you notice it at the time?</li>
 
 <li><strong>Find the parameter that broke.</strong> Run <code>VarCorr(M8)</code> and look at the <code>Corr</code> column. The estimated correlation between species intercepts and species slopes is exactly $1.000$ &mdash; not "close to 1", but sitting precisely on the largest value a correlation is allowed to take. That is what <em>boundary (singular) fit</em> means.
-<p style="margin:8px 0">Now count the information available. Your answer to (b) says this term costs three parameters: a variance for the intercepts, a variance for the slopes, and a correlation between them. How many species are there? Explain in two or three sentences why estimating all three from that many groups is asking too much, and why the correlation is the first thing to fail rather than either variance.</p></li>
+<p style="margin:8px 0">Why did the <em>correlation</em> break rather than one of the two variances? You have three species, so three (intercept, slope) pairs &mdash; three points. Rather than reason about it in the abstract, watch what three points can and cannot tell you. Both simulations below use data with a <strong>known</strong> answer:</p>
+<pre><code><span class="fn">set.seed</span>(<span class="nu">4</span>)
+
+<span class="cm"># Correlation from 3 points, when the TRUE correlation is zero</span>
+r3 &lt;- <span class="fn">replicate</span>(<span class="nu">20000</span>, <span class="fn">cor</span>(<span class="fn">rnorm</span>(<span class="nu">3</span>), <span class="fn">rnorm</span>(<span class="nu">3</span>)))
+<span class="fn">median</span>(<span class="fn">abs</span>(r3))        <span class="cm"># the typical |r| you get from three points</span>
+<span class="fn">mean</span>(<span class="fn">abs</span>(r3) &gt; <span class="nu">0.9</span>)     <span class="cm"># how often it looks nearly perfect</span>
+
+<span class="cm"># Standard deviation from 3 points, when the TRUE sd is 1</span>
+s3 &lt;- <span class="fn">replicate</span>(<span class="nu">20000</span>, <span class="fn">sd</span>(<span class="fn">rnorm</span>(<span class="nu">3</span>)))
+<span class="fn">median</span>(s3)
+<span class="fn">mean</span>(<span class="fn">abs</span>(s3 - <span class="nu">1</span>) &lt; <span class="nu">0.25</span>)  <span class="cm"># how often it lands within 25% of the truth</span></code></pre>
+<ol type="i" style="margin-bottom:6px">
+<li>Run the first block. Every one of those 20,000 correlations came from data with <em>no</em> relationship at all. What is the typical $|r|$, and how often does it come back above 0.9?</li>
+<li>Run the second. How far off is a standard deviation estimated from three points, and how often is it roughly right?</li>
+<li>Now put the two together: in two or three sentences, say why M8's correlation was the parameter that failed. Which of the two quantities can three groups say something useful about, and which one will happily return an extreme answer no matter what the truth is?</li>
+</ol>
+<p style="margin:8px 0">If you want to see it directly, plot one of the samples: <code>plot(rnorm(3), rnorm(3))</code>. Three points nearly always look like a line.</p></li>
 
 <li><strong>Ask for less: the <code>||</code> notation.</strong> Writing a double bar instead of a single one keeps both random effects but forces their correlation to zero, so the model estimates two parameters instead of three:
 <pre><code><span class="cm"># (1 + Z_Length | Fish_Species)   intercepts, slopes, AND their correlation  — 3 parameters</span>

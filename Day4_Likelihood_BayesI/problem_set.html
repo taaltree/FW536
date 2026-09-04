@@ -209,6 +209,31 @@ Logistic &lt;- Logistic[<span class="fn">order</span>(Logistic$PopulationSize), 
 <li>Report posterior means and 95% BCIs for $r$, $K$, and $\sigma$. Confirm the posterior of $r$ is consistent with the morning MLE from Problem 4.</li>
 <li>Add the <em>derived quantities</em> $\text{MSY} = rK/4$ and $N_{\max} = K/2$ inside the model block. Report their posterior medians and 95% HPDIs. This is the "for free" uncertainty propagation promised in Problem 4(d).</li>
 <li>Compute $\Pr(r &gt; 0.22 \mid y)$ from the posterior draws, and plot the posterior of $\sigma$ with both its 95% BCI and 95% HPDI overlaid. Comment on why the two intervals differ for $\sigma$.</li>
+
+<li><strong>From a posterior to a decision.</strong> A point estimate hands a manager one number;
+a posterior tells them how much risk sits behind a proposed quota. Compute
+$\Pr(\text{MSY} &lt; Q \mid y)$ &mdash; the probability that an annual quota $Q$ is larger than what
+the population can actually sustain &mdash; for $Q = 55,\ 60,\ 62,\ 65$ and $70$. Report the five
+probabilities. Your point estimate of MSY is close to 62. Explain why handing the manager
+&ldquo;62&rdquo; and handing them these five numbers can lead to different decisions, and say which
+quota you would defend and on what grounds.</li>
+
+<li><strong>Is $K \sim \text{Uniform}(0, 4000)$ actually uninformative?</strong> A vague-looking
+prior is only vague if the data pin the parameter down, which is a claim you can test rather than
+assume. Do it in two steps, changing nothing but the bound (and keeping your starting values inside
+it, or NIMBLE will refuse to initialise):
+  <ol type="i">
+  <li>Refit the full dataset three times, with $K \sim U(0, 2000)$, $U(0, 4000)$ and $U(0, 20000)$.
+  Report the posterior median and 95% BCI of $K$ and of MSY each time. How far does the bound move
+  the answer?</li>
+  <li>Now refit using only the <em>first eight rows</em> after the sort &mdash;
+  <code>head(Logistic, 8)</code>, the early low-density part of the curve, where the population is
+  nowhere near its ceiling &mdash; again under all three bounds. Report the same quantities.</li>
+  </ol>
+Something very different happens in the two cases. In two or three sentences, say what it is, what
+has to be true of your data before a bounded uniform prior deserves to be called
+&ldquo;uninformative&rdquo;, and what all this implies about the MSY you would have reported if the
+short time series were the only data you had.</li>
 </ol>
 </div>
 

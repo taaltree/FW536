@@ -99,7 +99,7 @@ ants$elevation &lt;- <span class="fn">as.numeric</span>(<span class="fn">scale</
 <div class="exercise" id="p2">
 <span class="ex-tag">Problem 2</span><span class="difficulty easy"> · 15 min · what a prior actually claims</span>
 <h3>What does a "vague" log-scale prior actually assert?</h3>
-<p>The walkthrough showed you what happens to the <em>chains</em> under a vague prior with unscaled predictors. This problem asks a different question: forget the sampler, and ask what the prior is claiming about the biology before any data arrive. On a log link, a prior on $\beta$ is a prior on a multiplicative effect $e^\beta$, and that translation is where "uninformative" priors stop being uninformative.</p>
+<p>Practice Exercise M1 had you draw from a vague log-scale prior and look at the multiplicative effect it implies across the latitude range; Practice Exercise M2 showed what that same prior does to the <em>chains</em> when the predictors are unscaled. This problem picks the M1 draw back up and takes it two steps further: onto a per-unit effect you can state in a sentence, and into an argument you would actually have with a reviewer. On a log link a prior on $\beta$ is a prior on a multiplicative effect $e^\beta$, and that translation is where "uninformative" priors stop being uninformative.</p>
 <ol type="a">
  <li>Draw $10^5$ values from $\mathcal{N}(0,\ \sigma^2 = 10000)$ &mdash; the classic "vague" choice. Report the fraction for which $e^{\beta}$ exceeds a million-fold, and the fraction for which the effect exceeds a million-fold <em>in either direction</em>. State the second number in a sentence beginning "before seeing any data, this prior says&hellip;".</li>
  <li>Repeat with $\mathcal{N}(0,\ \sigma^2 = 4)$. Report the same fraction, and also the central 95% range of multiplicative effects this prior allows (i.e. $e^{\pm 1.96 \times 2}$). Is that range wide enough for any ecological effect you have ever measured?</li>
@@ -135,9 +135,20 @@ nsites &lt;- <span class="fn">length</span>(<span class="fn">unique</span>(group
 <div class="eq-block">$\alpha_j \sim \mathcal{N}(\kappa + \eta\, w_j,\ \sigma_\alpha^2), \qquad \beta_{k} \sim \mathcal{N}(\mu_\beta, \sigma_\beta^2)$</div>
 <p>Build $w_j$ from each site's soil organic carbon (the <code>carbon</code> column, a percentage) &mdash; e.g. its logit $\log\!\big(c_j/(100-c_j)\big)$ &mdash; and state how you scaled it.</p>
 <div class="callout key" style="margin-top:12px;"><p class="callout-label">Key idea</p><p><strong>A group-level covariate.</strong> Here the site intercept is no longer a black-box draw from $\mathcal{N}(\mu_\alpha,\sigma_\alpha^2)$ but is given a <em>group-level predictor</em> $w_j$. Writing it as a regression on the intercept, $\alpha_j \sim \mathcal{N}(\kappa+\eta\, w_j, \sigma_\alpha^2)$, is <em>the same model</em> as carrying $w_j$ as an ordinary term in the linear predictor with a mean-zero site random effect &mdash; two notations, one likelihood and one set of predictions. What the covariate buys you (versus a random intercept with <em>no</em> covariate) is real either way: it explains <em>why</em> sites differ (through the posterior of $\eta$), it sharpens shrinkage (a data-poor site is pulled toward what its own covariate predicts, not just the grand mean), and it lets you predict the baseline emission of an unsampled site from its covariate. See section C of the <a href="lab.html#hier">practice lab</a> for the worked intuition.</p></div>
+<div class="callout key" style="margin-top:12px;"><p class="callout-label">Key idea</p><p><strong>And why let the slope vary?</strong>
+A single $\beta$ asserts that every fertilizer converts nitrogen input into emissions at the same
+rate. That is a strong claim, and it is one you make by accident every time you fit one slope to
+pooled data. Letting $\beta_k$ vary buys three things: it lets you ask a question the pooled model
+cannot phrase &mdash; does the response <em>depend on what you spread?</em> &mdash; it stops a
+heavily-sampled fertilizer from setting the slope for all the others, and it makes
+$\sigma_\beta$ itself an answer, since a small $\sigma_\beta$ is positive evidence that the
+pooled model was fine. Notice the price: ten slopes estimated from between 12 and 161 observations
+each. That is precisely the setting in which the largest estimate is most often just the noisiest
+group, which is what part (b) makes you check.</p></div>
+
 <ol type="a">
  <li>Fit the group-level-regression model in <span class="pill nimble">NIMBLE</span>. Is the posterior of $\eta$ (the effect of the site covariate on baseline emissions) credibly different from 0?</li>
- <li>Add the fertilizer-varying slope $\beta_k$. Which fertilizer type has the largest absolute N-input effect? Report the posterior of $\sigma_\beta$.</li>
+ <li>Now let the N-input slope vary by fertilizer type, $\beta_k \sim \mathcal{N}(\mu_\beta, \sigma_\beta^2)$. Report the posterior of $\sigma_\beta$ and rank the ten types by posterior median slope. Then <em>test the ranking before you believe it</em>: across your draws, count how often the top-ranked type actually holds the largest $\beta_k$ of the ten, and report that probability together with the type's 95% CI and the number of measurements it rests on. On this evidence, would you write &ldquo;fertilizer type X produces the steepest emissions response&rdquo; in a paper? One or two sentences.</li>
  <li>Show that writing the covariate as a regression on the intercept, $\alpha_j \sim \mathcal{N}(\kappa+\eta\, w_j,\sigma_\alpha^2)$, is the <em>same model</em> as adding $w_j$ as an ordinary term in the linear predictor with a mean-zero site random effect (substitute $\alpha_j=\kappa+\eta\, w_j+u_j$). Which parameter carries the between-site effect of $w_j$, and why does shrinkage still happen?</li>
 </ol>
 <div class="callout try" style="margin-top: 12px;"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
@@ -189,10 +200,39 @@ S &lt;- <span class="fn">rlnorm</span>(Nyears, <span class="nu">7.5</span>, <spa
 R &lt;- <span class="fn">numeric</span>(Nyears)
 <span class="kw">for</span> (t <span class="kw">in</span> <span class="nu">1</span>:Nyears)
   R[t] &lt;- (a.t*S[t])/(<span class="nu">1</span> + a.t/b.t*S[t]) * <span class="fn">exp</span>(<span class="fn">rnorm</span>(<span class="nu">1</span>, <span class="nu">0</span>, sig.t))</code></pre>
+<div class="callout key" style="margin-top:12px;"><p class="callout-label">Key idea</p><p><strong>What this problem is for.</strong>
+Nobody manages a fishery by $a$ and $b$. They manage by an escapement target and a harvest rate,
+which are nonlinear functions of $a$ and $b$ &mdash; and once those functions sit inside the model as
+deterministic nodes, NIMBLE evaluates them at every draw and hands you their full posteriors for
+free, correlations and all. The walkthrough fitted the curve; this problem is about what you can
+then <em>say</em>, and about the fact that a derived quantity does not simply inherit the uncertainty
+of the parameters underneath it.</p></div>
 <ol type="a">
- <li>Fit the model (monitor $a,b,\sigma,N_\text{eq},S_\text{msy},H_\text{msy}$). Report posterior medians and 95% CIs. Do the CIs cover the simulated truth?</li>
- <li>Plot the posterior of $H_\text{msy}$ as a histogram and mark its median.</li>
- <li>Compare $S_\text{msy}$ from Bayes to what you'd get by plugging the posterior-median $a,b$ into the formula. Are they the same? Explain any difference.</li>
+ <li><strong>Fit, with the reference points inside the model.</strong> Monitor
+ $a,b,\sigma,N_\text{eq},S_\text{msy},H_\text{msy}$. Before you look at the output, work out the
+ three <em>true</em> reference points by hand, substituting $a=5$ and $b=5000$ into the formulas above
+ &mdash; doing that arithmetic yourself is how you sanity-check any assessment. Report posterior
+ medians and 95% CIs for all six quantities next to your hand-computed truths. Does every interval
+ cover?</li>
+ <li><strong>Read the formulas before you read the output.</strong> $H_\text{msy} = 1-\sqrt{1/a}$
+ contains no $b$ at all, while $N_\text{eq}$ and $S_\text{msy}$ both scale with it. Say what that
+ means for a real assessment: which of the three could you still estimate for a stock whose absolute
+ abundance you have no handle on, and which ones collapse without it?</li>
+ <li><strong>A harvest rate with a risk statement attached.</strong> The posterior median of
+ $H_\text{msy}$ is, by construction, the harvest rate with a 50% chance of exceeding the true one.
+ Report the 5th, 10th, 25th and 50th percentiles of the posterior. Which would you advise, and write
+ the one-sentence risk statement that has to travel with it.</li>
+ <li><strong>An escapement target.</strong> Report $S_\text{msy}$'s posterior median and 95% CI, and
+ compute $\Pr(S_\text{msy} &gt; 1000)$, $\Pr(S_\text{msy} &gt; 1500)$ and
+ $\Pr(S_\text{msy} &gt; 2000)$. A manager asks you for &ldquo;the&rdquo; escapement target. Answer
+ them in two sentences that use these numbers rather than hiding them.</li>
+ <li><strong>Which quantity is best determined?</strong> Compute the coefficient of variation
+ (posterior SD &divide; posterior median) for $a$, $b$, $N_\text{eq}$, $S_\text{msy}$ and
+ $H_\text{msy}$, and rank them. You should find that <em>two of the derived quantities are more
+ precisely determined than the parameters they are built from</em> &mdash; which sounds impossible if
+ you think of uncertainty as something that only accumulates. Explain how it happens. One reason is
+ visible in the shape of $1-\sqrt{1/a}$; the other you can see by computing
+ <code>cor(a, b)</code> across your draws.</li>
 </ol>
 <div class="callout try" style="margin-top: 12px;"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
 </div>
@@ -251,9 +291,28 @@ y &lt;- <span class="fn">array</span>(<span class="kw">NA</span>, <span class="f
 <span class="kw">for</span> (t <span class="kw">in</span> <span class="nu">1</span>:nY) <span class="kw">for</span> (i <span class="kw">in</span> <span class="nu">1</span>:nS) <span class="kw">for</span> (j <span class="kw">in</span> <span class="nu">1</span>:nR)
   y[i,j,t] &lt;- <span class="fn">rbinom</span>(<span class="nu">1</span>, <span class="nu">1</span>, p.t) * z[i,t]</code></pre>
 <ol type="a">
- <li>Fit the model in <span class="pill nimble">NIMBLE</span>. Use the z-init trick (<code>zst &lt;- matrix(1L, nS, nY)</code>) &mdash; explain in one sentence why an all-1 start for $z$ is always consistent with the data, and what a random 0/1 start would produce instead. (Try it: NIMBLE will tell you something. Report exactly what it does, and whether the run finishes.)</li>
- <li>Plot the posterior medians of $\gamma_t$ against year. Does the rising-colonization signal come through?</li>
- <li>The individual $\phi_t$ posteriors are wide. Why? Name one change to the model that would tighten them in a real analysis.</li>
+ <li>Fit the model in <span class="pill nimble">NIMBLE</span>, using the z-init trick
+ (<code>zst &lt;- matrix(1L, nS, nY)</code>) that the walkthrough works through. Report $\hat R$ for
+ $p$ and for the $\gamma_t$.</li>
+ <li>Plot the posterior medians of $\gamma_t$ against year with their 95% intervals. Does the rising
+ colonization signal come through? Report the mean width of those five intervals, and say what that
+ width is telling you &mdash; think about how many sites actually contribute information to a single
+ year's transition.</li>
+ <li><strong>Two ways to tighten them.</strong> Refit twice more, changing only how $\gamma_t$ is
+ built:
+   <ol type="i">
+   <li>a hierarchical prior, $\text{logit}(\gamma_t) \sim \mathcal{N}(\mu_\gamma,\ \sigma_\gamma^2)$,
+   so the years borrow strength from each other;</li>
+   <li>a trend, $\text{logit}(\gamma_t) = g_0 + g_1 \cdot \text{year}_t$, which is a reasonable
+   thing to try given how you simulated the data.</li>
+   </ol>
+ For all three fits report the mean 95% interval width for $\gamma_t$ <em>and</em> the RMSE of the
+ posterior medians against the <code>gam.t</code> you simulated. Which structure narrowed the
+ intervals most? Which one estimated $\gamma_t$ most accurately? They are not the same model.</li>
+ <li><strong>Now the trap.</strong> Refit once more with a covariate that is pure noise in place of
+ the year index:
+ <pre><code><span class="fn">set.seed</span>(<span class="nu">99</span>); noise &lt;- <span class="fn">as.numeric</span>(<span class="fn">scale</span>(<span class="fn">rnorm</span>(nY - <span class="nu">1</span>)))</code></pre>
+ Report the same two numbers and compare them against (c)(ii). Then reach for the obvious defence: is the noise covariate's slope $g_1$ credibly different from zero? Report its posterior median and 95% interval, and the same for the real trend's $g_1$. Now answer in four or five sentences: if a narrower interval was what you were hoping to achieve, what have you learned by achieving it? Given what the two slopes just did, is there anything <em>inside this fit</em> that would have told you which covariate was real &mdash; and if not, what would? Finish by saying which of the three structures you would reach for by default when you cannot be sure your covariate is real, and why it is the safe choice.</li>
 </ol>
 <div class="callout try" style="margin-top: 12px;"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
 </div>

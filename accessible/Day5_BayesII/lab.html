@@ -513,20 +513,55 @@ samples &lt;- <span class="fn">nimbleMCMC</span>(lizardCode, constants=constants
 
 <div class="exercise" id="ex-3">
 <span class="ex-tag">Practice Exercise M3</span><span class="difficulty medium"> · 20 min · R · convergence</span>
-<h3>Lizards: run the model, diagnose, predict</h3>
-<p>Run the script <code>Lizards_Nimble.R</code> end to end. Then:</p>
+<h3>Lizards: run the model and read the diagnostics properly</h3>
+<p>Run the script <code>Lizards_Nimble.R</code> end to end. This exercise is about the
+<em>diagnostics</em>. The biological inference from this model &mdash; the sign of the slope, the
+occupancy difference between two islands, and how much work the prior is doing with only 19 islands
+&mdash; is <a href="problem_set.html#p5">Problem 5</a> and <a href="problem_set.html#p6">Problem 6</a>,
+where you write the model yourself.</p>
 <ol type="a">
- <li>Report <code>gelman.diag</code> and <code>heidel.diag</code> for $a$ and $b$. Do all three chains agree?</li>
- <li>What is the posterior probability that the slope $b$ is negative? (i.e., higher perimeter:area &rArr; lower occupancy)</li>
- <li>Compute and report the posterior median and 95% CI for $\text{diff} = P(\text{presence} \mid \text{PA}=20) - P(\text{presence} \mid \text{PA}=10)$.</li>
- <li>Compare the marginal posterior of $b$ under <code>dnorm(0, 1e-6)</code> versus <code>dnorm(0, 1/2.71)</code>. With this sample size, does the prior matter much?</li>
+ <li>Report <code>gelman.diag</code> and <code>heidel.diag</code> for $a$ and $b$ from the first
+ (vague-prior) fit. Do all three chains agree?</li>
+ <li>Given an <code>mcmc.list</code>, <code>heidel.diag</code> returns <em>one table per chain</em>
+ rather than one pooled table &mdash; so you get three sets of p-values, not one. Look at all three.
+ What would you have reported from chain 1 alone, and why is reading only the first chain a habit
+ worth breaking?</li>
+ <li>Now fit the second model in the script, the one with <code>dnorm(0, 1/2.71)</code>. Its
+ stationarity test passes but its <strong>halfwidth</strong> (precision) test flags on $a$ in all
+ three chains. Only one of those two results is telling you something about convergence. Work out
+ which, using this hint: look at where $a$'s posterior mean sits, and ask what a test of
+ <em>relative</em> precision does when the quantity it is measuring is near zero.</li>
 </ol>
 <details class="answer"><summary>Reveal worked solution (actual NIMBLE run)</summary><div class="answer-body">
-<p>Numbers below are from an actual run. <code>Lizards_Nimble.R</code> sets no seed, so we fixed <code>set.seed(2025)</code>; both the vague and the tight model use 3 chains, <code>niter=6000</code>, <code>nburnin=1000</code> on the $n=19$ islands.</p>
-<p><strong>(a) Convergence.</strong> For the vague-prior model <code>gelman.diag</code> returns R-hat = 1.00 for both $a$ and $b$ (upper C.I. 1.01). <code>heidel.diag</code> needs one word of explanation before you read it: given an <code>mcmc.list</code> it returns <em>one table per chain</em>, not one pooled table, so you get three sets of p-values and must look at all of them. All three pass stationarity for both parameters, with p-values of <strong>0.62, 0.23, 0.18</strong> for $a$ and <strong>0.84, 0.40, 0.48</strong> for $b$ across chains 1&ndash;3. The spread is normal: a stationarity p-value is not an estimate of anything; it is just "no evidence against stationarity" whenever it exceeds 0.05, and quoting only chain 1's 0.62/0.84 would make the agreement look tighter than it is. The tight-prior model behaves the same (R-hat = 1.00; stationarity p-values 0.83/0.19/0.89 for $a$ and 0.93/0.77/0.69 for $b$); its only blemish is that the halfwidth precision test on $a$ flags in all three chains, purely because $a$'s posterior mean sits almost exactly at 0, which makes the relative-precision criterion nearly impossible to satisfy. So yes, all three chains agree, and the model converges.</p>
-<p><strong>(b) Sign of the slope.</strong> The slope is negative with near-certainty: $P(b&lt;0)$ = <strong>1.00</strong> under the vague prior and <strong>0.9995</strong> under the tight prior. Higher perimeter:area &rArr; lower occupancy.</p>
-<p><strong>(c) Management difference.</strong> Using the tight-prior model, predicted occupancy falls from $y_{10}$ = 0.73 [0.47, 0.91] at PA = 10 to $y_{20}$ = 0.41 [0.17, 0.68] at PA = 20, so <code>diff</code> $= P(\text{PA}=20)-P(\text{PA}=10)$ has posterior median <strong>&minus;0.30</strong>, 95% CI <strong>[&minus;0.54, &minus;0.10]</strong>, credibly negative (the interval excludes 0).</p>
-<p><strong>(d) Does the prior matter?</strong> Here it does. With only 19 islands and near-separation (small-PA islands are almost all occupied, large-PA almost all empty), the vague <code>dnorm(0, 1e-6)</code> lets the logit slope run large and diffuse: $b$ mean <strong>&minus;4.97</strong>, 95% CI [&minus;10.2, &minus;1.5]. The weakly-informative <code>dnorm(0, 1/2.71)</code> regularises it to $b$ mean <strong>&minus;2.44</strong>, 95% CI [&minus;4.5, &minus;0.8], roughly half the magnitude and half the width. Both priors agree on the sign and the biological conclusion, but the marginal posterior of $b$ itself is much tighter and less extreme under the weakly-informative prior. This is exactly the small-$n$ regime, foreshadowed by the U-shaped-prior figure above, where the prior does real work rather than washing out.</p>
+<p>Numbers below are from an actual run. <code>Lizards_Nimble.R</code> sets no seed, so we fixed
+<code>set.seed(2025)</code>; both fits use 3 chains, <code>niter=6000</code>,
+<code>nburnin=1000</code> on the $n=19$ islands.</p>
+<p><strong>(a) Convergence.</strong> For the vague-prior model <code>gelman.diag</code> returns
+R-hat = 1.00 for both $a$ and $b$ (upper C.I. 1.01), and all three chains pass the stationarity
+test for both parameters, with p-values of <strong>0.62, 0.23, 0.18</strong> for $a$ and
+<strong>0.84, 0.40, 0.48</strong> for $b$. So yes: the chains agree and the model has converged.</p>
+<p><strong>(b) Three tables, not one.</strong> Chain 1 alone would have you reporting 0.62 and 0.84
+&mdash; comfortably the most reassuring pair of the nine numbers &mdash; and the honest summary is
+the whole spread, 0.18 to 0.62 for $a$. Nothing here is failing; the point is that a stationarity
+p-value is not an estimate of anything. It means only "no evidence against stationarity" whenever it
+exceeds 0.05, so it carries real sampling variation from chain to chain, and quoting the best of
+three makes the agreement look tighter than it is. The habit generalises: any diagnostic reported
+per chain should be read across all of them, because the one that fails is the one you need to
+see.</p>
+<p><strong>(c) A flag that is not a failure.</strong> The tight-prior model converges just as well
+(R-hat = 1.00; stationarity p-values 0.83/0.19/0.89 for $a$ and 0.93/0.77/0.69 for $b$). The
+halfwidth test flags anyway, and the reason is arithmetic rather than sampling. That test asks
+whether the Monte Carlo error of the posterior mean is small <em>relative to the mean itself</em>
+&mdash; roughly, is the half-width of the mean's confidence interval under some fraction of
+$|\hat\mu|$. Under <code>dnorm(0, 1/2.71)</code> the posterior mean of $a$ sits almost exactly at
+zero, so that denominator is near zero and the criterion is close to unsatisfiable no matter how
+long you run the chain. Stationarity is the diagnostic that answers "has it converged?"; halfwidth
+answers the different question "have I run it long enough for the precision I want?", and it is
+unreliable whenever the parameter is centred on zero. The right response is to ignore it here, not
+to add iterations.</p>
+<p><strong>The general lesson.</strong> A diagnostic flag is a prompt to work out what the test
+measures, not an instruction. Two of the three results on this page look alarming at first glance
+and neither one indicates a problem.</p>
 </div></details>
 </div>
 
@@ -599,39 +634,52 @@ samples &lt;- <span class="fn">nimbleMCMC</span>(lizardCode, constants=constants
 </div>
 
 <div class="exercise" id="ex-4">
-<span class="ex-tag">Practice Exercise M4</span><span class="difficulty medium"> · 30 min · R · core lab</span>
-<h3>Build and compare all five N2O models</h3>
-<p>Open <code>Multilevel_Nimble.R</code> and walk through all five models in order. For each:</p>
+<span class="ex-tag">Practice Exercise M4</span><span class="difficulty medium"> · 25 min · R · core lab</span>
+<h3>Walk the pooling spectrum: the three N<sub>2</sub>O models</h3>
+<p>Open <code>Multilevel_Nimble.R</code> and walk through <strong>models 1&ndash;3</strong> in order
+&mdash; complete pooling, no pooling, partial pooling. That progression is the point of the morning,
+and this exercise stops there. Models 4 and 5 in the same script (a covariate on the random
+intercept, and a slope that varies by fertilizer type) are what
+<a href="problem_set.html#p4">Problem 4</a> asks you to build for yourself; leave them alone for
+now.</p>
 <ol type="a">
- <li>Report posterior median + 95% CI for $\beta$ (the N-input slope on log scale).</li>
- <li>For models 2 and 3, plot the per-site $\alpha_j$ estimates from no-pooling vs. partial-pooling on the same axes. Where are the largest shrinkages?</li>
- <li>For model 4 (covariate on random intercept), is the posterior of $\eta$ (the effect of SOC on baseline emissions) credibly different from 0?</li>
- <li>For model 5 (random slope by fertilizer), which fertilizer has the largest absolute effect of N input on emissions?</li>
+ <li>For each of the three, report the posterior median + 95% CI for $\beta$ (the N-input slope on
+ the log scale). How much does the choice of pooling move the average slope?</li>
+ <li>Plot the per-site $\alpha_j$ estimates from no-pooling (model 2) against partial-pooling
+ (model 3) on the same axes, with the 1:1 line. Where are the largest shrinkages, and what do those
+ sites have in common?</li>
 </ol>
 <details class="answer"><summary>Reveal worked solution (actual NIMBLE run)</summary><div class="answer-body">
-<p>From an actual run of <code>Multilevel_Nimble.R</code> (<code>set.seed(10)</code>; 563 measurements across 107 sites and 10 fertilizer types; 3 chains, <code>niter=10000</code>, <code>nburnin=1000</code>). R-hat is 1.00 for every $\beta$ in Models 1&ndash;4 and for eight of Model 5's ten fertilizer slopes; the remaining two, <code>beta[5]</code> (<code>UM</code>, the worst-mixing slope at n.eff $\approx$ 800) and <code>beta[10]</code> (<code>unknown</code>), come back at 1.01.</p>
-<p>Model 4's site-level covariate is $w_j = \log\!\big(c_j / (100 - c_j)\big)$, the logit of site $j$'s mean soil organic carbon percentage $c_j$ (the <code>carbon</code> column of the data), entered on top of the within-site N-input slope $\beta$.</p>
-<p><strong>(a) The N-input slope $\beta$ is positive and stable across the whole pooling spectrum</strong> (posterior median [95% CI]):</p>
+<p>From an actual run of <code>Multilevel_Nimble.R</code> (<code>set.seed(10)</code>; 563
+measurements across 107 sites and 10 fertilizer types; 3 chains, <code>niter=10000</code>,
+<code>nburnin=1000</code>). R-hat is 1.00 for every $\beta$ in models 1&ndash;3.</p>
+<p><strong>(a) The N-input slope $\beta$ is positive and barely moves across the pooling
+spectrum</strong> (posterior median [95% CI]):</p>
 <table>
 <tr><th scope="col">Model</th><th scope="col">$\beta$ median</th><th scope="col">95% CI</th></tr>
-<tr><td>1 — complete pooling</td><td>0.91</td><td>[0.70, 1.12]</td></tr>
-<tr><td>2 — no pooling</td><td>0.85</td><td>[0.65, 1.05]</td></tr>
-<tr><td>3 — partial pooling</td><td>0.88</td><td>[0.69, 1.06]</td></tr>
-<tr><td>4 — + covariate on intercept</td><td>0.87</td><td>[0.69, 1.05]</td></tr>
-<tr><td>5 — random slope ($\mu_\beta$)</td><td>0.93</td><td>[0.58, 1.35]</td></tr>
+<tr><td>1 &mdash; complete pooling</td><td>0.91</td><td>[0.70, 1.12]</td></tr>
+<tr><td>2 &mdash; no pooling</td><td>0.85</td><td>[0.65, 1.05]</td></tr>
+<tr><td>3 &mdash; partial pooling</td><td>0.88</td><td>[0.69, 1.06]</td></tr>
 </table>
-<p>Pooling barely moves the average slope; it mostly tightens the per-site intercepts. (Model 5 reports the mean slope $\mu_\beta$; individual fertilizers spread around it, see (d).)</p>
-<p><strong>(b) Shrinkage is largest for the data-poor sites.</strong> Comparing per-site $\alpha_j$ medians from Model 2 (no pooling) to Model 3 (partial pooling, grand mean $\mu_\alpha=0.18$), the biggest movers are dominated by the data-poorest sites, though not exclusively: the top five are site 51 ($n_j=1$) shifting 0.72, site 76 ($n_j=2$) 0.64, site 39 ($n_j=1$) 0.63, site 21 ($n_j=3$) 0.62, and site 42 ($n_j=1$) 0.61. Shrinkage depends on how far a site's own estimate sits from the mean as well as on how little data it has, so a site with two or three measurements that lands far out (site 76's no-pooling $\alpha$ is 2.64, against a grand mean of 0.18) can be pulled harder than a one-measurement site that was already near the middle. The tendency is what matters, and it is unmistakable in the aggregate: averaged over all sites, $|\Delta\alpha_j|$ = <strong>0.46</strong> for $n_j=1$ sites versus only <strong>0.06</strong> for sites with $n_j\ge10$, and the correlation between $n_j$ and $|\Delta\alpha_j|$ is $-0.49$: more data &rArr; less shrinkage, exactly as the hierarchical prior intends.</p>
-<p><strong>(c) $\eta$ is credibly positive — higher-carbon sites emit more N<sub>2</sub>O.</strong> Posterior median $\eta = 0.30$, 95% CI <strong>[0.01, 0.59]</strong>, with $\Pr(\eta &gt; 0) = 0.98$. The interval clears zero, though only just: a site's soil organic carbon carries real, if modest, explanatory power for its baseline emission on top of the within-site N-input slope $\beta$ — consistent with more labile carbon fuelling denitrification. Notice $\eta$ is informed by the number of <em>sites</em> (107), not the 563 observations, which is why it stays fairly uncertain even with plenty of data. Note also that $\eta$ and the group-level intercept $\kappa$ are correlated and mix slowly, so the default <code>niter=10000</code> leaves R-hat $\approx 1.04$ for $\eta$; the numbers above come from a longer run (3 chains, 60k iterations, thin 5, R-hat = 1.00). Centering $w$ achieves the same mixing for far less compute.</p>
-<p><strong>(d) Fertilizer with the steepest N-input response (Model 5).</strong> Posterior medians run from <strong>0.67</strong> (<code>N</code>, plain mineral N) up to <strong>1.44</strong> for <strong><code>UM</code></strong> (fert.index 5), with the rest in between: <code>unknown</code> 1.04, <code>AM</code> 1.01, <code>U</code> 0.98, <code>UA</code> 0.96, <code>M</code> 0.90, <code>AN</code> 0.80, <code>UAN</code> 0.80, <code>A</code> 0.73. So <code>UM</code> has the largest median, but stop there, because that is all the fit supports.</p>
-<p><strong>What this fit does <em>not</em> show.</strong> It is tempting to read the ranking as "urea-based fertilizers emit most", and the numbers do not carry that. Three checks kill it:</p>
-<ul>
- <li><strong>The intervals overlap almost completely.</strong> <code>UM</code>'s 95% CI is [0.79, 2.37]: it is built from only 15 measurements, and it contains every other fertilizer's median. The posterior probability that <code>UM</code> really has the largest slope of the ten is only <strong>0.60</strong>; <code>unknown</code> takes it 13% of the time, <code>UA</code> and <code>AM</code> about 8% each.</li>
- <li><strong>The runners-up are not urea.</strong> Second and third by median are <code>unknown</code> (composition undocumented) and <code>AM</code> (ammonium), while <code>UAN</code>, which <em>is</em> urea-containing, sits in the bottom half at 0.80, tied with ammonium nitrate.</li>
- <li><strong>The urea/non-urea contrast is not credible.</strong> Grouping the four urea-containing types (<code>U</code>, <code>UM</code>, <code>UA</code>, <code>UAN</code>) against the other six, the posterior difference in mean slope is 0.17 with 95% CI <strong>[&minus;0.12, 0.63]</strong> — it straddles zero, $\Pr(\text{urea steeper})$ = 0.85.</li>
-</ul>
-<p>And $\sigma_\beta$ itself is 0.36 [0.05, 0.96]: the data are consistent with the fertilizer slopes barely differing at all. The defensible statement is "<code>UM</code> has the largest posterior median slope, on 15 observations, with an interval that overlaps every other type; these data cannot separate fertilizer types by N-input response." That is a perfectly good answer to part (d), and a better one than a chemistry story the posterior does not support. This is also why part (d) asks which fertilizer has the largest effect and not whether some chemical family does — ten groups with 12 to 161 observations each is a setting where the largest sample median is very often just the noisiest group.</p>
-<p>(At these settings eight of the ten per-fertilizer slopes reached R-hat 1.00, with <code>UM</code> and <code>unknown</code> at 1.01 and $\sigma_\beta$ at 1.02. The default 10k iterations are adequate for the slopes; push to 60k if you want $\sigma_\beta$ and those two slopes at 1.00.)</p>
+<p>This is worth pausing on, because it is the usual result and it is not the one students expect.
+Pooling is not a knob that changes your headline slope; it changes the <em>per-site intercepts</em>,
+and it changes how much you should believe each one. The average within-site response to nitrogen
+input is about the same however you handle the sites.</p>
+<p><strong>(b) Shrinkage is largest for the data-poor sites.</strong> Comparing per-site $\alpha_j$
+medians from model 2 (no pooling) to model 3 (partial pooling, grand mean $\mu_\alpha=0.18$), the
+biggest movers are dominated by the data-poorest sites, though not exclusively: the top five are
+site 51 ($n_j=1$) shifting 0.72, site 76 ($n_j=2$) 0.64, site 39 ($n_j=1$) 0.63, site 21 ($n_j=3$)
+0.62, and site 42 ($n_j=1$) 0.61. Shrinkage depends on how far a site's own estimate sits from the
+mean as well as on how little data it has, so a site with two or three measurements that lands far
+out (site 76's no-pooling $\alpha$ is 2.64, against a grand mean of 0.18) can be pulled harder than
+a one-measurement site that was already near the middle. The tendency is what matters, and in the
+aggregate it is unmistakable: averaged over all sites, $|\Delta\alpha_j|$ = <strong>0.46</strong>
+for $n_j=1$ sites versus only <strong>0.06</strong> for sites with $n_j\ge10$, and the correlation
+between $n_j$ and $|\Delta\alpha_j|$ is $-0.49$. More data &rArr; less shrinkage, exactly as the
+hierarchical prior intends.</p>
+<p><strong>Where this goes next.</strong> Partial pooling pulls a data-poor site toward the grand
+mean because the grand mean is the only other information the model has about it. Problem 4 asks
+what happens when you give the model something better to pull it toward.</p>
 </div></details>
 </div>
 
@@ -738,35 +786,55 @@ samples &lt;- <span class="fn">nimbleMCMC</span>(lizardCode, constants=constants
 </div>
 
 <div class="exercise" id="ex-5">
-<span class="ex-tag">Practice Exercise M5</span><span class="difficulty medium"> · 25 min · R</span>
-<h3>Spawner-recruit: fit, predict, derive</h3>
-<p>Open <code>SpawnerRecruit_Nimble.R</code>. The script simulates 20 years of data from a known truth ($a=5, b=5000, \sigma=0.2$), then fits the model.</p>
+<span class="ex-tag">Practice Exercise M5</span><span class="difficulty medium"> · 20 min · R</span>
+<h3>Spawner-recruit: fit the curve, then ask what it can support</h3>
+<p>Open <code>SpawnerRecruit_Nimble.R</code>. The script simulates 20 years of data from a known
+truth ($a=5$, $b=5000$, $\sigma=0.2$) and fits the Beverton-Holt curve. Fit it and interrogate the
+<em>parameters</em> here. The management quantities everyone actually manages by &mdash;
+$N_\text{eq}$, $S_\text{msy}$, $H_\text{msy}$ &mdash; are nonlinear functions of $a$ and $b$, and
+building them as deterministic nodes so their full posteriors come for free is
+<a href="problem_set.html#p7">Problem 7</a>. Get the fit right first; everything the problem set does
+rests on it.</p>
 <ol type="a">
- <li>Run the script. Report posterior median + 95% CI for $a, b, \sigma, N_\text{eq}, S_\text{msy}, H_\text{msy}$.</li>
- <li>Plot the posterior of $H_\text{msy}$ as a histogram. What is the 5th percentile? In management language, the harvest rate you'd allow if you wanted to be 95% confident you weren't overfishing.</li>
- <li>Increase <code>Nyears</code> from 20 to 100, regenerate data, refit. How much does the posterior of $H_\text{msy}$ tighten? Is the gain linear in $N$?</li>
+ <li>Run the script. Report the posterior median and 95% CI for $a$, $b$ and $\sigma$. Does every
+ interval contain the truth?</li>
+ <li>$a$ is the productivity parameter, and it is the one every reference point hinges on. How well
+ do 20 years pin it down? Compare its 95% interval against its own prior, $a \sim U(0, 10)$, and say
+ what you notice about the upper end.</li>
+ <li>Increase <code>Nyears</code> from 20 to 100, regenerate the data, refit. By what factor does
+ $a$'s 95% interval tighten? Compare that against the $\sqrt{N}$ rule of thumb
+ ($\sqrt{100/20}\approx 2.24$) and account for any discrepancy.</li>
 </ol>
 <details class="answer"><summary>Reveal worked solution (actual NIMBLE run)</summary><div class="answer-body">
-<p>From an actual run of <code>SpawnerRecruit_Nimble.R</code> (<code>set.seed(2025)</code>; 3 chains, <code>niter=10000</code>, <code>nburnin=1000</code>).</p>
-<p><strong>Where the truth values $N_\text{eq}=4000$, $S_\text{msy}=1236$, $H_\text{msy}=0.553$ come from.</strong> These are not three separate facts to look up — each is one of the reference-point formulas above with the simulation truth $(a,b)=(5,5000)$ dropped in, and doing that arithmetic by hand is exactly how you sanity-check any assessment's output. Equilibrium is where recruits exactly replace spawners:</p>
-<div class="eq-block">$N_\text{eq} = \dfrac{b(a-1)}{a} = \dfrac{5000\,(5-1)}{5} = \dfrac{20000}{5} = 4000.$</div>
-<p>The harvest rate depends on the productivity $a$ <em>alone</em>: the stock's scale $b$ never enters, because $\sqrt{1/a}$ is the fraction of recruits that must escape to replace themselves:</p>
-<div class="eq-block">$H_\text{msy} = 1 - \sqrt{1/a} = 1 - \sqrt{1/5} = 1 - 0.447 = 0.553.$</div>
-<p>and $S_\text{msy}$ carries that same $\sqrt{1/a}$ but rescaled by the capacity $b$:</p>
-<div class="eq-block">$S_\text{msy} = b\sqrt{1/a} - \dfrac{b}{a} = 5000\,(0.447) - \dfrac{5000}{5} = 2236 - 1000 = 1236.$</div>
-<p>The general reading is worth keeping: <strong>$a$ (productivity) alone fixes the harvest <em>rate</em>, while $b$ (capacity) sets the <em>scale</em></strong>, so $H_\text{msy}$ is a pure function of $a$, and both $N_\text{eq}$ and $S_\text{msy}$ ride linearly on $b$. That is why the $H_\text{msy}$ posterior below inherits its shape straight from the posterior of $a$, and why the prior ceiling $a<10$ translates directly into the $H_\text{msy}$ ceiling of $1-\sqrt{1/10}=0.684$ flagged earlier. The MCMC simply runs this same arithmetic at every draw, so the correlated uncertainty in $(a,b)$ flows automatically into a full joint posterior for all three management quantities.</p>
-<p><strong>(a) Posterior medians and 95% CIs (Nyears = 20).</strong> Every CI contains the truth (R-hat = 1.00&ndash;1.01):</p>
+<p>From an actual run of <code>SpawnerRecruit_Nimble.R</code> (<code>set.seed(2025)</code>; 3 chains,
+<code>niter=10000</code>, <code>nburnin=1000</code>).</p>
+<p><strong>(a) Posterior medians and 95% CIs (Nyears = 20).</strong> Every interval contains the
+truth (R-hat = 1.00&ndash;1.01):</p>
 <table>
 <tr><th scope="col">Quantity</th><th scope="col">Median</th><th scope="col">95% CI</th><th scope="col">Truth</th></tr>
 <tr><td>$a$</td><td>5.32</td><td>[3.22, 9.25]</td><td>5</td></tr>
 <tr><td>$b$</td><td>4977</td><td>[3927, 7151]</td><td>5000</td></tr>
 <tr><td>$\sigma$</td><td>0.245</td><td>[0.181, 0.351]</td><td>0.2</td></tr>
-<tr><td>$N_\text{eq}$</td><td>4044</td><td>[3393, 5099]</td><td>4000</td></tr>
-<tr><td>$S_\text{msy}$</td><td>1216</td><td>[889, 1770]</td><td>1236</td></tr>
-<tr><td>$H_\text{msy}$</td><td>0.566</td><td>[0.443, 0.671]</td><td>0.553</td></tr>
 </table>
-<p><strong>(b) Conservative harvest rate.</strong> The 5th percentile of the $H_\text{msy}$ posterior is <strong>0.46</strong>: the harvest rate you could allow while staying 95% confident you are not exceeding the true $H_\text{msy}$. Note how much lower this risk-based number sits than the median 0.57.</p>
-<p><strong>(c) More data, tighter posterior.</strong> Regenerating from the same truth with <code>Nyears = 100</code> shrinks the $H_\text{msy}$ 95% CI from width <strong>0.228</strong> (20 yr: [0.44, 0.67]) to <strong>0.069</strong> (100 yr: [0.53, 0.60]): a factor of <strong>3.3&times;</strong>. That is actually a bit <em>more</em> than the $\sqrt{100/20}=\sqrt5\approx2.24$ the pure $\sqrt N$ rule predicts: at only 20 years the Beverton-Holt curvature is weakly identified (note $a$'s posterior runs to 9.25, up against its prior ceiling of 10), so the 20-year interval is inflated; 100 years both add information and pull the posterior into its well-identified, roughly-Gaussian regime, so it tightens faster than $\sqrt N$ alone. The qualitative lesson holds — more data buy tighter management quantities, on the order of $\sqrt N$.</p>
+<p><strong>(b) $a$ is barely identified by 20 years.</strong> Its interval, [3.22, 9.25], covers
+almost two-thirds of the prior's entire range and its upper end runs very nearly into the prior
+ceiling of 10. That is the tell: when a posterior presses against a bound you chose, the bound is
+part of the answer. Productivity is the hardest thing to estimate from a short stock-recruit series,
+because $a$ is the slope of the curve <em>at the origin</em> and 20 years rarely include many
+observations at low spawner abundance &mdash; the very region that identifies it. Everything built
+on $a$ inherits that: this is worth remembering when Problem 7 turns $a$ into a harvest rate.</p>
+<p><strong>(c) More data, tighter posterior &mdash; faster than $\sqrt{N}$.</strong> Regenerating
+from the same truth with <code>Nyears = 100</code> shrinks $a$'s 95% interval from
+[3.17, 9.19] (width <strong>6.02</strong>) to [4.63, 6.34] (width <strong>1.71</strong>), a factor of
+<strong>3.5&times;</strong>. That beats the $\sqrt{100/20}\approx 2.24$ the $\sqrt N$ rule
+predicts, and (b) explains why: at 20 years the posterior is inflated by that collision with the
+prior ceiling, so it is wider than a well-identified posterior would be. The extra data do two jobs
+at once &mdash; they add information <em>and</em> pull the parameter into the regime where it is
+properly identified and roughly Gaussian, so the interval tightens faster than counting observations
+alone would suggest. $b$ behaves the same way (width 3269 &rarr; 878, a factor of 3.7), while
+$\sigma$, which was well identified from the start, tightens by 3.3&times;. The qualitative lesson
+is the safe one: more data buy tighter management quantities, on the order of $\sqrt N$ once you are
+out of the badly-identified regime.</p>
 </div></details>
 </div>
 
@@ -866,13 +934,12 @@ zst &lt;- <span class="fn">matrix</span>(<span class="nu">1L</span>, Nsites, Nye
  <li>Repeat for $\gamma_t$.</li>
  <li>Repeat for the year-specific expected occupancy $\psi_t$.</li>
  <li>What happens if you (mistakenly) omit the z-init trick — replace <code>zst</code> with <code>matrix(rbinom(Nsites*Nyears, 1, 0.3), Nsites, Nyears)</code>?</li>
- <li>Posterior intervals on individual $\phi_t$ are wide. Why? What would you do in a real analysis to tighten them?</li>
 </ol>
 <details class="answer"><summary>Reveal worked solution (actual NIMBLE run)</summary><div class="answer-body">
 <p>Numbers below are from actually running the script (<code>set.seed(2025)</code>: 30 sites, 8 years, 3 reps, true $p=0.6$, baseline occupancy $\approx 0.37$; 3 chains, 20000 iter, 10000 burn-in, thin 5). Across all 45 monitored parameters, <strong>R-hat is 1.00 everywhere except $\lambda_3$, which is 1.01</strong>, convergence is not the problem here.</p>
 <p><strong>(a&ndash;c)</strong> The two quantities informed by <em>all</em> the data are recovered well: detection $p$ = 0.63 [0.55, 0.70] (truth 0.60) and baseline occupancy $\psi$ = 0.33 [0.18, 0.51] (truth 0.37). Year-specific persistence and colonization scatter around the 1:1 line but with <strong>very wide 95% CIs</strong>, e.g. $\phi_3$ = 0.52 [0.16, 0.89], $\phi_5$ = 0.08 [0.00, 0.36], $\gamma_1$ = 0.47 [0.26, 0.70] (its truth 0.47, recovered almost exactly; others land anywhere in their wide interval). The derived yearly occupancy $\psi_t$ tracks the true trajectory, including the dip in year 3 (true 0.13, posterior 0.18 [0.08, 0.34]).</p>
 <p><strong>(d)</strong> Replacing the all-ones <code>zst</code> with random 0/1 inits does <em>not</em> stop NIMBLE 1.4.2. Every site-year where a randomly-drawn $z=0$ collides with an observed $y=1$ is logically impossible, so each such observation starts at a $-\infty$ log-density, and NIMBLE says so, printing one <code>warning: logProb of data node y[i, j, t]: logProb is -Inf.</code> line per offending observation before it runs. It then runs to completion, and because $z$ is binary the samplers move those cells to 1 on essentially the first sweep: with a random 0/1 start the posterior comes back the same as with <code>zst</code> (detection $p$ median 0.63 either way). Run the identical model in JAGS and it <em>is</em> fatal: <code>jags.model()</code> aborts with <code>Error in node y[1,1,1]: Node inconsistent with parents</code>. The lesson to take from (d) is therefore not "it crashes" but "read the warnings": a wall of $-\infty$ log-probabilities means your initial values contradict your data; you cannot rely on the sampler rescuing you in a model with continuous latent states, and the all-ones <code>zst</code> makes the whole class of problem disappear.</p>
-<p><strong>(e)</strong> Each year-transition $\phi_t,\gamma_t$ is informed by only ~30 sites across a single two-year step, so the CIs are wide even though R-hat is essentially 1.00 throughout — Bayes is being honest about a genuinely small sample, not failing to converge. The standard fixes: put a hierarchical prior on the transitions, e.g. $\text{logit}(\phi_t) \sim \mathcal{N}(\mu_\phi, \sigma_\phi^2)$ so years borrow strength, and/or add a covariate model for $\phi$ and $\gamma$.</p>
+<p><strong>Notice what you are left with.</strong> The intervals on the individual $\phi_t$ and $\gamma_t$ are very wide, and R-hat says that is not a convergence problem &mdash; the model is being honest about a genuinely small sample. What to do about it is <a href="problem_set.html#p10">Problem 10</a>, where you measure two different fixes and find that one of them can fool you.</p>
 </div></details>
 </div>
 

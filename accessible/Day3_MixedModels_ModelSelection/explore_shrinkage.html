@@ -42,7 +42,7 @@
 <header class="lab-header">
   <div class="eyebrow">Day 3 · Interactive</div>
   <h1>Shrinkage: how a random effect borrows strength</h1>
-  <p class="lede">Eight sites, each with its own noisy estimate. A mixed model pulls each site's estimate toward the overall mean — a lot when a site has little data or sites are alike, a little when a site has lots of data or sites truly differ.</p>
+  <p class="lede">Eight sites, each with its own noisy estimate. A mixed model pulls each site's estimate toward the overall mean, a lot when a site has little data or sites are alike, a little when a site has lots of data or sites truly differ.</p>
 </header>
 
 <section id="explorer">
@@ -52,6 +52,7 @@
     <div class="ctl"><label for="n">Observations per site n<span class="val" id="v_n"></span></label><input id="n" type="range" min="1" max="60" step="1" value="5"></div>
     <div class="ctl"><label for="sigma">Within-site residual SD σ (how noisy one observation is)<span class="val" id="v_sigma"></span></label><input id="sigma" type="range" min="0.2" max="6" step="0.1" value="2"></div>
   </div>
+  <label style="font-family:'Helvetica Neue',Arial,sans-serif; font-size:13px;"><input type="checkbox" id="unequal" /> Unequal effort: give each site its own n<sub>i</sub> (from about n/5 to 6n), so the pull differs site by site</label>
 
   <div class="sr-readout" id="srReadout" role="status" aria-live="polite" aria-atomic="true"></div>
 
@@ -59,7 +60,7 @@
   <div class="legend">
     <span style="color:#D73F09">● no-pooling estimate (site mean)</span>
     <span style="color:#1F5B50">● partial-pooling estimate (mixed model)</span>
-    <span style="color:#111">— overall (grand) mean</span>
+    <span style="color:#111">▬ overall (grand) mean</span>
   </div>
 
   <details class="data-table-details">
@@ -79,7 +80,8 @@
 <li><strong>Large τ → almost no shrinkage.</strong> Slide τ up. The model trusts each site's own data, and the teal estimates sit almost on top of the orange ones.</li>
 <li><strong>More data → less shrinkage.</strong> Raise n. Each site's own mean becomes more reliable, so it is pulled less toward the center.</li>
 <li><strong>Noisier observations → more shrinkage.</strong> Raise σ. Each site's own mean is now measured badly, so the model leans harder on the grand mean. Notice that τ and σ/√n are in a tug of war: only their <em>ratio</em> matters.</li>
-<li><strong>The retention weight B</strong> shown below is B = τ² / (τ² + σ²/n): the fraction of the way each estimate stays at its own site mean rather than the grand mean. Careful with the direction — B is what a site <em>keeps</em>, and 1 &minus; B is how far it is <em>shrunk</em> toward the grand mean. Day 3’s afternoon walkthrough uses B the same way.</li>
+<li><strong>The retention weight B</strong> shown below is B = τ² / (τ² + σ²/n): the fraction of the way each estimate stays at its own site mean rather than the grand mean. Careful with the direction: B is what a site <em>keeps</em>, and 1 &minus; B is how far it is <em>shrunk</em> toward the grand mean. Day 3's morning problem set (Problem 1) uses B the same way.</li>
+<li><strong>Unequal effort.</strong> Tick the box. Now every site gets its own B<sub>i</sub>, and the sparsely sampled sites are pulled hardest. This is the balanced-versus-unbalanced contrast that the lab's stream data cannot show, because every stream there has exactly three observations.</li>
 </ol>
 </div>
 <p><a href="lab.html">← Back to the Day 3 lab</a></p>
@@ -100,6 +102,10 @@ const grand = sites.reduce((a,s)=>a+s.ybar,0)/sites.length;
 // asked to reason about (B = tau^2 / (tau^2 + sigma^2/n)), so it must be visible and
 // adjustable rather than buried as a constant.
 const S={tau:1, n:5, sigma:2.0};
+// Multipliers for the "unequal effort" option: site n_i = max(1, round(n * mult)).
+const MULT=[0.2, 0.4, 0.6, 1, 1, 2, 4, 6];
+function siteN(i){ return document.getElementById('unequal').checked ? Math.max(1, Math.round(S.n*MULT[i])) : Math.round(S.n); }
+function siteB(i){ const tau2=S.tau*S.tau; return tau2/(tau2 + S.sigma*S.sigma/siteN(i)); }
 
 function render(){
   document.getElementById('v_tau').textContent=(+S.tau).toFixed(2);
@@ -123,59 +129,82 @@ function render(){
   // grand mean line
   s+=`<line x1="${ml}" y1="${py(grand)}" x2="${ml+pw}" y2="${py(grand)}" stroke="#111" stroke-width="1.5"/>`;
   s+=`<text x="${ml+pw-2}" y="${py(grand)-6}" font-size="11" fill="#111" text-anchor="end">grand mean = ${grand.toFixed(2)}</text>`;
+  const uneq=document.getElementById('unequal').checked;
   sites.forEach((st,i)=>{
-    const pp = grand + B*(st.ybar-grand);
+    const Bi=siteB(i);
+    const pp = grand + Bi*(st.ybar-grand);
     const x=px(i);
     // arrow from no-pool to partial-pool
     s+=`<line x1="${x}" y1="${py(st.ybar)}" x2="${x}" y2="${py(pp)}" stroke="#bbb" stroke-width="2"/>`;
     s+=`<circle cx="${x}" cy="${py(st.ybar)}" r="5.5" fill="#D73F09"/>`;
     s+=`<circle cx="${x}" cy="${py(pp)}" r="5.5" fill="#1F5B50"/>`;
     s+=`<text x="${x}" y="${mt+ph+16}" font-size="11" fill="#666" text-anchor="middle">${st.name}</text>`;
+    if(uneq) s+=`<text x="${x}" y="${mt+ph+30}" font-size="10" fill="#999" text-anchor="middle">n=${siteN(i)}, B=${Bi.toFixed(2)}</text>`;
   });
   document.getElementById('chart').innerHTML=s;
   const verdict = B<0.25 ? `Strong shrinkage — the model treats the sites as nearly interchangeable.` :
                   B>0.8  ? `Weak shrinkage — the model trusts each site's own data.` :
                            `Moderate shrinkage — a balance of site data and the shared population.`;
+  if(uneq){
+    const Bs=sites.map((s,i)=>siteB(i)); const bmin=Math.min(...Bs), bmax=Math.max(...Bs);
+    const imin=Bs.indexOf(bmin), imax=Bs.indexOf(bmax);
+    document.getElementById('interp').innerHTML=
+      `With τ = <b>${S.tau.toFixed(2)}</b> and σ = <b>${sigma.toFixed(1)}</b>, and effort now ranging from n = ${siteN(imin)} to n = ${siteN(imax)}, `+
+      `the retention weight B<sub>i</sub> = τ²/(τ² + σ²/n<sub>i</sub>) runs from <b>${bmin.toFixed(2)}</b> (site ${sites[imin].name}, n = ${siteN(imin)}) to <b>${bmax.toFixed(2)}</b> (site ${sites[imax].name}, n = ${siteN(imax)}). `+
+      `The same τ and σ, but the thinly sampled site is pulled ${((1-bmin)*100).toFixed(0)}% of the way to the grand mean while the heavily sampled one moves only ${((1-bmax)*100).toFixed(0)}%. `+
+      `That is partial pooling doing its job: the pull is proportional to how little each site's own data can be trusted.`;
+    describe(B,sigma,'Shrinkage now varies site by site with effort.');
+  } else {
   document.getElementById('interp').innerHTML=
     `With τ = <b>${S.tau.toFixed(2)}</b>, n = <b>${Math.round(S.n)}</b> and σ = <b>${sigma.toFixed(1)}</b>, `+
     `the retention weight B = τ²/(τ² + σ²/n) = ${tau2.toFixed(2)}/(${tau2.toFixed(2)} + ${se2.toFixed(2)}) = <b>${B.toFixed(2)}</b>. `+
     `Each site estimate keeps <b>${(B*100).toFixed(0)}%</b> of its own site mean and takes <b>${((1-B)*100).toFixed(0)}%</b> from the grand mean. `+
     verdict;
   describe(B,sigma,verdict);
+  }
 }
 
 // Spoken readout + text alternative to the dot plot, built from the same B the
 // chart uses, so the words and the dots can never disagree.
 function describe(B,sigma,verdict){
-  const rows=sites.map(st=>{
-    const pp=grand+B*(st.ybar-grand);
-    return {name:st.name, ybar:st.ybar, pp:pp, moved:pp-st.ybar};
+  const rows=sites.map((st,i)=>{
+    const Bi=siteB(i);
+    const pp=grand+Bi*(st.ybar-grand);
+    return {name:st.name, ybar:st.ybar, pp:pp, moved:pp-st.ybar, n:siteN(i), B:Bi};
   });
   // the site the eye goes to: the one furthest from the grand mean
   const far=rows.reduce((a,r)=>Math.abs(r.ybar-grand)>Math.abs(a.ybar-grand)?r:a, rows[0]);
   const nn=Math.round(S.n);
-  const msg=`Between-site SD tau = ${S.tau.toFixed(2)}, n = ${nn} observation${nn===1?'':'s'} per site, `+
-    `within-site residual SD sigma = ${sigma.toFixed(1)}. `+
-    `Retention weight B = tau squared over (tau squared plus sigma squared over n) = ${B.toFixed(2)}. `+
-    `Each site keeps ${(B*100).toFixed(0)} percent of its own mean and takes ${((1-B)*100).toFixed(0)} percent `+
-    `from the grand mean of ${grand.toFixed(2)}. `+
+  const uneq=document.getElementById('unequal').checked;
+  const effort = uneq
+    ? `effort differs by site, from ${Math.min(...rows.map(r=>r.n))} to ${Math.max(...rows.map(r=>r.n))} observations`
+    : `n = ${nn} observation${nn===1?'':'s'} per site`;
+  const weight = uneq
+    ? `Retention weights B sub i run from ${Math.min(...rows.map(r=>r.B)).toFixed(2)} to ${Math.max(...rows.map(r=>r.B)).toFixed(2)}, smallest for the least-sampled site. `
+    : `Retention weight B = tau squared over (tau squared plus sigma squared over n) = ${B.toFixed(2)}. `+
+      `Each site keeps ${(B*100).toFixed(0)} percent of its own mean and takes ${((1-B)*100).toFixed(0)} percent `+
+      `from the grand mean of ${grand.toFixed(2)}. `;
+  const msg=`Between-site SD tau = ${S.tau.toFixed(2)}, ${effort}, `+
+    `within-site residual SD sigma = ${sigma.toFixed(1)}. `+weight+
     `Site ${far.name}, the furthest out at ${far.ybar.toFixed(2)}, is pulled in to ${far.pp.toFixed(2)}. `+verdict;
   document.getElementById('srReadout').textContent=msg;
   document.getElementById('chart').setAttribute('aria-label',
     `Dot plot of ${sites.length} site estimates before and after partial pooling, against a grand mean of ${grand.toFixed(2)}. `+
-    `Each partial-pooling estimate sits ${(B*100).toFixed(0)} percent of the way from the grand mean out to its own site mean. `+verdict);
+    (uneq?`Each partial-pooling estimate sits its own B sub i of the way from the grand mean out to its own site mean, so the sparsely sampled sites move most. `
+         :`Each partial-pooling estimate sits ${(B*100).toFixed(0)} percent of the way from the grand mean out to its own site mean. `)+verdict);
   const body=rows.map(r=>
-    `<tr><th scope="row">${r.name}</th><td>${r.ybar.toFixed(2)}</td><td>${r.pp.toFixed(2)}</td>`+
+    `<tr><th scope="row">${r.name}</th><td>${r.n}</td><td>${r.B.toFixed(2)}</td><td>${r.ybar.toFixed(2)}</td><td>${r.pp.toFixed(2)}</td>`+
     `<td>${(r.moved>=0?'+':'')}${r.moved.toFixed(2)}</td></tr>`).join('');
   document.getElementById('tableWrap').innerHTML=
-    `<table><caption>Site estimates with τ = ${S.tau.toFixed(2)}, n = ${Math.round(S.n)}, σ = ${sigma.toFixed(1)}, `+
-      `giving B = ${B.toFixed(2)}. The grand mean is ${grand.toFixed(2)}.</caption>`+
-    `<thead><tr><th scope="col">Site</th><th scope="col">No-pooling site mean</th>`+
+    `<table><caption>Site estimates with τ = ${S.tau.toFixed(2)}, ${uneq?'unequal effort (see the n column)':'n = '+Math.round(S.n)}, σ = ${sigma.toFixed(1)}`+
+      `${uneq?'':', giving B = '+B.toFixed(2)}. The grand mean is ${grand.toFixed(2)}.</caption>`+
+    `<thead><tr><th scope="col">Site</th><th scope="col">n<sub>i</sub></th><th scope="col">B<sub>i</sub></th><th scope="col">No-pooling site mean</th>`+
     `<th scope="col">Partial-pooling estimate</th><th scope="col">Shift toward the grand mean</th></tr></thead>`+
     `<tbody>${body}</tbody></table>`;
 }
 
 ['tau','n','sigma'].forEach(id=>document.getElementById(id).addEventListener('input',e=>{S[id]=+e.target.value; render();}));
+document.getElementById('unequal').addEventListener('change',render);
 render();
 </script>
 </body>

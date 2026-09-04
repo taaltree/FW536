@@ -302,14 +302,46 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 </section>
 <section aria-labelledby="slide-21-h">
 <h2 id="slide-21-h"><span id="slide-21"></span>Slide 21: Most common mistake in ecology!</h2>
+<p>Interpretation of relative AIC is not symmetric</p>
 <ul>
-<li>Interpretation of relative AIC is not symmetric</li>
-<li style="margin-left:1.2em">More complex model only “significantly better” if its AIC score is &gt;2 units smaller.</li>
-<li style="margin-left:1.2em">Otherwise simpler and complex model are competitive</li>
-<li>Penalty for adding parameter is 2 units and fit improves with complexity, so models with random data as predictor will be within 2 AIC. The complex model has no support even if within 2 AIC units</li>
-<li>The 2 AIC convention is about whether a more complex model with lower AIC is better enough relative to simpler model (in the sense that the parameters are informative)</li>
+<li>THE CLAIM</li>
+<li>Two models within 2 AIC units of each other are “competitive.”</li>
 </ul>
-<p>AICi = −2 log Li + 2 pi</p>
+<ul>
+<li>WHY IT FAILS</li>
+<li>Within 2 units is exactly where a pure-noise parameter always lands. It is the floor, not evidence.</li>
+</ul>
+<p>ΔAIC = AIC(complex) − AIC(simple) = 2 − χ²₁</p>
+<p>χ²₁ = likelihood-ratio statistic for the one extra parameter</p>
+<ul>
+<li>Real evidence</li>
+<li>χ²₁ &gt; 4,  p &lt; 0.05</li>
+</ul>
+<ul>
+<li>Weak</li>
+<li>2 &lt; χ²₁ &lt; 4</li>
+</ul>
+<ul>
+<li>No evidence</li>
+<li>0 &lt; χ²₁ &lt; 2</li>
+</ul>
+<p>cannot happen</p>
+<p>hard ceiling at ΔAIC = 2  ▼</p>
+<p>-6</p>
+<p>-4</p>
+<p>-2</p>
+<p>0</p>
+<p>+2</p>
+<p>+4</p>
+<p>◀  complex model better</p>
+<p>complex model worse  ▶</p>
+<p>Complex model wins by more than 2 units. The only zone that is evidence.</p>
+<p>Complex model ahead, but by less than 2.</p>
+<p>Complex model behind. Pure noise lands here every time.</p>
+<ul>
+<li>Because χ²₁ is never negative, ΔAIC can never exceed 2. Landing “within 2” is guaranteed by the arithmetic, not earned by the data.</li>
+<li>On average χ²₁ = 1, so a useless parameter typically sits about 1 AIC unit behind — and 16% of the time χ²₁ exceeds 2, so it takes the lower AIC outright.</li>
+</ul>
 </section>
 <section aria-labelledby="slide-22-h">
 <h2 id="slide-22-h"><span id="slide-22"></span>Slide 22: 3700 Citations! 72% of all papers incorrectly interpret uninformative parameters!</h2>

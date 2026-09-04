@@ -44,23 +44,11 @@
 <main class="content">
 <header class="lab-header">
  <div class="eyebrow">Day 3 · Two assessed problem sets · 20 pts each</div>
- <h1>Mixed models &amp; model selection — the graded hand-in</h1>
- <p class="lede">Two separately submitted 20-point problem sets, 40 points across Day 3. Ten problems: six on hierarchical (mixed) models in the <a href="#morning">morning</a>, four on hypothesis tests and model selection in the <a href="#afternoon">afternoon</a>. Several problems are worked on real datasets that live in this folder; others ask you to simulate, exactly as in the lab. Write every answer in the R Markdown hand-in template, knit to HTML, and submit on Canvas.</p>
+ <h1>Mixed models &amp; model selection: the graded hand-in</h1>
+ <p class="lede">Two separately submitted 20-point problem sets, 40 points across Day 3. Ten problems, six on hierarchical (mixed) models in the <a href="#morning">morning</a>, four on hypothesis tests and model selection in the <a href="#afternoon">afternoon</a>. Three problems are worked on real datasets that live in this folder; four ask you to simulate, exactly as in the lab; the rest are worked from printed output. Write every answer in the R Markdown hand-in template, knit to HTML, and submit on Canvas.</p>
 </header>
 
 <section class="callout warn" style="margin-top:24px;"><p><strong>This is the assessed problem set.</strong> Answers are <em>not</em> shown here. Write your work in the hand-in templates: <a href="morning_lab_template.Rmd"><code>morning_lab_template.Rmd</code></a> for the morning (mixed-model) problems and <a href="afternoon_lab_template.Rmd"><code>afternoon_lab_template.Rmd</code></a> for the afternoon (model-selection) problems. Knit each to HTML, then upload to the matching Canvas assignment.</p><p>For worked-example study with visible answers, see <a href="lab.html">the practice problem set</a> and the <a href="plain_language_summary.html">plain-language summary</a>.</p></section>
-
-<section class="data-card" id="data-files">
-<h2>Data files used in this problem set</h2>
-<p>Every real-data problem below reads one of these files from the <code>data/</code> folder. The <code>read.csv()</code> calls are copied from the main lab so you can paste them directly.</p>
-<div class="data-section">
-  <h3 class="data-h">Datasets</h3>
-  <div class="data-row"><a href="data/stream_density.csv"><code>stream_density.csv</code></a><span class="data-desc">Fish density in 100 streams, three observations per stream. Used in Problem 1.</span></div>
-  <div class="data-row"><a href="data/length_weight.csv"><code>length_weight.csv</code></a><span class="data-desc">Length–weight measurements per individual, grouped by subject. Used in Problem 2.</span></div>
-  <div class="data-row"><a href="data/fish_growth.csv"><code>fish_growth.csv</code></a><span class="data-desc">Age and length per individual fish (von Bertalanffy growth). Used in Problem 3.</span></div>
-  <div class="data-row"><a href="data/qcbs_w6_data.csv"><code>qcbs_w6_data.csv</code></a><span class="data-desc">QCBS fish trophic position: three species across six lakes. Used in Problems 4 and 10.</span></div>
-</div>
-</section>
 
 <section><p>This problem set is designed to take roughly the same time as the main lab. Work each problem in the matching R Markdown template, knit to HTML, and submit on Canvas. Where simulations are requested, exact numbers depend on the seed; "approximately" is in the spirit of the exercise.</p></section>
 
@@ -70,11 +58,10 @@
 <h2>Datasets for this assignment</h2>
 <p>Click a file to download it, then put it in a <code>data/</code> subfolder beside your <code>.Rmd</code> so the <code>read.csv()</code> calls resolve.</p>
 <div class="data-section">
-  <div class="data-row"><a href="data/qcbs_w6_data.csv" download><code>qcbs_w6_data.csv</code></a><span class="data-desc">Fish trophic position across three species and six lakes (mixed models).</span></div>
-  <div class="data-row"><a href="data/stream_density.csv" download><code>stream_density.csv</code></a><span class="data-desc">Fish density in 100 streams, 3 observations each (random-intercept intro).</span></div>
-  <div class="data-row"><a href="data/length_weight.csv" download><code>length_weight.csv</code></a><span class="data-desc">Length and weight per individual (random-intercept regression).</span></div>
-  <div class="data-row"><a href="data/fish_growth.csv" download><code>fish_growth.csv</code></a><span class="data-desc">Age and length per individual fish (nonlinear mixed / von Bertalanffy).</span></div>
+  <div class="data-row"><a href="data/length_weight.csv" download><code>length_weight.csv</code></a><span class="data-desc">Length and weight per individual, grouped by subject. Used in Problem 2.</span></div>
+  <div class="data-row"><a href="data/qcbs_w6_data.csv" download><code>qcbs_w6_data.csv</code></a><span class="data-desc">QCBS fish trophic position: three species across six lakes. Used in Problems 4 and 9.</span></div>
 </div>
+<p style="margin-top:10px"><em>Problems 1, 3, 7 and 8 simulate their own data in the code block given with each problem, so they need no file.</em></p>
 </section>
 
 <a id="morning"></a>
@@ -83,8 +70,8 @@
 <div class="exercise" id="p1">
 <span class="ex-tag">Problem 1</span><span class="difficulty medium"> · simulation · shrinkage and effort</span>
 <h3>Which streams get pulled hardest toward the mean?</h3>
-<p>The walkthrough used a balanced design: every stream sampled the same number of times. Real survey effort is never balanced, and the imbalance is exactly where partial pooling earns its keep. Here you simulate an unbalanced design, so you know the truth, and watch what the model does with it.</p>
-<div class="code-label">Setup &mdash; 24 streams, deliberately unequal effort</div>
+<p>The walkthrough used a balanced design, with every stream sampled the same number of times. Real survey effort is never balanced, and the imbalance is exactly where partial pooling earns its keep. Here you simulate an unbalanced design, so you know the truth, and watch what the model does with it.</p>
+<div class="code-label">Setup: 24 streams, deliberately unequal effort</div>
 <pre><code><span class="kw">library</span>(nlme)
 <span class="fn">set.seed</span>(<span class="nu">413</span>)
 
@@ -153,7 +140,7 @@ m1b &lt;- <span class="fn">lmer</span>(Weight ~ Length + (<span class="nu">1</sp
 <div class="exercise" id="p3">
 <span class="ex-tag">Problem 3</span><span class="difficulty medium"> · simulation · where the variation goes</span>
 <h3>If you leave the fish out of the model, where does the fish-to-fish variation go?</h3>
-<p>Fish differ from one another, and they also get measured imperfectly. Those are two separate sources of variation, and a mixed model can tell them apart. A fixed-effects fit has only one place to put variation &mdash; the residual &mdash; so it has to blend them.</p>
+<p>Fish differ from one another, and they also get measured imperfectly. Those are two separate sources of variation, and a mixed model can tell them apart. A fixed-effects fit has only one place to put variation, the residual, so it has to blend them.</p>
 <p>Here you build the data yourself, so you know exactly how big each source really is, and then watch what each fit reports.</p>
 <div class="code-label">Simulate 12 fish, measured at ages 1 to 8</div>
 <pre><code><span class="kw">library</span>(nlme)
@@ -181,8 +168,8 @@ fit_nlme &lt;- <span class="fn">nlme</span>(Length ~ Linf*(<span class="nu">1</s
 <ol type="a">
 <li><strong>What does each fit say the measurement error is?</strong> Run <code>summary(fit_nls)$sigma</code> and <code>VarCorr(fit_nlme)</code>. You built the data with a measurement error of 3 and a fish-to-fish SD of 12. Which fit recovers both numbers, and what does the other one report instead?</li>
 
-<li><strong>Work out where that wrong number came from.</strong> No calculus needed &mdash; just look at the growth equation. Length is $L_\infty$ <em>multiplied by</em> the factor $(1 - e^{-\kappa a})$, and that factor is the fraction of its final size a fish has reached by age $a$.
-<p style="margin:8px 0">So two fish whose $L_\infty$ differ by 12 are <em>not</em> 12 apart at every age. At age $a$ they are $12 \times (\text{that fraction})$ apart &mdash; close together when young, far apart when old.</p>
+<li><strong>Work out where that wrong number came from.</strong> No calculus needed. Just look at the growth equation. Length is $L_\infty$ <em>multiplied by</em> the factor $(1 - e^{-\kappa a})$, and that factor is the fraction of its final size a fish has reached by age $a$.
+<p style="margin:8px 0">So two fish whose $L_\infty$ differ by 12 are <em>not</em> 12 apart at every age. At age $a$ they are $12 \times (\text{that fraction})$ apart, close together when young and far apart when old.</p>
 <ol type="i" style="margin-bottom:6px">
 <li>Compute the fraction at each age: <code>1 - exp(-0.25 * 1:8)</code>. How far apart are two such fish at age 1? At age 8?</li>
 <li>At any age the fish are spread out by <em>both</em> that gap and the measurement error. Squares add, so the spread at age $a$ is <code>sqrt((12*fraction)^2 + 3^2)</code>. Compute all eight.</li>
@@ -190,21 +177,21 @@ fit_nlme &lt;- <span class="fn">nlme</span>(Length ~ Linf*(<span class="nu">1</s
 </ol></li>
 
 <li><strong>What that does to the residual plot.</strong> Your eight numbers in (b) should grow with age. But <code>nls</code> used a single $\sigma$ for all of them, so its residuals must be too small at young ages and too large at old ones. Draw <code>plot(fitted(fit_nls), resid(fit_nls))</code> and describe the shape.
-<p style="margin:8px 0">Here is the trap: that picture looks exactly like non-constant variance, and the usual fixes are a variance function or a log transform. Neither would help. Say in one or two sentences what is actually wrong with the model.</p></li>
+<p style="margin:8px 0">Here is the trap. That picture looks exactly like non-constant variance, and the usual fixes are a variance function or a log transform. Neither would help. Say in one or two sentences what is actually wrong with the model.</p></li>
 
-<li><strong>What you gain by separating the two.</strong> Compare the standard errors of <code>Kappa</code> and <code>Tzero</code> between the fits (<code>summary(fit_nls)$coefficients</code> and <code>summary(fit_nlme)$tTable</code>). Neither parameter was given a random effect, yet one fit gives much tighter values. Every standard error is scaled by how noisy the model thinks the data are &mdash; use that to explain the difference.</li>
+<li><strong>What you gain by separating the two.</strong> Compare the standard errors of <code>Kappa</code> and <code>Tzero</code> between the fits (<code>summary(fit_nls)$coefficients</code> and <code>summary(fit_nlme)$tTable</code>). Neither parameter was given a random effect, yet one fit gives much tighter values. Every standard error is scaled by how noisy the model thinks the data are. Use that to explain the difference.</li>
 
 <li><strong>How many fish do you need?</strong> Re-run the whole thing with <code>nfish &lt;- 4</code>, then with <code>nfish &lt;- 20</code>, refitting <code>fit_nlme</code> each time, and report the estimated fish-to-fish SD. It was built as 12 in every case. What does the pattern say about how many groups you need before a random effect is worth fitting?</li>
 </ol>
-<div class="callout warn" style="margin-top:12px;"><strong>Watch out.</strong> Part (e) estimates a <em>spread</em>, which needs far more groups to pin down than an average does. One run at <code>nfish = 4</code> proves nothing on its own &mdash; if you can, run each setting a few times and look at how much the answer jumps around.</div>
+<div class="callout warn" style="margin-top:12px;"><strong>Watch out.</strong> Part (e) estimates a <em>spread</em>, which needs far more groups to pin down than an average does. One run at <code>nfish = 4</code> proves nothing on its own. If you can, run each setting a few times and look at how much the answer jumps around.</div>
 <div class="callout try" style="margin-top: 12px;"><strong>Your answer goes in the R Markdown hand-in.</strong> Report the three SDs from (a), your eight numbers and the comparison in (b), the residual-plot description, the standard-error comparison, and the pattern from (e).</div>
 </div>
 
 
 <div class="exercise" id="p4">
 <span class="ex-tag">Problem 4</span><span class="difficulty hard"> · real data · crossed random effects · when a model asks for too much</span>
-<h3>Fish trophic position — and a random-effect structure the data cannot support</h3>
-<p>The QCBS dataset <code>qcbs_w6_data.csv</code> gives trophic position vs body length for three fish species (<code>S1</code>, <code>S2</code>, <code>S3</code>) sampled across six lakes (<code>L1</code>&ndash;<code>L6</code>). The biological question: does trophic position increase with body length, and does that relationship differ by species and by lake?</p>
+<h3>Fish trophic position, and a random-effect structure the data cannot support</h3>
+<p>The QCBS dataset <code>qcbs_w6_data.csv</code> gives trophic position vs body length for three fish species (<code>S1</code>, <code>S2</code>, <code>S3</code>) sampled across six lakes (<code>L1</code>&ndash;<code>L6</code>). The biological question is whether trophic position increases with body length, and does that relationship differ by species and by lake?</p>
 <p>This problem has a second purpose. One of the candidate models below asks the data for something it cannot give, and it is the model that <em>wins</em> the model-selection table. Learning to spot that is the point.</p>
 <div class="code-label">Setup &amp; z-scoring</div>
 <pre><code>dat &lt;- <span class="fn">read.csv</span>(<span class="st">"data/qcbs_w6_data.csv"</span>)
@@ -224,14 +211,14 @@ M8 &lt;- <span class="fn">lmer</span>(Z_TP ~ Z_Length + (<span class="nu">1</spa
 <ol type="a">
 <li>Why are <em>both</em> Lake and Fish_Species candidates for random effects rather than fixed? Give the argument that would push you the other way.</li>
 
-<li>What does the term <code>(1 + Z_Length | Fish_Species)</code> assume about the population of slopes across species? Write out the implied bivariate Normal for the (intercept, slope) pair, and count how many parameters that costs: two variances plus what?</li>
+<li>What does the term <code>(1 + Z_Length | Fish_Species)</code> assume about the population of slopes across species? Write out the implied bivariate Normal for the (intercept, slope) pair, and count how many parameters that costs. Two variances plus what?</li>
 
 <li>Report the AICc table and name the winner. Then run <code>isSingular()</code> on all five fits:
 <pre><code><span class="fn">sapply</span>(<span class="kw">list</span>(M1=M1,M3=M3,M4=M4,M7=M7,M8=M8), lme4::isSingular)</code></pre>
 Two of them come back <code>TRUE</code>, and one of those two is the model that just won. What did R print when you fitted them, and did you notice it at the time?</li>
 
-<li><strong>Find the parameter that broke.</strong> Run <code>VarCorr(M8)</code> and look at the <code>Corr</code> column. The estimated correlation between species intercepts and species slopes is exactly $1.000$ &mdash; not "close to 1", but sitting precisely on the largest value a correlation is allowed to take. That is what <em>boundary (singular) fit</em> means.
-<p style="margin:8px 0">Why did the <em>correlation</em> break rather than one of the two variances? You have three species, so three (intercept, slope) pairs &mdash; three points. Rather than reason about it in the abstract, watch what three points can and cannot tell you. Both simulations below use data with a <strong>known</strong> answer:</p>
+<li><strong>Find the parameter that broke.</strong> Run <code>VarCorr(M8)</code> and look at the <code>Corr</code> column. The estimated correlation between species intercepts and species slopes is exactly $1.000$, not "close to 1" but sitting precisely on the largest value a correlation is allowed to take. That is what <em>boundary (singular) fit</em> means.
+<p style="margin:8px 0">Why did the <em>correlation</em> break rather than one of the two variances? You have three species, so three (intercept, slope) pairs, which is three points. Rather than reason about it in the abstract, watch what three points can and cannot tell you. Both simulations below use data with a <strong>known</strong> answer:</p>
 <pre><code><span class="fn">set.seed</span>(<span class="nu">4</span>)
 
 <span class="cm"># Correlation from 3 points, when the TRUE correlation is zero</span>
@@ -246,7 +233,7 @@ s3 &lt;- <span class="fn">replicate</span>(<span class="nu">20000</span>, <span 
 <ol type="i" style="margin-bottom:6px">
 <li>Run the first block. Every one of those 20,000 correlations came from data with <em>no</em> relationship at all. What is the typical $|r|$, and how often does it come back above 0.9?</li>
 <li>Run the second. How far off is a standard deviation estimated from three points, and how often is it roughly right?</li>
-<li>Now put the two together: in two or three sentences, say why M8's correlation was the parameter that failed. Which of the two quantities can three groups say something useful about, and which one will happily return an extreme answer no matter what the truth is?</li>
+<li>Now put the two together. In two or three sentences, say why M8's correlation was the parameter that failed. Which of the two quantities can three groups say something useful about, and which one will happily return an extreme answer no matter what the truth is?</li>
 </ol>
 <p style="margin:8px 0">If you want to see it directly, plot one of the samples: <code>plot(rnorm(3), rnorm(3))</code>. Three points often look like a line.</p></li>
 
@@ -259,19 +246,19 @@ lme4::<span class="fn">isSingular</span>(M8u)
 <span class="fn">VarCorr</span>(M8u)</code></pre>
 Does it converge? Compare its two standard deviations with M8's. Has dropping the correlation cost you anything you actually wanted to know?</li>
 
-<li><strong>The judgment call.</strong> Add <code>M8u</code> to the AICc table. M8 still comes out ahead by about 6 AICc units, and <code>anova(M8u, M8, refit = FALSE)</code> returns $p = 0.004$ &mdash; both criteria say the correlation parameter is "worth it". Yet that parameter is pinned at its boundary.
+<li><strong>The judgment call.</strong> Add <code>M8u</code> to the AICc table. M8 still comes out ahead by about 6 AICc units, and <code>anova(M8u, M8, refit = FALSE)</code> returns $p = 0.004$, so both criteria say the correlation parameter is "worth it". Yet that parameter is pinned at its boundary.
 <p style="margin:8px 0">Which model do you report, and why? Your answer should say what a likelihood-ratio test and an AICc difference can and cannot tell you about a parameter sitting on the edge of its allowed range.</p></li>
 
 <li>Three species and six lakes is on the edge of what should be treated as random at all. When would you switch species to a fixed effect instead, and what would you lose by doing so?</li>
 </ol>
-<div class="callout key" style="margin-top:12px"><strong>Carry this forward.</strong> You will meet <code>||</code> again in the afternoon walkthrough, where the same species-slope model appears in a model-comparison exercise. The habit worth forming today: after every <code>lmer</code> fit with a random slope, check <code>isSingular()</code> before you believe anything the model tells you.</div>
+<div class="callout key" style="margin-top:12px"><strong>Carry this forward.</strong> You will meet <code>||</code> again in the afternoon walkthrough, where the same species-slope model appears in a model-comparison exercise. The habit worth forming today is that after every <code>lmer</code> fit with a random slope, check <code>isSingular()</code> before you believe anything the model tells you.</div>
 <div class="callout try" style="margin-top: 12px;"><strong>Your answer goes in the R Markdown hand-in.</strong> Report the AICc table, the singularity check, the correlation from <code>VarCorr(M8)</code>, the converging <code>M8u</code> fit, and your reasoning in (d), (f) and (g).</div>
 </div>
 
 
 <div class="exercise" id="p5">
 <span class="ex-tag">Problem 5</span><span class="difficulty medium"> · variance partitioning · binomial GLMM</span>
-<h3>Detection probability across regions — a binomial GLMM</h3>
+<h3>Detection probability across regions, a binomial GLMM</h3>
 <p>You fit a binomial mixed model to detection/non-detection data (a camera-trap or PIT-array design; the algebra is identical). Cameras are nested within regions:</p>
 <pre><code>m &lt;- glmer(Detect ~ scale(Covariate) + (1 | Region/Camera), data=d, family=binomial)
 VarCorr(m)
@@ -283,7 +270,7 @@ VarCorr(m)
 # (Intercept)       -1.4      0.30     -4.6
 # scale(Covariate)   0.62     0.13      4.8</code></pre>
 <ol type="a">
-<li>Interpret the output in words. (i) The fixed-effect estimate for <code>scale(Covariate)</code> is $0.62$ on the logit scale &mdash; in which direction does detection change as the covariate increases, and is the effect statistically clear (look at the estimate relative to its standard error)? (ii) Compare the two random-effect standard deviations, Region ($\sqrt{0.46}=0.68$) and Camera-within-Region ($\sqrt{1.05}=1.02$): at which level &mdash; among regions, or among cameras within a region &mdash; is there more unexplained variation in detectability, and what would that suggest biologically?</li>
+<li>Interpret the output in words. (i) The fixed-effect estimate for <code>scale(Covariate)</code> is $0.62$ on the logit scale. In which direction does detection change as the covariate increases, and is the effect statistically clear (look at the estimate relative to its standard error)? (ii) Compare the two random-effect standard deviations, Region ($\sqrt{0.46}=0.68$) and Camera-within-Region ($\sqrt{1.05}=1.02$): at which level, among regions, or among cameras within a region, is there more unexplained variation in detectability, and what would that suggest biologically?</li>
 <li>For a camera at mean covariate value with average region and camera intercepts, what is the expected detection probability? (Use <code>plogis()</code>.)</li>
 <li>Translate the covariate slope into an odds ratio per 1 SD, with an approximate 95% CI.</li>
 <li>Why include the camera-level (rather than only the region-level) random intercept at all? What does dropping it do to your standard errors?</li>
@@ -333,13 +320,13 @@ pstor &lt;- AICstor &lt;- AICcstor &lt;- BICstor &lt;- <span class="fn">rep</spa
 <span class="fn">data.frame</span>(p = <span class="fn">mean</span>(pstor &gt; <span class="nu">0</span>), AIC = <span class="fn">mean</span>(AICstor &gt; <span class="nu">0</span>),
            AICc = <span class="fn">mean</span>(AICcstor &gt; <span class="nu">0</span>), BIC = <span class="fn">mean</span>(BICstor &gt; <span class="nu">0</span>))</code></pre>
 <ol type="a">
-<li><strong>Start from the walkthrough loop.</strong> You built this simulation in the afternoon walkthrough and found roughly <code>p</code> 0.16, AIC 0.45, AICc 0.39, BIC 0.16. Bring that loop across &mdash; there is nothing new to discover in re-running it, and the rest of this problem extends it rather than repeating it.</li>
+<li><strong>Start from the walkthrough loop.</strong> You built this simulation in the afternoon walkthrough and found roughly <code>p</code> 0.16, AIC 0.45, AICc 0.39, BIC 0.16. Bring that loop across. There is nothing new to discover in re-running it, and the rest of this problem extends it rather than repeating it.</li>
 <li><strong>Now apply the rule the lecture warns about.</strong> Taking the AICc-best model is one decision rule; a stricter one is <em>only accept the winner if it beats the runner-up by more than 2 AICc units, and otherwise decline to choose</em>. Modify the loop to record both whether the top model contains a predictor and the gap <code>dd$AICc[2] - dd$AICc[1]</code>:
 <pre><code>dd  &lt;- <span class="fn">dredge</span>(<span class="fn">lm</span>(y ~ ., data=d), rank=<span class="st">"AICc"</span>)
 noise_top[i] &lt;- <span class="fn">sum</span>(!<span class="fn">is.na</span>(dd[<span class="nu">1</span>, <span class="nu">2</span>:<span class="nu">4</span>]))
 gap[i]       &lt;- dd$AICc[<span class="nu">2</span>] - dd$AICc[<span class="nu">1</span>]</code></pre>
 Report three numbers: how often the winner is more than 2 units clear; among <em>those</em> runs, how often it still contains a noise predictor; and the overall fraction of runs in which the strict rule keeps a noise predictor.</li>
-<li>The strict rule cuts the overall false-positive rate a long way. Explain <em>how</em> it does that &mdash; look at how often it declines to pick anything at all, and at the noise rate <em>conditional</em> on a clear winner existing. Is the rule choosing better models, or mostly refusing to choose? What does the median gap between best and runner-up tell you about how often a clear winner exists when nothing is real?</li>
+<li>The strict rule cuts the overall false-positive rate a long way. Explain <em>how</em> it does that. Look at how often it declines to pick anything at all, and at the noise rate <em>conditional</em> on a clear winner existing. Is the rule choosing better models, or mostly refusing to choose? What does the median gap between best and runner-up tell you about how often a clear winner exists when nothing is real?</li>
 <li><strong>Is AICc uniquely bad, or is this just Type I error?</strong> Every selection rule keeps noise sometimes, so the 2-unit rule only means something next to a benchmark. Repeat the gap calculation for BIC (<code>dredge(reg, rank="BIC")</code>, gap <code>db$BIC[2] - db$BIC[1]</code>) and record the same three numbers, plus the plain <code>p &lt; 0.05</code> rate you already have. Fill in this table:
 <pre><code>                      picks noise   winner &gt;2 clear   noise GIVEN clear
 p &lt; 0.05 (any of 3)      ____%            --                 --
@@ -347,7 +334,7 @@ AICc best                ____%          ____%              ____%
 BIC  best                ____%          ____%              ____%
 
 median gap to runner-up:  AICc ____    BIC ____</code></pre></li>
-<li>Two things in that table need explaining. (i) BIC declares a clear winner far more often than AICc does &mdash; work out why from the size of the two penalties at $n = 50$, and check your reasoning against the median gaps. (ii) BIC is wrong less often <em>when it commits</em>, yet its overall rate of "confident <em>and</em> wrong" is <em>higher</em> than AICc's. Explain how both can be true at once, and say which of the two numbers you would want to know before trusting a published model-selection result.</li>
+<li>Two things in that table need explaining. (i) BIC declares a clear winner far more often than AICc does. Work out why from the size of the two penalties at $n = 50$, and check your reasoning against the median gaps. (ii) BIC is wrong less often <em>when it commits</em>, yet its overall rate of "confident <em>and</em> wrong" is <em>higher</em> than AICc's. Explain how both can be true at once, and say which of the two numbers you would want to know before trusting a published model-selection result.</li>
 </ol>
 <div class="callout try" style="margin-top: 12px;"><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
 </div>
@@ -355,7 +342,7 @@ median gap to runner-up:  AICc ____    BIC ____</code></pre></li>
 <div class="exercise" id="p8">
 <span class="ex-tag">Problem 8</span><span class="difficulty medium"> · simulation · BIC vs AIC on weak effects</span>
 <h3>When BIC misses a weak-but-real effect</h3>
-<p>Three predictors have known effect sizes: one strong, one modest, one weak. Ask which criterion keeps the weak one.</p>
+<p>Three predictors have known effect sizes, one strong, one modest, one weak. Ask which criterion keeps the weak one.</p>
 <div class="code-label">Code</div>
 <pre><code><span class="kw">library</span>(MuMIn); <span class="fn">options</span>(na.action=<span class="st">"na.fail"</span>)
 <span class="fn">set.seed</span>(<span class="nu">11</span>); n &lt;- <span class="nu">60</span>
@@ -368,6 +355,13 @@ m &lt;- <span class="fn">lm</span>(y ~ strong + modest + weak, data=d)
 <li>Run the single simulation. Which predictors does each criterion retain in its top model?</li>
 <li>Wrap it in a 500-rep loop (resampling <code>y</code> and the predictors each time) and report the proportion of reps in which each criterion retains <code>weak</code>. Do the same for <code>modest</code> and <code>strong</code>.</li>
 <li>Which criterion would you use if the science question is "is the weak predictor worth studying further?", and which if it is "does the weak signal generalize out of sample?" Justify each choice.</li>
+<li><strong>Now change the sample size.</strong> Run the loop from (b) again with <code>n = 500</code>, and also rerun the pure-noise loop from Problem 7 at <code>n = 500</code>. Fill in this table with the rate at which each criterion keeps the weak-but-real predictor (its power, one minus the Type II error) and the rate at which it keeps at least one pure-noise predictor (its Type I error):
+<pre><code>                keeps weak (real)      keeps noise (Type I)
+                n = 60    n = 500      n = 50    n = 500
+AIC             ____      ____         ____      ____
+AICc            ____      ____         ____      ____
+BIC             ____      ____         ____      ____</code></pre>
+One criterion's Type I error barely moves with $n$ and one collapses. Explain both from the size of the penalties, $2$ against $\ln n$, and then say what that means for a criterion's ability to find a weak effect as data accumulate. Which of the two behaviours would you want from a criterion used for inference, and which for prediction?</li>
 </ol>
 <div class="callout try" style="margin-top: 12px;"><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
 </div>
@@ -375,7 +369,7 @@ m &lt;- <span class="fn">lm</span>(y ~ strong + modest + weak, data=d)
 <div class="exercise" id="p9">
 <span class="ex-tag">Problem 9</span><span class="difficulty hard"> · real data · AIC vs cross-validation</span>
 <h3>AIC vs LOOCV on the trophic-position data</h3>
-<p>Return to <code>qcbs_w6_data.csv</code> from Problem 4, but now treat species and lake as ordinary fixed factors so we can rank candidate <em>fixed-effect</em> models by both an information criterion and cross-validation. The question is predictive: which set of predictors best forecasts a fish's trophic position?</p>
+<p>Return to <code>qcbs_w6_data.csv</code> from Problem 4, but now treat species and lake as ordinary fixed factors so we can rank candidate <em>fixed-effect</em> models by both an information criterion and cross-validation. The question is predictive. Which set of predictors best forecasts a fish's trophic position?</p>
 <div class="code-label">Setup &amp; candidate models</div>
 <pre><code><span class="kw">library</span>(boot); <span class="kw">library</span>(AICcmodavg)
 dat &lt;- <span class="fn">read.csv</span>(<span class="st">"data/qcbs_w6_data.csv"</span>)
@@ -416,7 +410,7 @@ M0      3   1244.7   4.7         0.04</code></pre>
 <ol type="a">
 <li>Write the Akaike-weight formula. Confirm the weights in the table from the $\Delta$AICc column, and list which models are "competitive" by the $\Delta\text{AICc} &lt; 2$ rule.</li>
 <li>Why can model-averaging <em>coefficients</em> mislead when the candidate models contain different, correlated predictors? Why is model-averaging <em>predictions</em> usually safer?</li>
-<li>The biologist's actual question is "does temperature affect size-at-age?" Re-frame the table to answer <em>that</em> question directly: compute the summed weight of models containing temperature vs those without, and interpret it as an evidence ratio rather than "which model wins."</li>
+<li>The biologist's actual question is "does temperature affect size-at-age?" Re-frame the table to answer <em>that</em> question directly. Compute the summed weight of models containing temperature vs those without, and interpret it as an evidence ratio rather than "which model wins."</li>
 <li>If the temperature coefficient in M3 is $\hat\beta_T = 0.03$ with SE 0.02, what does that say about the practical importance of temperature, regardless of which model "wins"? What single number would you also report so a reader can judge how much of the inference rides on one model?</li>
 </ol>
 <div class="callout try" style="margin-top: 12px;"><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>

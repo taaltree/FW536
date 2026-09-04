@@ -19,6 +19,12 @@
   .readout b { color:var(--osu-orange-dark); font-variant-numeric:tabular-nums; }
   svg text { font-family:'Helvetica Neue',Arial,sans-serif; }
   .cmp-toggle { font-family:'Helvetica Neue',Arial,sans-serif; font-size:13px; }
+  .subpanel { border-top:1px dashed var(--border); margin-top:14px; padding-top:12px; }
+  .subpanel h3 { font-size:15px; margin:0 0 8px; color:var(--osu-stone); }
+  .btns button { font-family:'Helvetica Neue',Arial,sans-serif; font-size:14px; font-weight:600; border:2px solid var(--osu-orange); background:var(--osu-orange); color:#fff; border-radius:6px; padding:7px 16px; cursor:pointer; margin-right:8px; }
+  .btns button.sec { background:#fff; color:var(--osu-orange-dark); }
+  .tail { font-family:'Helvetica Neue',Arial,sans-serif; font-size:14px; margin-top:8px; }
+  .tail b { color:var(--osu-orange-dark); font-variant-numeric:tabular-nums; }
 </style>
 </head>
 <body>
@@ -71,6 +77,23 @@
 
   <div class="readout" id="readout"></div>
   <p id="story" style="margin-top:10px; color:var(--osu-stone); font-style:italic;"></p>
+
+  <div class="subpanel">
+    <h3>Tail probabilities</h3>
+    <div class="controls">
+      <div class="ctl"><label for="s_thr">threshold c<span class="val" id="v_thr"></span></label><input type="range" id="s_thr" min="0" max="60" step="1" value="20"></div>
+    </div>
+    <div class="tail" id="tail"></div>
+  </div>
+
+  <div class="subpanel">
+    <h3>Draw a sample and compare it with the theory</h3>
+    <div class="controls">
+      <div class="ctl"><label for="s_nsamp">sample size n<span class="val" id="v_nsamp"></span></label><input type="range" id="s_nsamp" min="10" max="2000" step="10" value="100"></div>
+    </div>
+    <div class="btns"><button id="drawbtn">Draw n values</button><button id="clearbtn" class="sec">Clear sample</button></div>
+    <div class="tail" id="sampout">No sample drawn yet. The hollow bars will show the sample proportions on top of the theoretical pmf.</div>
+  </div>
 </div>
 </section>
 
@@ -79,9 +102,11 @@
 <div class="callout key">
 <ol>
 <li><strong>Binomial → symmetric vs skewed.</strong> Set <em>p</em> = 0.5 and watch the PMF become symmetric; push <em>p</em> toward 0 or 1 and it skews.</li>
-<li><strong>Poisson mean = variance.</strong> Change λ and note the mean and variance readouts stay equal. This is the Poisson's defining constraint — and why it so often fails on real ecological counts.</li>
-<li><strong>Overdispersion.</strong> Switch to Negative Binomial, tick "overlay a Poisson with the same mean," and drag the dispersion <em>k</em> down. The NegBin spreads far wider than the Poisson at the same mean — that extra spread is what clumped ecological data need.</li>
+<li><strong>Poisson mean = variance.</strong> Change λ and note the mean and variance readouts stay equal. This is the Poisson's defining constraint, and the reason it so often fails on real ecological counts.</li>
+<li><strong>Overdispersion.</strong> Switch to Negative Binomial, tick "overlay a Poisson with the same mean," and drag the dispersion <em>k</em> down. The NegBin spreads far wider than the Poisson at the same mean. That extra spread is what clumped ecological data need.</li>
 <li><strong>NegBin → Poisson limit.</strong> Drag <em>k</em> up to its maximum; the Negative Binomial collapses onto the Poisson.</li>
+<li><strong>Both tails at once.</strong> On the Negative Binomial with μ = 10, set the threshold to c = 20 and drag <em>k</em> down. P(X = 0) and P(X &gt; 20) rise together. That is the "many zeros and a few huge counts" signature of clumped data.</li>
+<li><strong>How noisy is a sample variance?</strong> Draw n = 100 values a few times and watch the sample variance jump around while the sample mean barely moves, especially at small <em>k</em>. Then raise n to 2000. This is the "mind the gap" lesson from the whale exercise in the lab.</li>
 </ol>
 </div>
 <p><a href="lab.html">← Back to the Day 1 practice lab</a></p>
@@ -130,6 +155,16 @@ const defs = {
 };
 let cur='binom';
 const P={};
+let THR=20, NSAMP=100, sampleCounts=null, sampleN=0, sampleDist='';
+
+// Inverse-CDF draw from the plotted pmf (renormalised over the plotted support).
+function drawSample(xs, ys, n){
+  const tot=ys.reduce((a,b)=>a+b,0)||1;
+  const cum=[]; let c=0; for(let i=0;i<ys.length;i++){ c+=ys[i]/tot; cum.push(c); }
+  const counts=new Array(xs.length).fill(0);
+  for(let s=0;s<n;s++){ const u=Math.random(); let i=0; while(i<cum.length-1 && cum[i]<u) i++; counts[i]++; }
+  return counts;
+}
 
 function buildControls(){
   const box=document.getElementById('controls'); box.innerHTML='';
@@ -241,8 +276,21 @@ function render(){
   // optional Poisson overlay at same mean
   let oy=null;
   if(document.getElementById('cmp').checked){ oy=xs.map(k=>dpois(k,mean)); }
+  // tail probabilities at the threshold
+  const thr=Math.round(THR);
+  let ple=0, p0=ys[0]||0; for(let i=0;i<xs.length;i++) if(xs[i]<=thr) ple+=ys[i];
+  ple=Math.min(ple,1);
+  document.getElementById('v_thr').textContent=thr;
+  document.getElementById('s_thr').setAttribute('aria-valuetext',`threshold ${thr}`);
+  document.getElementById('tail').innerHTML=
+    `P(X = 0) = <b>${p0.toFixed(4)}</b> &nbsp; P(X &le; ${thr}) = <b>${ple.toFixed(4)}</b> &nbsp; P(X &gt; ${thr}) = <b>${(1-ple).toFixed(4)}</b>`+
+    (oy?` &nbsp; <span style="color:#1F5B50">Poisson with the same mean: P(X = 0) = ${oy[0].toFixed(4)}, P(X &gt; ${thr}) = ${(1-Math.min(1,oy.filter((v,i)=>xs[i]<=thr).reduce((a,b)=>a+b,0))).toFixed(4)}</span>`:'');
+  // sample overlay (drawn as hollow bars); drop the sample if the distribution changed
+  if(sampleCounts && sampleDist!==name){ sampleCounts=null; document.getElementById('sampout').textContent='Parameters changed, so the sample was cleared. Draw again to compare.'; }
+  let sp=null;
+  if(sampleCounts){ sp=xs.map((x,i)=>(sampleCounts[i]||0)/sampleN); }
   const W=720,H=340,ml=44,mr=14,mt=18,mb=40,pw=W-ml-mr,ph=H-mt-mb;
-  const ymax=Math.max(...ys, ...(oy||[0]))*1.1||1;
+  const ymax=Math.max(...ys, ...(oy||[0]), ...(sp||[0]))*1.1||1;
   const n=xs.length, bw=pw/n;
   const x=i=>ml+i*bw, y=v=>mt+ph-(v/ymax)*ph;
   let s=`<rect x="0" y="0" width="${W}" height="${H}" fill="white"/>`;
@@ -257,6 +305,11 @@ function render(){
   for(let i=0;i<n;i++){ const bh=(ys[i]/ymax)*ph;
     s+=`<rect x="${x(i)+bw*0.12}" y="${y(ys[i])}" width="${bw*0.76}" height="${bh}" fill="#D73F09" opacity="0.85"><title>P(X=${xs[i]}) = ${ys[i].toFixed(4)}</title></rect>`;
   }
+  // sample proportions as hollow bars
+  if(sp){ for(let i=0;i<n;i++){ const bh=(sp[i]/ymax)*ph;
+      s+=`<rect x="${x(i)+bw*0.12}" y="${y(sp[i])}" width="${bw*0.76}" height="${bh}" fill="none" stroke="#111" stroke-width="1.5"><title>sample proportion at ${xs[i]}: ${sp[i].toFixed(3)}</title></rect>`; } }
+  // threshold marker
+  { const ti=xs.indexOf(thr); if(ti>=0){ const tx=x(ti)+bw; s+=`<line x1="${tx}" y1="${mt}" x2="${tx}" y2="${mt+ph}" stroke="#1F5B50" stroke-width="1.2" stroke-dasharray="5 3"/><text x="${tx+3}" y="${mt+ph-4}" font-size="10" fill="#1F5B50">c = ${thr}</text>`; } }
   // overlay poisson as dots+line
   if(oy){ let pts=oy.map((v,i)=>`${x(i)+bw/2},${y(v)}`).join(' ');
     s+=`<polyline points="${pts}" fill="none" stroke="#1F5B50" stroke-width="2" stroke-dasharray="4 3"/>`;
@@ -288,6 +341,27 @@ document.querySelectorAll('#distpick button').forEach(b=>{
   });
 });
 document.getElementById('cmp').addEventListener('change',render);
+document.getElementById('s_thr').addEventListener('input',e=>{THR=+e.target.value; render();});
+document.getElementById('s_nsamp').addEventListener('input',e=>{NSAMP=+e.target.value; document.getElementById('v_nsamp').textContent=NSAMP; e.target.setAttribute('aria-valuetext',`sample size ${NSAMP}`);});
+document.getElementById('drawbtn').addEventListener('click',()=>{
+  const {xs,ys,mean,varc,name}=pmfAndStats();
+  sampleCounts=drawSample(xs,ys,NSAMP); sampleN=NSAMP; sampleDist=name;
+  const vals=[]; xs.forEach((x,i)=>{ for(let k=0;k<sampleCounts[i];k++) vals.push(x); });
+  const m=vals.reduce((a,b)=>a+b,0)/vals.length;
+  const v=vals.reduce((a,b)=>a+(b-m)*(b-m),0)/(vals.length-1);
+  const pz=vals.filter(x=>x===0).length/vals.length;
+  const thr=Math.round(THR); const pgt=vals.filter(x=>x>thr).length/vals.length;
+  let ple=0; for(let i=0;i<xs.length;i++) if(xs[i]<=thr) ple+=ys[i];
+  document.getElementById('sampout').innerHTML=
+    `Sample of <b>${NSAMP}</b> from ${name}: mean <b>${m.toFixed(2)}</b> (theory ${mean.toFixed(2)}), `+
+    `variance <b>${v.toFixed(2)}</b> (theory ${varc.toFixed(2)}), `+
+    `P(X = 0) <b>${pz.toFixed(3)}</b> (theory ${(ys[0]||0).toFixed(3)}), `+
+    `P(X &gt; ${thr}) <b>${pgt.toFixed(3)}</b> (theory ${(1-Math.min(ple,1)).toFixed(3)}). `+
+    `Draw again and watch which of these numbers moves most.`;
+  render();
+});
+document.getElementById('clearbtn').addEventListener('click',()=>{ sampleCounts=null; document.getElementById('sampout').textContent='Sample cleared.'; render(); });
+document.getElementById('v_nsamp').textContent=NSAMP;
 buildControls(); render();
 </script>
 </body>

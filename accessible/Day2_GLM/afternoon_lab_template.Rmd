@@ -1,5 +1,5 @@
 ---
-title: "FW 536 — Day 2 afternoon lab (Linear models & GLMs) — Your Name"
+title: "FW 536 · Day 2 afternoon lab (Linear models & GLMs) · Your Name"
 author: "Your Name Here"
 date: "`r Sys.Date()`"
 output:
@@ -16,21 +16,17 @@ output:
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 ```
 
-# Day 2 afternoon lab — Linear models & GLMs problem set
+# Day 2 afternoon lab · Linear models & GLMs problem set
 
 This template matches the **afternoon** section (Problems 5–12) of
 [`problem_set.html`](problem_set.html). Read each problem statement there,
 write your work below, **Knit** to HTML, and upload the `.html` to the
 matching Canvas assignment.
 
-Several problems load real datasets from this Day's `data/` folder:
-
-- `data/sockeye_adult.csv` — daily sockeye counts and flow-corrected qPCR eDNA
-  (Levi et al. 2019); used in **Problem 5**.
-- `data/titanic_long.csv` — one row per passenger; used in **Problems 6 and 7**.
-- `data/titanic_prop.csv` — aggregated (Yes, No) survival counts; used in **Problem 6**.
-
-Keep the `.Rmd` in this folder so the `read.csv("data/...")` paths resolve.
+Problems 5 to 7 generate their own data in the code block that comes with each
+problem, so no data file is needed for the afternoon set. Problems 8 to 12 are
+worked from coefficient tables given in the problem statements. Keep the `.Rmd`
+in this folder anyway, so any `read.csv("data/...")` call you add resolves.
 For setup help see the [R Markdown tutorial](../rmarkdown_tutorial.html).
 
 ---
@@ -40,34 +36,31 @@ For setup help see the [R Markdown tutorial](../rmarkdown_tutorial.html).
 ```{r}
 # Load the packages you'll need. Add or remove as appropriate.
 library(ggplot2)
-library(MASS)        # for glm.nb
-library(dplyr)       # AFTER MASS on purpose: MASS::select would otherwise
-                     # mask dplyr::select and break any select() call below
-library(effects)     # for allEffects() plots
-library(emmeans)     # for pairwise contrasts on the fitted GLM
+library(dplyr)
 ```
 
 ---
 
-# Problem 5 — Sockeye eDNA → daily count: pick the right model
+# Problem 5 · Interactions I: the additive baseline
 
-> Load `data/sockeye_adult.csv`, subset to `Sockeye_Adults`, build a `Year`
-> factor, and keep complete cases. Fit `lm(log(Count+1) ~ ...)`, Poisson,
-> quasipoisson, and `glm.nb`. Diagnose overdispersion; compare SEs on the
-> eDNA slope; back-transform the log-link slope to a "doubling of eDNA →
-> ×__ count" statement.
+> Simulate data with **no** interaction (`set.seed(123)`, the block in the problem
+> statement), then fit `lm(y ~ x1 * x2)` anyway. (a) Compare the four fitted
+> coefficients with the values used to build the data, and say whether the
+> `x1:x2` term is distinguishable from zero. (b) Write the full model in
+> mathematical notation. (c) Differentiate the fitted mean with respect to $x_1$;
+> does $x_2$ appear? (d) Evaluate the slope in $x_1$ at $x_2 = -1$ and $x_2 = +1$
+> and explain why the two are not exactly equal. (e) Name the shape of the fitted
+> surface and describe its contour lines.
 
 **My work:**
 
 ```{r}
-sock <- read.csv("data/sockeye_adult.csv", stringsAsFactors = FALSE)
-sock <- subset(sock, Sockeyetype == "Sockeye_Adults")
-sock$Year <- factor(sub(".*/", "", sock$Date))            # "15" or "16"
-sock <- sock[!is.na(sock$Count) & !is.na(sock$Qcorr_qPCR), ]
-min_pos <- min(sock$Qcorr_qPCR[sock$Qcorr_qPCR > 0])
-sock$logED <- log(sock$Qcorr_qPCR + min_pos)
-
-# Fit the four models and compare deviance/df, dispersion, and SE(logED) here
+set.seed(123)
+d5 <- data.frame(x1 = runif(200, -2, 2), x2 = runif(200, -2, 2))
+d5$y <- 1 + 1.5*d5$x1 - 1*d5$x2 + rnorm(200, 0, 1)   # no x1*x2 term
+m5 <- lm(y ~ x1 * x2, data = d5)
+summary(m5)
+# Your slope calculations here
 ```
 
 **Answer / biological interpretation:**
@@ -75,21 +68,26 @@ sock$logED <- log(sock$Qcorr_qPCR + min_pos)
 
 ---
 
-# Problem 6 — Titanic survival: individual-level vs aggregated binomial
+# Problem 6 · Interactions II: a slope that moves
 
-> Fit `glm(survived ~ class, binomial, long)` and
-> `glm(cbind(Yes, No) ~ Class, binomial, prop)`. Show the fitted class
-> probabilities match the raw proportions; explain the reference-level
-> difference between the two coefficient tables; convert log-odds → odds →
-> probability by hand; give an odds-ratio sentence.
+> Same design, now with a genuine product term (`set.seed(456)`). (a) Compare the
+> coefficients with the truth (2, 1.5, −1, 2). (b) Write the model in notation.
+> (c) Find the slope in $x_1$ as a formula in $x_2$ (differentiate, or factor
+> $x_1$ out), and evaluate it at $x_2 = -1, 0, +1$. (d) Solve for the $x_2$ at
+> which the effect of $x_1$ vanishes and compare with the generating parameters.
+> (e) Explain in two sentences why "the effect of $x_1$ is 1.52" cannot be
+> written for this model. (f) Name the surface and say what happened to the
+> contour lines.
 
 **My work:**
 
 ```{r}
-long <- read.csv("data/titanic_long.csv", stringsAsFactors = TRUE)
-prop <- read.csv("data/titanic_prop.csv", stringsAsFactors = TRUE)
-
-# Fit both models; verify fitted probabilities against raw proportions here
+set.seed(456)
+d6 <- data.frame(x1 = runif(200, -2, 2), x2 = runif(200, -2, 2))
+d6$y <- 2 + 1.5*d6$x1 - 1*d6$x2 + 2*d6$x1*d6$x2 + rnorm(200, 0, 1)
+m6 <- lm(y ~ x1 * x2, data = d6)
+summary(m6)
+# Your slope formula and its three evaluations here
 ```
 
 **Answer / biological interpretation:**
@@ -97,22 +95,29 @@ prop <- read.csv("data/titanic_prop.csv", stringsAsFactors = TRUE)
 
 ---
 
-# Problem 7 — Titanic: does the class effect depend on sex?
+# Problem 7 · Interactions III: link scale vs response scale
 
-> Fit `glm(survived ~ class * sex + age, binomial, long)`. Use
-> `allEffects()` and `emmeans(fit, pairwise ~ class | sex, type="response")`.
-> Report the largest within-sex class odds ratio, the child odds ratio, the
-> female first-vs-third probability difference, and why `emmeans` (not
-> `TukeyHSD`) is the right tool.
+> Binary response with a product term on the logit scale (`set.seed(789)`).
+> (a) Report the four coefficients and name the scale they are on. (b) Write the
+> model with its link function. (c) Write the log-odds slope in $x_1$ and
+> evaluate it at $x_2 = \pm 1$. (d) Refit **without** the interaction
+> (`m7add`), then use $\partial p/\partial x_1 = p(1-p)\,\beta_1$ at $x_1 = 0$
+> for $x_2 = -1$ and $x_2 = +1$; report both and their ratio. (e) Explain in
+> three or four sentences why the effect of $x_1$ on the probability depends on
+> $x_2$ in a model with no interaction term, naming both scales.
 
 **My work:**
 
 ```{r}
-long <- read.csv("data/titanic_long.csv", stringsAsFactors = TRUE)
-
-# fit <- glm(survived ~ class * sex + age, family = binomial, data = long)
-# plot(allEffects(fit))
-# emmeans(fit, pairwise ~ class | sex, type = "response")
+set.seed(789)
+d7 <- data.frame(x1 = runif(200, -2, 2), x2 = runif(200, -2, 2))
+eta <- -1 + 1.2*d7$x1 - 0.8*d7$x2 + 1.5*d7$x1*d7$x2
+d7$ybin <- rbinom(200, 1, plogis(eta))
+m7 <- glm(ybin ~ x1 * x2, data = d7, family = binomial)
+summary(m7)
+m7add <- glm(ybin ~ x1 + x2, data = d7, family = binomial)   # additive on the log-odds scale
+coef(m7add)
+# Your marginal-effect calculations here
 ```
 
 **Answer / biological interpretation:**
@@ -120,7 +125,7 @@ long <- read.csv("data/titanic_long.csv", stringsAsFactors = TRUE)
 
 ---
 
-# Problem 8 — Reading a Poisson coefficient table as biology
+# Problem 8 · Reading a Poisson coefficient table as biology
 
 > Given intercept $+0.10$, oak-canopy slope $+0.020$/percent, elevation slope
 > $-0.55$/km: intercept back-transform; multiplicative effect of 10→60% oak;
@@ -137,7 +142,7 @@ long <- read.csv("data/titanic_long.csv", stringsAsFactors = TRUE)
 
 ---
 
-# Problem 9 — When the sign of an effect flips between groups
+# Problem 9 · When the sign of an effect flips between groups
 
 > Poisson interaction `macros ~ discharge * season`: intercept 3.50,
 > discharge $-0.30$, seasonFall $+0.40$, discharge:seasonFall $+0.50$.
@@ -155,7 +160,7 @@ long <- read.csv("data/titanic_long.csv", stringsAsFactors = TRUE)
 
 ---
 
-# Problem 10 — Turning counts into rates with an offset
+# Problem 10 · Turning counts into rates with an offset
 
 > Longline bycatch with `offset(log(hooks))`. What the offset intercept
 > means; why the offset is on the log scale; per-hook rate sentence for a
@@ -172,7 +177,7 @@ long <- read.csv("data/titanic_long.csv", stringsAsFactors = TRUE)
 
 ---
 
-# Problem 11 — Occupancy thresholds and choosing a management lever
+# Problem 11 · Occupancy thresholds and choosing a management lever
 
 > Logistic `present ~ basal_area + shrub_cover`: intercept $-3.0$, BA $+0.08$,
 > shrub $+0.04$. Threshold BA at 25% and 50% shrub; marginal effect at
@@ -190,7 +195,7 @@ long <- read.csv("data/titanic_long.csv", stringsAsFactors = TRUE)
 
 ---
 
-# Problem 12 — From a log-scale contrast to a percent change with uncertainty
+# Problem 12 · From a log-scale contrast to a percent change with uncertainty
 
 > Gamma-log contrast $\hat\beta = -0.65$, 95% CI $(-0.95, -0.35)$.
 > Back-transform point estimate and CI; is the multiplicative CI symmetric?;
@@ -223,7 +228,7 @@ knitr::include_graphics("images/problemN_derivation.jpg")
 # Submission checklist
 
 - [ ] Answered every afternoon problem (5–12) from `problem_set.html`.
-- [ ] Loaded `data/sockeye_adult.csv` (Problem 5) and `data/titanic_long.csv` / `data/titanic_prop.csv` (Problems 6–7); `.Rmd` kept in this folder so paths resolve.
+- [ ] Ran the three simulation blocks (Problems 5–7) with the seeds given in the problem set.
 - [ ] Exponentiated every log/logit coefficient and stated the effect as a multiplicative factor, odds ratio, or probability change.
 - [ ] Knitted to HTML without errors.
 - [ ] Photos (if any) embedded with `self_contained: true` in the YAML.

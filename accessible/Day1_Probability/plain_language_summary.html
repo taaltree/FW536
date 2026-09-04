@@ -52,7 +52,7 @@ MathJax = {
 <section id="what">
 <h2>What we did today, in one paragraph</h2>
 <div class="callout plain"><p class="callout-label">Plain-language summary</p>
-We started with the question: <em>"What does it mean to give a number to how likely something is?"</em> We built up the rules for how those numbers behave (probability axioms), how to combine them when one thing depends on another (conditional probability), and how to flip them around (Bayes' rule). Then we introduced <em>random variables</em> — numerical summaries of random outcomes — and met five workhorse "named" distributions you'll see all week: <strong>Bernoulli, Binomial, Poisson, Negative Binomial, and Multinomial</strong>. The lab problems ground each of these in real wildlife and ecology examples.
+We started with the question: <em>"What does it mean to give a number to how likely something is?"</em> We built up the rules for how those numbers behave (probability axioms), how to combine them when one thing depends on another (conditional probability), and how to flip them around (Bayes' rule). Then we introduced <em>random variables</em>, numerical summaries of random outcomes, and met five workhorse "named" distributions you'll see all week: <strong>Bernoulli, Binomial, Poisson, Negative Binomial, and Multinomial</strong>. The lab problems ground each of these in real wildlife and ecology examples.
 </div>
 </section>
 
@@ -61,7 +61,7 @@ We started with the question: <em>"What does it mean to give a number to how lik
 <p>By the end of the week, you'll be fitting models like <code>glm(y ~ x, family=binomial)</code> or writing Bayesian models in Nimble. Underneath every such command is the same idea:</p>
 
 <div class="callout key"><p class="callout-label">Key idea</p>
-<p><strong>Every statistical model is a probability story about how your data were made.</strong> You picked it. The computer's job is to find parameter values that make that story most plausible given what you saw. Your job — the part that doesn't go away no matter how fancy the tools get — is to pick a story that resembles how the data really were generated.</p>
+<p><strong>Every statistical model is a probability story about how your data were made.</strong> You picked it. The computer's job is to find parameter values that make that story most plausible given what you saw. Your job, the part that doesn't go away no matter how fancy the tools get, is to pick a story that resembles how the data really were generated.</p>
 </div>
 
 <p>That's why we spend Day 1 on probability and distributions, not on R syntax. If you know the right story, the R will follow.</p>
@@ -85,7 +85,7 @@ We started with the question: <em>"What does it mean to give a number to how lik
 
 <div class="callout plain"><p class="callout-label">Plain-language summary</p>
 <p><strong>Addition rule (OR, for mutually exclusive events).</strong> If two events can't both happen, the probability that one or the other does is the sum.</p>
-<p><em>Ecology example:</em> A camera classifies a photo as bobcat, lynx, or cougar with probabilities 0.6, 0.1, 0.3. A photo gets exactly one label, so the classes are mutually exclusive. The chance it says "bobcat or lynx" is $0.6 + 0.1 = 0.7$ — and, equivalently, the chance it does <em>not</em> say cougar is $1 - 0.3 = 0.7$.</p>
+<p><em>Ecology example:</em> A camera classifies a photo as bobcat, lynx, or cougar with probabilities 0.6, 0.1, 0.3. A photo gets exactly one label, so the classes are mutually exclusive. The chance it says "bobcat or lynx" is $0.6 + 0.1 = 0.7$, and, equivalently, the chance it does <em>not</em> say cougar is $1 - 0.3 = 0.7$.</p>
 </div>
 
 <div class="callout plain"><p class="callout-label">Plain-language summary</p>
@@ -119,29 +119,29 @@ We started with the question: <em>"What does it mean to give a number to how lik
 <section id="dist">
 <h2>The cast of characters (discrete distributions)</h2>
 
-<h3>Bernoulli — one coin flip</h3>
+<h3>Bernoulli: one coin flip</h3>
 <p><strong>Story:</strong> a single yes/no outcome. The only parameter is $p$, the probability of "yes."</p>
 <p><strong>Where you'll see it:</strong> Did the animal survive? Was the species present? Was the egg fertile?</p>
 
-<h3>Binomial — count of yeses in $n$ independent coin flips</h3>
+<h3>Binomial: count of yeses in $n$ independent coin flips</h3>
 <p><strong>Story:</strong> $n$ fixed-size Bernoulli trials with the same success probability $p$, all independent. You report only the total count.</p>
 <p><strong>Where you'll see it:</strong> Number of marten cameras that detected the species; number of nests that hatched out of $n$ monitored; number of deer testing positive for CWD out of a sample of 24.</p>
 
-<h3>Poisson — count of rare independent events in a window</h3>
+<h3>Poisson: count of rare independent events in a window</h3>
 <p><strong>Story:</strong> events happen "rarely" and "independently" at some average rate $\lambda$ per unit. The count in one unit is Poisson.</p>
 <p><strong>Where you'll see it:</strong> Whales per transect, calls per hour at an acoustic detector, mortalities per year, anything with an obvious "rate."</p>
 <p><strong>Key feature:</strong> mean equals variance. This will almost never match real data. Which leads us to...</p>
 
-<h3>Negative Binomial — counts that clump</h3>
+<h3>Negative Binomial: counts that clump</h3>
 <p><strong>Story:</strong> a Poisson, but the rate itself varies from unit to unit (heterogeneity). The marginal counts are over-dispersed.</p>
 <p><strong>Where you'll see it:</strong> Basically every count dataset in ecology. Use it as your default.</p>
 
-<h3>Multinomial — Binomial with more than two categories</h3>
+<h3>Multinomial: Binomial with more than two categories</h3>
 <p><strong>Story:</strong> a fixed sample of size $n$ is sorted into $k$ mutually exclusive categories with probabilities $p_1, \dots, p_k$ that sum to 1.</p>
 <p><strong>Where you'll see it:</strong> Survey results (oppose/neutral/support); age-sex classifications; habitat-use proportions.</p>
 
 <div class="callout key"><p class="callout-label">Key idea</p>
-<p><strong>Pattern to memorize:</strong> Each named distribution is identified by (a) its sample space — what values it can take — and (b) its parameters. Memorizing the <em>story</em> is far more useful than memorizing the PMF formula.</p>
+<p><strong>Pattern to memorize:</strong> Each named distribution is identified by (a) its sample space, what values it can take, and (b) its parameters. Memorizing the <em>story</em> is far more useful than memorizing the PMF formula.</p>
 </div>
 </section>
 
@@ -161,14 +161,14 @@ We started with the question: <em>"What does it mean to give a number to how lik
 </div>
 
 <div class="callout warn"><p class="callout-label">Watch out</p>
-<strong>Forgetting that independence is rare in ecology.</strong> Detections on the same transect, animals in the same herd, plots in the same site — all tend to be positively correlated. Treating them as independent inflates your effective sample size and gives you confidence intervals that are too narrow. This is the seed of the entire <em>mixed models</em> conversation we'll have on Day 3.
+<strong>Forgetting that independence is rare in ecology.</strong> Detections on the same transect, animals in the same herd, plots in the same site all tend to be positively correlated. Treating them as independent inflates your effective sample size and gives you confidence intervals that are too narrow. This is the seed of the entire <em>mixed models</em> conversation we'll have on Day 3.
 </div>
 </section>
 
 <section id="tomorrow">
 <h2>Looking ahead</h2>
-<p>Tomorrow morning (Day 2) we shift from discrete to <strong>continuous distributions</strong> — Normal, Lognormal, Gamma, Beta, Exponential — and start to use them inside linear models. That same afternoon, we'll combine the linear model framework with the various distributions to get <strong>Generalized Linear Models</strong>, which are the bread and butter of modern ecological statistics.</p>
-<p>Everything else this week — model selection, mixed models, MLE, Bayes — is built directly on the foundation we put down today.</p>
+<p>Tomorrow morning (Day 2) we shift from discrete to <strong>continuous distributions</strong>, Normal, Lognormal, Gamma, Beta, Exponential, and start to use them inside linear models. That same afternoon, we'll combine the linear model framework with the various distributions to get <strong>Generalized Linear Models</strong>, which are the bread and butter of modern ecological statistics.</p>
+<p>Everything else this week, model selection, mixed models, MLE, Bayes, is built directly on the foundation we put down today.</p>
 </section>
 
 </main>

@@ -59,11 +59,14 @@
     <div class="ctl"><label for="b0">β₀ (intercept)<span class="val" id="v_b0"></span></label><input id="b0" type="range" min="-4" max="4" step="0.1" value="-1"></div>
     <div class="ctl"><label for="b1">β₁ (slope, per 1 unit of x)<span class="val" id="v_b1"></span></label><input id="b1" type="range" min="-1.5" max="1.5" step="0.05" value="0.5"></div>
     <div class="ctl"><label for="xq">Highlight x =<span class="val" id="v_xq"></span></label><input id="xq" type="range" min="0" max="10" step="0.5" value="4"></div>
+    <div class="ctl"><label for="dx">Step Δx (units of x to compound over)<span class="val" id="v_dx"></span></label><input id="dx" type="range" min="1" max="5" step="1" value="1"></div>
   </div>
+  <label class="cmp-toggle" style="font-family:'Helvetica Neue',Arial,sans-serif; font-size:13px;"><input type="checkbox" id="showlink" checked /> Also show the link scale (the straight line the model actually fits)</label>
 
   <div class="sr-readout" id="srReadout" role="status" aria-live="polite" aria-atomic="true"></div>
 
   <svg id="chart" viewBox="0 0 720 340" width="100%" role="img" aria-label="Response versus predictor curve for the chosen link"></svg>
+  <svg id="linkchart" viewBox="0 0 720 200" width="100%" role="img" aria-label="Linear predictor versus x: a straight line on the link scale"></svg>
 
   <details class="data-table-details">
     <summary>Show the plotted values as a table</summary>
@@ -79,9 +82,11 @@
 <div class="callout key"><p class="callout-label">Key idea</p>
 <ol>
 <li><strong>Identity is a straight line.</strong> With the identity link the response <em>is</em> the linear predictor: a 1-unit change in x always adds β₁, everywhere.</li>
-<li><strong>Log link is multiplicative.</strong> Switch to Log. Now a 1-unit change in x <em>multiplies</em> the mean by e^β₁. Notice the curve bends and can never go negative — perfect for counts.</li>
-<li><strong>Logit link is S-shaped.</strong> Switch to Logit. The response is a probability trapped between 0 and 1. The same β₁ moves the probability a lot in the middle and barely at all near 0 or 1 — that is why we talk about <em>odds ratios</em>, not probability differences.</li>
+<li><strong>Log link is multiplicative.</strong> Switch to Log. Now a 1-unit change in x <em>multiplies</em> the mean by e^β₁. Notice the curve bends and can never go negative, which is perfect for counts.</li>
+<li><strong>Logit link is S-shaped.</strong> Switch to Logit. The response is a probability trapped between 0 and 1. The same β₁ moves the probability a lot in the middle and barely at all near 0 or 1. That is why we talk about <em>odds ratios</em>, not probability differences.</li>
 <li><strong>The "divide by 4" rule.</strong> On the logit, drag x to where the curve is steepest (p ≈ 0.5) and compare the local probability change to β₁/4.</li>
+<li><strong>Compounding.</strong> Set Δx to 3 on the log link. The multiplier over three units is (e^β₁)³ = e^{3β₁}, not 3·e^β₁. Additive on the link scale, multiplicative on the response scale.</li>
+<li><strong>Two pictures of one model.</strong> The lower panel is always a straight line, whatever the link. The upper panel is that same line pushed through the inverse link. A GLM never fits a curve; it fits a line and bends it back.</li>
 </ol>
 </div>
 <p>For 16 worked biological examples, see the <a href="log_logit_intuition.html">log/logit intuition guide</a>. <a href="lab.html">← Back to the Day 2 lab</a></p>
@@ -92,7 +97,7 @@
 
 <script>
 let link='identity';
-const S={b0:-1,b1:0.5,xq:4};
+const S={b0:-1,b1:0.5,xq:4,dx:1};
 const ginv=(eta)=> link==='identity'?eta : link==='log'?Math.exp(eta) : 1/(1+Math.exp(-eta));
 const xmax=10;
 
@@ -157,6 +162,8 @@ function render(){
   document.getElementById('v_b0').textContent=(+S.b0).toFixed(1);
   document.getElementById('v_b1').textContent=(+S.b1).toFixed(2);
   document.getElementById('v_xq').textContent=(+S.xq).toFixed(1);
+  document.getElementById('v_dx').textContent=Math.round(S.dx);
+  document.getElementById('dx').setAttribute('aria-valuetext',`step of ${Math.round(S.dx)} units of x`);
   document.getElementById('b0').setAttribute('aria-valuetext',`intercept ${(+S.b0).toFixed(1)} on the link scale`);
   document.getElementById('b1').setAttribute('aria-valuetext',`slope ${(+S.b1).toFixed(2)} on the link scale, per 1 unit of x`);
   document.getElementById('xq').setAttribute('aria-valuetext',`x = ${(+S.xq).toFixed(1)}`);
@@ -185,25 +192,50 @@ function render(){
   s+=`<circle cx="${px(xq+1<=xmax?xq+1:xq)}" cy="${py(mu1)}" r="4" fill="#1F5B50"/>`;
   document.getElementById('chart').innerHTML=s;
 
+  // link-scale panel: eta = b0 + b1 x, always a straight line
+  const lc=document.getElementById('linkchart');
+  if(document.getElementById('showlink').checked){
+    lc.style.display='';
+    const W2=720,H2=200,ml2=54,mr2=16,mt2=14,mb2=36,pw2=W2-ml2-mr2,ph2=H2-mt2-mb2;
+    const e0=S.b0, e1=S.b0+S.b1*xmax; let elo=Math.min(e0,e1), ehi=Math.max(e0,e1); const pad=(ehi-elo)*0.15||1; elo-=pad; ehi+=pad;
+    const px2=x=>ml2+(x/xmax)*pw2, py2=v=>mt2+ph2-((v-elo)/(ehi-elo))*ph2;
+    let t=`<rect width="${W2}" height="${H2}" fill="white"/>`;
+    t+=`<line x1="${ml2}" y1="${mt2+ph2}" x2="${ml2+pw2}" y2="${mt2+ph2}" stroke="#999"/><line x1="${ml2}" y1="${mt2}" x2="${ml2}" y2="${mt2+ph2}" stroke="#999"/>`;
+    for(let k=0;k<=2;k++){const v=elo+(ehi-elo)*k/2; t+=`<text x="${ml2-8}" y="${py2(v)+4}" font-size="11" fill="#666" text-anchor="end">${v.toFixed(1)}</text>`;}
+    for(let k=0;k<=10;k+=2) t+=`<text x="${px2(k)}" y="${mt2+ph2+14}" font-size="11" fill="#666" text-anchor="middle">${k}</text>`;
+    const ylab2 = link==='identity'?'η = μ':(link==='log'?'η = log(μ)':'η = logit(p)');
+    t+=`<text transform="translate(14,${mt2+ph2/2}) rotate(-90)" font-size="12" fill="#444" text-anchor="middle">${ylab2}</text>`;
+    t+=`<line x1="${px2(0)}" y1="${py2(e0)}" x2="${px2(xmax)}" y2="${py2(e1)}" stroke="#1F5B50" stroke-width="3"/>`;
+    const xq2=S.xq, d=Math.round(S.dx), x2=Math.min(xmax,xq2+d);
+    t+=`<circle cx="${px2(xq2)}" cy="${py2(S.b0+S.b1*xq2)}" r="5" fill="#111"/>`;
+    t+=`<circle cx="${px2(x2)}" cy="${py2(S.b0+S.b1*x2)}" r="4" fill="#D73F09"/>`;
+    t+=`<text x="${ml2+6}" y="${mt2+12}" font-size="11" fill="#1F5B50">link scale: a straight line, slope β₁ = ${S.b1.toFixed(2)} per unit x, everywhere</text>`;
+    lc.innerHTML=t;
+  } else { lc.style.display='none'; }
+
   // interpretation
   const eb=Math.exp(S.b1);
+  const d=Math.round(S.dx), xd=Math.min(xmax,xq+d), mud=ginv(S.b0+S.b1*xd), ebd=Math.exp(S.b1*d);
   let html='';
   if(link==='identity'){
     html=`Linear predictor: η = ${S.b0.toFixed(1)} + ${S.b1.toFixed(2)}·x, and μ = η. `+
       `A 1-unit increase in x <b>adds ${S.b1.toFixed(2)}</b> to the mean, everywhere. `+
-      `At x=${xq.toFixed(1)}, mean = <b>${mu.toFixed(2)}</b>; at x=${(xq+1).toFixed(1)}, mean = <b>${mu1.toFixed(2)}</b> (difference ${(mu1-mu).toFixed(2)}).`;
+      `At x=${xq.toFixed(1)}, mean = <b>${mu.toFixed(2)}</b>; at x=${(xq+1).toFixed(1)}, mean = <b>${mu1.toFixed(2)}</b> (difference ${(mu1-mu).toFixed(2)}). `+
+      `Over Δx = ${d}: adds ${d}·β₁ = <b>${(S.b1*d).toFixed(2)}</b>.`;
   } else if(link==='log'){
     html=`log(μ) = ${S.b0.toFixed(1)} + ${S.b1.toFixed(2)}·x, so μ = e^(η). `+
       `A 1-unit increase in x <b>multiplies</b> the mean by e^β₁ = <b>${eb.toFixed(3)}</b> `+
       `(${eb>=1?'+':''}${((eb-1)*100).toFixed(1)}% per unit). `+
-      `At x=${xq.toFixed(1)}, mean = <b>${mu.toFixed(2)}</b>; at x=${(xq+1).toFixed(1)}, mean = <b>${mu1.toFixed(2)}</b> = ${(mu1/mu).toFixed(3)}× as large.`;
+      `At x=${xq.toFixed(1)}, mean = <b>${mu.toFixed(2)}</b>; at x=${(xq+1).toFixed(1)}, mean = <b>${mu1.toFixed(2)}</b> = ${(mu1/mu).toFixed(3)}× as large. `+
+      `Over Δx = ${d}: the multiplier compounds to (e^β₁)^${d} = e^{${d}β₁} = <b>${ebd.toFixed(3)}</b>, so the mean at x=${xd.toFixed(1)} is ${mud.toFixed(2)}.`;
   } else {
     const odds=mu/(1-mu), odds1=mu1/(1-mu1);
     html=`logit(p) = ${S.b0.toFixed(1)} + ${S.b1.toFixed(2)}·x. `+
       `A 1-unit increase in x <b>multiplies the odds</b> by e^β₁ = <b>${eb.toFixed(3)}</b> (odds ratio). `+
       `At x=${xq.toFixed(1)}: p = <b>${mu.toFixed(3)}</b>, odds = ${odds.toFixed(3)}. `+
       `At x=${(xq+1).toFixed(1)}: p = <b>${mu1.toFixed(3)}</b>, odds = ${odds1.toFixed(3)} (ratio ${(odds1/odds).toFixed(3)}). `+
-      `Probability change here ≈ <b>${(mu1-mu>=0?'+':'')}${(mu1-mu).toFixed(3)}</b>; the "β₁/4" rule gives ${(S.b1/4).toFixed(3)} at the steepest point.`;
+      `Probability change here ≈ <b>${(mu1-mu>=0?'+':'')}${(mu1-mu).toFixed(3)}</b>; the marginal effect β₁·p(1−p) at this point is ${(S.b1*mu*(1-mu)).toFixed(3)}, and the "β₁/4" rule gives ${(S.b1/4).toFixed(3)} at the steepest point. `+
+      `Over Δx = ${d}: odds multiply by e^{${d}β₁} = <b>${ebd.toFixed(3)}</b>, taking p from ${mu.toFixed(3)} to ${mud.toFixed(3)}.`;
   }
   document.getElementById('interp').innerHTML=html;
   describe();
@@ -216,7 +248,8 @@ document.querySelectorAll('#linkpick button').forEach(b=>b.addEventListener('cli
   b.classList.add('active'); b.setAttribute('aria-pressed','true');
   link=b.dataset.l; render();
 }));
-['b0','b1','xq'].forEach(id=>document.getElementById(id).addEventListener('input',e=>{S[id]=+e.target.value; render();}));
+['b0','b1','xq','dx'].forEach(id=>document.getElementById(id).addEventListener('input',e=>{S[id]=+e.target.value; render();}));
+document.getElementById('showlink').addEventListener('change',render);
 render();
 </script>
 </body>

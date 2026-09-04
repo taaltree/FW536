@@ -54,7 +54,7 @@ MathJax = {
 <section id="what">
 <h2>What we did today, in one paragraph</h2>
 <div class="callout plain"><p class="callout-label">Plain-language summary</p>
-We tackled the fact that real ecological data are not independent — fish are inside lakes, plots are inside sites, measurements are repeated on the same individual. <strong>Mixed effects models</strong> let us include these grouping structures as <em>random effects</em>: rather than estimating a separate parameter for each group, we estimate <em>how much groups vary</em> and let each group's estimate be pulled toward the population mean. In the afternoon, we faced the harder question: when we have several plausible models, how do we pick one? We compared the likelihood ratio test, AIC, AICc, BIC, and cross-validation, and ran simulations to see what each criterion does — and doesn't — protect us from. The honest answer at the end of the day: there is no automated procedure that replaces thinking carefully about your science question.
+We tackled the fact that real ecological data are not independent. Fish are inside lakes, plots are inside sites, measurements are repeated on the same individual. <strong>Mixed effects models</strong> let us include these grouping structures as <em>random effects</em>: rather than estimating a separate parameter for each group, we estimate <em>how much groups vary</em> and let each group's estimate be pulled toward the population mean. In the afternoon, we faced the harder question. When we have several plausible models, how do we pick one? We compared the likelihood ratio test, AIC, AICc, BIC, and cross-validation, and ran simulations to see what each criterion does, and doesn't, protect us from. The honest answer at the end of the day is that there is no automated procedure that replaces thinking carefully about your science question.
 </div>
 </section>
 
@@ -71,24 +71,24 @@ We tackled the fact that real ecological data are not independent — fish are i
 <h2>Fixed effects vs random effects, in English</h2>
 
 <div class="callout bio"><p class="callout-label">Biological intuition</p>
-<p><strong>The scenario we'll use &mdash; and yes, "badjuice" is made up.</strong> A new graduate student joins your lab to study <strong>razor clam abundance along 10 beaches on the Oregon coast</strong>. At each beach they record clam abundance and the local concentration of <strong>badjuice</strong> &mdash; a <em>fictitious</em> environmental toxin invented for this course; it is not a real chemical &mdash; and they repeat the survey for four years. The student wants to know: <strong>does badjuice affect clam abundance?</strong></p>
+<p><strong>The scenario we'll use (and yes, "badjuice" is made up).</strong> A new graduate student joins your lab to study <strong>razor clam abundance along 10 beaches on the Oregon coast</strong>. At each beach they record clam abundance and the local concentration of <strong>badjuice</strong>, a <em>fictitious</em> environmental toxin invented for this course (it is not a real chemical), and they repeat the survey for four years. The student wants to know: <strong>does badjuice affect clam abundance?</strong></p>
 <p>That one scenario already contains the whole distinction below: <em>badjuice</em> is the thing you want a number for, and <em>beach</em> is the grouping you must respect but don't care about one-by-one.</p>
 </div>
 
 <p>The technical distinction is often muddled. Here is the most useful way to think about it:</p>
 
 <ul>
-<li>A <strong>fixed effect</strong> is something whose specific value you want to know. "What is the effect of badjuice on clams?" — badjuice is a fixed effect because the slope <em>is</em> the answer to your question.</li>
+<li>A <strong>fixed effect</strong> is something whose specific value you want to know. "What is the effect of badjuice on clams?" Badjuice is a fixed effect because the slope <em>is</em> the answer to your question.</li>
 <li>A <strong>random effect</strong> is a grouping variable. Each level (beach 1, beach 2, ..., beach 10) is one draw from a larger pool of possible levels. You don't particularly need to know beach 7's specific intercept; you need to make sure that putting all 10 beaches' observations together didn't pretend they were independent when they weren't.</li>
 </ul>
 
 <div class="callout bio"><p class="callout-label">Biological intuition</p>
-<strong>A useful test:</strong> ask yourself "if next year I had a brand new beach, would I want my model to be able to say anything useful about it?" If yes, beach is a random effect — you're learning about beaches as a population. If you only care about these particular 10 beaches in this particular year, you could just use fixed effects for them.
+<strong>A useful test:</strong> ask yourself "if next year I had a brand new beach, would I want my model to be able to say anything useful about it?" If yes, beach is a random effect, and you are learning about beaches as a population. If you only care about these particular 10 beaches in this particular year, you could just use fixed effects for them.
 </div>
 
 <p>A few rules of thumb that catch most decisions:</p>
 <ul>
-<li>Fewer than ~5 levels? Probably use a fixed effect — random effect variance is essentially unidentifiable.</li>
+<li>Fewer than ~5 levels? Probably use a fixed effect, because the random effect variance is essentially unidentifiable.</li>
 <li>Treatment, sex, species (when there are 2 or 3)? Fixed.</li>
 <li>Stream, plot, site, year (when there are many)? Random.</li>
 <li>Repeated measurements on the same animal? Animal is a random effect (or you have a multilevel model with animal nested in higher groups).</li>
@@ -98,20 +98,20 @@ We tackled the fact that real ecological data are not independent — fish are i
 <section id="shrink">
 <h2>What "shrinkage" actually does (the magic of partial pooling)</h2>
 
-<p>Imagine measuring fish density in 100 streams, three measurements in each — the Day 3 stream dataset. A few streams come out looking extreme (Stream 11 has the lowest average, 8.9; Stream 43 the highest, 111.7, against a grand mean of 63.3). If you fit a separate intercept per stream (no pooling), those streams keep their raw averages exactly as measured. If you fit one grand mean and ignore stream (complete pooling), you miss the fact that streams really are different.</p>
+<p>Imagine measuring fish density in 100 streams, three measurements in each, the Day 3 stream dataset. A few streams come out looking extreme (Stream 11 has the lowest average, 8.9; Stream 43 the highest, 111.7, against a grand mean of 63.3). If you fit a separate intercept per stream (no pooling), those streams keep their raw averages exactly as measured. If you fit one grand mean and ignore stream (complete pooling), you miss the fact that streams really are different.</p>
 
-<p>A mixed model splits the difference. It says: "the streams probably aren't quite as different as their raw means suggest — let me pull the extreme ones a little toward the overall average." That pull is shrinkage. The strength of the pull depends on:</p>
+<p>A mixed model splits the difference. It says: "the streams probably aren't quite as different as their raw means suggest, so let me pull the extreme ones a little toward the overall average." That pull is shrinkage. The strength of the pull depends on:</p>
 <ul>
 <li><strong>How much data each stream has.</strong> A stream with 30 observations gets pulled very little; its own data dominate. A stream with 3 observations gets pulled more; we trust its own average less.</li>
 <li><strong>How variable streams are overall.</strong> If among-stream variance is huge, even small samples convince us streams really do differ. If it's small, the model assumes most variation is residual noise and pulls hard.</li>
 </ul>
-<p>Both dials are pinned in the Day 3 stream data. Every stream has exactly the same three measurements, so the first dial cannot differ between streams. And streams differ enormously (among-stream SD 21.4 against a within-stream SD of 4.6), so the second dial is set to "barely pull at all". The result: <strong>every one of the 100 streams is pulled by the same 1.49% of its distance from the grand mean</strong>, keeping 98.5% of its own average. Stream 11 moves from 8.9 to 9.7; Stream 43 from 111.7 to 111.0. Nothing here shrinks harder than anything else — to see that you would need an unbalanced design, where some streams have far fewer measurements than others. The <a href="explore_shrinkage.html">interactive shrinkage demo</a> lets you move both dials yourself and watch strong shrinkage appear.</p>
+<p>Both dials are pinned in the Day 3 stream data. Every stream has exactly the same three measurements, so the first dial cannot differ between streams. And streams differ enormously (among-stream SD 21.4 against a within-stream SD of 4.6), so the second dial is set to "barely pull at all". The result: <strong>every one of the 100 streams is pulled by the same 1.49% of its distance from the grand mean</strong>, keeping 98.5% of its own average. Stream 11 moves from 8.9 to 9.7; Stream 43 from 111.7 to 111.0. Nothing here shrinks harder than anything else. To see that you would need an unbalanced design, where some streams have far fewer measurements than others. The <a href="explore_shrinkage.html">interactive shrinkage demo</a> lets you move both dials yourself and watch strong shrinkage appear.</p>
 
 <div class="callout key"><p class="callout-label">Key idea</p>
-<p>The shrinkage formula is not magic — it's exactly what an idealized Bayesian would do with a prior "fish density is around the population mean, with variance $\sigma_\text{stream}^2$" combined with the actual data for each stream. Mixed models are quietly Bayesian.</p>
+<p>The shrinkage formula is not magic. It is exactly what an idealized Bayesian would do with a prior "fish density is around the population mean, with variance $\sigma_\text{stream}^2$" combined with the actual data for each stream. Mixed models are quietly Bayesian.</p>
 </div>
 
-<p><strong>Why this is good science.</strong> Shrinkage gives more honest predictions for new streams. A separate-intercept (no-pooling) model overfits, predicting extreme values for new streams that won't be there. The complete-pooling model underfits, ignoring real variation. Partial pooling is the predictive sweet spot — and the principle is general (anywhere you have groups of related estimates, partial pooling tends to outperform either extreme).</p>
+<p><strong>Why this is good science.</strong> Shrinkage gives more honest predictions for new streams. A separate-intercept (no-pooling) model overfits, predicting extreme values for new streams that won't be there. The complete-pooling model underfits, ignoring real variation. Partial pooling is the predictive sweet spot, and the principle is general (anywhere you have groups of related estimates, partial pooling tends to outperform either extreme).</p>
 </section>
 
 <section id="selection">
@@ -124,11 +124,11 @@ We tackled the fact that real ecological data are not independent — fish are i
 <tr><td>Does adding this predictor explain significantly more variation than chance?</td><td>Likelihood ratio test (for nested models)</td></tr>
 <tr><td>Of these models, which would be expected to predict best on new data?</td><td>AIC / AICc (in theory); cross-validation (in practice)</td></tr>
 <tr><td>Of these models, which is most plausible given a (heavier) penalty for complexity?</td><td>BIC</td></tr>
-<tr><td>Which predictor is causally important?</td><td>None of the above — needs a study design</td></tr>
+<tr><td>Which predictor is causally important?</td><td>None of the above; this needs a study design</td></tr>
 </table>
 
 <div class="callout warn"><p class="callout-label">Watch out</p>
-The trap that has wrecked many graduate theses is to run all subsets of predictors through <code>dredge()</code> or stepwise selection, then write up the "best" model as if it were a normal regression. The coefficients in that best model are biased away from zero, the standard errors are too small, and the p-values are meaningless. This is true even when you use AIC instead of p-values — the simulations in today's lab show that AIC keeps junk predictors in the top model surprisingly often.
+The trap that has wrecked many graduate theses is to run all subsets of predictors through <code>dredge()</code> or stepwise selection, then write up the "best" model as if it were a normal regression. The coefficients in that best model are biased away from zero, the standard errors are too small, and the p-values are meaningless. This is true even when you use AIC instead of p-values. The simulations in today's lab show that AIC keeps junk predictors in the top model surprisingly often.
 </div>
 </section>
 
@@ -146,12 +146,12 @@ The trap that has wrecked many graduate theses is to run all subsets of predicto
 <ul>
 <li>Not a p-value. There is no null hypothesis being tested.</li>
 <li>Not a measure of effect size or biological importance.</li>
-<li>Not a hard cutoff. The famous "$\Delta\text{AIC} &lt; 2$" rule of thumb is actually quite weak — adding a pure noise predictor costs a penalty of exactly 2 but buys back some fit, so the net change is $\Delta\text{AIC} = 2 - \chi^2_1$ — always under 2, and about 1 on average. Noise variables are therefore "competitive" by construction.</li>
+<li>Not a hard cutoff. The famous "$\Delta\text{AIC} &lt; 2$" rule of thumb is actually quite weak. Adding a pure noise predictor costs a penalty of exactly 2 but buys back some fit, so the net change is $\Delta\text{AIC} = 2 - \chi^2_1$, always under 2 and about 1 on average. Noise variables are therefore "competitive" by construction.</li>
 <li>Not magic. AIC's variance is large in small samples (use AICc), and it tends to retain more complex models than necessary in noise simulations.</li>
 </ul>
 </div>
 
-<p>The corrected version, <strong>AICc</strong>, adds an extra penalty $2k(k+1)/(n-k-1)$ that matters when sample size is small relative to the number of parameters. Use AICc by default unless $n/k$ is large. <strong>BIC</strong> uses a $k \ln n$ penalty, which is larger than AIC's $2k$ as soon as $n \gtrsim 8$ — so BIC is more conservative about retaining predictors, at the cost of missing weak real effects.</p>
+<p>The corrected version, <strong>AICc</strong>, adds an extra penalty $2k(k+1)/(n-k-1)$ that matters when sample size is small relative to the number of parameters. Use AICc by default unless $n/k$ is large. <strong>BIC</strong> uses a $k \ln n$ penalty, which is larger than AIC's $2k$ as soon as $n \gtrsim 8$, so BIC is more conservative about retaining predictors, at the cost of missing weak real effects.</p>
 </section>
 
 <section id="cv">
@@ -159,11 +159,11 @@ The trap that has wrecked many graduate theses is to run all subsets of predicto
 
 <p>Cross-validation answers the question "how well does this model predict data it hasn't seen?" by literally hiding some data, fitting the model on what's left, and seeing how badly the predictions miss the hidden values. Repeat for every observation (leave-one-out CV) or every fold of, say, ten (10-fold CV), and average the prediction errors.</p>
 
-<p>If a model is overfit — using random noise to make the training data look great — it will look bad on the held-out data. CV catches that directly.</p>
-<p><strong>But CV is not an independent second opinion on AIC.</strong> For a Gaussian linear model, leave-one-out CV and AIC are <em>asymptotically the same criterion</em> (Stone 1977), and at the sample sizes in this lab they have already nearly converged: in Exercise A3 the two rankings correlate at 0.95, they pick the same model about 90% of the time, and over 2000 simulated datasets they recover the truth at indistinguishable rates (58.4% vs 57.6%). Holding data out does not buy you protection that AIC lacks — it is a slower route to the same number. That equivalence is the reason AIC is everywhere: LOOCV costs you $n$ refits, AIC gives the same answer in closed form from one fit.</p>
+<p>If a model is overfit, using random noise to make the training data look great, it will look bad on the held-out data. CV catches that directly.</p>
+<p><strong>But CV is not an independent second opinion on AIC.</strong> For a Gaussian linear model, leave-one-out CV and AIC are <em>asymptotically the same criterion</em> (Stone 1977), and at the sample sizes in this lab they have already nearly converged. In Exercise A3 the two rankings correlate at 0.95, they pick the same model about 90% of the time, and over 2000 simulated datasets they recover the truth at indistinguishable rates (58.4% vs 57.6%). Holding data out does not buy you protection that AIC lacks. It is a slower route to the same number. That equivalence is the reason AIC is everywhere: LOOCV costs you $n$ refits, AIC gives the same answer in closed form from one fit.</p>
 
 <div class="callout key"><p class="callout-label">Key idea</p>
-For any modeling project whose goal is "predict X for new units", cross-validation should appear in your methods. It is much more honest than reporting the in-sample $R^2$. Reporting AIC instead is not a lesser substitute — for Gaussian models AIC <em>is</em> the closed-form version of LOOCV — but neither one answers "is this effect real?" Both rank models for prediction; only the coefficient, its interval, and the study design speak to whether an effect exists.
+For any modeling project whose goal is "predict X for new units", cross-validation should appear in your methods. It is much more honest than reporting the in-sample $R^2$. Reporting AIC instead is not a lesser substitute (for Gaussian models AIC <em>is</em> the closed-form version of LOOCV), but neither one answers "is this effect real?" Both rank models for prediction; only the coefficient, its interval, and the study design speak to whether an effect exists.
 </div>
 </section>
 
@@ -175,7 +175,7 @@ For any modeling project whose goal is "predict X for new units", cross-validati
 </div>
 
 <div class="callout warn"><p class="callout-label">Watch out</p>
-<strong>"My fixed effect went away when I added the random effect."</strong> That can happen when the variable you thought was the predictor was really just a marker for the group. (Imagine "lake pH" as a fixed effect when really all you have is one pH value per lake — adding a lake random effect absorbs the pH information.) The fix is study design, not statistics.
+<strong>"My fixed effect went away when I added the random effect."</strong> That can happen when the variable you thought was the predictor was really just a marker for the group. (Imagine "lake pH" as a fixed effect when really all you have is one pH value per lake. Adding a lake random effect absorbs the pH information.) The fix is study design, not statistics.
 </div>
 
 <div class="callout warn"><p class="callout-label">Watch out</p>
@@ -183,7 +183,7 @@ For any modeling project whose goal is "predict X for new units", cross-validati
 </div>
 
 <div class="callout warn"><p class="callout-label">Watch out</p>
-<strong>"$\Delta\text{AIC} = 1.7$ means model A and model B are equally good."</strong> Not really — the lab simulations show that a model containing a pure noise predictor sits within 2 AIC units of the truth essentially always — adding one parameter can raise AIC by at most 2, so a junk variable is never ruled out by the "within 2" rule. Treat $\Delta\text{AIC} &lt; 2$ as "the data don't strongly distinguish them," not as evidence that the extra predictor matters.
+<strong>"$\Delta\text{AIC} = 1.7$ means model A and model B are equally good."</strong> Not really. The lab simulations show that a model containing a pure noise predictor sits within 2 AIC units of the truth essentially always, because adding one parameter can raise AIC by at most 2, so a junk variable is never ruled out by the "within 2" rule. Treat $\Delta\text{AIC} &lt; 2$ as "the data don't strongly distinguish them," not as evidence that the extra predictor matters.
 </div>
 
 <div class="callout warn"><p class="callout-label">Watch out</p>
@@ -197,7 +197,7 @@ For any modeling project whose goal is "predict X for new units", cross-validati
 
 <section id="tomorrow">
 <h2>Looking ahead</h2>
-<p>Tomorrow (Day 4) we'll formalize what we've been quietly doing with <em>maximum likelihood</em>: the engine inside <code>lm</code>, <code>glm</code>, <code>lmer</code>, <code>nls</code>, and <code>nlme</code>. Once you see how MLE works, you'll see that almost everything in this course is the same idea applied to different distributions and link functions. We'll also start Bayesian inference, which gives a much more direct answer to many of the questions today's frequentist tools handle awkwardly — "what is the probability my effect is positive?", "what is the posterior on $\sigma_\text{stream}$?", and so on.</p>
+<p>Tomorrow (Day 4) we'll formalize what we've been quietly doing with <em>maximum likelihood</em>: the engine inside <code>lm</code>, <code>glm</code>, <code>lmer</code>, <code>nls</code>, and <code>nlme</code>. Once you see how MLE works, you'll see that almost everything in this course is the same idea applied to different distributions and link functions. We'll also start Bayesian inference, which gives a much more direct answer to many of the questions today's frequentist tools handle awkwardly, such as "what is the probability my effect is positive?", "what is the posterior on $\sigma_\text{stream}$?", and so on.</p>
 <p>If today's mixed-model material didn't fully click, re-work the <a href="lab.html">lab</a> exercises and the <a href="problem_set.html">problem set</a> before tomorrow morning.</p>
 </section>
 

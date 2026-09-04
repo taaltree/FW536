@@ -416,7 +416,7 @@ MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
 <h2 id="slide-34-h"><span id="slide-34"></span>Slide 34: Allow intercept to vary by lake</h2>
 <ul>
 <li>lmer(Z_TP~Z_Length + (1|Lake))</li>
-<li style="margin-left:1.2em">Can also do both species and length</li>
+<li style="margin-left:1.2em">Can also do both species and lake</li>
 <li style="margin-left:1.2em">lmer(Z_TP~Z_Length + (1|Fish_Species)+(1|Lake))</li>
 </ul>
 <figure role="group"><figcaption><strong>Figure 34.1.</strong> Random-intercept-by-lake schematic: six parallel colored lines (Lake 1 lowest to Lake 6 highest) offset around the black lake-level mean line; a normal curve shows intercept spread.</figcaption></figure>

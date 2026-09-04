@@ -1,5 +1,5 @@
 ---
-title: "FW 536 — Pre-course exam"
+title: "FW 536 · Pre-course exam"
 author: "Your Name Here"
 date: "`r Sys.Date()`"
 output:
@@ -20,10 +20,10 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 
 This template matches the [Pre-course exam](pre_course_exam.html). Fill in
 each section with your answer. You can use prose, R code, math, or an
-embedded photo of hand-written work — whatever is clearest for each
+embedded photo of hand-written work, whatever is clearest for each
 question.
 
-You have 60 minutes. Do not consult outside materials or your classmates.
+Do not consult outside materials or your classmates.
 This exam is graded generously; **guessing is not penalized**, and "I
 don't know" is an acceptable answer.
 
@@ -32,7 +32,7 @@ Pre-Course Exam assignment.
 
 ---
 
-# Part A — Probability fundamentals (8 points)
+# Part A · Probability fundamentals (8 points)
 
 ## A1. Conditional probability (2 pts)
 
@@ -71,7 +71,7 @@ Given a positive test, what is the probability the animal is infected?*
 
 ---
 
-# Part B — Distributions (8 points)
+# Part B · Distributions (8 points)
 
 ## B1. Pick the distribution (2 pts)
 
@@ -104,7 +104,7 @@ Given a positive test, what is the probability the animal is infected?*
 
 ---
 
-# Part C — Regression (10 points)
+# Part C · Regression (10 points)
 
 ## C1. Reading a coefficient (2 pts)
 
@@ -138,7 +138,7 @@ Given a positive test, what is the probability the animal is infected?*
 
 ---
 
-# Part D — Mixed models / hierarchy (8 points)
+# Part D · Mixed models / hierarchy (8 points)
 
 ## D1. When to use a random effect (2 pts)
 
@@ -160,7 +160,7 @@ Given a positive test, what is the probability the animal is infected?*
 
 ---
 
-# Part E — Likelihood (5 points)
+# Part E · Likelihood (5 points)
 
 ## E1. What is a likelihood? (2 pts)
 
@@ -178,7 +178,7 @@ Given a positive test, what is the probability the animal is infected?*
 
 ---
 
-# Part F — Bayes (8 points)
+# Part F · Bayes (8 points)
 
 ## F1. Prior, likelihood, posterior (2 pts)
 
@@ -200,7 +200,7 @@ Given a positive test, what is the probability the animal is infected?*
 
 ---
 
-# Part G — Free response (3 points)
+# Part G · Free response (3 points)
 
 ## G1. Tell me about your data
 

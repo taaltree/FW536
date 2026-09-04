@@ -52,19 +52,19 @@ MathJax = {
 <section id="big">
 <h2>The big idea</h2>
 <div class="callout plain"><p class="callout-label">Plain-language summary</p>
-<p>Yesterday you learned that data come from a distribution. Today you learn how to <em>connect a distribution to a predictor</em>. That's all a regression is: a recipe that says "if the predictor is $x$, the expected response is $\mu(x)$, and observations vary around $\mu$ according to some distribution."</p>
-<p>The traditional linear regression you've seen ($y = a + bx + \text{noise}$) assumes the response is Normal and unbounded. But ecological responses are usually counts, proportions, or strictly positive — none of which are Normal. So we generalize.</p>
+<p>Yesterday you learned that data come from a distribution. Today you learn how to <em>connect a distribution to a predictor</em>. That's all a regression is, a recipe that says "if the predictor is $x$, the expected response is $\mu(x)$, and observations vary around $\mu$ according to some distribution."</p>
+<p>The traditional linear regression you've seen ($y = a + bx + \text{noise}$) assumes the response is Normal and unbounded. But ecological responses are usually counts, proportions, or strictly positive, and none of those are Normal. So we generalize.</p>
 </div>
 </section>
 
 <section id="cont">
 <h2>Continuous distributions: the morning's cast</h2>
 <ul>
-<li><strong>Normal</strong> — symmetric, unbounded. Workhorse for measurements that can fall on either side of a mean, like temperatures and model residuals. Because it puts probability on negative values, it is a poor default for strictly positive quantities such as lengths and masses — those belong with the Lognormal or Gamma below.</li>
-<li><strong>Lognormal</strong> — log(Y) is Normal. Always positive, right-skewed. Use for abundances, concentrations, body sizes.</li>
-<li><strong>Gamma</strong> — flexible positive continuous. Use when variance grows with the mean (common in biology).</li>
-<li><strong>Beta</strong> — for proportions strictly between 0 and 1 (not derived from a count).</li>
-<li><strong>Exponential</strong> — time between events in a Poisson process. Use for survival times, time-to-first-detection.</li>
+<li><strong>Normal.</strong> Symmetric, unbounded. Workhorse for measurements that can fall on either side of a mean, like temperatures and model residuals. Because it puts probability on negative values, it is a poor default for strictly positive quantities such as lengths and masses. Those belong with the Lognormal or Gamma below.</li>
+<li><strong>Lognormal.</strong> log(Y) is Normal. Always positive, right-skewed. Use for abundances, concentrations, body sizes.</li>
+<li><strong>Gamma.</strong> Flexible positive continuous. Use when variance grows with the mean (common in biology).</li>
+<li><strong>Beta.</strong> For proportions strictly between 0 and 1 (not derived from a count).</li>
+<li><strong>Exponential.</strong> Time between events in a Poisson process. Use for survival times, time-to-first-detection.</li>
 </ul>
 </section>
 
@@ -77,9 +77,9 @@ MathJax = {
 </section>
 
 <section id="glm">
-<h2>Generalized linear models — three ingredients</h2>
+<h2>Generalized linear models: three ingredients</h2>
 <ol>
-<li><strong>The linear predictor:</strong> $\eta_i = \beta_0 + \beta_1 x_{i1} + \dots$ — same as before.</li>
+<li><strong>The linear predictor:</strong> $\eta_i = \beta_0 + \beta_1 x_{i1} + \dots$, same as before.</li>
 <li><strong>The link function:</strong> $g(\mu_i) = \eta_i$. Transforms the mean onto an unbounded scale so a line makes sense.</li>
 <li><strong>The distribution:</strong> $y_i \sim D(\mu_i, \theta)$. Says how observations vary.</li>
 </ol>
@@ -95,7 +95,7 @@ MathJax = {
 <tr><td>Positive numbers only</td><td>log</td><td>Poisson, NB, Gamma regression</td></tr>
 <tr><td>Between 0 and 1</td><td>logit</td><td>Logistic regression</td></tr>
 </table>
-<p>The choice isn't arbitrary — it's about making sure the model doesn't predict impossible values (negative counts, probabilities &gt; 1).</p>
+<p>The choice isn't arbitrary. It is about making sure the model doesn't predict impossible values (negative counts, probabilities &gt; 1).</p>
 
 <div class="callout key"><p class="callout-label">Key idea</p>
 <strong>The biology hook:</strong> a log link encodes the assumption that effects are <em>multiplicative</em>. A logit link encodes the assumption that effects are multiplicative <em>on the odds</em>. Both match how biology actually works far better than the additive assumption baked into a plain Normal regression. See the <a href="log_logit_intuition.html">log/logit intuition guide</a> for many worked examples.
@@ -117,8 +117,8 @@ MathJax = {
 <section id="mistakes">
 <h2>Common mistakes</h2>
 <div class="callout warn"><p class="callout-label">Watch out</p><strong>Fitting a Normal to count data.</strong> Predicts negative counts; variance assumption usually wrong. Use a Poisson or NB instead.</div>
-<div class="callout warn"><p class="callout-label">Watch out</p><strong>Forgetting to back-transform.</strong> A log-link coefficient of 0.5 is not "a 0.5 increase in response per unit x" — it's "a $\times e^{0.5} = \times 1.65$ multiplicative effect." Always exponentiate.</div>
-<div class="callout warn"><p class="callout-label">Watch out</p><strong>Trusting Poisson SEs when overdispersed.</strong> Overdispersion makes Poisson SEs too small &mdash; on the sockeye counts the Poisson SE on <code>logED</code> is 0.013 when it should be ~0.09. Switch to NB, or to quasipoisson if the Poisson point estimate is all you need to keep: quasipoisson does not move the estimate at all (0.737 either way), it just multiplies the SEs by $\sqrt{\hat\phi}$ &mdash; here $\sqrt{51}\approx 7.1$. The NB is a different likelihood and moves the estimate too.</div>
+<div class="callout warn"><p class="callout-label">Watch out</p><strong>Forgetting to back-transform.</strong> A log-link coefficient of 0.5 is not "a 0.5 increase in response per unit x". It is "a $\times e^{0.5} = \times 1.65$ multiplicative effect." Always exponentiate.</div>
+<div class="callout warn"><p class="callout-label">Watch out</p><strong>Trusting Poisson SEs when overdispersed.</strong> Overdispersion makes Poisson SEs too small. On the sockeye counts the Poisson SE on <code>logED</code> is 0.013 when it should be ~0.09. Switch to NB, or to quasipoisson if the Poisson point estimate is all you need to keep. Quasipoisson does not move the estimate at all (0.737 either way), it just multiplies the SEs by $\sqrt{\hat\phi}$, here $\sqrt{51}\approx 7.1$. The NB is a different likelihood and moves the estimate too.</div>
 <div class="callout warn"><p class="callout-label">Watch out</p><strong>Treating interactions as one-size-fits-all.</strong> An interaction that looks important on the log scale might disappear on the natural scale, and vice versa. Always state which scale you're talking about.</div>
 </section>
 

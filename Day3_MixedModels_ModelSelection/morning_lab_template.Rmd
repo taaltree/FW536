@@ -1,5 +1,5 @@
 ---
-title: "FW 536 — Day 3 morning lab (mixed models) — Your Name"
+title: "FW 536 · Day 3 morning lab (mixed models) · Your Name"
 author: "Your Name Here"
 date: "`r Sys.Date()`"
 output:
@@ -16,7 +16,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 ```
 
-# Day 3 morning lab — Mixed models problem set
+# Day 3 morning lab · Mixed models problem set
 
 This template matches the morning (Part 1) problems in
 [`problem_set.html`](problem_set.html#morning). Read each problem statement there,
@@ -41,38 +41,49 @@ library(MuMIn)
 
 ```{r data}
 # Real-data problems read these files from the data/ folder.
-# Problem 1 — streams (stream_density.csv): 100 streams, three observations each
-Streams <- read.csv("data/stream_density.csv")
-Streams$Stream <- factor(Streams$Stream)
-
-# Problem 2 — length-weight (length_weight.csv)
+# Problem 2 · length-weight (length_weight.csv)
 LenW <- read.csv("data/length_weight.csv")
 LenW$Subject <- as.factor(LenW$Subject)
 
-# Problem 3 — von Bertalanffy growth (fish_growth.csv)
-AgeLen <- groupedData(Length ~ Age | Subject,
-                      data = read.csv("data/fish_growth.csv"))
-
-# Problem 4 — trophic position (qcbs_w6_data.csv)
+# Problem 4 · trophic position (qcbs_w6_data.csv)
 dat <- read.csv("data/qcbs_w6_data.csv")
 dat$Fish_Species <- as.factor(dat$Fish_Species)
 dat$Lake         <- as.factor(dat$Lake)
 dat$Z_Length     <- scale(dat$Fish_Length)[, 1]
 dat$Z_TP         <- scale(dat$Trophic_Pos)[, 1]
+
+# Problems 1 and 3 simulate their own data (code blocks in the problem set).
 ```
 
 ---
 
-# Problem 1 — Streams: complete / no / partial pooling (stream_density.csv)
+# Problem 1 · Which streams get pulled hardest toward the mean? (simulation)
 
-> Fit `lm(Density ~ 1)`, `lm(Density ~ Stream - 1)`, and
-> `lme(Density ~ 1, random = ~ 1 | Stream)`. Compare pooling behaviour, residual
-> structure, shrinkage of the most extreme stream, and the ICC.
+> Simulate 24 streams with unequal effort (8 each at 2, 5 and 30 visits;
+> `set.seed(413)`, true $\tau = 12$, $\sigma = 20$, $\mu = 80$). (a) Predict by
+> hand the retention weight $B_i = \tau^2/(\tau^2 + \sigma^2/n_i)$ for 2 and 30
+> visits. (b) Fit `lme(Density ~ 1, random = ~ 1 | Stream)`, extract
+> $\hat\tau, \hat\sigma$, and tabulate mean |no-pooling − partial| by effort
+> group. (c) Explain why the formula behaves this way. (d) Find the most extreme
+> 2-visit stream and say which estimate you would report. (e) Reply to the
+> proposal to drop every stream with fewer than 5 visits.
 
 **My work:**
 
 ```{r}
-# Your R code here (Streams data frame is loaded above)
+library(nlme)
+set.seed(413)
+nvisit <- c(rep(2, 8), rep(5, 8), rep(30, 8))
+tau <- 12;  sig <- 20;  mu <- 80
+stream_mean <- rnorm(length(nvisit), mu, tau)
+Streams <- do.call(rbind, lapply(seq_along(nvisit), function(i)
+  data.frame(Stream = factor(i),
+             Density = rnorm(nvisit[i], stream_mean[i], sig))))
+m <- lme(Density ~ 1, random = ~ 1 | Stream, data = Streams)
+nopool  <- tapply(Streams$Density, Streams$Stream, mean)
+partial <- coef(m)[, 1]
+n_i     <- as.numeric(table(Streams$Stream))
+# Your B_i calculations and the table for (b) here
 ```
 
 **Answer / biological interpretation:**
@@ -80,16 +91,21 @@ dat$Z_TP         <- scale(dat$Trophic_Pos)[, 1]
 
 ---
 
-# Problem 2 — Length–weight random intercepts (length_weight.csv)
+# Problem 2 · Reading a mixed model someone else fitted (length_weight.csv)
 
-> Fit `lme(Weight ~ Length, random = ~ 1 | Subject)` (and the `lmer` equivalent).
-> Report the fixed slope, the among-subject intercept SD, the residual SD and ICC,
-> then test a random slope with `anova(..., refit = FALSE)`.
+> (a) From the printed nestling output alone: compute the ICC and say it in a
+> sentence, interpret the brood-size effect and its uncertainty, and give one
+> reason "brood size doesn't matter" is premature. (b) Back to `LenW`: report
+> the residual SD and ICC from `m1`, and contrast with the ICC implied by
+> Problem 1's true values. (c) Fit the random-slope model and compare it to
+> `m1b` with `anova(m1b, m_slope, refit = FALSE)`; explain why `refit = FALSE`.
 
 **My work:**
 
 ```{r}
-# Your R code here (LenW data frame is loaded above)
+m1  <- lme(Weight ~ Length, data = LenW, random = ~ 1 | Subject, method = "REML")
+m1b <- lmer(Weight ~ Length + (1 | Subject), data = LenW)
+# Your ICC arithmetic and the random-slope comparison here
 ```
 
 **Answer / biological interpretation:**
@@ -97,16 +113,35 @@ dat$Z_TP         <- scale(dat$Trophic_Pos)[, 1]
 
 ---
 
-# Problem 3 — Von Bertalanffy nonlinear mixed model (fish_growth.csv)
+# Problem 3 · Where does the fish-to-fish variation go? (simulation)
 
-> Fit the fixed-effect `nls` von Bertalanffy curve and the `nlme` version with a
-> random $L_\infty$ per fish. Compare residual structure and residual SE, and
-> interpret the per-fish BLUPs.
+> Simulate 12 fish at ages 1 to 8 (`set.seed(77)`; fish-to-fish SD of
+> $L_\infty$ = 12, measurement error = 3) and fit `nls` (one curve for all) and
+> `nlme` (random $L_\infty$). (a) Report the three SDs and say which fit
+> recovers both sources. (b) Work out where the wrong `nls` sigma comes from
+> using the fraction $1 - e^{-\kappa a}$. (c) Describe the `nls` residual plot
+> and say what is actually wrong with the model. (d) Compare the standard
+> errors of Kappa and Tzero between the fits. (e) Re-run with `nfish` = 4 and
+> 20 and report the estimated fish-to-fish SD.
 
 **My work:**
 
 ```{r}
-# Your R code here (AgeLen groupedData is loaded above)
+set.seed(77)
+nfish <- 12; ages <- 1:8
+Kap <- 0.25; T0 <- 0
+sd_Linf <- 12; sd_obs <- 3
+Linf_i <- rnorm(nfish, 100, sd_Linf)
+sim <- do.call(rbind, lapply(1:nfish, function(i) data.frame(
+  Subject = factor(i), Age = ages,
+  Length  = Linf_i[i]*(1-exp(-Kap*(ages - T0))) + rnorm(length(ages), 0, sd_obs))))
+gd <- groupedData(Length ~ Age | Subject, data = sim)
+fit_nls  <- nls(Length ~ Linf*(1-exp(-Kappa*(Age-Tzero))), data = sim,
+                start = c(Linf=100, Kappa=.2, Tzero=0))
+fit_nlme <- nlme(Length ~ Linf*(1-exp(-Kappa*(Age-Tzero))),
+                 fixed = Linf + Kappa + Tzero ~ 1, random = Linf ~ 1 | Subject,
+                 data = gd, start = c(Linf=100, Kappa=.2, Tzero=0))
+# Your comparisons here
 ```
 
 **Answer / biological interpretation:**
@@ -114,15 +149,29 @@ dat$Z_TP         <- scale(dat$Trophic_Pos)[, 1]
 
 ---
 
-# Problem 4 — Trophic position: crossed random effects (qcbs_w6_data.csv)
+# Problem 4 · Trophic position: a random-effect structure the data cannot support (qcbs_w6_data.csv)
 
-> Fit the candidate `lmer` models (M1, M3, M4, M7, M8), rank with `aictab()`, and
-> read the variance components of the best model. Discuss the few-levels risk.
+> Fit M1, M3, M4, M7 and M8 and rank them with `aictab()`. (a) Why are Lake and
+> Fish_Species random-effect candidates, and what would push you the other way?
+> (b) Write the bivariate Normal implied by `(1 + Z_Length | Fish_Species)` and
+> count its parameters. (c) Report the table, then run `isSingular()` on all
+> five fits. (d) Read the correlation off `VarCorr(M8)`, run the two
+> three-point simulations, and explain which parameter broke and why. (e) Fit
+> `M8u` with the `||` form and compare its SDs with M8's. (f) Decide which model
+> to report and justify it. (g) Say when you would switch species to a fixed
+> effect and what that costs.
 
 **My work:**
 
 ```{r}
-# Your R code here (dat data frame is loaded above)
+M1 <- lmer(Z_TP ~ Z_Length + (1|Fish_Species) + (1|Lake), data=dat, REML=TRUE)
+M3 <- lmer(Z_TP ~ Z_Length + (1|Fish_Species), data=dat, REML=TRUE)
+M4 <- lmer(Z_TP ~ Z_Length + (1|Lake), data=dat, REML=TRUE)
+M7 <- lmer(Z_TP ~ Z_Length + (1|Fish_Species) + (1+Z_Length|Lake), data=dat, REML=TRUE)
+M8 <- lmer(Z_TP ~ Z_Length + (1+Z_Length|Fish_Species) + (1|Lake), data=dat, REML=TRUE)
+aictab(list(M1=M1, M3=M3, M4=M4, M7=M7, M8=M8))
+sapply(list(M1=M1, M3=M3, M4=M4, M7=M7, M8=M8), lme4::isSingular)
+# Your VarCorr(M8), the three-point simulations, and M8u here
 ```
 
 **Answer / biological interpretation:**
@@ -130,7 +179,7 @@ dat$Z_TP         <- scale(dat$Trophic_Pos)[, 1]
 
 ---
 
-# Problem 5 — Detection probability: binomial GLMM
+# Problem 5 · Detection probability: binomial GLMM
 
 > Given the `VarCorr` output in the problem, interpret the covariate slope and
 > compare the two random-effect SDs, compute the detection probability at mean
@@ -147,7 +196,7 @@ dat$Z_TP         <- scale(dat$Trophic_Pos)[, 1]
 
 ---
 
-# Problem 6 — Nested random effects + overdispersion
+# Problem 6 · Nested random effects + overdispersion
 
 > Diagram the nesting, write the Poisson GLMM, distinguish `(1 | unit/transect)`
 > from `(1 | unit) + (1 | transect)`, and give the Pearson-dispersion check plus
@@ -180,7 +229,7 @@ knitr::include_graphics("images/problemN_derivation.jpg")
 # Submission checklist
 
 - [ ] Answered every morning (Part 1) problem from `problem_set.html`.
-- [ ] Loaded the data files (`stream_density.csv`, `length_weight.csv`, `fish_growth.csv`, `qcbs_w6_data.csv`) from `data/`.
+- [ ] Loaded `length_weight.csv` (Problem 2) and `qcbs_w6_data.csv` (Problem 4) from `data/`, and ran the simulation blocks for Problems 1 and 3 with the seeds given.
 - [ ] Knitted to HTML without errors.
 - [ ] Photos (if any) embedded with `self_contained: true` in the YAML.
 - [ ] Uploaded the `.html` to the matching Canvas assignment.

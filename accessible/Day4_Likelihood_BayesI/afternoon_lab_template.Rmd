@@ -1,5 +1,5 @@
 ---
-title: "FW 536 — Day 4 afternoon lab (Bayesian I · Nimble) — Your Name"
+title: "FW 536 · Day 4 afternoon lab (Bayesian I · Nimble) · Your Name"
 author: "Your Name Here"
 date: "`r Sys.Date()`"
 output:
@@ -16,7 +16,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 ```
 
-# Day 4 afternoon lab — Bayesian modeling problem set 1
+# Day 4 afternoon lab · Bayesian modeling problem set 1
 
 > **Topic scope.** These are the *afternoon* problems and use **Bayesian methods** (priors, posteriors, conjugacy, MCMC). Every fitted model is written in **Nimble** (`nimbleCode` + `nimbleMCMC`), not JAGS. The morning problems (maximum likelihood only) live in `morning_lab_template.Rmd`.
 
@@ -43,7 +43,7 @@ library(HDInterval)  # hdi() for highest-posterior-density intervals
 
 ---
 
-# Problem 5 — Bayesian survival with an informative prior
+# Problem 5 · Bayesian survival with an informative prior
 
 > 50 animals marked, 38 re-encountered alive. Prior Beta(11, 9) on annual survival $\phi$. Fit $y \sim \text{Binomial}(50, \phi)$ in Nimble with 3 chains; report posterior mean/median/BCI/HPDI and $\Pr(\phi > 0.7 \mid \text{data})$; verify against the closed-form Beta(49, 21) posterior.
 
@@ -58,7 +58,7 @@ library(HDInterval)  # hdi() for highest-posterior-density intervals
 
 ---
 
-# Problem 6 — Bayesian detection rate for a species of concern
+# Problem 6 · Bayesian detection rate for a species of concern
 
 > 25 point counts, `y = c(0,1,0,2,0,1,0,0,3,1,0,0,1,2,0,1,0,1,0,0,2,0,1,1,0)`, Poisson($\lambda$) with a Gamma(1, 1) prior. Fit in Nimble; report the posterior mean and 95% BCI; compute $\Pr(\lambda < 1 \mid y)$; verify against the closed-form Gamma$(1 + \sum y, 1 + n)$ posterior.
 
@@ -73,9 +73,9 @@ library(HDInterval)  # hdi() for highest-posterior-density intervals
 
 ---
 
-# Problem 7 — Bayesian logistic (r/K) growth with derived quantities (Logistic.csv)
+# Problem 7 · Bayesian logistic (r/K) growth with derived quantities (Logistic.csv)
 
-> Refit the per-capita logistic model from morning Problem 4 in Nimble with priors $K \sim U(0, 4000)$, $r \sim U(0, 2)$, $\sigma \sim U(0, 2)$. Report posteriors for $r$, $K$, $\sigma$; add derived quantities MSY $= rK/4$ and $N_{\max} = K/2$; compute $\Pr(r > 0.22 \mid y)$ and compare the BCI vs HPDI for $\sigma$. Scaffold: `Logistic_BayesianGrowth_Nimble.R`.
+> Refit the per-capita logistic model from morning Problem 4 in Nimble with priors $K \sim U(0, 4000)$, $r \sim U(0, 2)$, $\sigma \sim U(0, 2)$. (a, b) Report posteriors for $r$, $K$, $\sigma$ and check $r$ against the MLE. (c) Add derived nodes MSY $= rK/4$ and $N_{\max} = K/2$ and report medians and HPDIs. (d) Compute $\Pr(r > 0.22 \mid y)$ and compare the BCI and HPDI for $\sigma$. (e) Compute $\Pr(\text{MSY} < Q \mid y)$ for $Q = 55, 60, 62, 65, 70$ and defend a quota. (f) Refit under $K \sim U(0, 2000)$, $U(0, 4000)$ and $U(0, 20000)$, on the full data and on the first eight rows, and say when a bounded uniform prior deserves to be called uninformative. Scaffold: `Logistic_BayesianGrowth_Nimble.R`.
 
 ```{r}
 # Load exactly as in the lab:
@@ -94,7 +94,7 @@ library(HDInterval)  # hdi() for highest-posterior-density intervals
 
 ---
 
-# Problem 8 — Prior sensitivity in a data-poor problem
+# Problem 8 · Prior sensitivity in a data-poor problem
 
 > 3 detections in 20 surveys. Compare posteriors under Beta(1,1), Beta(1,9), Beta(20,30), Beta(100,100). Which is closest to the MLE $\hat p = 0.15$? Which prior most plausibly produced a reported posterior mean of 0.49, and what would you raise as a reviewer? (Closed-form Beta–Binomial; no MCMC needed.)
 
@@ -109,7 +109,7 @@ library(HDInterval)  # hdi() for highest-posterior-density intervals
 
 ---
 
-# Problem 9 — BCI vs HPDI for a skewed posterior
+# Problem 9 · BCI vs HPDI for a skewed posterior
 
 > Posterior Gamma(40, 13). Compute mean, mode, median, 95% BCI, 95% HPDI (`HDInterval::hdi()`); plot the density with both intervals; explain when BCI and HPDI separate.
 
@@ -124,9 +124,9 @@ library(HDInterval)  # hdi() for highest-posterior-density intervals
 
 ---
 
-# Problem 10 — Identifiability and label switching in a Bayesian mixture
+# Problem 10 · Identifiability and label switching in a Bayesian mixture
 
-> Refit the whale-blow mixture (morning Problem 3) in Nimble. (a) Explain geometrically why $\hat R$ explodes even though each chain has converged. (b) Reproduce the pathology: run the unconstrained model with chain 2 started from the mirrored labeling, and record $\hat R$ for `lam[1]`. (c) Add the ordering constraint $\lambda_1 < \lambda_2$, rerun, and confirm the fix. (d) Discuss the bias of post hoc relabeling and when it is justified. **Both runs are required — report $\hat R$ for $\lambda_1$ before and after the constraint.**
+> Refit the whale-blow mixture (morning Problem 3) in Nimble. (a) Explain geometrically why $\hat R$ explodes even though each chain has converged. (b) Reproduce the pathology: run the unconstrained model with chain 2 started from the mirrored labeling, and record $\hat R$ for `lam[1]`. (c) Add the ordering constraint $\lambda_1 < \lambda_2$, rerun, and confirm the fix. (d) Discuss the bias of post hoc relabeling and when it is justified. **Both runs are required. Report $\hat R$ for $\lambda_1$ before and after the constraint.**
 
 **My work:**
 

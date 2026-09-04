@@ -1,5 +1,5 @@
 ---
-title: "FW 536 — Day 3 afternoon lab (model selection) — Your Name"
+title: "FW 536 · Day 3 afternoon lab (model selection) · Your Name"
 author: "Your Name Here"
 date: "`r Sys.Date()`"
 output:
@@ -16,7 +16,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 ```
 
-# Day 3 afternoon lab — Model selection problem set
+# Day 3 afternoon lab · Model selection problem set
 
 This template matches the afternoon (Part 2) problems in
 [`problem_set.html`](problem_set.html#afternoon). Read each problem statement there,
@@ -42,7 +42,7 @@ options(na.action = "na.fail")   # required by MuMIn::dredge()
 ```
 
 ```{r data}
-# Problem 10 uses the real trophic-position data (fixed factors this time).
+# Problem 9 uses the real trophic-position data (fixed factors this time).
 dat <- read.csv("data/qcbs_w6_data.csv")
 dat$Fish_Species <- as.factor(dat$Fish_Species)
 dat$Lake         <- as.factor(dat$Lake)
@@ -51,15 +51,42 @@ dat$Z_Length     <- scale(dat$Fish_Length)[, 1]
 
 ---
 
-# Problem 7 — What does $\Delta\text{AIC} = 1.5$ actually mean?
+# Problem 7 · How often does each criterion pick noise as "best"? (simulation)
 
-> Simulate a strong real effect plus a pure-noise predictor and record how often
-> the junk model lands within 2 AIC units of the correct one.
+> (a) Bring across the walkthrough loop (response unrelated to three predictors,
+> `set.seed(126)`, 500 reps) and its four proportions. (b) Add the strict rule:
+> accept the AICc winner only if it beats the runner-up by more than 2 units.
+> Record how often a winner is more than 2 clear, how often that winner still
+> holds a noise predictor, and the overall rate. (c) Explain how the strict rule
+> lowers the false-positive rate, using the median gap. (d) Repeat for BIC and
+> fill in the comparison table. (e) Explain why BIC declares a clear winner more
+> often, and how it can be both more trustworthy when it commits and more often
+> confidently wrong overall.
 
 **My work:**
 
 ```{r}
-# Your R code here
+set.seed(126)
+n <- 50; a <- 5; sdy <- 3
+nummodels <- 500
+pstor <- AICstor <- AICcstor <- BICstor <- rep(NA, nummodels)
+noise_top <- gap <- rep(NA, nummodels)
+for (i in 1:nummodels) {
+  y <- rnorm(n, mean = a, sd = sdy)
+  x1 <- runif(n); x2 <- runif(n); x3 <- runif(n)
+  d <- data.frame(y, x1, x2, x3)
+  reg <- lm(y ~ ., data = d)
+  pstor[i]    <- sum(summary(reg)$coefficients[2:4, 4] < 0.05)
+  AICstor[i]  <- sum(!is.na(dredge(reg, rank = "AIC")[1, 2:4]))
+  dd          <- dredge(reg, rank = "AICc")
+  AICcstor[i] <- sum(!is.na(dd[1, 2:4]))
+  noise_top[i] <- AICcstor[i]
+  gap[i]       <- dd$AICc[2] - dd$AICc[1]
+  BICstor[i]  <- sum(!is.na(dredge(reg, rank = "BIC")[1, 2:4]))
+}
+data.frame(p = mean(pstor > 0), AIC = mean(AICstor > 0),
+           AICc = mean(AICcstor > 0), BIC = mean(BICstor > 0))
+# Your strict-rule summaries and the BIC comparison here
 ```
 
 **Answer / biological interpretation:**
@@ -67,15 +94,27 @@ dat$Z_Length     <- scale(dat$Fish_Length)[, 1]
 
 ---
 
-# Problem 8 — Type I error of AIC / AICc / BIC on pure noise
+# Problem 8 · When BIC misses a weak-but-real effect (simulation)
 
-> Response unrelated to three predictors; `dredge()` every subset; record how often
-> the top model retains a noise variable under each criterion.
+> Three predictors with known effects (strong 0.8, modest −0.4, weak 0.1;
+> `set.seed(11)`, n = 60). (a) Run the single simulation and report which
+> predictors each criterion keeps. (b) Wrap it in a 500-rep loop and report the
+> retention proportion of each predictor under AIC, AICc and BIC. (c) Say which
+> criterion you would use for "is the weak predictor worth studying further?"
+> and which for "does the weak signal generalize?". (d) Rerun (b) and the
+> Problem 7 noise loop at n = 500, fill in the power / Type I table, and explain
+> the two behaviours from the penalties 2 and ln n.
 
 **My work:**
 
 ```{r}
-# Your R code here (options(na.action = "na.fail") is set above)
+set.seed(11); n <- 60
+strong <- runif(n); modest <- runif(n); weak <- runif(n)
+y <- 0.8*strong - 0.4*modest + 0.1*weak + rnorm(n, 0, 0.5)
+d <- data.frame(y, strong, modest, weak)
+m <- lm(y ~ strong + modest + weak, data = d)
+dredge(m, rank = "AIC"); dredge(m, rank = "AICc"); dredge(m, rank = "BIC")
+# Your 500-rep loop here
 ```
 
 **Answer / biological interpretation:**
@@ -83,15 +122,29 @@ dat$Z_Length     <- scale(dat$Fish_Length)[, 1]
 
 ---
 
-# Problem 9 — BIC vs AIC on a weak-but-real effect
+# Problem 9 · AIC vs LOOCV on the trophic-position data (qcbs_w6_data.csv)
 
-> Three predictors (strong / modest / weak). Report the proportion of 500 reps in
-> which each criterion retains each predictor.
+> Rank the six candidate fixed-effect models by AICc and by LOOCV MSE
+> (`cv.glm`). (a) Report the table; do the two criteria agree? (b) Compute
+> $\Delta$AICc and Akaike weights; is there a cluster within 2 units? (c)
+> Compare the best model's LOOCV MSE to `var(dat$Trophic_Pos)`. (d) Say which
+> criterion you would trust for pure prediction, and one way AICc could mislead
+> at this sample size.
 
 **My work:**
 
 ```{r}
-# Your R code here
+forms <- list(
+  null     = Trophic_Pos ~ 1,
+  length   = Trophic_Pos ~ Z_Length,
+  len_sp   = Trophic_Pos ~ Z_Length + Fish_Species,
+  len_lk   = Trophic_Pos ~ Z_Length + Lake,
+  full     = Trophic_Pos ~ Z_Length + Fish_Species + Lake,
+  interact = Trophic_Pos ~ Z_Length * Fish_Species + Lake)
+cv   <- sapply(forms, function(f) cv.glm(dat, glm(f, data = dat))$delta[1])
+aicc <- sapply(forms, function(f) AICc(glm(f, data = dat)))
+data.frame(cv_MSE = round(cv, 4), AICc = round(aicc, 1))
+# Your weights and variance comparison here
 ```
 
 **Answer / biological interpretation:**
@@ -99,31 +152,21 @@ dat$Z_Length     <- scale(dat$Fish_Length)[, 1]
 
 ---
 
-# Problem 10 — AIC vs LOOCV on the trophic-position data (qcbs_w6_data.csv)
+# Problem 10 · Model averaging, evidence ratios, and asking the right question
 
-> Rank candidate fixed-effect models by AICc and by LOOCV MSE (`cv.glm`), compute
-> Akaike weights, and compare the best model's CV MSE to `var(Trophic_Pos)`.
-
-**My work:**
-
-```{r}
-# Your R code here (dat data frame is loaded above)
-```
-
-**Answer / biological interpretation:**
-
-
----
-
-# Problem 11 — Multimodel inference and the "right question" trap
-
-> From the AICc table, confirm the Akaike weights, discuss averaging coefficients
-> vs predictions, and re-frame the temperature question as an evidence ratio.
+> From the four-model AICc table: (a) write the Akaike-weight formula, confirm
+> the weights, and list the models "competitive" by the 2-unit rule. (b)
+> Explain why averaging coefficients can mislead but averaging predictions is
+> usually safer. (c) Compute the summed weight of models with temperature vs
+> without and interpret it as an evidence ratio. (d) Interpret
+> $\hat\beta_T = 0.03$ (SE 0.02) and name the single extra number you would
+> report.
 
 **My work:**
 
 ```{r}
-# Your R code here
+delta <- c(M3 = 0, M1 = 0.6, M2 = 1.9, M0 = 4.7)
+# Your weights and evidence ratio here
 ```
 
 **Answer / biological interpretation:**

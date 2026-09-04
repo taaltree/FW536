@@ -1,5 +1,5 @@
 ---
-title: "FW 536 — R Markdown tutorial starter"
+title: "FW 536 · R Markdown tutorial starter"
 author: "Your Name Here"
 date: "`r Sys.Date()`"
 output:
@@ -112,6 +112,6 @@ multiplies expected `y` by approximately
    folder as the `.Rmd`.
 3. Upload the `.html` to the Canvas assignment.
 
-Tip — always **Restart R** (Session menu) and re-knit from a fresh
+Tip: always **Restart R** (Session menu) and re-knit from a fresh
 session before submitting, to catch bugs that depend on hidden console
 state.

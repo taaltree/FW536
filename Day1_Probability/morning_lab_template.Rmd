@@ -1,5 +1,5 @@
 ---
-title: "FW 536 — Day 1 morning lab (Probability) — Your Name"
+title: "FW 536 · Day 1 morning lab (Probability) · Your Name"
 author: "Your Name Here"
 date: "`r Sys.Date()`"
 output:
@@ -16,7 +16,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 ```
 
-# Day 1 morning lab — Probability problem set
+# Day 1 morning lab · Probability problem set
 
 This template matches the morning problems (1–6) in [`problem_set.html`](problem_set.html).
 Read each problem statement there, write your work below, **Knit** to HTML, and
@@ -39,7 +39,7 @@ library(dplyr)
 
 ---
 
-# Problem 1 — Acoustic detection of tagged steelhead
+# Problem 1 · Acoustic detection of tagged steelhead
 
 > A tagged steelhead passes through a river reach with two independent acoustic
 > receivers. Given the fish is present, each detects the tag with probability 0.85.
@@ -56,7 +56,7 @@ library(dplyr)
 
 ---
 
-# Problem 2 — eDNA detection of invasive carp
+# Problem 2 · eDNA detection of invasive carp
 
 > Prior P(carp present) = 0.20; assay sensitivity 0.92, specificity 0.97.
 > (a) Posterior after one positive. (b) After two positives. (c) Effect of a 0.02 prior.
@@ -76,7 +76,7 @@ head(edna)
 
 ---
 
-# Problem 3 — Combining two survey indices
+# Problem 3 · Combining two survey indices
 
 > Aerial count $X$: $E[X]=40$, $SD=6$ (Var $=36$). Ground transect $Y$: $E[Y]=30$, $SD=8$
 > (Var $=64$). $X$ and $Y$ independent. Use only $E[aX+b]=aE[X]+b$,
@@ -87,9 +87,9 @@ head(edna)
 > or smaller than that of the total $T$, and why?
 > (d) If $X$ and $Y$ were in fact *positively correlated* (good survey conditions inflate both),
 > which of your variance answers in (b) and (c) would be wrong, and would the true variance be
-> larger or smaller than what you computed? One or two sentences — no calculation needed.
+> larger or smaller than what you computed? One or two sentences, no calculation needed.
 
-**My work:** (algebra — no simulation needed)
+**My work:** (algebra, no simulation needed)
 
 
 **Answer / interpretation:**
@@ -97,14 +97,14 @@ head(edna)
 
 ---
 
-# Problem 4 — Isolated callers along a ridgeline
+# Problem 4 · Isolated callers along a ridgeline
 
 > n = 30 cougars in a line; each calls independently with p = 0.3. An "isolated caller"
 > calls while neither neighbor calls. Using the 28 interior cougars:
 > (a) E[X] via indicator variables. (b) Verify by simulation (20,000 reps).
 > (c) Would positive correlation between neighbors change the expected value you found in (a)?
-> Would it change the *variance* of the number of isolated callers? Say which of the two —
-> mean, variance, or both — is affected, and why.
+> Would it change the *variance* of the number of isolated callers? Say which of the two,
+> mean, variance, or both, is affected, and why.
 
 **My work:**
 
@@ -118,7 +118,7 @@ set.seed(1)
 
 ---
 
-# Problem 5 — Grizzly bear DNA from hair snares
+# Problem 5 · Grizzly bear DNA from hair snares
 
 > Detection given a bear is present p = 0.18; bears present at 60% of stations; no
 > false positives. (a) P(at least one sample) at a random station. (b) P(present | at
@@ -135,7 +135,7 @@ set.seed(1)
 
 ---
 
-# Problem 6 — Fishers vote on a regulation
+# Problem 6 · Fishers vote on a regulation
 
 > Twenty fishers each vote "yes" independently with probability $0.4$. Treat the number of yes
 > votes as a sum of twenty independent 0/1 votes.
@@ -170,7 +170,7 @@ to this `.Rmd`. See the [R Markdown tutorial](../rmarkdown_tutorial.html) for de
 
 - [ ] Answered every morning problem (1–6) from `problem_set.html`.
 - [ ] Loaded `data/edna_carp_results.csv` for Problem 2 (kept the `data/` folder next to this file).
-- [ ] Set a seed before each simulation (Problem 4; also 10 and 11 in the afternoon set).
+- [ ] Set a seed before the simulation in Problem 4.
 - [ ] Knitted to HTML without errors.
 - [ ] Photos (if any) embedded with `self_contained: true` in the YAML.
 - [ ] Uploaded the `.html` to the matching Canvas assignment.

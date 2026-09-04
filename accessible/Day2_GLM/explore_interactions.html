@@ -82,9 +82,9 @@
       <input type="range" id="b3" min="-2" max="2" step="0.05" value="0"></div>
     <div class="ctl"><label for="link">Link / scale</label>
       <select id="link" style="width:100%;padding:6px;border:1px solid var(--border);border-radius:6px;">
-        <option value="identity">identity (Gaussian) — plot the linear predictor</option>
-        <option value="logit">logit (binomial) — plot the probability</option>
-        <option value="log">log (Poisson) — plot the expected count</option>
+        <option value="identity">identity (Gaussian): plot the linear predictor</option>
+        <option value="logit">logit (binomial): plot the probability</option>
+        <option value="log">log (Poisson): plot the expected count</option>
       </select></div>
   </div>
 
@@ -274,7 +274,10 @@
     var s="<b>"+(p.link==="identity"?"Identity link":p.link==="logit"?"Logit link":"Log link")+"</b>. "+
       "Model: &beta;<sub>0</sub>="+p.b0.toFixed(1)+", &beta;<sub>1</sub>="+p.b1.toFixed(1)+
       ", &beta;<sub>2</sub>="+p.b2.toFixed(1)+", interaction &beta;<sub>3</sub>=<b>"+p.b3.toFixed(2)+"</b>. ";
-    s+="The effect of x<sub>1</sub> at x<sub>2</sub>=0 is <b>"+slopeLow.toFixed(3)+
+    s+="On the link scale the slope in x<sub>1</sub> is &beta;<sub>1</sub> + &beta;<sub>3</sub>x<sub>2</sub> = "+p.b1.toFixed(1)+
+       (p.b3>=0?" + ":" &minus; ")+Math.abs(p.b3).toFixed(2)+"&middot;x<sub>2</sub>"+
+       (p.link==="identity"?"":", and on the response scale it is that quantity times the link's own steepness ("+(p.link==="logit"?"p(1&minus;p)":"&mu;")+")")+". "+
+       "The effect of x<sub>1</sub> at x<sub>2</sub>=0 is <b>"+slopeLow.toFixed(3)+
        "</b>; at x<sub>2</sub>=+2 it is <b>"+slopeHigh.toFixed(3)+"</b>. ";
     var same=Math.abs(slopeHigh-slopeLow)<1e-6;
     if(same) s+="Those are equal, so the effect of x<sub>1</sub> does not depend on x<sub>2</sub> here. ";

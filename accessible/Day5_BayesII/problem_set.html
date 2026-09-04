@@ -2,7 +2,7 @@
 <html lang="en" data-a11y="done">
 <head>
 <meta charset="UTF-8" />
-<title>Day 5 · Problem Set — Hierarchical &amp; Latent-State Bayesian Models | FW 536 · Student copy (no answers)</title>
+<title>Day 5 · Problem Set · Hierarchical &amp; Latent-State Bayesian Models | FW 536 · Student copy (no answers)</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="stylesheet" href="../_Shared/css/accessible.css" />
 <script defer src="../_Shared/js/accessible.js"></script>
@@ -23,7 +23,7 @@ MathJax = {
 
 <aside class="sidebar">
  <p class="brand"><a href="../index.html" title="Back to course home">FW 536 · Day 5</a></p>
- <div class="subtitle">Assessed Problem Set — Hierarchical &amp; Latent-State Models</div>
+ <div class="subtitle">Assessed Problem Set · Hierarchical &amp; Latent-State Models</div>
  <nav aria-label="On this page and related documents">
  <div class="section">Problems</div>
  <ul>
@@ -51,14 +51,14 @@ MathJax = {
 <header class="lab-header">
  <div class="eyebrow">Day 5 · Assessed problem set · 20 pts · the only graded set on Day 5</div>
  <h1>Hierarchical &amp; latent-state Bayesian inference on real data</h1>
- <p class="lede">Ten graded problems in <span class="pill nimble">NIMBLE</span> spanning hierarchical Poisson, multilevel pooling, Bayesian logistic regression, spawner-recruit derived management quantities, and latent-state models &mdash; fit on the datasets in <code>data/</code> wherever possible.</p>
+ <p class="lede">Ten graded problems in <span class="pill nimble">NIMBLE</span> spanning hierarchical Poisson, multilevel pooling, Bayesian logistic regression, spawner-recruit derived management quantities, and latent-state models, fit on the datasets in <code>data/</code> wherever possible.</p>
 </header>
 
 <section class="callout warn" style="margin-top:24px;"><p class="callout-label">Watch out</p><p><strong>Assessed problem set &middot; hand-in required.</strong> Answers are <em>not</em> shown here. Write your reasoning, R code, numeric answers, and biological interpretation in <a href="morning_lab_template.Rmd"><code>morning_lab_template.Rmd</code></a>, knit to HTML, and upload the <code>.html</code> to the Canvas assignment.</p><p>All models are fit in <span class="pill nimble">NIMBLE</span>. For worked-example study with visible answers, see <a href="lab.html">the main lab (in-class practice)</a>.</p></section>
 
 <section>
 <div class="callout plain"><p class="callout-label">Plain-language summary</p>
-<p>Six of the ten problems use the real datasets shipped in this Day's <code>data/</code> folder &mdash; <code>ants.csv</code>, <code>N2OEmission.csv</code>, and <code>IslandsLizards.csv</code>. Each of those problems shows the <code>read.csv()</code> call you should start from; run it, then build the requested model. The remaining four problems (spawner-recruit and latent-state) simulate their data in the same code block, following the patterns in the accompanying Nimble scripts.</p>
+<p>Five of the ten problems use the real datasets shipped in this Day's <code>data/</code> folder: <code>ants.csv</code>, <code>N2OEmission.csv</code>, and <code>IslandsLizards.csv</code>. Each of those problems shows the <code>read.csv()</code> call you should start from; run it, then build the requested model. The remaining five problems (the prior-predictive draws in Problem 2, spawner-recruit, and the latent-state models) simulate their data in the same code block, following the patterns in the accompanying Nimble scripts.</p>
 <p>Set <code>samplesAsCodaMCMC = TRUE</code> in every <code>nimbleMCMC()</code> call so <code>coda</code> diagnostics (<code>gelman.diag</code>, <code>effectiveSize</code>) work directly. Report R-hat and effective sample size for the parameters you interpret.</p>
 </div>
 </section>
@@ -99,9 +99,9 @@ ants$elevation &lt;- <span class="fn">as.numeric</span>(<span class="fn">scale</
 <div class="exercise" id="p2">
 <span class="ex-tag">Problem 2</span><span class="difficulty easy"> · what a prior actually claims</span>
 <h3>What does a "vague" log-scale prior actually assert?</h3>
-<p>Practice Exercise M1 had you draw from a vague log-scale prior and look at the multiplicative effect it implies across the latitude range; Practice Exercise M2 showed what that same prior does to the <em>chains</em> when the predictors are unscaled. This problem picks the M1 draw back up and takes it two steps further: onto a per-unit effect you can state in a sentence, and into an argument you would actually have with a reviewer. On a log link a prior on $\beta$ is a prior on a multiplicative effect $e^\beta$, and that translation is where "uninformative" priors stop being uninformative.</p>
+<p>Practice Exercise M1 had you draw from a vague log-scale prior and look at the multiplicative effect it implies across the latitude range; Practice Exercise M2 showed what that same prior does to the <em>chains</em> when the predictors are unscaled. This problem picks the M1 draw back up and takes it two steps further, onto a per-unit effect you can state in a sentence, and into an argument you would actually have with a reviewer. On a log link a prior on $\beta$ is a prior on a multiplicative effect $e^\beta$, and that translation is where "uninformative" priors stop being uninformative.</p>
 <ol type="a">
- <li>Draw $10^5$ values from $\mathcal{N}(0,\ \sigma^2 = 10000)$ &mdash; the classic "vague" choice. Report the fraction for which $e^{\beta}$ exceeds a million-fold, and the fraction for which the effect exceeds a million-fold <em>in either direction</em>. State the second number in a sentence beginning "before seeing any data, this prior says&hellip;".</li>
+ <li>Draw $10^5$ values from $\mathcal{N}(0,\ \sigma^2 = 10000)$, the classic "vague" choice. Report the fraction for which $e^{\beta}$ exceeds a million-fold, and the fraction for which the effect exceeds a million-fold <em>in either direction</em>. State the second number in a sentence beginning "before seeing any data, this prior says&hellip;".</li>
  <li>Repeat with $\mathcal{N}(0,\ \sigma^2 = 4)$. Report the same fraction, and also the central 95% range of multiplicative effects this prior allows (i.e. $e^{\pm 1.96 \times 2}$). Is that range wide enough for any ecological effect you have ever measured?</li>
  <li>A reviewer objects that $\mathcal{N}(0, 4)$ is "informative" and demands $\mathcal{N}(0, 10000)$ for objectivity. Using your two numbers, write the two-sentence reply you would actually send.</li>
 </ol>
@@ -133,16 +133,16 @@ nsites &lt;- <span class="fn">length</span>(<span class="fn">unique</span>(group
 <h3>Modeling the random intercept with a site-level covariate</h3>
 <p>Extend the partial-pooling model from Problem 3 so the per-site mean intercept is itself regressed on a <strong>site-level covariate</strong> $w_j$ (a per-site summary derived from the data), and let the N-input slope vary by fertilizer type (<code>fert.index</code>):</p>
 <div class="eq-block">$\alpha_j \sim \mathcal{N}(\kappa + \eta\, w_j,\ \sigma_\alpha^2), \qquad \beta_{k} \sim \mathcal{N}(\mu_\beta, \sigma_\beta^2)$</div>
-<p>Build $w_j$ from each site's soil organic carbon (the <code>carbon</code> column, a percentage) &mdash; e.g. its logit $\log\!\big(c_j/(100-c_j)\big)$ &mdash; and state how you scaled it.</p>
-<div class="callout key" style="margin-top:12px;"><p class="callout-label">Key idea</p><p><strong>A group-level covariate.</strong> Here the site intercept is no longer a black-box draw from $\mathcal{N}(\mu_\alpha,\sigma_\alpha^2)$ but is given a <em>group-level predictor</em> $w_j$. Writing it as a regression on the intercept, $\alpha_j \sim \mathcal{N}(\kappa+\eta\, w_j, \sigma_\alpha^2)$, is <em>the same model</em> as carrying $w_j$ as an ordinary term in the linear predictor with a mean-zero site random effect &mdash; two notations, one likelihood and one set of predictions. What the covariate buys you (versus a random intercept with <em>no</em> covariate) is real either way: it explains <em>why</em> sites differ (through the posterior of $\eta$), it sharpens shrinkage (a data-poor site is pulled toward what its own covariate predicts, not just the grand mean), and it lets you predict the baseline emission of an unsampled site from its covariate. See section C of the <a href="lab.html#hier">practice lab</a> for the worked intuition.</p></div>
+<p>Build $w_j$ from each site's soil organic carbon (the <code>carbon</code> column, a percentage), e.g. its logit $\log\!\big(c_j/(100-c_j)\big)$, and state how you scaled it.</p>
+<div class="callout key" style="margin-top:12px;"><p class="callout-label">Key idea</p><p><strong>A group-level covariate.</strong> Here the site intercept is no longer a black-box draw from $\mathcal{N}(\mu_\alpha,\sigma_\alpha^2)$ but is given a <em>group-level predictor</em> $w_j$. Writing it as a regression on the intercept, $\alpha_j \sim \mathcal{N}(\kappa+\eta\, w_j, \sigma_\alpha^2)$, is <em>the same model</em> as carrying $w_j$ as an ordinary term in the linear predictor with a mean-zero site random effect: two notations, one likelihood and one set of predictions. What the covariate buys you (versus a random intercept with <em>no</em> covariate) is real either way. It explains <em>why</em> sites differ (through the posterior of $\eta$), it sharpens shrinkage (a data-poor site is pulled toward what its own covariate predicts, not just the grand mean), and it lets you predict the baseline emission of an unsampled site from its covariate. See section C of the <a href="lab.html#hier">practice lab</a> for the worked intuition.</p></div>
 <div class="callout key" style="margin-top:12px;"><p class="callout-label">Key idea</p><p><strong>And why let the slope vary?</strong>
 A single $\beta$ asserts that every fertilizer converts nitrogen input into emissions at the same
 rate. That is a strong claim, and it is one you make by accident every time you fit one slope to
-pooled data. Letting $\beta_k$ vary buys three things: it lets you ask a question the pooled model
-cannot phrase &mdash; does the response <em>depend on what you spread?</em> &mdash; it stops a
+pooled data. Letting $\beta_k$ vary buys three things. It lets you ask a question the pooled model
+cannot phrase (does the response <em>depend on what you spread?</em>), it stops a
 heavily-sampled fertilizer from setting the slope for all the others, and it makes
 $\sigma_\beta$ itself an answer, since a small $\sigma_\beta$ is positive evidence that the
-pooled model was fine. Notice the price: ten slopes estimated from between 12 and 161 observations
+pooled model was fine. Notice the price. Ten slopes are estimated from between 12 and 161 observations
 each. That is precisely the setting in which the largest estimate is most often just the noisiest
 group, which is what part (b) makes you check.</p></div>
 
@@ -202,7 +202,7 @@ R &lt;- <span class="fn">numeric</span>(Nyears)
   R[t] &lt;- (a.t*S[t])/(<span class="nu">1</span> + a.t/b.t*S[t]) * <span class="fn">exp</span>(<span class="fn">rnorm</span>(<span class="nu">1</span>, <span class="nu">0</span>, sig.t))</code></pre>
 <div class="callout key" style="margin-top:12px;"><p class="callout-label">Key idea</p><p><strong>What this problem is for.</strong>
 Nobody manages a fishery by $a$ and $b$. They manage by an escapement target and a harvest rate,
-which are nonlinear functions of $a$ and $b$ &mdash; and once those functions sit inside the model as
+which are nonlinear functions of $a$ and $b$, and once those functions sit inside the model as
 deterministic nodes, NIMBLE evaluates them at every draw and hands you their full posteriors for
 free, correlations and all. The walkthrough fitted the curve; this problem is about what you can
 then <em>say</em>, and about the fact that a derived quantity does not simply inherit the uncertainty
@@ -210,13 +210,12 @@ of the parameters underneath it.</p></div>
 <ol type="a">
  <li><strong>Fit, with the reference points inside the model.</strong> Monitor
  $a,b,\sigma,N_\text{eq},S_\text{msy},H_\text{msy}$. Before you look at the output, work out the
- three <em>true</em> reference points by hand, substituting $a=5$ and $b=5000$ into the formulas above
- &mdash; doing that arithmetic yourself is how you sanity-check any assessment. Report posterior
+ three <em>true</em> reference points by hand, substituting $a=5$ and $b=5000$ into the formulas above. Doing that arithmetic yourself is how you sanity-check any assessment. Report posterior
  medians and 95% CIs for all six quantities next to your hand-computed truths. Does every interval
  cover?</li>
  <li><strong>Read the formulas before you read the output.</strong> $H_\text{msy} = 1-\sqrt{1/a}$
  contains no $b$ at all, while $N_\text{eq}$ and $S_\text{msy}$ both scale with it. Say what that
- means for a real assessment: which of the three could you still estimate for a stock whose absolute
+ means for a real assessment. Which of the three could you still estimate for a stock whose absolute
  abundance you have no handle on, and which ones collapse without it?</li>
  <li><strong>A harvest rate with a risk statement attached.</strong> The posterior median of
  $H_\text{msy}$ is, by construction, the harvest rate with a 50% chance of exceeding the true one.
@@ -229,7 +228,7 @@ of the parameters underneath it.</p></div>
  <li><strong>Which quantity is best determined?</strong> Compute the coefficient of variation
  (posterior SD &divide; posterior median) for $a$, $b$, $N_\text{eq}$, $S_\text{msy}$ and
  $H_\text{msy}$, and rank them. You should find that <em>two of the derived quantities are more
- precisely determined than the parameters they are built from</em> &mdash; which sounds impossible if
+ precisely determined than the parameters they are built from</em>, which sounds impossible if
  you think of uncertainty as something that only accumulates. Explain how it happens. One reason is
  visible in the shape of $1-\sqrt{1/a}$; the other you can see by computing
  <code>cor(a, b)</code> across your draws.</li>
@@ -241,14 +240,14 @@ of the parameters underneath it.</p></div>
 <div class="exercise" id="p8">
 <span class="ex-tag">Problem 8</span><span class="difficulty medium"> · derived quantities, done properly</span>
 <h3>Why you cannot build a derived quantity from summary numbers</h3>
-<p>You have posterior draws of $a$ and $b$ from Problem 7. Management quantities are functions of those parameters, and there are two ways to produce an interval for them &mdash; one right, one that looks reasonable and is not.</p>
+<p>You have posterior draws of $a$ and $b$ from Problem 7. Management quantities are functions of those parameters, and there are two ways to produce an interval for them, one right and one that looks reasonable and is not.</p>
 <ol type="a">
- <li>Compute $S_\text{msy} = b\sqrt{1/a} - b/a$ <strong>once per draw</strong>, then take the 5th, 50th and 95th percentiles of the result. Now do it the other way: take the 5th, 50th and 95th percentiles of $a$ and of $b$ separately, and substitute those numbers into the formula. Report both sets of three numbers and the percentage difference at the 5th percentile.</li>
+ <li>Compute $S_\text{msy} = b\sqrt{1/a} - b/a$ <strong>once per draw</strong>, then take the 5th, 50th and 95th percentiles of the result. Now do it the other way. Take the 5th, 50th and 95th percentiles of $a$ and of $b$ separately, and substitute those numbers into the formula. Report both sets of three numbers and the percentage difference at the 5th percentile.</li>
  <li>Explain why the two disagree. What does <code>cor(a, b)</code> across your draws have to do with it, and why does summarising each parameter first throw away exactly the information the derived quantity needs?</li>
  <li>Now repeat the comparison for $H_\text{msy} = 1 - \sqrt{1/a}$. The two approaches agree here, to the digit. What is different about this quantity, and what does that tell you about when the shortcut is safe? State the general rule in one sentence.</li>
  <li>In one sentence, contrast how a frequentist MLE fit would produce a precautionary interval for $S_\text{msy}$ (bootstrap or the delta method) with how Bayes produces it directly.</li>
 </ol>
-<div class="callout warn" style="margin-top:12px;"><p class="callout-label">Watch out</p><strong>Watch out.</strong> The disagreement in (a) is not large &mdash; single-digit percentages on these data. The size is not the lesson; the reason is. A quantity built from several correlated parameters can be badly wrong this way when the correlation is strong or the function is sharply curved, and you will not get a warning.</div>
+<div class="callout warn" style="margin-top:12px;"><p class="callout-label">Watch out</p><strong>Watch out.</strong> The disagreement in (a) is not large, single-digit percentages on these data. The size is not the lesson; the reason is. A quantity built from several correlated parameters can be badly wrong this way when the correlation is strong or the function is sharply curved, and you will not get a warning.</div>
 <div class="callout try" style="margin-top: 12px;"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Report both sets of percentiles, the percentage difference, your explanation, and the general rule from (c).</div>
 </div>
 
@@ -256,7 +255,7 @@ of the parameters underneath it.</p></div>
 <div class="exercise" id="p9">
 <span class="ex-tag">Problem 9</span><span class="difficulty hard"> · N-mixture + Bayesian p-value</span>
 <h3>Repeat-count abundance and a goodness-of-fit check</h3>
-<p>An <strong>N-mixture model</strong> estimates the abundance of unmarked animals when you cannot count every individual: repeated visits to the same closed site let it separate true abundance ($\lambda$) from detection probability ($p$), which a raw count confounds. (It is the abundance analog of the occupancy model; see the practice lab for a fuller explanation.) Here you will simulate repeated counts, fit the Royle (2004) N-mixture model in <span class="pill nimble">NIMBLE</span>, and then test the Poisson-abundance assumption with a posterior-predictive Bayesian p-value.</p>
+<p>An <strong>N-mixture model</strong> estimates the abundance of unmarked animals when you cannot count every individual. Repeated visits to the same closed site let it separate true abundance ($\lambda$) from detection probability ($p$), which a raw count confounds. (It is the abundance analog of the occupancy model; see the practice lab for a fuller explanation.) Here you will simulate repeated counts, fit the Royle (2004) N-mixture model in <span class="pill nimble">NIMBLE</span>, and then test the Poisson-abundance assumption with a posterior-predictive Bayesian p-value.</p>
 <div class="eq-block">$N_i \sim \text{Poisson}(\lambda), \quad y_{ij} \sim \text{Binomial}(N_i, p)$</div>
 <div class="code-label">R · simulate overdispersed abundance on purpose</div>
 <pre><code><span class="kw">library</span>(MASS)
@@ -268,7 +267,7 @@ y &lt;- <span class="fn">matrix</span>(<span class="kw">NA</span>, sites, reps)
 <ol type="a">
  <li>Fit the basic (constant $\lambda$, constant $p$) N-mixture. Remember: <code>dbinom(prob, size)</code> in NIMBLE and initialise <code>N = apply(y, 1, max)</code>. Report the posteriors of $\lambda$ and $p$.</li>
  <li>Add posterior-predictive replicates $y^\text{rep}$ and a discrepancy statistic (e.g. a Freeman-Tukey or variance/mean statistic). Compute the Bayesian p-value $p_B$. What does a value far from 0.5 indicate here?</li>
- <li>Propose (in words, or as a modified <code>nimbleCode</code> block) a fix &mdash; e.g. a Poisson-lognormal random effect on $\log\lambda_i$ &mdash; and explain how it would move $p_B$ toward 0.5.</li>
+ <li>Propose (in words, or as a modified <code>nimbleCode</code> block) a fix, e.g. a Poisson-lognormal random effect on $\log\lambda_i$, and explain how it would move $p_B$ toward 0.5.</li>
 </ol>
 <div class="callout try" style="margin-top: 12px;"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
 </div>
@@ -296,7 +295,7 @@ y &lt;- <span class="fn">array</span>(<span class="kw">NA</span>, <span class="f
  $p$ and for the $\gamma_t$.</li>
  <li>Plot the posterior medians of $\gamma_t$ against year with their 95% intervals. Does the rising
  colonization signal come through? Report the mean width of those five intervals, and say what that
- width is telling you &mdash; think about how many sites actually contribute information to a single
+ width is telling you. Think about how many sites actually contribute information to a single
  year's transition.</li>
  <li><strong>Two ways to tighten them.</strong> Refit twice more, changing only how $\gamma_t$ is
  built:
@@ -312,7 +311,7 @@ y &lt;- <span class="fn">array</span>(<span class="kw">NA</span>, <span class="f
  <li><strong>Now the trap.</strong> Refit once more with a covariate that is pure noise in place of
  the year index:
  <pre><code><span class="fn">set.seed</span>(<span class="nu">99</span>); noise &lt;- <span class="fn">as.numeric</span>(<span class="fn">scale</span>(<span class="fn">rnorm</span>(nY - <span class="nu">1</span>)))</code></pre>
- Report the same two numbers and compare them against (c)(ii). Then reach for the obvious defence: is the noise covariate's slope $g_1$ credibly different from zero? Report its posterior median and 95% interval, and the same for the real trend's $g_1$. Now answer in four or five sentences: if a narrower interval was what you were hoping to achieve, what have you learned by achieving it? Given what the two slopes just did, is there anything <em>inside this fit</em> that would have told you which covariate was real &mdash; and if not, what would? Finish by saying which of the three structures you would reach for by default when you cannot be sure your covariate is real, and why it is the safe choice.</li>
+ Report the same two numbers and compare them against (c)(ii). Then reach for the obvious defence. Is the noise covariate's slope $g_1$ credibly different from zero? Report its posterior median and 95% interval, and the same for the real trend's $g_1$. Now answer in four or five sentences. If a narrower interval was what you were hoping to achieve, what have you learned by achieving it? Given what the two slopes just did, is there anything <em>inside this fit</em> that would have told you which covariate was real, and if not, what would? Finish by saying which of the three structures you would reach for by default when you cannot be sure your covariate is real, and why it is the safe choice.</li>
 </ol>
 <div class="callout try" style="margin-top: 12px;"><p class="callout-label">Try it yourself</p><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
 </div>

@@ -69,8 +69,8 @@
   <svg id="chart" viewBox="0 0 720 340" width="100%" role="img" aria-label="Prior, likelihood, and posterior densities"></svg>
   <div class="legend">
     <span style="color:#666">– – prior</span>
-    <span style="color:#1F5B50">— likelihood (scaled)</span>
-    <span style="color:#D73F09">— posterior</span>
+    <span style="color:#1F5B50">▬ likelihood (scaled)</span>
+    <span style="color:#D73F09">▬ posterior</span>
   </div>
 
   <details class="data-table-details">
@@ -86,11 +86,12 @@
 <h2>Things to try</h2>
 <div class="callout key">
 <ol>
-<li><strong>The prior is pseudo-data.</strong> In Beta&ndash;Binomial, a $\text{Beta}(\alpha,\beta)$ prior acts like $\alpha$ prior "successes" and $\beta$ prior "failures." Add real data and the posterior is $\text{Beta}(\alpha + y,\, \beta + n - y)$ — literally add the counts.</li>
+<li><strong>The prior is pseudo-data.</strong> In Beta&ndash;Binomial, a $\text{Beta}(\alpha,\beta)$ prior acts like $\alpha$ prior "successes" and $\beta$ prior "failures." Add real data and the posterior is $\text{Beta}(\alpha + y,\, \beta + n - y)$. Literally add the counts.</li>
 <li><strong>Flat prior = the likelihood.</strong> Set the Beta prior to $\text{Beta}(1,1)$ (the Uniform). The posterior lands right on the scaled likelihood, and its mode is the MLE $y/n$.</li>
-<li><strong>Data overwhelms the prior.</strong> Keep the prior fixed and increase $n$. The likelihood sharpens and drags the posterior onto it — with enough data the prior barely matters.</li>
+<li><strong>Data overwhelms the prior.</strong> Keep the prior fixed and increase $n$. The likelihood sharpens and drags the posterior onto it. With enough data the prior barely matters.</li>
 <li><strong>A strong prior fights back.</strong> Make the prior very informative (large $\alpha+\beta$, or a tight Normal prior SD). Now it takes a lot of data to move the posterior.</li>
 <li><strong>Same recipe, three families.</strong> Switch families and notice the pattern is always the same: posterior parameters = prior parameters + a simple function of the data.</li>
+<li><strong>Read the prior weight.</strong> The readout writes the posterior mean as w × prior mean + (1 − w) × MLE. In Beta–Binomial, w is α+β against n. In Gamma–Poisson it is b against n, and α only sets what the prior claims, not how loudly. Match a prior's pseudo-sample size to your real n and watch w land at one half.</li>
 </ol>
 </div>
 <p><a href="lab.html">← Back to the Day 4 lab</a> · see also the <a href="explore_likelihood_mcmc.html">likelihood &amp; MCMC explorer</a>.</p>
@@ -220,8 +221,10 @@ function compute(){
     xlab='p (success probability)';
     const pm=pa/(pa+pb);
     story=`Posterior = Beta(α+y, β+n−y) = <b>Beta(${a}+${y}, ${b}+${n-y}) = Beta(${pa}, ${pb})</b>.`;
-    readout=`${story} Posterior mean = ${pa}/${pa+pb} = <b>${pm.toFixed(3)}</b>. `+
-      `MLE = y/n = <b>${(y/n).toFixed(3)}</b>. The posterior mean sits between the prior mean (${(a/(a+b)).toFixed(3)}) and the MLE.`;
+    { const w=(a+b)/(a+b+n);
+    readout=`${story} Posterior mean = ${pa}/${pa+pb} = <b>${pm.toFixed(3)}</b>, 95% credible interval <b>(${qbeta(0.025,pa,pb).toFixed(3)}, ${qbeta(0.975,pa,pb).toFixed(3)})</b>. `+
+      `MLE = y/n = <b>${(y/n).toFixed(3)}</b>. `+
+      `<br>Prior weight: the prior is worth α+β = ${a+b} pseudo-trials against n = ${n} real ones, so w = ${(a+b)}/(${a+b}+${n}) = <b>${w.toFixed(2)}</b>, and posterior mean = ${w.toFixed(2)}·${(a/(a+b)).toFixed(3)} (prior mean) + ${(1-w).toFixed(2)}·${(y/n).toFixed(3)} (MLE) = ${(w*a/(a+b)+(1-w)*y/n).toFixed(3)}.`; }
     famName='Beta–Binomial'; postName=`Beta(${pa}, ${pb})`;
     speech=`Beta–Binomial. Prior Beta(${a}, ${b}), prior mean ${(a/(a+b)).toFixed(3)}. `+
       `Data: ${y} success${y===1?'':'es'} in ${n} trial${n===1?'':'s'}, MLE ${(y/n).toFixed(3)}. `+
@@ -235,8 +238,10 @@ function compute(){
     G(0,hi,x=>[dgamma(x,a,b), dpoisLikeContinuous(x,sy,no), dgamma(x,pa,pb)]);
     xlab='λ (rate / mean count)';
     story=`Posterior = Gamma(a+Σy, b+n) = <b>Gamma(${a}+${sy}, ${b}+${no}) = Gamma(${pa}, ${pb})</b>.`;
-    readout=`${story} Posterior mean = (a+Σy)/(b+n) = <b>${postMean.toFixed(3)}</b>. `+
-      `MLE = Σy/n = <b>${(sy/no).toFixed(3)}</b>.`;
+    { const w=b/(b+no);
+    readout=`${story} Posterior mean = (a+Σy)/(b+n) = <b>${postMean.toFixed(3)}</b>, 95% credible interval <b>(${qgamma(0.025,pa,pb).toFixed(3)}, ${qgamma(0.975,pa,pb).toFixed(3)})</b>. `+
+      `MLE = Σy/n = <b>${(sy/no).toFixed(3)}</b>. `+
+      `<br>Prior weight: here the weight is carried by the rate b alone (b pseudo-units of effort against n real ones), w = ${b}/(${b}+${no}) = <b>${w.toFixed(2)}</b>, and posterior mean = ${w.toFixed(2)}·${(a/b).toFixed(3)} (prior mean a/b) + ${(1-w).toFixed(2)}·${(sy/no).toFixed(3)} (MLE) = ${(w*a/b+(1-w)*sy/no).toFixed(3)}. Raise a with b fixed and the weight does not move, but the prior mean it pulls toward does.`; }
     famName='Gamma–Poisson'; postName=`Gamma(${pa}, ${pb})`;
     speech=`Gamma–Poisson. Prior Gamma(shape ${a}, rate ${b}), prior mean ${(a/b).toFixed(3)}. `+
       `Data: total count ${sy} over ${no} observation${no===1?'':'s'}, MLE ${(sy/no).toFixed(3)}. `+
@@ -253,9 +258,10 @@ function compute(){
     G(lo,hi,x=>[dnorm(x,m0,s0), dnorm(x,ybar,likeSD), dnorm(x,postMean,postSD)]);
     xlab='μ (population mean)';
     story=`Posterior is Normal with precision = prior precision + data precision, and a precision-weighted mean.`;
-    readout=`${story} Posterior mean = <b>${postMean.toFixed(2)}</b>, posterior SD = <b>${postSD.toFixed(2)}</b>. `+
+    { const w=priorPrec/postPrec;
+    readout=`${story} Posterior mean = <b>${postMean.toFixed(2)}</b>, posterior SD = <b>${postSD.toFixed(2)}</b>, 95% credible interval <b>(${(postMean-Z975*postSD).toFixed(2)}, ${(postMean+Z975*postSD).toFixed(2)})</b>. `+
       `Prior mean ${m0.toFixed(1)} (SD ${s0.toFixed(1)}), data mean ${ybar.toFixed(1)} (SE ${likeSD.toFixed(2)}). `+
-      `With more data the posterior slides toward ȳ.`;
+      `<br>Prior weight: precisions add, so w = (1/σ₀²)/(1/σ₀² + n/σ²) = <b>${w.toFixed(2)}</b> on the prior and ${(1-w).toFixed(2)} on ȳ. With more data the posterior slides toward ȳ.`; }
     famName='Normal–Normal'; postName=`Normal(mean ${postMean.toFixed(2)}, SD ${postSD.toFixed(2)})`;
     speech=`Normal–Normal. Prior mean ${m0.toFixed(1)} with SD ${s0.toFixed(1)}. `+
       `Data: sample mean ${ybar.toFixed(1)} from n = ${n} with known SD ${sig.toFixed(1)}, so the standard error is ${likeSD.toFixed(3)}. `+

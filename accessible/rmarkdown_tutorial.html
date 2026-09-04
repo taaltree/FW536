@@ -43,7 +43,7 @@
 <main class="content" id="main-content" tabindex="-1">
 <header class="lab-header">
  <div class="eyebrow">FW 536 · Day 1 · pre-lab tutorial</div>
- <h1>R Markdown for FW 536 — install, knit, and submit</h1>
+ <h1>R Markdown for FW 536: install, knit, and submit</h1>
  <p class="lede">Every assignment in this course is submitted as an R Markdown HTML output. This 30-minute tutorial walks you through installation, creating your first document, embedding code, adding photos of hand-written work, and uploading to Canvas. Please complete the install steps before Day 1.</p>
 </header>
 
@@ -56,11 +56,11 @@
 <li>Math equations rendered nicely.</li>
 <li>Photos of hand-written work for problems best done on paper.</li>
 </ul>
-<p>When you "knit" the document, R Markdown runs all the code, captures the output, and produces a polished HTML file you can submit. The grader sees both your reasoning and your code in one place — which is exactly how scientific writing should work.</p>
+<p>When you "knit" the document, R Markdown runs all the code, captures the output, and produces a polished HTML file you can submit. The grader sees both your reasoning and your code in one place, which is exactly how scientific writing should work.</p>
 </section>
 
 <section id="install">
-<h2>Install — do this BEFORE Day 1</h2>
+<h2>Install (do this before Day 1)</h2>
 
 <h3>1. R (the language)</h3>
 <p>Download from <a href="https://cran.r-project.org/">cran.r-project.org</a>. Pick your platform; install the most recent stable release.</p>
@@ -71,7 +71,7 @@
 <h3>3. R Markdown and knitr packages</h3>
 <p>Open RStudio and run, in the Console pane:</p>
 <pre><code>install.packages(c("rmarkdown", "knitr"))</code></pre>
-<p>RStudio may also prompt you to install these the first time you open a new R Markdown file — accept the prompt.</p>
+<p>RStudio may also prompt you to install these the first time you open a new R Markdown file. Accept the prompt.</p>
 
 <h3>4. (Optional but recommended) Pandoc</h3>
 <p>RStudio ships with a bundled Pandoc, so you usually don't need to install it separately. If knitting fails with a "pandoc not found" error, install it from <a href="https://pandoc.org/installing.html">pandoc.org/installing.html</a>.</p>
@@ -86,7 +86,7 @@
 <h2>Your first R Markdown document</h2>
 <ol>
 <li>In RStudio: <strong>File → New File → R Markdown…</strong></li>
-<li>Choose <strong>HTML</strong> as the output format. Give the document a title (e.g., "FW536 — Day 1 morning lab — YourName").</li>
+<li>Choose <strong>HTML</strong> as the output format. Give the document a title (e.g., "FW536, Day 1 morning lab, YourName").</li>
 <li>RStudio creates a starter <code>.Rmd</code> with example content.</li>
 <li>Click the <strong>Knit</strong> button (a yarn-and-needles icon at the top of the editor).</li>
 <li>RStudio renders the document and opens it in a viewer pane and as a <code>.html</code> file in your working directory.</li>
@@ -116,7 +116,7 @@ hist(x)
 <tr><td><code>cache = TRUE</code></td><td>Cache the chunk so re-knits skip slow code.</td><td><code>{r, cache=TRUE}</code></td></tr>
 </table>
 
-<p>The most useful default for FW 536 assignments: leave <code>echo</code> ON so graders can see your code; turn <code>message</code> and <code>warning</code> OFF for clean output.</p>
+<p>The most useful default for FW 536 assignments is to leave <code>echo</code> ON so graders can see your code; turn <code>message</code> and <code>warning</code> OFF for clean output.</p>
 </section>
 
 <section id="text">
@@ -151,7 +151,7 @@ $$</code></pre>
 <p>Useful symbols: <code>\alpha</code>, <code>\beta</code>, <code>\theta</code>, <code>\mu</code>, <code>\sigma</code>, <code>\lambda</code>, <code>\sum</code>, <code>\int</code>, <code>\frac{a}{b}</code>, <code>\sqrt{x}</code>, <code>x^2</code>, <code>x_i</code>, <code>\hat{\beta}</code>, <code>\bar{y}</code>, <code>\to</code>, <code>\ge</code>, <code>\le</code>, <code>\sim</code>.</p>
 
 <div class="callout key"><p class="callout-label">Key idea</p>
-<p>For most FW 536 derivations, math will be cleaner in R Markdown than the equivalent typed-up Word file. But many derivations are also fine to do by hand and photograph — see the next section.</p>
+<p>For most FW 536 derivations, math will be cleaner in R Markdown than the equivalent typed-up Word file. But many derivations are also fine to do by hand and photograph. See the next section.</p>
 </div>
 </section>
 
@@ -159,34 +159,34 @@ $$</code></pre>
 <h2>Adding photos of hand-written work</h2>
 <p>For probability derivations, Punnett squares, or any work that's faster on paper, you can photograph the page (or scan it) and embed the image in R Markdown.</p>
 
-<h3>Step 1 — get the photo onto your computer</h3>
+<h3>Step 1. Get the photo onto your computer</h3>
 <ul>
 <li>Phone camera → AirDrop / Google Drive / email to yourself.</li>
 <li>Or use a phone scanner app (Adobe Scan, CamScanner, Apple Notes) that exports a clean PDF or PNG.</li>
 <li>Crop and rotate if needed.</li>
 </ul>
 
-<h3>Step 2 — save the image alongside your <code>.Rmd</code> file</h3>
+<h3>Step 2. Save the image alongside your <code>.Rmd</code> file</h3>
 <p>Create a folder named <code>images/</code> in the same directory as your <code>.Rmd</code>, and drop the photo in there. Suggested naming: <code>problem3_derivation.jpg</code>.</p>
 
-<h3>Step 3 — insert the image in R Markdown</h3>
+<h3>Step 3. Insert the image in R Markdown</h3>
 <p>Two equally good ways:</p>
 
-<h4>Option A — Markdown syntax</h4>
+<h4>Option A. Markdown syntax</h4>
 <pre><code>![Caption goes here](images/problem3_derivation.jpg)</code></pre>
 
-<h4>Option B — knitr code chunk (gives more control)</h4>
+<h4>Option B. A knitr code chunk (gives more control)</h4>
 <pre><code>```{r, echo=FALSE, out.width="60%", fig.cap="Hand-derivation of Problem 3"}
 knitr::include_graphics("images/problem3_derivation.jpg")
 ```</code></pre>
 
-<h3>Step 4 — make sure the image fits</h3>
+<h3>Step 4. Make sure the image fits</h3>
 <p>If the photo is huge, restrict width with <code>out.width="60%"</code> (a percentage of the page width) or <code>out.width="400px"</code> (fixed pixels).</p>
 
 <div class="callout warn"><p class="callout-label">Watch out</p>
 <strong>Embedding the image so the HTML is self-contained.</strong> By default, the HTML output references the image file. If you upload only the <code>.html</code> file to Canvas, the image will appear broken. Two fixes:
 <ol>
-<li><strong>Better:</strong> add <code>self_contained: true</code> in your YAML header (see next section). The HTML will then embed the image as base64 — one file is all you need to upload.</li>
+<li><strong>Better:</strong> add <code>self_contained: true</code> in your YAML header (see next section). The HTML will then embed the image as base64, so one file is all you need to upload.</li>
 <li><strong>Alternative:</strong> upload the <code>.html</code> file AND the <code>images/</code> folder together (zip them first).</li>
 </ol>
 </div>
@@ -197,7 +197,7 @@ knitr::include_graphics("images/problem3_derivation.jpg")
 <p>Every R Markdown file starts with a YAML block between two <code>---</code> lines. A good default for FW 536:</p>
 
 <pre><code>---
-title: "FW 536 — Day 2 afternoon lab — YourName"
+title: "FW 536 · Day 2 afternoon lab · YourName"
 author: "Your Name"
 date: "`r Sys.Date()`"
 output:
@@ -231,7 +231,7 @@ output:
 <p>If a chunk has an error, knitting stops at that chunk. Read the error message, fix the code, and re-knit.</p>
 
 <div class="callout key"><p class="callout-label">Key idea</p>
-<strong>Always knit from a fresh session before submitting.</strong> In RStudio: Session → Restart R, then Knit. This catches bugs that depend on hidden state in your console — a very common source of "it worked yesterday but won't knit today."
+<strong>Always knit from a fresh session before submitting.</strong> In RStudio: Session → Restart R, then Knit. This catches bugs that depend on hidden state in your console, a very common source of "it worked yesterday but won't knit today."
 </div>
 </section>
 
@@ -241,12 +241,12 @@ output:
 <li>Knit your <code>.Rmd</code> to HTML (with <code>self_contained: true</code> in the YAML).</li>
 <li>Find the resulting <code>.html</code> file in your working directory.</li>
 <li>Open the Canvas assignment for the lab.</li>
-<li>Upload the <code>.html</code> file. (If you also want to upload the <code>.Rmd</code> source, that's welcomed — it helps the grader help you on partial credit.)</li>
+<li>Upload the <code>.html</code> file. (If you also want to upload the <code>.Rmd</code> source, that's welcomed. It helps the grader help you on partial credit.)</li>
 <li>Submit before the deadline.</li>
 </ol>
 
 <div class="callout warn"><p class="callout-label">Watch out</p>
-<strong>Don't upload the <code>.Rmd</code> alone</strong> — the grader can't be sure your code runs cleanly without your local environment. The <code>.html</code> is the deliverable; the <code>.Rmd</code> is a courtesy.
+<strong>Don't upload the <code>.Rmd</code> alone.</strong> The grader can't be sure your code runs cleanly without your local environment. The <code>.html</code> is the deliverable; the <code>.Rmd</code> is a courtesy.
 </div>
 </section>
 
@@ -268,7 +268,7 @@ output:
 <h2>A working template</h2>
 <p>Download <a href="rmarkdown_tutorial_starter.Rmd"><code>rmarkdown_tutorial_starter.Rmd</code></a> for a known-good starter file. Open it in RStudio, knit it once to confirm everything works, then save a copy and re-use it for every FW 536 lab.</p>
 
-<p>Per-lab R Markdown templates are also provided alongside each problem set in the day's folder (e.g., <code>Day1_Probability/morning_lab_template.Rmd</code>). Start from those — they pre-set the right title and chunks so you can focus on the content.</p>
+<p>Per-lab R Markdown templates are also provided alongside each problem set in the day's folder (e.g., <code>Day1_Probability/morning_lab_template.Rmd</code>). Start from those. They pre-set the right title and chunks so you can focus on the content.</p>
 </section>
 
 </main>

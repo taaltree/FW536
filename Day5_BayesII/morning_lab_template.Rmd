@@ -1,5 +1,5 @@
 ---
-title: "FW 536 — Day 5 morning problem set (Hierarchical & Latent-State Bayesian Models) — Your Name"
+title: "FW 536 · Day 5 morning problem set (Hierarchical & Latent-State Bayesian Models) · Your Name"
 author: "Your Name Here"
 date: "`r Sys.Date()`"
 output:
@@ -24,7 +24,7 @@ library(dplyr)       # site-level summaries for Problem 4
                      # (load dplyr AFTER MASS so dplyr::select is not masked)
 ```
 
-# Day 5 morning problem set — Hierarchical & latent-state Bayesian inference
+# Day 5 morning problem set · Hierarchical & latent-state Bayesian inference
 
 This template matches [`problem_set.html`](problem_set.html). Read each problem
 statement there, write your work below, **Knit** to HTML, and upload the `.html`
@@ -37,20 +37,20 @@ For setup help see the [R Markdown tutorial](../rmarkdown_tutorial.html).
 
 # Loading the data
 
-Six problems use the real datasets in this Day's `data/` folder. Load them once
-here (or inside each problem's chunk — your choice). Keep your `.Rmd` in the
+Five problems use the real datasets in this Day's `data/` folder. Load them once
+here (or inside each problem's chunk, your choice). Keep your `.Rmd` in the
 `Day5_BayesII/` folder so these relative paths resolve.
 
 ```{r load-data}
-ants <- read.csv("data/ants.csv")            # Problems 1–2
+ants <- read.csv("data/ants.csv")            # Problem 1
 N2O  <- read.csv("data/N2OEmission.csv")     # Problems 3–4
 liz  <- read.csv("data/IslandsLizards.csv")  # Problems 5–6
-# Problems 7–10 simulate their own data (see each problem statement).
+# Problems 2 and 7–10 simulate their own data (see each problem statement).
 ```
 
 ---
 
-# Problem 1 — Overdispersed ant richness with a bog-level random effect
+# Problem 1 · Overdispersed ant richness with a bog-level random effect
 
 > Load `ants.csv`, scale the three predictors, and fit a Poisson regression of
 > richness on forest, latitude, and elevation with a bog-level (observation-level)
@@ -68,17 +68,19 @@ liz  <- read.csv("data/IslandsLizards.csv")  # Problems 5–6
 
 ---
 
-# Problem 2 — What does a "vague" log-scale prior actually do?
+# Problem 2 · What does a "vague" log-scale prior actually assert?
 
-> Refit the `ants.csv` Poisson regression (a) raw predictors + N(0, 10000) prior,
-> (b) scaled predictors + same prior, (c) scaled + N(0, 4) prior. Compare mixing,
-> R-hat, and posteriors, and use a prior-predictive draw to justify a weakly
-> informative default.
+> (a) Draw $10^5$ values from $\mathcal{N}(0, \sigma^2 = 10000)$; report the
+> fraction with $e^\beta > 10^6$ and the fraction with a million-fold effect in
+> either direction, and state the second as a sentence beginning "before seeing
+> any data, this prior says…". (b) Repeat under $\mathcal{N}(0, 4)$ and give the
+> central 95% range of multiplicative effects. (c) Write the two-sentence reply
+> to a reviewer who demands $\mathcal{N}(0, 10000)$ "for objectivity".
 
 **My work:**
 
 ```{r p2}
-# Your R code here
+# Your R code here (no data file needed)
 ```
 
 **Answer / biological interpretation:**
@@ -86,7 +88,7 @@ liz  <- read.csv("data/IslandsLizards.csv")  # Problems 5–6
 
 ---
 
-# Problem 3 — The pooling spectrum for soil N₂O emissions
+# Problem 3 · The pooling spectrum for soil N₂O emissions
 
 > Model log(emission) ~ centred log(n.input) with sites indexed by `group.index`.
 > Fit complete-pooling, no-pooling, and partial-pooling versions; make the
@@ -103,12 +105,17 @@ liz  <- read.csv("data/IslandsLizards.csv")  # Problems 5–6
 
 ---
 
-# Problem 4 — Modeling the random intercept with a site-level covariate
+# Problem 4 · Modeling the random intercept with a site-level covariate
 
 > Extend Problem 3 so $\alpha_j \sim \mathcal{N}(\kappa + \eta\,w_j,\ \sigma_\alpha^2)$
-> with a site-level covariate $w_j$ built from the data, and let the N-input slope
-> vary by fertilizer type (`fert.index`). Is $\eta$ credibly nonzero? Which
-> fertilizer has the steepest slope?
+> with $w_j$ built from site soil carbon (state how you scaled it), and let the
+> N-input slope vary by fertilizer type. (a) Is $\eta$ credibly different from
+> 0? (b) Report $\sigma_\beta$, rank the ten types by median slope, then test the
+> ranking: across draws, how often does the top type really hold the largest
+> slope? Report that probability with the type's 95% CI and its sample size, and
+> say whether you would write "type X produces the steepest response". (c) Show
+> the regression-on-the-intercept form is the same model as carrying $w_j$ in
+> the linear predictor with a mean-zero site effect.
 
 **My work:**
 
@@ -121,7 +128,7 @@ liz  <- read.csv("data/IslandsLizards.csv")  # Problems 5–6
 
 ---
 
-# Problem 5 — Island lizard occupancy vs. perimeter:area ratio
+# Problem 5 · Island lizard occupancy vs. perimeter:area ratio
 
 > Fit logistic regression of presence on scaled perimeter:area ratio with the
 > weakly informative prior dnorm(0, 1/2.71). Report diagnostics, the posterior
@@ -138,7 +145,7 @@ liz  <- read.csv("data/IslandsLizards.csv")  # Problems 5–6
 
 ---
 
-# Problem 6 — A management-relevant probability difference
+# Problem 6 · A management-relevant probability difference
 
 > Add derived nodes y10, y20, and diff = y20 − y10 (scaled versions of PA = 10 and
 > PA = 20) inside your Problem 5 model. Report the posterior of diff and explain
@@ -155,16 +162,28 @@ liz  <- read.csv("data/IslandsLizards.csv")  # Problems 5–6
 
 ---
 
-# Problem 7 — Beverton-Holt fit with management quantities
+# Problem 7 · Beverton-Holt fit with management quantities
 
-> Simulate 25 years of spawner-recruit data, fit Beverton-Holt in NIMBLE, and
-> define Neq, Smsy, Hmsy as deterministic nodes. Report posteriors, check CI
-> coverage of truth, and contrast the derived-node Smsy with plug-in Smsy.
+> Simulate 25 years (`set.seed(7)`; $a = 5$, $b = 5000$, $\sigma = 0.3$) and fit
+> Beverton-Holt in NIMBLE with $N_\text{eq}$, $S_\text{msy}$, $H_\text{msy}$ as
+> deterministic nodes. (a) Compute the three true reference points by hand and
+> check every interval covers. (b) Which reference point survives without an
+> absolute-abundance handle? (c) Report the 5th, 10th, 25th and 50th percentiles
+> of $H_\text{msy}$ and write the risk statement. (d) Report $S_\text{msy}$ and
+> $\Pr(S_\text{msy} > 1000, 1500, 2000)$ and answer the manager. (e) Rank the
+> five quantities by CV and explain why two derived quantities are sharper than
+> the parameters they are built from.
 
 **My work:**
 
 ```{r p7}
-# Your R code here
+set.seed(7)
+Nyears <- 25; a.t <- 5; b.t <- 5000; sig.t <- 0.3
+S <- rlnorm(Nyears, 7.5, 0.8)
+R <- numeric(Nyears)
+for (t in 1:Nyears)
+  R[t] <- (a.t*S[t])/(1 + a.t/b.t*S[t]) * exp(rnorm(1, 0, sig.t))
+# Your NIMBLE model and summaries here
 ```
 
 **Answer / biological interpretation:**
@@ -172,16 +191,19 @@ liz  <- read.csv("data/IslandsLizards.csv")  # Problems 5–6
 
 ---
 
-# Problem 8 — The 5th-percentile ("precautionary") harvest rate
+# Problem 8 · Why you cannot build a derived quantity from summary numbers
 
-> Using the Problem 7 posterior of Hmsy, report its 5th percentile and interpret
-> it. Refit with Nyears = 100 and check the CI-width shrinkage against a √N rule.
-> Contrast with how a frequentist fit would produce this number.
+> Using your Problem 7 draws: (a) compute $S_\text{msy}$ once per draw and take
+> the 5th, 50th and 95th percentiles; then substitute the percentiles of $a$ and
+> $b$ into the formula instead, and report the percentage difference at the 5th
+> percentile. (b) Explain the disagreement through `cor(a, b)`. (c) Repeat for
+> $H_\text{msy}$, where the two routes agree, and state the general rule. (d)
+> Contrast with how a frequentist fit would produce this interval.
 
 **My work:**
 
 ```{r p8}
-# Your R code here
+# Your R code here (reuse the posterior draws from Problem 7)
 ```
 
 **Answer / biological interpretation:**
@@ -189,7 +211,7 @@ liz  <- read.csv("data/IslandsLizards.csv")  # Problems 5–6
 
 ---
 
-# Problem 9 — Repeat-count abundance and a goodness-of-fit check
+# Problem 9 · Repeat-count abundance and a goodness-of-fit check
 
 > Simulate overdispersed repeat counts, fit the basic Royle N-mixture in NIMBLE
 > (remember `dbinom(prob, size)` and `N = apply(y, 1, max)`), add posterior
@@ -206,16 +228,32 @@ liz  <- read.csv("data/IslandsLizards.csv")  # Problems 5–6
 
 ---
 
-# Problem 10 — Multi-season occupancy: recover persistence and colonization
+# Problem 10 · Multi-season occupancy: recover persistence and colonization
 
-> Simulate a dynamic occupancy dataset with rising colonization, fit it in NIMBLE
-> using the z-init trick, plot posterior-median gamma against year, and explain
-> why the persistence posteriors are wide.
+> Simulate the rising-colonization dataset (`set.seed(10)`) and fit the dynamic
+> occupancy model with the z-init trick. (a) Report $\hat R$ for $p$ and the
+> $\gamma_t$. (b) Plot posterior medians of $\gamma_t$ with 95% intervals and
+> report their mean width. (c) Refit with a hierarchical prior on
+> $\text{logit}(\gamma_t)$ and with a linear trend in year; report mean width
+> and RMSE against `gam.t` for all three fits. (d) Refit with a pure-noise
+> covariate (`set.seed(99)`), report the same two numbers and both slopes, and
+> answer the four questions in the problem statement.
 
 **My work:**
 
 ```{r p10}
-# Your R code here
+set.seed(10)
+nS <- 50; nY <- 6; nR <- 3; p.t <- 0.5
+phi.t <- c(0.70, 0.70, 0.80, 0.85, 0.85)
+gam.t <- c(0.05, 0.15, 0.25, 0.30, 0.30)
+z <- matrix(NA, nS, nY); z[, 1] <- rbinom(nS, 1, 0.2)
+for (i in 1:nS) for (t in 2:nY)
+  z[i,t] <- rbinom(1, 1, z[i,t-1]*phi.t[t-1] + (1-z[i,t-1])*gam.t[t-1])
+y <- array(NA, c(nS, nR, nY))
+for (t in 1:nY) for (i in 1:nS) for (j in 1:nR)
+  y[i,j,t] <- rbinom(1, 1, p.t) * z[i,t]
+zst <- matrix(1L, nS, nY)          # the z-init trick
+# Your NIMBLE fits here
 ```
 
 **Answer / biological interpretation:**

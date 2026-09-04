@@ -1,5 +1,5 @@
 ---
-title: "FW 536 — Day 1 afternoon lab (Discrete distributions) — Your Name"
+title: "FW 536 · Day 1 afternoon lab (Discrete distributions) · Your Name"
 author: "Your Name Here"
 date: "`r Sys.Date()`"
 output:
@@ -16,7 +16,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 ```
 
-# Day 1 afternoon lab — Discrete distributions problem set
+# Day 1 afternoon lab · Discrete distributions problem set
 
 This template matches the afternoon problems (7–12) in [`problem_set.html`](problem_set.html).
 Read each problem statement there, write your work below, **Knit** to HTML, and
@@ -39,7 +39,7 @@ library(dplyr)
 
 ---
 
-# Problem 7 — Sea turtle nest success
+# Problem 7 · Sea turtle nest success
 
 > n = 18 nests, each hatching successfully with p = 0.62, independently.
 > (a) Model + mean and variance. (b) P(exactly 12). (c) P(at least 15).
@@ -56,11 +56,11 @@ library(dplyr)
 
 ---
 
-# Problem 8 — Wolf approaches at an active den
+# Problem 8 · Wolf approaches at an active den
 
 > Wolf approaches occur at rate lambda = 1.8 per 12-h period.
 > (a) Model + independence assumption. (b) P(0 in 12 h). (c) P(more than 3 in 12 h).
-> (d) P(exactly 5 in 36 h) — scale lambda with the window.
+> (d) P(exactly 5 in 36 h), scaling lambda with the window.
 
 **My work:**
 
@@ -73,10 +73,10 @@ library(dplyr)
 
 ---
 
-# Problem 9 — Coyote scat counts: is Poisson enough?
+# Problem 9 · Coyote scat counts: is Poisson enough?
 
 > Load `data/coyote_scat_counts.csv` (120 grid cells, column `scats`).
-> (a) Sample mean and variance — what do you notice about mean vs variance?
+> (a) Sample mean and variance. What do you notice about mean vs variance?
 > (b) Method-of-moments NB dispersion k = mu^2 / (var - mu).
 > (c) Compare observed P(Y=0) and P(Y>15) against Poisson(mu) and NB(mu, k).
 > (d) Histogram with Poisson and NB pmfs overlaid; name a mechanism for the over-dispersion.
@@ -97,7 +97,7 @@ c(mean = mu, variance = v)
 
 ---
 
-# Problem 10 — Owl pellet contents
+# Problem 10 · Owl pellet contents
 
 > Prey composition voles 0.65, shrews 0.20, mice 0.10, birds 0.05; 15 items per pellet.
 > (a) P(exact composition (10, 3, 1, 1)). (b) Marginal distribution of shrews (name, mean,
@@ -116,12 +116,12 @@ set.seed(1)
 
 ---
 
-# Problem 11 — Pooling counts across sites creates over-dispersion
+# Problem 11 · Pooling counts across sites creates over-dispersion
 
 > Poisson counts with lambda_A = 2, lambda_B = 8; 50 mussels from each site, pooled.
-> (a) Naive pooled mean/variance — still Poisson? (b) Simulate and show over-dispersion.
+> (a) Naive pooled mean/variance. Still Poisson? (b) Simulate and show over-dispersion.
 > (c) Derive the exact pooled mean and variance step by step, using only the definitions of
-> mean and variance — no new theorem — and compare with (b).
+> mean and variance, no new theorem, and compare with (b).
 > (d) Why are real count data over-dispersed even when Poisson within each unit?
 
 **My work:**
@@ -136,7 +136,7 @@ set.seed(1)
 
 ---
 
-# Problem 12 — Disease surveillance sample size
+# Problem 12 · Disease surveillance sample size
 
 > Prevalence p = 0.15; want at least 95% probability of detecting >= 1 positive.
 > (a) Write P(at least one positive) and the 95% inequality. (b) Smallest n (log form +

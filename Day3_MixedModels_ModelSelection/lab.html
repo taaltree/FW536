@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>Day 3 Lab — Mixed Models & Model Selection | FW 536</title>
+<title>Day 3 lab · Mixed Models & Model Selection | FW 536</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="stylesheet" href="../_Shared/css/lab.css" />
 <script defer src="../_Shared/js/lab.js"></script>
@@ -45,23 +45,23 @@
 <header class="lab-header">
  <div class="eyebrow">Day 3 · Lab</div>
  <h1>Mixed effects models in the morning, model selection in the afternoon</h1>
- <p class="lede">From streams to fish in lakes, we build up random intercepts, random slopes, REML vs ML, and variance components — then turn around and ask the harder question: <em>which model do we trust, and what does "trust" even mean?</em></p>
+ <p class="lede">From streams to fish in lakes, we build up random intercepts, random slopes, REML vs ML, and variance components. Then we turn around and ask the harder question: <em>which model do we trust, and what does "trust" even mean?</em></p>
 </header>
 
 <div class="lab-toc" id="lab-toc">
   <h2>What's in this lab and what to hand in</h2>
-  <p class="toc-intro">This page is your <strong>in-class practice</strong> problem set — worked examples with visible answers. Your graded work is a separate problem set: the morning session's <strong>Hierarchical modeling problem set is worth 20 points</strong> and the afternoon session's <strong>Model selection problem set is worth 20 points</strong>, for <strong>40 points across Day 3</strong>. Both live on the same page (<a href="problem_set.html">the graded problem set</a>); write up your answers in the R Markdown template for each session and submit them as two Canvas assignments.</p>
+  <p class="toc-intro">This page is your <strong>in-class practice</strong> problem set, worked examples with visible answers. Your graded work is a separate problem set. The morning session's <strong>Hierarchical modeling problem set is worth 20 points</strong> and the afternoon session's <strong>Model selection problem set is worth 20 points</strong>, for <strong>40 points across Day 3</strong>. Both live on the same page (<a href="problem_set.html">the graded problem set</a>); write up your answers in the R Markdown template for each session and submit them as two Canvas assignments.</p>
   
 <div class="session">
   <div class="session-label">Morning · 20 pts</div>
 <div>
     <div class="session-title">Hierarchical modeling problem set</div>
     <div class="row"><span class="tag practice">Practice</span>
-      <span><a href="#morning">Walk through the morning problems on this page</a> <span class="note">— answers visible, in-class</span></span></div>
+      <span><a href="#morning">Walk through the morning problems on this page</a> <span class="note">(answers visible, in class)</span></span></div>
     <div class="row"><span class="tag assessed">Assessed</span>
       <span><a href="problem_set.html#morning">Graded problem set</a>
-            <span class="note">— answers NOT shown; graded — submit on Canvas</span></span></div>
-    <div class="row"><span class="tag template">Hand-in</span><span><a href="morning_lab_template.Rmd">morning_lab_template.Rmd</a> <span class="note">— knit to HTML and upload to Canvas</span></span></div>
+            <span class="note">(answers not shown, graded, submit on Canvas)</span></span></div>
+    <div class="row"><span class="tag template">Hand-in</span><span><a href="morning_lab_template.Rmd">morning_lab_template.Rmd</a> <span class="note">(knit to HTML and upload to Canvas)</span></span></div>
     <div class="row"><span class="tag lecture">Lecture</span>
       <span><a href="FW536_Day3_Morning_mixed%20effects_nosoln_accessible.pptx">Morning lecture · mixed effects</a></span></div>
   </div>
@@ -72,11 +72,11 @@
   <div>
     <div class="session-title">Model selection problem set</div>
     <div class="row"><span class="tag practice">Practice</span>
-      <span><a href="#afternoon">Walk through the afternoon problems on this page</a> <span class="note">— answers visible, in-class</span></span></div>
+      <span><a href="#afternoon">Walk through the afternoon problems on this page</a> <span class="note">(answers visible, in class)</span></span></div>
     <div class="row"><span class="tag assessed">Assessed</span>
       <span><a href="problem_set.html#afternoon">Graded problem set</a>
-            <span class="note">— answers NOT shown; graded — submit on Canvas</span></span></div>
-    <div class="row"><span class="tag template">Hand-in</span><span><a href="afternoon_lab_template.Rmd">afternoon_lab_template.Rmd</a> <span class="note">— knit to HTML and upload to Canvas</span></span></div>
+            <span class="note">(answers not shown, graded, submit on Canvas)</span></span></div>
+    <div class="row"><span class="tag template">Hand-in</span><span><a href="afternoon_lab_template.Rmd">afternoon_lab_template.Rmd</a> <span class="note">(knit to HTML and upload to Canvas)</span></span></div>
     <div class="row"><span class="tag lecture">Lecture</span>
       <span><a href="FW536_Day3_Afternoon_hypothesis%20test%20and%20model%20selection_nosoln_accessible.pptx">Afternoon lecture · hypothesis tests & model selection</a></span></div>
   </div>
@@ -107,7 +107,7 @@
 
 <a class="primer-banner" href="plain_language_summary.html">
   <span class="label">Plain-language summary</span>
-  <span class="pb-title">Day 3 &mdash; the ideas in normal English</span>
+  <span class="pb-title">Day 3, the ideas in normal English</span>
   <span class="pb-desc">A short, no-math explanation of what a random effect actually does, why partial pooling beats both extremes, and what model selection can and cannot tell you. Read it before the lab to preview the ideas, or afterwards to consolidate what you did.</span>
   <span class="pb-cta">Open the summary &rarr;</span>
 </a>
@@ -116,13 +116,13 @@
 
 <section id="orient">
 <h2>Where we are in the week</h2>
-<p>Day 1 you wrote down probability stories and named the distribution that matched. Day 2 you bolted a linear predictor and a link function onto those distributions to get GLMs. Today we attack the assumption that has been quietly buried in every model so far: <strong>independence</strong>. Almost no ecological data are independent — fish are nested in lakes, plots in sites, repeated measurements in subjects. Mixed models are how we model that nesting <em>without</em> burning a separate parameter per group. Model selection is then how we decide, given several plausible nested structures, which one to use.</p>
+<p>Day 1 you wrote down probability stories and named the distribution that matched. Day 2 you bolted a linear predictor and a link function onto those distributions to get GLMs. Today we attack the assumption that has been quietly buried in every model so far: <strong>independence</strong>. Almost no ecological data are independent. Fish are nested in lakes, plots in sites, repeated measurements in subjects. Mixed models are how we model that nesting <em>without</em> burning a separate parameter per group. Model selection is then how we decide, given several plausible nested structures, which one to use.</p>
 
 <div class="callout key">
 <p>Three habits to start today:</p>
 <ol>
 <li><strong>Draw the nesting before fitting anything.</strong> A diagram of "observations within groups within bigger groups" determines every random-effect term.</li>
-<li><strong>State whether each effect is fixed or random</strong> — and have a defensible reason. The right answer is usually about <em>what you want to generalize to</em>, not what's in your data frame.</li>
+<li><strong>State whether each effect is fixed or random</strong>, and have a defensible reason. The right answer is usually about <em>what you want to generalize to</em>, not what's in your data frame.</li>
 <li><strong>Estimate uncertainty, not just point values.</strong> A confidence interval on a variance component or an effect size is far more useful than "p &lt; 0.05" or "$\Delta\text{AIC} = 1.3$."</li>
 </ol>
 </div>
@@ -131,18 +131,18 @@
 <section id="big-picture">
 <h2>Plain-language overview</h2>
 <div class="callout plain">
-<p><strong>Today's running example &mdash; and yes, "badjuice" is made up.</strong> A new graduate student joins your lab to study <strong>razor clam abundance along 10 beaches on the Oregon coast</strong>. At each beach they record clam abundance and the local concentration of <strong>badjuice</strong> &mdash; a <em>fictitious</em> environmental toxin invented for this course; it is not a real chemical &mdash; and they repeat the survey for four years. The student wants to know: <strong>does badjuice affect clam abundance?</strong> Hold on to that scenario &mdash; it is the example we return to all day, and it already contains the whole fixed-vs-random distinction.</p>
-<p>A <strong>fixed effect</strong> is an effect you care about by name: badjuice concentration, body length, treatment. A <strong>random effect</strong> is a grouping variable whose individual levels you don't particularly care about, but which violates independence if you ignore it: which stream, which lake, which subject. We don't estimate a separate intercept for each stream as a "thing we want to know"; we estimate <em>how much streams vary</em> and let each stream's estimate be pulled toward the overall mean. That pulling is called <strong>shrinkage</strong> and it's the magic of mixed models: streams with little data borrow strength from the rest.</p>
-<p>This afternoon we ask the next obvious question: with several candidate models on the table, how do we pick? We meet <strong>LRT</strong> for nested models, <strong>AIC / AICc / BIC</strong> for ranking on a common scale, and <strong>cross-validation</strong> when the goal is honest prediction error. We also take the lab time to make a hard but important argument: that picking "the best model" from a long candidate list and then reporting its p-values is one of the most common ways scientists fool themselves.</p>
+<p><strong>Today's running example (and yes, "badjuice" is made up).</strong> A new graduate student joins your lab to study <strong>razor clam abundance along 10 beaches on the Oregon coast</strong>. At each beach they record clam abundance and the local concentration of <strong>badjuice</strong>, a <em>fictitious</em> environmental toxin invented for this course (it is not a real chemical), and they repeat the survey for four years. The student wants to know: <strong>does badjuice affect clam abundance?</strong> Hold on to that scenario. It is the example we return to all day, and it already contains the whole fixed-vs-random distinction.</p>
+<p>A <strong>fixed effect</strong> is an effect you care about by name, such as badjuice concentration, body length, treatment. A <strong>random effect</strong> is a grouping variable whose individual levels you don't particularly care about, but which violates independence if you ignore it, such as which stream, which lake, or which subject. We don't estimate a separate intercept for each stream as a "thing we want to know"; we estimate <em>how much streams vary</em> and let each stream's estimate be pulled toward the overall mean. That pulling is called <strong>shrinkage</strong> and it's the magic of mixed models. Streams with little data borrow strength from the rest.</p>
+<p>This afternoon we ask the next obvious question. With several candidate models on the table, how do we pick? We meet <strong>LRT</strong> for nested models, <strong>AIC / AICc / BIC</strong> for ranking on a common scale, and <strong>cross-validation</strong> when the goal is honest prediction error. We also take the lab time to make a hard but important argument, that picking "the best model" from a long candidate list and then reporting its p-values is one of the most common ways scientists fool themselves.</p>
 </div>
-<p><strong><a href="plain_language_summary.html">Read the full plain-language summary for Day 3 &rarr;</a></strong> &mdash; the same ideas worked through slowly, with examples and no math.</p>
+<p><strong><a href="plain_language_summary.html">Read the full plain-language summary for Day 3 &rarr;</a></strong>. The same ideas are worked through slowly, with examples and no math.</p>
 </section>
 
 <!-- ================================================================== -->
 <section id="concepts">
-<h2>Core concepts — linear mixed effects models</h2>
+<h2>Core concepts: linear mixed effects models</h2>
 <div class="callout warn">
-<p><strong>Scope.</strong> Everything in this section is about <em>linear</em> mixed models: <code>lmer()</code> and <code>lme()</code>, a Normal response with a separate residual variance $\sigma^2$. Most of it carries over to generalized mixed models (<code>glmer()</code>) unchanged, but two items below do not, and both are flagged where they appear: the REML rule in item 4, and the one-observation-per-level guidance in item 6.</p>
+<p><strong>Scope.</strong> Everything in this section is about <em>linear</em> mixed models: <code>lmer()</code> and <code>lme()</code>, a Normal response with a separate residual variance $\sigma^2$. Most of it carries over to generalized mixed models (<code>glmer()</code>) unchanged, but two items below do not, and both are flagged where they appear, the REML rule in item 4 and the one-observation-per-level guidance in item 6.</p>
 </div>
 
 <h3>1. Complete pooling, no pooling, partial pooling</h3>
@@ -154,17 +154,17 @@
 <tr><td><strong>Partial pooling</strong></td><td><code>lmer(y ~ 1 + (1|stream))</code></td><td>Streams are drawn from a population of streams. Each stream's mean is pulled toward the grand mean by an amount proportional to how little data we have on it.</td></tr>
 </table>
 
-<div class="callout bio">How hard a group is pulled depends on the size of its own uncertainty, $\sigma^2/n_j$, relative to the among-group variance $\sigma_\text{stream}^2$: the partially-pooled estimate keeps a fraction $B_j = \sigma_\text{stream}^2/(\sigma_\text{stream}^2 + \sigma^2/n_j)$ of its own group mean and takes $1 - B_j$ from the grand mean. Groups with few or noisy observations get pulled hard; groups with plenty of data in a genuinely heterogeneous population barely move. <strong>Note that every dataset in today's lab is balanced</strong> — exactly 3 observations per stream, 10 per subject, 10 fish per lake&times;species cell — so $n_j$ is the same for every group and the pull is <em>identical</em> for all of them. In the streams example each of the 100 streams keeps $B = 98.51\%$ of its own mean and borrows $1.49\%$ from the grand mean, no matter how extreme it is. To watch the pull change with $n$ you need the <a href="explore_shrinkage.html">shrinkage demo</a>, where $n$ is a slider — not these data.</div>
+<div class="callout bio">How hard a group is pulled depends on the size of its own uncertainty, $\sigma^2/n_j$, relative to the among-group variance $\sigma_\text{stream}^2$: the partially-pooled estimate keeps a fraction $B_j = \sigma_\text{stream}^2/(\sigma_\text{stream}^2 + \sigma^2/n_j)$ of its own group mean and takes $1 - B_j$ from the grand mean. Groups with few or noisy observations get pulled hard; groups with plenty of data in a genuinely heterogeneous population barely move. <strong>Note that every dataset in today's lab is balanced</strong>, with exactly 3 observations per stream, 10 per subject, 10 fish per lake&times;species cell, so $n_j$ is the same for every group and the pull is <em>identical</em> for all of them. In the streams example each of the 100 streams keeps $B = 98.51\%$ of its own mean and borrows $1.49\%$ from the grand mean, no matter how extreme it is. To watch the pull change with $n$ you need the <a href="explore_shrinkage.html">shrinkage demo</a>, where $n$ is a slider, not these data.</div>
 
 <h3>2. The random-intercept model in equations</h3>
 <div class="eq-block">$y_{ij} = \beta_0 + b_{0,j} + \varepsilon_{ij}, \quad b_{0,j} \sim \mathcal{N}(0, \sigma_\text{group}^2), \quad \varepsilon_{ij} \sim \mathcal{N}(0, \sigma^2)$</div>
-<p>Read it as: the $i$-th observation in group $j$ has the grand mean $\beta_0$, plus a group-specific bump $b_{0,j}$ shared by every member of group $j$, plus its own residual noise. The bumps are drawn from a Normal centered at 0 with variance $\sigma_\text{group}^2$. Two variance components ($\sigma_\text{group}^2$ and $\sigma^2$) replace the long list of "one parameter per group" you would have in the fixed-effects version.</p>
+<p>Read it as follows. The $i$-th observation in group $j$ has the grand mean $\beta_0$, plus a group-specific bump $b_{0,j}$ shared by every member of group $j$, plus its own residual noise. The bumps are drawn from a Normal centered at 0 with variance $\sigma_\text{group}^2$. Two variance components ($\sigma_\text{group}^2$ and $\sigma^2$) replace the long list of "one parameter per group" you would have in the fixed-effects version.</p>
 
 <h3>3. Random intercepts vs random slopes</h3>
 <div class="eq-block">$y_{ij} = (\beta_0 + b_{0,j}) + (\beta_1 + b_{1,j}) x_{ij} + \varepsilon_{ij}$</div>
-<p>A random <em>slope</em> says "the effect of $x$ varies across groups." For length–weight, that would mean different groups have different length–weight allometric slopes. The pair $(b_{0,j}, b_{1,j})$ is drawn from a bivariate Normal with a $2\times 2$ covariance matrix — usually estimated, sometimes constrained to be diagonal with <code>(1|g) + (0+x|g)</code>.</p>
+<p>A random <em>slope</em> says "the effect of $x$ varies across groups." For length–weight, that would mean different groups have different length–weight allometric slopes. The pair $(b_{0,j}, b_{1,j})$ is drawn from a bivariate Normal with a $2\times 2$ covariance matrix, usually estimated, sometimes constrained to be diagonal with <code>(1|g) + (0+x|g)</code>.</p>
 
-<h3>4. REML vs ML — the one rule to memorize</h3>
+<h3>4. REML vs ML: the one rule to memorize</h3>
 <div class="callout key">
 <p><strong>The rule:</strong></p>
 <ul>
@@ -172,34 +172,34 @@
 <li>Compare models that differ in <em>fixed effects</em> (e.g., adding/removing a covariate) using <strong>ML</strong>.</li>
 <li><strong>Report</strong> the final model fit with <strong>REML</strong>.</li>
 </ul>
-<p>In <code>lme4::lmer()</code> the default is REML; pass <code>REML = FALSE</code> to switch to ML. In <code>nlme::lme()</code>, set <code>method = "ML"</code> or <code>"REML"</code>. <strong>This rule is for linear mixed models only.</strong> <code>glmer()</code> has no <code>REML</code> argument at all: generalized mixed models are fit by maximum likelihood (Laplace approximation or adaptive Gauss-Hermite quadrature), so the REML-versus-ML choice does not arise there.</p>
+<p>In <code>lme4::lmer()</code> the default is REML; pass <code>REML = FALSE</code> to switch to ML. In <code>nlme::lme()</code>, set <code>method = "ML"</code> or <code>"REML"</code>. <strong>This rule is for linear mixed models only.</strong> <code>glmer()</code> has no <code>REML</code> argument at all, because generalized mixed models are fit by maximum likelihood (Laplace approximation or adaptive Gauss-Hermite quadrature), so the REML-versus-ML choice does not arise there.</p>
 </div>
-<p><strong>Why?</strong> Maximum likelihood underestimates variance components (it ignores the degrees of freedom used by the fixed effects). REML "restricts" the likelihood to contrasts that don't depend on the fixed effects, giving unbiased variance estimates. But REML likelihoods from models with different fixed effects aren't directly comparable — they're computed on different reduced data.</p>
+<p><strong>Why?</strong> Maximum likelihood underestimates variance components (it ignores the degrees of freedom used by the fixed effects). REML "restricts" the likelihood to contrasts that don't depend on the fixed effects, giving unbiased variance estimates. But REML likelihoods from models with different fixed effects aren't directly comparable, because they are computed on different reduced data.</p>
 
-<h3>5. Variance components — what to read off the summary</h3>
-<p>Every <code>lmer</code> or <code>lme</code> summary gives you two numbers per random effect: a <strong>variance</strong> (or standard deviation) for the random effect itself, and a <strong>residual variance</strong>. Their ratio tells you how clumpy the data are:</p>
+<h3>5. Variance components: what to read off the summary</h3>
+<p>Every <code>lmer</code> or <code>lme</code> summary gives you two numbers per random effect, a <strong>variance</strong> (or standard deviation) for the random effect itself, and a <strong>residual variance</strong>. Their ratio tells you how clumpy the data are:</p>
 <div class="eq-block">$\text{ICC} = \dfrac{\sigma_\text{group}^2}{\sigma_\text{group}^2 + \sigma^2}$</div>
-<p>The <strong>intraclass correlation coefficient (ICC)</strong> is the proportion of total variation explained by the grouping. An ICC near 0 means groups are interchangeable — you barely needed the random effect. An ICC near 1 means almost all the variability is between groups, and ignoring it would give wildly anti-conservative inference.</p>
+<p>The <strong>intraclass correlation coefficient (ICC)</strong> is the proportion of total variation explained by the grouping. An ICC near 0 means groups are interchangeable, and you barely needed the random effect. An ICC near 1 means almost all the variability is between groups, and ignoring it would give wildly anti-conservative inference.</p>
 
 <h3>6. When to use a random effect at all</h3>
 <table>
 <tr><th>Use a random effect when…</th><th>Don't bother when…</th></tr>
 <tr><td>You have ≥ 5 (better: 8+) levels of the grouping.</td><td>You only have 2–3 levels. Use a fixed effect.</td></tr>
 <tr><td>You don't care about each level by name; they are exchangeable samples from a larger population (streams in Oregon, deer in a herd).</td><td>Each level is biologically distinct and you specifically want its coefficient (sex, treatment).</td></tr>
-<tr><td>Observations are nested or repeated within levels.</td><td>Each level has exactly one observation — you have no within-group residual to separate from the group effect. <em>(Linear models only: a GLMM has no separate residual variance, so a random effect with one observation per level is identifiable there. That is exactly the observation-level random effect used to absorb overdispersion in a Poisson or binomial GLMM.)</em></td></tr>
+<tr><td>Observations are nested or repeated within levels.</td><td>Each level has exactly one observation, so you have no within-group residual to separate from the group effect. <em>(Linear models only. A GLMM has no separate residual variance, so a random effect with one observation per level is identifiable there. That is exactly the observation-level random effect used to absorb overdispersion in a Poisson or binomial GLMM.)</em></td></tr>
 <tr><td>Generalization to <em>other</em> levels (other streams, other years) is the goal.</td><td>The levels are the universe of interest.</td></tr>
 </table>
 </section>
 
 <!-- ================================================================== -->
-<div class="practice-banner"><div class="label">Practice — answers visible</div><h3>Morning practice problems</h3><p>The exercises below are walk-through practice. Your graded morning assignment (Hierarchical modeling problem set) uses a separate, novel problem set &mdash; <strong>open the graded problem set below</strong> and write your answers in <code>morning_lab_template.Rmd</code>.</p><p style="margin: 8px 0 0 0;"><a class="hand-in" href="problem_set.html#morning">Open the graded morning problem set &rarr;</a> &nbsp;&nbsp; <a class="hand-in" href="morning_lab_template.Rmd" style="background:#1C638A; color:white; border-color:#1C638A;">morning_lab_template.Rmd &darr;</a></p></div>
+<div class="practice-banner"><div class="label">Practice (answers visible)</div><h3>Morning practice problems</h3><p>The exercises below are walk-through practice. Your graded morning assignment (Hierarchical modeling problem set) uses a separate, novel problem set. <strong>Open the graded problem set below</strong> and write your answers in <code>morning_lab_template.Rmd</code>.</p><p style="margin: 8px 0 0 0;"><a class="hand-in" href="problem_set.html#morning">Open the graded morning problem set &rarr;</a> &nbsp;&nbsp; <a class="hand-in" href="morning_lab_template.Rmd" style="background:#1C638A; color:white; border-color:#1C638A;">morning_lab_template.Rmd &darr;</a></p></div>
 <section id="morning">
 <h2>Morning lab · Mixed effects models (four progressive examples)</h2>
 
-<p>We use the same four datasets the original lab does: a simple stream example to see complete vs partial pooling side by side; a length–weight example to introduce random intercepts with a fixed-effect covariate; a nonlinear von Bertalanffy growth model to show that random effects work on parameters of nonlinear models too; and a fish trophic position dataset with two crossed random effects (lake and species) and multiple competing structures.</p>
+<p>We use the same four datasets the original lab does. A simple stream example to see complete vs partial pooling side by side; a length–weight example to introduce random intercepts with a fixed-effect covariate; a nonlinear von Bertalanffy growth model to show that random effects work on parameters of nonlinear models too; and a fish trophic position dataset with two crossed random effects (lake and species) and multiple competing structures.</p>
 
 <div class="callout warn">
-You'll see two packages in this lab: <code>nlme</code> (Pinheiro &amp; Bates, the classic — required for <code>nlme()</code> nonlinear models) and <code>lme4</code> (Bates et al., the modern workhorse). Both fit linear mixed models; <code>lme4::lmer()</code> is faster and uses a cleaner formula syntax (random terms in parentheses). For most linear problems you want <code>lme4</code>; for nonlinear mixed models you need <code>nlme</code>.
+You'll see two packages in this lab: <code>nlme</code> (Pinheiro &amp; Bates, the classic, and required for <code>nlme()</code> nonlinear models) and <code>lme4</code> (Bates et al., the modern workhorse). Both fit linear mixed models; <code>lme4::lmer()</code> is faster and uses a cleaner formula syntax (random terms in parentheses). For most linear problems you want <code>lme4</code>; for nonlinear mixed models you need <code>nlme</code>.
 </div>
 
 <!-- Example 1: Streams -->
@@ -228,13 +228,13 @@ lm3 &lt;- <span class="fn">lme</span>(fixed = Density ~ <span class="nu">1</span
 </ol>
 
 <details class="answer"><summary>Reveal worked solution</summary><div class="answer-body">
-<p><strong>(a)</strong> Let $y_{ij}$ be density measurement $i$ in stream $j$. <code>lm1</code>: $y_{ij} = \beta_0 + \varepsilon_{ij}$, two parameters ($\beta_0, \sigma^2$). <code>lm2</code>: $y_{ij} = \alpha_j + \varepsilon_{ij}$ with a free mean $\alpha_j$ for each of the $j=1,\dots,100$ streams — 101 parameters (100 means $+\ \sigma^2$). <code>lm3</code>: $y_{ij} = \beta_0 + b_{0,j} + \varepsilon_{ij}$, $b_{0,j} \sim \mathcal{N}(0,\sigma_\text{stream}^2)$ — only 3 parameters ($\beta_0, \sigma_\text{stream}^2, \sigma^2$), regardless of how many streams there are.</p>
+<p><strong>(a)</strong> Let $y_{ij}$ be density measurement $i$ in stream $j$. <code>lm1</code>: $y_{ij} = \beta_0 + \varepsilon_{ij}$, two parameters ($\beta_0, \sigma^2$). <code>lm2</code>: $y_{ij} = \alpha_j + \varepsilon_{ij}$ with a free mean $\alpha_j$ for each of the $j=1,\dots,100$ streams, 101 parameters (100 means $+\ \sigma^2$). <code>lm3</code>: $y_{ij} = \beta_0 + b_{0,j} + \varepsilon_{ij}$, $b_{0,j} \sim \mathcal{N}(0,\sigma_\text{stream}^2)$, only 3 parameters ($\beta_0, \sigma_\text{stream}^2, \sigma^2$), regardless of how many streams there are.</p>
 
 <p><strong>(b)</strong> Residuals from <code>lm1</code> cluster strongly by stream, entire streams are shifted above or below zero. This violates the independence assumption of OLS. Standard errors from <code>lm1</code> are too small (anti-conservative).</p>
 
-<p><strong>(c)</strong> Stream 11 has the lowest mean (8.9) and Stream 43 the highest (111.7); every stream has exactly 3 observations. The partially-pooled estimates from <code>lm3</code> sit slightly closer to the grand mean of 63.26 — Stream 11 moves 8.9 → 9.7, Stream 43 moves 111.7 → 111.0.</p>
-<p>What shrinkage does here is simple: every stream is pulled toward the grand mean by the <em>same percentage</em> of its distance from that mean, about 1.5%. Because it is the same fraction for all of them, a stream that starts far from the grand mean moves more in <em>absolute</em> terms — Stream 11 sits about 54 units below the mean and is nudged ~0.8, Stream 43 about 48 units above and is nudged ~0.7, but no stream is shrunk by a larger <em>fraction</em> than any other. Each estimate keeps roughly 98.5% of its own stream average and borrows just ~1.5% from the overall mean.</p>
-<p>Two things set how big that pull is: how noisy each stream's own average is, and how different the streams genuinely are. Here the streams differ a lot relative to the noise in a 3-observation average, so the model mostly trusts each stream's own data and barely shrinks, and because every stream has the same number of observations (3), every stream gets the same small pull. Shrinkage grows when a group has few or noisy observations, or when the groups are nearly alike; it fades toward nothing when each group's own data are already precise.</p>
+<p><strong>(c)</strong> Stream 11 has the lowest mean (8.9) and Stream 43 the highest (111.7); every stream has exactly 3 observations. The partially-pooled estimates from <code>lm3</code> sit slightly closer to the grand mean of 63.26. Stream 11 moves 8.9 → 9.7, Stream 43 moves 111.7 → 111.0.</p>
+<p>What shrinkage does here is simple. Every stream is pulled toward the grand mean by the <em>same percentage</em> of its distance from that mean, about 1.5%. Because it is the same fraction for all of them, a stream that starts far from the grand mean moves more in <em>absolute</em> terms. Stream 11 sits about 54 units below the mean and is nudged ~0.8, Stream 43 about 48 units above and is nudged ~0.7, but no stream is shrunk by a larger <em>fraction</em> than any other. Each estimate keeps roughly 98.5% of its own stream average and borrows just ~1.5% from the overall mean.</p>
+<p>Two things set how big that pull is, how noisy each stream's own average is, and how different the streams genuinely are. Here the streams differ a lot relative to the noise in a 3-observation average, so the model mostly trusts each stream's own data and barely shrinks, and because every stream has the same number of observations (3), every stream gets the same small pull. Shrinkage grows when a group has few or noisy observations, or when the groups are nearly alike; it fades toward nothing when each group's own data are already precise.</p>
 
 <p><strong>(d)</strong> Approximate output:</p>
 <pre><code>Random effects:
@@ -261,7 +261,7 @@ intervals(lm3)$sigma
 <div class="exercise" id="ex-2">
 <span class="ex-tag">Practice Exercise M2</span><span class="difficulty medium"> · length-weight</span>
 <h3>Length–weight: random intercepts with a fixed-effect covariate</h3>
-<p><code>length_weight.csv</code> has length and weight for individuals from multiple subjects (groups). The biological question: is there a length–weight relationship, and does the intercept vary by subject?</p>
+<p><code>length_weight.csv</code> has length and weight for individuals from multiple subjects (groups). The biological question is whether there is a length–weight relationship, and does the intercept vary by subject?</p>
 
 <div class="code-label">Code</div>
 <pre><code>TheData &lt;- <span class="fn">read.csv</span>(<span class="st">"data/length_weight.csv"</span>)
@@ -328,12 +328,12 @@ m_fixed &lt;- <span class="fn">nls</span>(Length ~ Linf*(<span class="nu">1</spa
 <details class="answer"><summary>Reveal worked solution</summary><div class="answer-body">
 <p><strong>(a)</strong> Asymptotic body size depends on genetics, food availability, and individual life history. Pooling all fish into a single $L_\infty$ ignores real biological heterogeneity.</p>
 
-<p><strong>(b)</strong> Residuals from the fixed-effects <code>nls</code> form coherent vertical clusters by subject, entire subjects are systematically above or below zero. This is the same diagnostic as in the streams example: independence is violated.</p>
+<p><strong>(b)</strong> Residuals from the fixed-effects <code>nls</code> form coherent vertical clusters by subject, entire subjects are systematically above or below zero. This is the same diagnostic as in the streams example. Independence is violated.</p>
 
 <p><strong>(c)</strong> The mixed-model within-subject residual SE is much smaller than the <code>nls</code> residual SE: $0.1060$ against $5.4168$ on this file, because the random effect on $L_\infty$ absorbed the among-subject variability that <code>nls</code> was forced to dump into residuals.</p>
 
 <div class="eq-block">$\overline{\left(1 - e^{-\kappa(a - t_0)}\right)^2}\;\sigma_{L_\infty}^2 = 0.4211 \times 68.697 = 28.93,$</div>
-<p>which <em>is</em> the <code>nls</code> residual variance of $29.34$. The additive partition is a random-<em>intercept</em> result: it holds when the random effect enters the mean with coefficient 1. $L_\infty$ does not, so you have to carry the attenuation factor through.</p>
+<p>which <em>is</em> the <code>nls</code> residual variance of $29.34$. The additive partition is a random-<em>intercept</em> result. It holds when the random effect enters the mean with coefficient 1. $L_\infty$ does not, so you have to carry the attenuation factor through.</p>
 
 <p><strong>(d)</strong> It returns the BLUP (best linear unbiased predictor) of each subject's $L_\infty$, population mean plus the partially-pooled random deviation. Compared with running a separate <code>nls</code> per subject, BLUPs use information from <em>other</em> subjects to stabilize estimates for subjects with sparse or noisy data. In general, subjects with few or noisy age-points get pulled hard toward the population mean while data-rich subjects stay near their own MLE, but do not go looking for that contrast in <code>fish_growth.csv</code>: all 10 fish have exactly 10 age-points each, so the design is balanced and every subject receives the same amount of pull. Seeing sparse subjects shrink harder than dense ones requires an <em>unbalanced</em> dataset.</p>
 </div></details>
@@ -364,7 +364,7 @@ fit_with_x &lt;- <span class="fn">lmer</span>(Z_TP ~ Z_Length + (<span class="nu
 <p><strong>(b)</strong> The LRT statistic is twice the gain in maximized log-likelihood from adding the one fixed slope: $\Lambda = 2(\ell_\text{alt} - \ell_\text{null})$. Here the ML log-likelihoods are $\ell_\text{null} = -146.4$ and $\ell_\text{alt} = -33.5$, so</p>
 <div class="eq-block">$\Lambda = 2\big(-33.5 - (-146.4)\big) = 225.9 \quad\text{on 1 df},\qquad p \approx 5\times10^{-51}.$</div>
 <p>Body length is overwhelmingly supported, and AIC agrees: <strong>300.8</strong> without the slope against <strong>77.0</strong> with it, a drop of 224 units. Both tools point the same way, which is the ordinary case.</p>
-<div class="callout key"><p><strong>Why are we selecting models before we have covered model selection?</strong> Two reasons. First, the honest answer to "is length supported?" here is that you do not need a selection criterion at all: the slope is $0.420$ with a standard error of $0.019$, a 95% interval of $[0.382, 0.458]$ nowhere near zero. Reading the coefficient and its interval is the first thing you should do, and often the last. Second, we are running the LRT and AIC anyway because you need the mechanics in hand before this afternoon, when the whole session is about what these criteria do <em>not</em> tell you. Today they agree with the coefficient and with each other; that will not always be true.</p></div>
+<div class="callout key"><p><strong>Why are we selecting models before we have covered model selection?</strong> Two reasons. First, the honest answer to "is length supported?" here is that you do not need a selection criterion at all. The slope is $0.420$ with a standard error of $0.019$, a 95% interval of $[0.382, 0.458]$ nowhere near zero. Reading the coefficient and its interval is the first thing you should do, and often the last. Second, we are running the LRT and AIC anyway because you need the mechanics in hand before this afternoon, when the whole session is about what these criteria do <em>not</em> tell you. Today they agree with the coefficient and with each other; that will not always be true.</p></div>
 
 <p><strong>(c)</strong> REML gives less-biased variance components. The point estimates of the fixed effects barely change, but the standard errors are more honest under REML.</p>
 </div></details>
@@ -377,12 +377,12 @@ fit_with_x &lt;- <span class="fn">lmer</span>(Z_TP ~ Z_Length + (<span class="nu
 
 <!-- ================================================================== -->
 <section id="concepts2">
-<h2>Core concepts — model selection</h2>
+<h2>Core concepts: model selection</h2>
 
 <h3>1. The likelihood ratio test (LRT) for nested models</h3>
 <p>If model $M_0$ is a special case of $M_1$ (e.g., one coefficient set to zero), then under the null hypothesis that $M_0$ is true,</p>
 <div class="eq-block">$2\left[\ell(M_1) - \ell(M_0)\right] \;\sim\; \chi^2_{\,k_1 - k_0}$</div>
-<p>where $\ell$ is the maximized log-likelihood and $k$ is the parameter count. The test is approximate, and it is least reliable exactly where mixed-model users reach for it: when you are testing whether a variance component is zero, because zero sits on the boundary of the values a variance is allowed to take. In that situation the reported $p$-value is too large. If it matters to your conclusion, use <code>RLRsim::exactRLRT()</code> or a parametric bootstrap, which build the correct reference distribution by simulation.</p>
+<p>where $\ell$ is the maximized log-likelihood and $k$ is the parameter count. The test is approximate, and it is least reliable exactly where mixed-model users reach for it, when you are testing whether a variance component is zero, because zero sits on the boundary of the values a variance is allowed to take. In that situation the reported $p$-value is too large. If it matters to your conclusion, use <code>RLRsim::exactRLRT()</code> or a parametric bootstrap, which build the correct reference distribution by simulation.</p>
 
 <h3>2. AIC, AICc, BIC</h3>
 <table>
@@ -397,14 +397,14 @@ fit_with_x &lt;- <span class="fn">lmer</span>(Z_TP ~ Z_Length + (<span class="nu
 <div class="callout warn">
 <strong>The $\Delta\text{AIC} &lt; 2$ misconception.</strong> A common (but problematic) rule of thumb says any model within 2 AIC units of the best is "competitive." Two important caveats:
 <ul>
-<li>This is <em>asymmetric</em>. Adding one pure-noise parameter changes AIC by exactly $\Delta\text{AIC} = 2 - \chi^2_1$, where $\chi^2_1$ is the likelihood-ratio statistic for the extra term. Since that statistic is never negative, the penalty of 2 is the <em>most</em> the complex model can ever be behind, and it is usually behind by less: on average $\chi^2_1 = 1$, so the typical gap is about 1, and roughly 16% of the time $\chi^2_1$ exceeds 2 and the noise model wins outright. So $\Delta\text{AIC} \le 2$ sweeps in models that <em>cannot</em> be further behind than that by construction; it is not evidence of an effect. Note the rule only bites in this direction. If the more complex model is 2 AIC units <em>better</em>, that is a real gap and the simpler model is not competitive.</li>
+<li>This is <em>asymmetric</em>. Adding one pure-noise parameter changes AIC by exactly $\Delta\text{AIC} = 2 - \chi^2_1$, where $\chi^2_1$ is the likelihood-ratio statistic for the extra term. Since that statistic is never negative, the penalty of 2 is the <em>most</em> the complex model can ever be behind, and it is usually behind by less. On average $\chi^2_1 = 1$, so the typical gap is about 1, and roughly 16% of the time $\chi^2_1$ exceeds 2 and the noise model wins outright. So $\Delta\text{AIC} \le 2$ sweeps in models that <em>cannot</em> be further behind than that by construction; it is not evidence of an effect. Note the rule only bites in this direction. If the more complex model is 2 AIC units <em>better</em>, that is a real gap and the simpler model is not competitive.</li>
 <li>The rule conflates "predictively comparable" with "biologically supported." You'll see in the simulations below that nonsense predictors slip into the "best" model with $\Delta\text{AIC} = 0$ surprisingly often.</li>
 </ul>
 </div>
 
-<h3>3. Cross-validation — the direct way to estimate prediction error</h3>
+<h3>3. Cross-validation: the direct way to estimate prediction error</h3>
 <p>If the goal is predictive performance, the most honest evaluation is to hold out data, fit on the rest, and measure prediction error on the held-out set. Leave-one-out cross-validation (LOOCV) does this $n$ times, $k$-fold CV does it $k$ times. <code>boot::cv.glm()</code> gives you LOOCV (and $k$-fold) for a GLM.</p>
-<p>Be careful about what this does and does not buy you. CV gives you a direct <em>estimate</em> of out-of-sample error, which is exactly what you want when the question is "how well does this model predict?" It is <strong>not</strong> an independent safeguard against picking the wrong model: for a Gaussian linear model, LOOCV is asymptotically equivalent to AIC (Stone 1977), so the two agree far more often than intuition suggests — and are fooled by the same noise. Exercise A3 makes you measure this yourself rather than take it on faith.</p>
+<p>Be careful about what this does and does not buy you. CV gives you a direct <em>estimate</em> of out-of-sample error, which is exactly what you want when the question is "how well does this model predict?" It is <strong>not</strong> an independent safeguard against picking the wrong model. For a Gaussian linear model, LOOCV is asymptotically equivalent to AIC (Stone 1977), so the two agree far more often than intuition suggests, and are fooled by the same noise. Exercise A3 makes you measure this yourself rather than take it on faith.</p>
 
 <div class="eq-block">$\text{MSE}_\text{CV} = \dfrac{1}{n}\sum_{i=1}^n \big(y_i - \hat{f}_{-i}(\mathbf{x}_i)\big)^2$</div>
 <p>where $\hat{f}_{-i}$ is the model fit with the $i$-th observation withheld. Models that overfit will perform well on the training data but poorly on the held-out fold; CV exposes this directly.</p>
@@ -416,7 +416,7 @@ weight each model's predictions and can be used for model-averaged effect estima
 </section>
 
 <!-- ================================================================== -->
-<div class="practice-banner"><div class="label">Practice — answers visible</div><h3>Afternoon practice problems</h3><p>The exercises below are walk-through practice. Your graded afternoon assignment (Model selection problem set) uses a separate, novel problem set &mdash; <strong>open the graded problem set below</strong> and write your answers in <code>afternoon_lab_template.Rmd</code>.</p><p style="margin: 8px 0 0 0;"><a class="hand-in" href="problem_set.html#afternoon">Open the graded afternoon problem set &rarr;</a> &nbsp;&nbsp; <a class="hand-in" href="afternoon_lab_template.Rmd" style="background:#1C638A; color:white; border-color:#1C638A;">afternoon_lab_template.Rmd &darr;</a></p></div>
+<div class="practice-banner"><div class="label">Practice (answers visible)</div><h3>Afternoon practice problems</h3><p>The exercises below are walk-through practice. Your graded afternoon assignment (Model selection problem set) uses a separate, novel problem set. <strong>Open the graded problem set below</strong> and write your answers in <code>afternoon_lab_template.Rmd</code>.</p><p style="margin: 8px 0 0 0;"><a class="hand-in" href="problem_set.html#afternoon">Open the graded afternoon problem set &rarr;</a> &nbsp;&nbsp; <a class="hand-in" href="afternoon_lab_template.Rmd" style="background:#1C638A; color:white; border-color:#1C638A;">afternoon_lab_template.Rmd &darr;</a></p></div>
 <section id="afternoon">
 <h2>Afternoon lab · Model selection &amp; the limits of "the best model"</h2>
 
@@ -442,7 +442,7 @@ lm2 &lt;- <span class="fn">lm</span>(y ~ x + x2)
 
 <ol type="a">
 <li>Run the code 20 times (resampling x2 and y each time). How often does the model with the nonsense variable have $\Delta\text{AIC} &lt; 2$?</li>
-<li>Use the snippet below to formalize it — what fraction of 1000 reps puts the "junk" model within 2 AIC units of the right one?</li>
+<li>Use the snippet below to formalize it. What fraction of 1000 reps puts the "junk" model within 2 AIC units of the right one?</li>
 </ol>
 
 <pre><code>reps &lt;- <span class="nu">1000</span>
@@ -455,9 +455,9 @@ within2 &lt;- <span class="fn">replicate</span>(reps, {
 <span class="fn">mean</span>(within2) <span class="cm"># essentially 1.0 &mdash; it is always within 2</span></code></pre>
 
 <details class="answer"><summary>Reveal solution &amp; discussion</summary><div class="answer-body">
-<p>The nonsense-variable model is within 2 AIC units of the correct model <em>essentially 100% of the time — it always is</em>. This is not luck; it falls straight out of the definition of AIC. Write $\text{AIC} = -2\ell + 2k$ for each model and subtract the simpler ($k$ parameters) from the more complex ($k+1$ parameters):</p>
+<p>The nonsense-variable model is within 2 AIC units of the correct model <em>essentially 100% of the time. It always is</em>. This is not luck; it falls straight out of the definition of AIC. Write $\text{AIC} = -2\ell + 2k$ for each model and subtract the simpler ($k$ parameters) from the more complex ($k+1$ parameters):</p>
 <div class="eq-block">$\Delta\text{AIC} = \text{AIC}_{\text{big}} - \text{AIC}_{\text{small}} = -2\big(\ell_{\text{big}} - \ell_{\text{small}}\big) + 2\big[(k+1) - k\big] = 2 - \chi^2_1,$</div>
-<p>because $2(\ell_{\text{big}} - \ell_{\text{small}})$ is exactly the likelihood-ratio statistic $\chi^2_1$ for the extra term (twice the gain in maximized log-likelihood). This is the general identity worth keeping — <strong>adding one parameter moves AIC by $2 - \chi^2_1$</strong>: the penalty for a parameter is a flat $+2$, while the reward is a random $\chi^2_1$. Two consequences follow at once. Since $\chi^2_1 \ge 0$ always, $\Delta\text{AIC} \le 2$ always: a nested one-extra-parameter model is <em>within 2 by construction</em>, whatever the data say. And the junk model wins outright ($\Delta\text{AIC} &lt; 0$) exactly when $\chi^2_1 &gt; 2$, which for a true null happens with probability $P(\chi^2_1 &gt; 2) = 0.157$, about 16% of the time. The $\Delta\text{AIC} &lt; 2$ rule does not screen out useless variables at all.</p>
+<p>because $2(\ell_{\text{big}} - \ell_{\text{small}})$ is exactly the likelihood-ratio statistic $\chi^2_1$ for the extra term (twice the gain in maximized log-likelihood). This is the general identity worth keeping. <strong>Adding one parameter moves AIC by $2 - \chi^2_1$</strong>: the penalty for a parameter is a flat $+2$, while the reward is a random $\chi^2_1$. Two consequences follow at once. Since $\chi^2_1 \ge 0$ always, $\Delta\text{AIC} \le 2$ always, so a nested one-extra-parameter model is <em>within 2 by construction</em>, whatever the data say. And the junk model wins outright ($\Delta\text{AIC} &lt; 0$) exactly when $\chi^2_1 &gt; 2$, which for a true null happens with probability $P(\chi^2_1 &gt; 2) = 0.157$, about 16% of the time. The $\Delta\text{AIC} &lt; 2$ rule does not screen out useless variables at all.</p>
 <p><strong>The lesson:</strong> the $\Delta\text{AIC} &lt; 2$ rule is structurally biased toward including junk. Anderson &amp; Burnham's own writing has been used selectively here; many authors (Arnold 2010 is the standard reference) push back on the "include any model within 2" practice and emphasize that the included variable's <em>coefficient and CI</em> have to do real work.</p>
 </div></details>
 </div>
@@ -494,7 +494,7 @@ pstor &lt;- AICstor &lt;- AICcstor &lt;- BICstor &lt;- <span class="fn">rep</spa
  BIC = <span class="fn">mean</span>(BICstor &gt; <span class="nu">0</span>))</code></pre>
 
 <ol type="a">
-<li>Predict before you run: which criterion will pick "at least one noise variable" most often?</li>
+<li>Predict before you run. Which criterion will pick "at least one noise variable" most often?</li>
 <li>Run the simulation. Report the four proportions. Compare to your prediction.</li>
 <li>Why does BIC do so much better than AIC at avoiding noise variables in this setting? When would BIC backfire?</li>
 </ol>
@@ -508,9 +508,9 @@ pstor &lt;- AICstor &lt;- AICcstor &lt;- BICstor &lt;- <span class="fn">rep</spa
 <tr><td>AICc</td><td>~0.39</td></tr>
 <tr><td>BIC</td><td>~0.16</td></tr>
 </table>
-<p>AIC and AICc retain a noise predictor in the top model about 40&ndash;45% of the time. You can <em>predict</em> that rate rather than only reporting it, using the $\Delta\text{AIC} = 2 - \chi^2_1$ identity from Exercise A1: a single noise predictor enters the AIC-best model exactly when it clears $\chi^2_1 &gt; 2$ — probability $0.157$ each. With three near-independent noise predictors, the chance that <em>at least one</em> slips in is</p>
+<p>AIC and AICc retain a noise predictor in the top model about 40&ndash;45% of the time. You can <em>predict</em> that rate rather than only reporting it, using the $\Delta\text{AIC} = 2 - \chi^2_1$ identity from Exercise A1. A single noise predictor enters the AIC-best model exactly when it clears $\chi^2_1 &gt; 2$, probability $0.157$ each. With three near-independent noise predictors, the chance that <em>at least one</em> slips in is</p>
 <div class="eq-block">$1 - (1 - 0.157)^3 = 1 - 0.843^3 = 0.40,$</div>
-<p>in line with the simulated 40&ndash;45% (the small excess is joint selection and the mild correlation among the fitted predictors). The same reusable move explains the two conservative criteria, each just raises the bar the extra variable must clear. The family-wise p-value rate is $1 - 0.95^3 \approx 0.14$. BIC replaces AIC's flat penalty of 2 with $\ln n \approx 3.9$ for $n = 50$, so a junk predictor now needs $\chi^2_1 &gt; 3.9$ (probability $P(\chi^2_1 &gt; 3.9) \approx 0.048$ each, hence $1 - (1 - 0.048)^3 \approx 0.14$ overall) — about as strict as the p-value screen, and matching the observed $\approx 0.16$. AIC's penalty of 2 is simply too small to keep junk out.</p>
+<p>in line with the simulated 40&ndash;45% (the small excess is joint selection and the mild correlation among the fitted predictors). The same reusable move explains the two conservative criteria, each just raises the bar the extra variable must clear. The family-wise p-value rate is $1 - 0.95^3 \approx 0.14$. BIC replaces AIC's flat penalty of 2 with $\ln n \approx 3.9$ for $n = 50$, so a junk predictor now needs $\chi^2_1 &gt; 3.9$ (probability $P(\chi^2_1 &gt; 3.9) \approx 0.048$ each, hence $1 - (1 - 0.048)^3 \approx 0.14$ overall), about as strict as the p-value screen, and matching the observed $\approx 0.16$. AIC's penalty of 2 is simply too small to keep junk out.</p>
 <p><strong>When would BIC backfire?</strong> When true effects are <em>weak</em>. BIC's heavier penalty buys Type-I safety at the cost of Type-II error, see the next exercise.</p>
 </div></details>
 </div>
@@ -543,7 +543,7 @@ aic &lt;- <span class="fn">sapply</span>(forms, <span class="kw">function</span>
 
 <ol type="a">
 <li>Which model has the smallest LOOCV MSE? Which does AIC pick? Is either one the true model?</li>
-<li>By how much does the winner beat the intercept-only model — in AIC units, and as a percentage of the CV MSE? The winner is just the intercept-only model plus one junk predictor, so the $\Delta\text{AIC} = 2 - \chi^2_1$ identity from the core-concepts section applies. Use it to work out what that margin actually tells you.</li>
+<li>By how much does the winner beat the intercept-only model, in AIC units and as a percentage of the CV MSE? The winner is just the intercept-only model plus one junk predictor, so the $\Delta\text{AIC} = 2 - \chi^2_1$ identity from the core-concepts section applies. Use it to work out what that margin actually tells you.</li>
 <li>Repeat over many simulated datasets. What fraction of the time does the intercept-only model (truth!) win on LOOCV, and what fraction on AIC? Do the two criteria disagree as often as you expected?</li>
 <li>Neither criterion recovers the truth reliably here. Is that a defect in the criteria, and would a better criterion fix it?</li>
 </ol>
@@ -562,13 +562,13 @@ m12  6.309 235.939 2.880</code></pre>
 <p>The two orderings are nearly identical (Spearman correlation 0.95). This is the first hint that CV is not an independent check on AIC.</p>
 <p><strong>(b)</strong> <code>m3</code> beats the truth by $\Delta$AIC = 0.658 and by 0.036 in CV MSE, six tenths of one percent. But the interesting part is <em>why</em> the margin has that value. <code>m3</code> is <code>m0</code> with one extra junk predictor, so the identity from the core-concepts section applies exactly:</p>
 <div class="eq-block">$\Delta\text{AIC} = 2 - \chi^2_1 = 2 - 2.658 = -0.658$</div>
-<p>The entire margin is just the likelihood-ratio statistic for <code>x3</code>, which is $\chi^2_1 = 2.658$ ($p = 0.103$, not close to significant). <code>x3</code> wins for one reason and one reason only: its $\chi^2$ landed above 2. That is exactly the event you already met when the $\Delta\text{AIC} &lt; 2$ rule was picked apart: $P(\chi^2_1 &gt; 2) = 15.7\%$, the rate at which a junk variable takes the top spot outright. Exercise A3 is not a new phenomenon; it is that same 16% event, caught in the act.</p>
+<p>The entire margin is just the likelihood-ratio statistic for <code>x3</code>, which is $\chi^2_1 = 2.658$ ($p = 0.103$, not close to significant). <code>x3</code> wins for one reason and one reason only. Its $\chi^2$ landed above 2. That is exactly the event you already met when the $\Delta\text{AIC} &lt; 2$ rule was picked apart: $P(\chi^2_1 &gt; 2) = 15.7\%$, the rate at which a junk variable takes the top spot outright. Exercise A3 is not a new phenomenon; it is that same 16% event, caught in the act.</p>
 <p>So do <em>not</em> read this table by asking which models fall within 2 AIC of the winner. As you saw earlier, a nested junk model is within 2 by construction, so that question has a guaranteed answer and tells you nothing. Ask instead what <code>x3</code>'s coefficient does: $-1.914$ with a 95% CI of $[-4.292,\ 0.463]$, spanning zero. The variable that "won" cannot even sign its own effect.</p>
 <p><strong>(c)</strong> Over 2000 simulated datasets the intercept-only model wins <strong>58.4%</strong> of the time on LOOCV and <strong>57.6%</strong> on AIC. That gap of 0.8 points is smaller than the Monte Carlo error on either estimate (±2.2), so the honest reading is that the two criteria perform <em>identically</em>. They select the same model 90% of the time. Both are fooled by noise in roughly 42% of datasets.</p>
-<p>This is not a coincidence of this simulation. For a Gaussian linear model, leave-one-out CV and AIC are <strong>asymptotically equivalent</strong> — Stone (1977) proved they are the same criterion in the limit, and at $n=50$ they have already nearly converged. Holding data out does not buy you protection AIC lacks; it is a different route to the same number.</p>
-<p>That equivalence is the best reason AIC is everywhere. LOOCV is the gold-standard estimate of out-of-sample prediction error, but it costs you $n$ refits; AIC gives you the same answer in closed form from a <em>single</em> fit. So when the goal is genuinely <strong>prediction</strong>, which model will forecast best on data it has not seen — AIC is doing exactly its job, and doing it cheaply, which is why it became the standard tool. The trouble in this exercise is not that AIC predicts badly; it is that we asked a prediction criterion an <strong>inference</strong> question — "which variable is real?", that it was never built to answer. Much of the ecology literature slips here, reading a low-$\Delta$AIC predictor as an established effect. Keep the two jobs apart: AIC (≈ LOOCV) ranks models for prediction; coefficients, intervals, and study design tell you whether an effect is real.</p>
-<p><strong>(d)</strong> Not a defect, and no. With eight candidate models and $n=50$, three noise predictors will produce spurious in-sample fit some of the time, and <em>any</em> criterion that ranks models on fit to this one dataset will sometimes rank noise first. The criteria are answering the question they were asked — "which of these eight predicts best?", and dutifully returning an answer even though the honest answer is "none of them, and they are all the same." Selection returns a winner whether or not one deserves to win.</p>
-<p>What helps is not a cleverer criterion but a different question. Once a table is in front of you, the rank is the least informative thing in it — make the winning variable justify itself with its coefficient and interval, as in (b), where <code>x3</code>'s CI comfortably contains zero (this is Arnold's 2010 point). And upstream of that, keep the candidate set small and tied to hypotheses you held before seeing the data: the 42% failure rate is a direct consequence of dredging eight models out of pure noise. Fewer, better-motivated models is the only move here that changes the failure rate rather than relabeling it.</p>
+<p>This is not a coincidence of this simulation. For a Gaussian linear model, leave-one-out CV and AIC are <strong>asymptotically equivalent</strong>. Stone (1977) proved they are the same criterion in the limit, and at $n=50$ they have already nearly converged. Holding data out does not buy you protection AIC lacks; it is a different route to the same number.</p>
+<p>That equivalence is the best reason AIC is everywhere. LOOCV is the gold-standard estimate of out-of-sample prediction error, but it costs you $n$ refits; AIC gives you the same answer in closed form from a <em>single</em> fit. So when the goal is genuinely <strong>prediction</strong>, which model will forecast best on data it has not seen, AIC is doing exactly its job, and doing it cheaply, which is why it became the standard tool. The trouble in this exercise is not that AIC predicts badly; it is that we asked a prediction criterion an <strong>inference</strong> question, "which variable is real?", that it was never built to answer. Much of the ecology literature slips here, reading a low-$\Delta$AIC predictor as an established effect. Keep the two jobs apart: AIC (≈ LOOCV) ranks models for prediction; coefficients, intervals, and study design tell you whether an effect is real.</p>
+<p><strong>(d)</strong> Not a defect, and no. With eight candidate models and $n=50$, three noise predictors will produce spurious in-sample fit some of the time, and <em>any</em> criterion that ranks models on fit to this one dataset will sometimes rank noise first. The criteria are answering the question they were asked, "which of these eight predicts best?", and dutifully returning an answer even though the honest answer is "none of them, and they are all the same." Selection returns a winner whether or not one deserves to win.</p>
+<p>What helps is not a cleverer criterion but a different question. Once a table is in front of you, the rank is the least informative thing in it. Make the winning variable justify itself with its coefficient and interval, as in (b), where <code>x3</code>'s CI comfortably contains zero (this is Arnold's 2010 point). And upstream of that, keep the candidate set small and tied to hypotheses you held before seeing the data. The 42% failure rate is a direct consequence of dredging eight models out of pure noise. Fewer, better-motivated models is the only move here that changes the failure rate rather than relabeling it.</p>
 <p><strong>Caveat:</strong> both criteria are about prediction. If your question is "is variable X causally important," neither AIC nor CV answers it; you need a causal frame and (often) a designed experiment.</p>
 </div></details>
 </div>
@@ -579,7 +579,7 @@ m12  6.309 235.939 2.880</code></pre>
 <h3>LRT vs AICc for a random-slope decision</h3>
 <p>Return to the trophic-position dataset. Compare two nested random-effects structures using both LRT and AICc.</p>
 
-<div class="callout key"><strong>Note the double bar.</strong> <code>(1 + Z_Length || Fish_Species)</code> gives species their own intercepts <em>and</em> their own slopes, but fixes the correlation between the two at zero. With only three species there is not enough information to estimate that correlation on top of the two variances: the single-bar form <code>(1 + Z_Length | Fish_Species)</code> returns <code>boundary (singular) fit</code>, with the correlation pinned at exactly 1.000. You work through why in the morning problem set (Problem 4); here we use the version that converges.</div>
+<div class="callout key"><strong>Note the double bar.</strong> <code>(1 + Z_Length || Fish_Species)</code> gives species their own intercepts <em>and</em> their own slopes, but fixes the correlation between the two at zero. With only three species there is not enough information to estimate that correlation on top of the two variances. The single-bar form <code>(1 + Z_Length | Fish_Species)</code> returns <code>boundary (singular) fit</code>, with the correlation pinned at exactly 1.000. You work through why in the morning problem set (Problem 4); here we use the version that converges.</div>
 <pre><code><span class="cm"># Both fit with REML because they share the same fixed effects</span>
 m_int &lt;- <span class="fn">lmer</span>(Z_TP ~ Z_Length + (<span class="nu">1</span>|Fish_Species) + (<span class="nu">1</span>|Lake), data=dat, REML=<span class="kw">TRUE</span>)
 m_slop &lt;- <span class="fn">lmer</span>(Z_TP ~ Z_Length + (<span class="nu">1</span>+Z_Length||Fish_Species) + (<span class="nu">1</span>|Lake), data=dat, REML=<span class="kw">TRUE</span>)
@@ -595,7 +595,7 @@ m_slop &lt;- <span class="fn">lmer</span>(Z_TP ~ Z_Length + (<span class="nu">1<
 
 <details class="answer"><summary>Reveal solution</summary><div class="answer-body">
 <p><strong>(a)</strong> The two models share fixed effects but differ in random structure. We compare REML log-likelihoods because they are unbiased for variance components. Setting <code>refit = FALSE</code> prevents <code>anova</code> from refitting them under ML.</p>
-<p><strong>(b)</strong> Run them. Here the two agree emphatically: the species-level random slope is strongly supported both ways:</p>
+<p><strong>(b)</strong> Run them. Here the two agree emphatically. The species-level random slope is strongly supported both ways:</p>
 <pre><code>anova(m_int, m_slop, refit=FALSE)
 #         npar   AIC    logLik  Chisq Df  Pr(>Chisq)
 # m_int      5  82.47  -36.23
@@ -605,9 +605,9 @@ AICcmodavg::aictab(list(intercepts_only=m_int, with_species_slope=m_slop))
 #                    K   AICc  Delta_AICc  AICcWt
 # with_species_slope 6  42.36    0.00      1.00
 # intercepts_only    5  82.81   40.45      0.00</code></pre>
-<p>The LRT gives $\chi^2 = 50.8$ on 2 df, $p \approx 9\times10^{-12}$; AICc favors the random-slope model by $\Delta$AICc $= 46.5$ (Akaike weight $\approx 1.00$). This is easy territory, keep the slope. But notice <em>what each statistic claimed</em>, because they answer different questions and will not always agree. The LRT asks "is the larger model significantly better at maximizing likelihood?": an inference question about whether the slope variance is really nonzero. AICc asks "is the larger model expected to predict better out of sample?" When they disagree (LRT says "not significant" but AICc still prefers the bigger model), let the question decide: for inference — does the random slope matter biologically? — lean on the LRT and the variance-component CI; for prediction, trust AICc (which, from Exercise A3, is ≈ LOOCV).</p>
+<p>The LRT gives $\chi^2 = 42.6$ on 1 df, $p \approx 7\times10^{-11}$; AICc favors the random-slope model by $\Delta$AICc $= 40.5$ (Akaike weight $\approx 1.00$). This is easy territory, keep the slope. But notice <em>what each statistic claimed</em>, because they answer different questions and will not always agree. The LRT asks "is the larger model significantly better at maximizing likelihood?", an inference question about whether the slope variance is really nonzero. AICc asks "is the larger model expected to predict better out of sample?" When they disagree (LRT says "not significant" but AICc still prefers the bigger model), let the question decide. For inference (does the random slope matter biologically?) lean on the LRT and the variance-component CI; for prediction, trust AICc (which, from Exercise A3, is ≈ LOOCV).</p>
 <p><strong>(c)</strong> One catch makes the LRT $p$-value untrustworthy in borderline cases. The null hypothesis is that the slope variance is <em>exactly zero</em>, but a variance cannot be negative, so zero sits on the very edge of the values the parameter is allowed to take. When you test a parameter at the boundary of its space, the usual $\chi^2$ reference distribution is the wrong one, and it makes the reported $p$-value <strong>too large</strong> (conservative). A genuinely important random slope can therefore come back looking "not significant."</p>
-<p>Here it does not matter: the effect is so strong ($p \approx 9\times10^{-12}$) that no correction would change the verdict. But in a borderline case the boundary correction can flip your conclusion. <strong>The practical rule:</strong> for a boundary test — "is this variance zero?" — do not trust <code>anova()</code>'s $p$-value. Use <code>RLRsim::exactRLRT()</code> or a parametric bootstrap, which build the correct reference distribution by simulation and give you an honest $p$-value.</p>
+<p>Here it does not matter. The effect is so strong ($p \approx 7\times10^{-11}$) that no correction would change the verdict. But in a borderline case the boundary correction can flip your conclusion. <strong>The practical rule:</strong> for a boundary test ("is this variance zero?") do not trust <code>anova()</code>'s $p$-value. Use <code>RLRsim::exactRLRT()</code> or a parametric bootstrap, which build the correct reference distribution by simulation and give you an honest $p$-value.</p>
 </div></details>
 </div>
 
@@ -621,7 +621,7 @@ AICcmodavg::aictab(list(intercepts_only=m_int, with_species_slope=m_slop))
 <p>By the end of today, you should be skeptical of three habits:</p>
 <ol>
 <li><strong>Dredging</strong>: fitting every subset of predictors with <code>dredge()</code> or stepwise selection, then reporting the "best" model as if its coefficients were honest. The simulations above show how this manufactures false discoveries.</li>
-<li><strong>Reporting only p-values or $\Delta\text{AIC}$ instead of the effect size.</strong> A coefficient with a tight CI bounded well away from zero is a meaningful effect; a coefficient with a wide CI is uncertain no matter what any criterion says. (For a <em>Wald</em> CI and a Wald test built from the same SE, "the 95% CI overlaps zero" and "$p &gt; 0.05$" are the same statement, so they cannot disagree. That equivalence is not general: a profile-likelihood or bootstrap CI is built differently and can perfectly well sit off zero while an LRT returns $p &gt; 0.05$, or vice versa — which is exactly why, in the singular-fit and boundary cases above, we prefer the profile/bootstrap interval to the Wald one.) The science lives in the <em>magnitude and direction</em> of the effect and how sure you are of it, not in whether it cleared a $p = 0.05$ or $\Delta\text{AIC} = 2$ threshold.</li>
+<li><strong>Reporting only p-values or $\Delta\text{AIC}$ instead of the effect size.</strong> A coefficient with a tight CI bounded well away from zero is a meaningful effect; a coefficient with a wide CI is uncertain no matter what any criterion says. (For a <em>Wald</em> CI and a Wald test built from the same SE, "the 95% CI overlaps zero" and "$p &gt; 0.05$" are the same statement, so they cannot disagree. That equivalence is not general. A profile-likelihood or bootstrap CI is built differently and can perfectly well sit off zero while an LRT returns $p &gt; 0.05$, or vice versa, which is exactly why, in the singular-fit and boundary cases above, we prefer the profile/bootstrap interval to the Wald one.) The science lives in the <em>magnitude and direction</em> of the effect and how sure you are of it, not in whether it cleared a $p = 0.05$ or $\Delta\text{AIC} = 2$ threshold.</li>
 <li><strong>Confusing prediction quality with effect support.</strong> Two different questions, two different criteria. Cross-validation tells you about prediction; coefficient CIs (and study design) tell you about effects.</li>
 </ol>
 </div>
@@ -629,12 +629,12 @@ AICcmodavg::aictab(list(intercepts_only=m_int, with_species_slope=m_slop))
 <p>A defensible workflow:</p>
 <ol>
 <li><strong>State the question first.</strong> Back in the razor-clam scenario from this morning (badjuice, the fictitious toxin, measured on 10 Oregon beaches): "Does badjuice affect clam abundance, controlling for beach?" is a different question from "Predict clam abundance at a new beach next year."</li>
-<li><strong>Decide the model structure from biology and design</strong>, not from automated selection. Beach and year are random effects because you want to generalize beyond the particular beaches you sampled. Badjuice is a fixed effect because you care about its coefficient &mdash; that slope <em>is</em> the answer to the student's question.</li>
+<li><strong>Decide the model structure from biology and design</strong>, not from automated selection. Beach and year are random effects because you want to generalize beyond the particular beaches you sampled. Badjuice is a fixed effect because you care about its coefficient. That slope <em>is</em> the answer to the student's question.</li>
 <li><strong>Fit one principal model</strong>; check assumptions; report the coefficient of interest with a CI.</li>
-<li><strong>If competing structures are scientifically interesting</strong>, compare them — but match the tool to the question. For <strong>inference</strong> (is this structure real?), use an LRT or BIC. For <strong>prediction</strong> (which structure forecasts best out of sample?), use AIC, AICc, or LOOCV — and since AIC is asymptotically LOOCV (Exercise A3), AIC gives you the cross-validation answer from a single fit, which is why it is the standard and easiest prediction criterion. Either way, show the coefficient of interest under each candidate: does the conclusion change?</li>
+<li><strong>If competing structures are scientifically interesting</strong>, compare them, but match the tool to the question. For <strong>inference</strong> (is this structure real?), use an LRT or BIC. For <strong>prediction</strong> (which structure forecasts best out of sample?), use AIC, AICc, or LOOCV, and since AIC is asymptotically LOOCV (Exercise A3), AIC gives you the cross-validation answer from a single fit, which is why it is the standard and easiest prediction criterion. Either way, show the coefficient of interest under each candidate: does the conclusion change?</li>
 </ol>
 
-<p>This is the philosophical stance you'll see again in Day 4 (likelihood/Bayes) and Day 5 (full Bayesian inference). The Bayesian framework makes points 2–4 explicit and quantitative: you specify priors, get a full posterior on every parameter, and the "uncertainty" you report is just the spread of that posterior.</p>
+<p>This is the philosophical stance you'll see again in Day 4 (likelihood/Bayes) and Day 5 (full Bayesian inference). The Bayesian framework makes points 2–4 explicit and quantitative. You specify priors, get a full posterior on every parameter, and the "uncertainty" you report is just the spread of that posterior.</p>
 </section>
 
 <!-- ================================================================== -->
@@ -670,7 +670,7 @@ AICcmodavg::aictab(list(intercepts_only=m_int, with_species_slope=m_slop))
 <strong>Two final gotchas:</strong>
 <ul>
 <li><code>anova(lmer1, lmer2)</code> with REML fits will silently refit them in ML. That is usually what you want for a fixed-effect LRT, but be aware. For random-effect comparisons, fit both with REML and pass <code>refit = FALSE</code>.</li>
-<li><code>dredge()</code> requires you to set <code>options(na.action = "na.fail")</code> globally — otherwise different submodels can be fit to slightly different rows of your data after <code>na.omit</code>, and the AIC values are not comparable.</li>
+<li><code>dredge()</code> requires you to set <code>options(na.action = "na.fail")</code> globally. Otherwise different submodels can be fit to slightly different rows of your data after <code>na.omit</code>, and the AIC values are not comparable.</li>
 </ul>
 </div>
 </section>

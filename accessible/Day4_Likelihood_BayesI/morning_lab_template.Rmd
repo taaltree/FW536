@@ -1,5 +1,5 @@
 ---
-title: "FW 536 — Day 4 morning lab (Maximum Likelihood) — Your Name"
+title: "FW 536 · Day 4 morning lab (Maximum Likelihood) · Your Name"
 author: "Your Name Here"
 date: "`r Sys.Date()`"
 output:
@@ -16,9 +16,9 @@ output:
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 ```
 
-# Day 4 morning lab — Maximum likelihood problem set
+# Day 4 morning lab · Maximum likelihood problem set
 
-> **Topic scope.** These are the *morning* problems and use **maximum likelihood only** — likelihood functions, grid search, `optim()`/`stats4::mle()`, likelihood-ratio tests, and profile-likelihood confidence intervals. Bayesian methods (priors, posteriors, MCMC) are taught this afternoon; do **not** use them here. The afternoon problems live in `afternoon_lab_template.Rmd`.
+> **Topic scope.** These are the *morning* problems and use **maximum likelihood only**: likelihood functions, grid search, `optim()`/`stats4::mle()`, likelihood-ratio tests, and profile-likelihood confidence intervals. Bayesian methods (priors, posteriors, MCMC) are taught this afternoon; do **not** use them here. The afternoon problems live in `afternoon_lab_template.Rmd`.
 
 This template matches Problems 1–4 of [`problem_set.html`](problem_set.html). Write your work below, **Knit** to HTML, and upload the `.html` to the matching Canvas assignment.
 
@@ -42,7 +42,7 @@ library(stats4)   # mle() and confint() for profile-likelihood CIs
 
 ---
 
-# Problem 1 — Post-release survival from a tagging study
+# Problem 1 · Post-release survival from a tagging study
 
 > You released 80 fish after barotrauma treatment; 47 were detected alive after 7 days. Treat each outcome as independent Bernoulli($\phi$). Derive the MLE $\hat\phi$ and Fisher-information Wald CI by hand; get the profile CI from `mle()` + `confint()`; and explain why MLE alone cannot answer "$\Pr(\phi \ge 0.5 \mid \text{data})$".
 
@@ -57,7 +57,7 @@ library(stats4)   # mle() and confint() for profile-likelihood CIs
 
 ---
 
-# Problem 2 — Von Bertalanffy growth from length-at-age data (vonbert.csv)
+# Problem 2 · Von Bertalanffy growth from length-at-age data (vonbert.csv)
 
 > Load `data/vonbert.csv` (sex, age, length). Run a grid search for $\kappa$, fit the full 3-parameter model with `mle()`, and test for a sex effect with a likelihood-ratio test.
 
@@ -78,9 +78,9 @@ library(stats4)   # mle() and confint() for profile-likelihood CIs
 
 ---
 
-# Problem 3 — Two-component Poisson mixture for whale blow counts (whale.csv)
+# Problem 3 · Two-component Poisson mixture for whale blow counts (whale.csv)
 
-> Load `data/whale.csv` (sex, blows). Fit the mixture $f(y) = \pi\,\text{Pois}(y;\lambda_1) + (1-\pi)\text{Pois}(y;\lambda_2)$ with `mle()` from several starts; discuss multimodality and label switching (the two components correspond to males and females).
+> Load `data/whale.csv` (sex, blows). Fit the mixture $f(y) = \pi\,\text{Pois}(y;\lambda_1) + (1-\pi)\text{Pois}(y;\lambda_2)$ with `mle()` from at least 8 starts; discuss local optima and label switching; then validate $\hat\pi$, $\hat\lambda_1$ and $\hat\lambda_2$ against the `sex` column the mixture never used (1 = male, the lower-rate group).
 
 ```{r}
 # Load exactly as in the lab:
@@ -99,7 +99,7 @@ library(stats4)   # mle() and confint() for profile-likelihood CIs
 
 ---
 
-# Problem 4 — Logistic (r/K) growth by maximum likelihood (Logistic.csv)
+# Problem 4 · Logistic (r/K) growth by maximum likelihood (Logistic.csv)
 
 > Load `data/Logistic.csv` (PopulationSize, GrowthRate). Fit the per-capita linear model, recover $\hat r$ and $\hat K$, reproduce them with `mle()`, and compute the plug-in MLE of MSY $= rK/4$.
 
@@ -137,7 +137,7 @@ knitr::include_graphics("images/problemN_derivation.jpg")
 # Submission checklist
 
 - [ ] Answered every morning problem (1–4) from `problem_set.html`.
-- [ ] Used **maximum likelihood only** — no priors, posteriors, or MCMC.
+- [ ] Used **maximum likelihood only**, with no priors, posteriors, or MCMC.
 - [ ] Loaded `vonbert.csv`, `whale.csv`, and `Logistic.csv` from the `data/` folder.
 - [ ] Knitted to HTML without errors.
 - [ ] Photos (if any) embedded with `self_contained: true` in the YAML.

@@ -71,10 +71,10 @@ MathJax = {
 <section id="what">
 <h2>What is actually happening</h2>
 <div class="callout key"><p class="callout-label">Key idea</p>
-<p>You want the posterior $p(\theta \mid y)$ but you cannot compute its normalizing constant (the integral in the denominator of Bayes' rule). MCMC sidesteps that: it builds a <strong>random walk through parameter space whose long-run visiting frequency equals the posterior</strong>. You never compute the integral — you just take steps according to a simple rule, and the histogram of where the chain has been <em>is</em> the posterior.</p>
-<p>Every sampler below only ever needs the posterior <em>up to a constant</em> — i.e., prior × likelihood — because the unknown constant cancels in every accept/reject ratio. That is the whole trick.</p>
+<p>You want the posterior $p(\theta \mid y)$ but you cannot compute its normalizing constant (the integral in the denominator of Bayes' rule). MCMC sidesteps that: it builds a <strong>random walk through parameter space whose long-run visiting frequency equals the posterior</strong>. You never compute the integral. You just take steps according to a simple rule, and the histogram of where the chain has been <em>is</em> the posterior.</p>
+<p>Every sampler below only ever needs the posterior <em>up to a constant</em>, i.e. prior × likelihood, because the unknown constant cancels in every accept/reject ratio. That is the whole trick.</p>
 </div>
-<p>The target here is a two-parameter posterior shaped like a tilted ellipse (a correlated bivariate normal — think of two parameters, like a slope and an intercept, whose estimates are correlated). Correlation is what makes samplers struggle, so you can dial it up and watch each sampler cope.</p>
+<p>The target here is a two-parameter posterior shaped like a tilted ellipse (a correlated bivariate normal; think of two parameters, like a slope and an intercept, whose estimates are correlated). Correlation is what makes samplers struggle, so you can dial it up and watch each sampler cope.</p>
 </section>
 
 <section id="explorer">
@@ -88,6 +88,7 @@ MathJax = {
   <div class="layout">
     <div>
       <svg id="plot" viewBox="0 0 500 500" width="100%" role="img" aria-label="2D parameter space with target contours and the sampler's path"></svg>
+      <svg id="trace" viewBox="0 0 500 130" width="100%" role="img" aria-label="Trace plot of the first parameter over the last 300 iterations"></svg>
     </div>
     <div>
       <div class="controls" id="controls"></div>
@@ -110,7 +111,7 @@ MathJax = {
 </section>
 
 <section id="compare">
-<h2>Metropolis vs Gibbs vs HMC — pros and cons</h2>
+<h2>Metropolis vs Gibbs vs HMC: pros and cons</h2>
 <table class="cmp">
 <tr><th scope="col">Sampler</th><th scope="col">How it proposes a move</th><th scope="col">Strengths</th><th scope="col">Weaknesses</th></tr>
 <tr>
@@ -122,7 +123,7 @@ MathJax = {
 <tr>
   <td><strong>Gibbs</strong></td>
   <td>Update one parameter at a time by drawing it from its <em>full conditional</em> distribution, holding the others fixed.</td>
-  <td>No tuning, no rejections — every draw is accepted. Excellent when the conditionals are known (conjugate models); this is what classic BUGS/JAGS lean on.</td>
+  <td>No tuning, no rejections, every draw is accepted. Excellent when the conditionals are known (conjugate models); this is what classic BUGS/JAGS lean on.</td>
   <td>Needs the conditionals in closed form. Moves are axis-aligned, so strong correlation between parameters makes it inch along a ridge very slowly.</td>
 </tr>
 <tr>
@@ -141,8 +142,9 @@ MathJax = {
 <ol>
 <li><strong>Crank up the correlation.</strong> Slide the correlation toward $\pm 0.95$. Watch random-walk Metropolis and Gibbs both bog down, crawling along the diagonal ridge, while HMC still slides along it in big strokes.</li>
 <li><strong>Mis-tune Metropolis.</strong> Set its step size very small (chain barely moves, acceptance near 100% but useless) then very large (almost every proposal rejected). Find the middle where acceptance is ~20–40%.</li>
-<li><strong>Watch Gibbs turn corners.</strong> Gibbs only ever moves horizontally then vertically — you can see the right-angle staircase. Under high correlation those steps get tiny.</li>
+<li><strong>Watch Gibbs turn corners.</strong> Gibbs only ever moves horizontally then vertically, so you can see the right-angle staircase. Under high correlation those steps get tiny.</li>
 <li><strong>HMC trajectories.</strong> With HMC, each proposal is the end of a curved glide across the posterior (shown faintly). Increase the leapfrog steps $L$ and each move reaches further.</li>
+<li><strong>Count what you actually got.</strong> The readout estimates the effective sample size (ESS) of the x-coordinate from its autocorrelation. Run each sampler for 500 iterations at ρ = 0.9 and compare ESS. A chain that took 500 steps but is worth 30 independent draws has told you exactly how badly it mixed, which the trace plot also shows as slow, sticky wandering.</li>
 </ol>
 </div>
 <p><a href="explore_likelihood_mcmc.html">← See the 1D version (likelihood → posterior → MCMC)</a> · <a href="lab.html">Day 4 lab</a></p>
@@ -241,6 +243,33 @@ const NOTE={
   hmc:'HMC: give the point random momentum and simulate it rolling along the posterior for L leapfrog steps of size ε (faint curve), then accept/reject to correct numerical error. Long, informed moves.'
 };
 
+// ---------- effective sample size of the x-coordinate (initial positive sequence) ----------
+function ess(v){
+  const n=v.length; if(n<20) return null;
+  const m=v.reduce((a,b)=>a+b,0)/n; const c0=v.reduce((a,b)=>a+(b-m)*(b-m),0)/n; if(c0<=0) return null;
+  let sum=0;
+  for(let k=1;k<Math.min(n-1,200);k+=2){
+    const r1=acf(v,m,c0,k), r2=(k+1<n)?acf(v,m,c0,k+1):0;
+    const pair=r1+r2; if(pair<=0) break; sum+=pair;
+  }
+  return n/(1+2*sum);
+}
+function acf(v,m,c0,k){ let s=0; for(let i=0;i<v.length-k;i++) s+=(v[i]-m)*(v[i+k]-m); return (s/v.length)/c0; }
+
+function drawTrace(){
+  const W=500,H=130,ml=34,mr=8,mt=10,mb=22,pw=W-ml-mr,ph=H-mt-mb;
+  const show=chain.slice(-300).map(p=>p[0]);
+  let v=`<rect width="${W}" height="${H}" fill="white"/>`;
+  v+=`<line x1="${ml}" y1="${mt}" x2="${ml}" y2="${mt+ph}" stroke="#999"/><line x1="${ml}" y1="${mt+ph}" x2="${ml+pw}" y2="${mt+ph}" stroke="#999"/>`;
+  [-3,0,3].forEach(t=>{ const yy=mt+ph-((t+4)/8)*ph; v+=`<text x="${ml-4}" y="${yy+3}" font-size="9" fill="#666" text-anchor="end">${t}</text>`; });
+  v+=`<text x="${ml+pw/2}" y="${H-4}" font-size="11" fill="#444" text-anchor="middle">trace of x, last ${show.length} iterations</text>`;
+  if(show.length>1){
+    const px=i=>ml+(i/(show.length-1))*pw, py=val=>mt+ph-((Math.max(-4,Math.min(4,val))+4)/8)*ph;
+    v+=`<polyline points="${show.map((val,i)=>`${px(i)},${py(val)}`).join(' ')}" fill="none" stroke="#1F5B50" stroke-width="1.2"/>`;
+  }
+  document.getElementById('trace').innerHTML=v;
+}
+
 // ---------- drawing ----------
 function toPx(x,y,W){ const lo=-4.2,hi=4.2; return [ (x-lo)/(hi-lo)*W, W-(y-lo)/(hi-lo)*W ]; }
 function ellipse(r){ // Mahalanobis radius r contour of the bivariate normal
@@ -301,11 +330,15 @@ function draw(){
   const accRate=iters?accepts/iters:0;
   const post=chain.slice(Math.floor(chain.length*0.2));
   const mx=post.reduce((a,b)=>a+b[0],0)/(post.length||1), my=post.reduce((a,b)=>a+b[1],0)/(post.length||1);
+  const e=ess(post.map(p=>p[0]));
   document.getElementById('readout').innerHTML=
     `Iterations: <b>${iters}</b><br>`+
     (sampler==='gibbs'?`Acceptance: <b>100%</b> (Gibbs never rejects)`:`Acceptance rate: <b>${(accRate*100).toFixed(0)}%</b>`)+`<br>`+
     `Posterior mean estimate: <b>(${mx.toFixed(2)}, ${my.toFixed(2)})</b><br>`+
-    `<span style="color:var(--muted)">true posterior mean = (0, 0)</span>`;
+    `<span style="color:var(--muted)">true posterior mean = (0, 0)</span><br>`+
+    (e===null?`Effective sample size: <b>—</b> (run at least 25 iterations)`:
+     `Effective sample size of x: <b>${Math.round(e)}</b> from ${post.length} post-burn-in draws (<b>${(e/post.length).toFixed(2)}</b> per iteration)`);
+  drawTrace();
   document.getElementById('note').textContent=NOTE[sampler];
   describe(accRate,mx,my);
 }

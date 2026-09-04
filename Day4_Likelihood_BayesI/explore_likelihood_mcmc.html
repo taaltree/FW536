@@ -41,7 +41,7 @@
 <header class="lab-header">
   <div class="eyebrow">Day 4 · Interactive</div>
   <h1>From likelihood to posterior to MCMC</h1>
-  <p class="lede">One running example — you observed <em>k</em> successes in <em>n</em> trials — shown three ways: the likelihood curve and its peak (the MLE), and a live Metropolis sampler whose histogram builds up the Bayesian posterior.</p>
+  <p class="lede">One running example (you observed <em>k</em> successes in <em>n</em> trials) shown three ways: the likelihood curve and its peak (the MLE), and a live Metropolis sampler whose histogram builds up the Bayesian posterior.</p>
 </header>
 
 <div class="widget">
@@ -58,6 +58,7 @@
   <div class="controls">
     <div class="ctl"><label for="p">Try a value of p<span class="val" id="v_p"></span></label><input id="p" type="range" min="0.01" max="0.99" step="0.01" value="0.5"></div>
   </div>
+  <label style="font-family:'Helvetica Neue',Arial,sans-serif; font-size:13px;"><input type="checkbox" id="showll" /> Show the log-likelihood instead, with the 1.92 rule for a 95% profile interval</label>
   <div class="sr-readout" id="srLike" role="status" aria-live="polite" aria-atomic="true"></div>
   <svg id="likechart" viewBox="0 0 720 300" width="100%" role="img" aria-label="Likelihood curve as a function of p"></svg>
   <details class="data-table-details">
@@ -74,10 +75,10 @@
 <p><strong>What the sampler does, one step at a time.</strong> It wanders over values of $p$, and the values it visits pile up into the posterior. Each step:</p>
 <ol>
 <li><strong>Propose.</strong> From the current $p$, jump to a nearby candidate $p' = p + \text{(a random nudge of size "step")}$.</li>
-<li><strong>Score.</strong> Compute the posterior ratio $r = \dfrac{\text{posterior}(p')}{\text{posterior}(p)}$. Because the unknown normalizing constant cancels, this is just $\dfrac{p'^{\,k}(1-p')^{\,n-k}}{p^{\,k}(1-p)^{\,n-k}}$ — likelihood × (flat) prior.</li>
+<li><strong>Score.</strong> Compute the posterior ratio $r = \dfrac{\text{posterior}(p')}{\text{posterior}(p)}$. Because the unknown normalizing constant cancels, this is just $\dfrac{p'^{\,k}(1-p')^{\,n-k}}{p^{\,k}(1-p)^{\,n-k}}$, likelihood × (flat) prior.</li>
 <li><strong>Accept or reject.</strong> If the candidate is <em>more</em> probable ($r \ge 1$), move there. If it is <em>less</em> probable, move there only with probability $r$ (flip a biased coin); otherwise stay put and record the current value again.</li>
 </ol>
-<p>That is the entire algorithm. Downhill moves are sometimes accepted, which is what lets the chain explore the whole posterior instead of just climbing to the peak. Run it and watch the histogram fill in the exact posterior curve &mdash; without ever computing the integral in Bayes' rule.</p>
+<p>That is the entire algorithm. Downhill moves are sometimes accepted, which is what lets the chain explore the whole posterior instead of just climbing to the peak. Run it and watch the histogram fill in the exact posterior curve without ever computing the integral in Bayes' rule.</p>
 </div>
 <div class="widget">
   <div class="controls">
@@ -103,8 +104,9 @@
 <h2>Things to try</h2>
 <div class="callout key">
 <ol>
-<li><strong>The peak is the MLE.</strong> Drag p in panel 1 to the top of the likelihood curve — it lands on k/n.</li>
-<li><strong>MCMC recovers the posterior.</strong> Hit Run and watch the orange histogram in panel 2 fill in the dashed black posterior curve. The MCMC never computes that curve — it just wanders and the samples pile up in the right shape.</li>
+<li><strong>The peak is the MLE.</strong> Drag p in panel 1 to the top of the likelihood curve. It lands on k/n.</li>
+<li><strong>The 1.92 rule.</strong> Tick the log-likelihood box. Every p whose log-likelihood is within 1.92 of the peak is inside the 95% profile interval (1.92 is half of the 3.84 chi-square cutoff). Set k = 3, n = 10 and compare that lopsided interval with the symmetric Wald interval printed beside it.</li>
+<li><strong>MCMC recovers the posterior.</strong> Hit Run and watch the orange histogram in panel 2 fill in the dashed black posterior curve. The MCMC never computes that curve. It just wanders and the samples pile up in the right shape.</li>
 <li><strong>Step size matters.</strong> Set the step very small: the chain crawls and the acceptance rate is high but mixing is slow. Set it very large: most proposals are rejected (low acceptance) and the chain gets stuck. A middling step (acceptance ≈ 20–45%) works best.</li>
 <li><strong>More data → tighter posterior.</strong> Raise n (keeping k/n fixed) and both the likelihood and the posterior get narrower.</li>
 </ol>
@@ -125,6 +127,7 @@ function lgamma(z){const g=7,c=[0.99999999999980993,676.5203681218851,-1259.1392
  return 0.5*Math.log(2*Math.PI)+(z+0.5)*Math.log(t)-t+Math.log(x);}
 
 let K=30,N=50,P=0.5,STEP=0.1;
+let SHOWLL=false;
 // Log-likelihood kernel. The endpoints need care: at p=0 the term K*log(p) is
 // 0*(-Infinity) = NaN when K=0, and the honest answer is that p=0 explains
 // "0 successes" perfectly and anything else not at all.
@@ -170,6 +173,12 @@ function axes(s,W,H,ml,mr,mt,mb,xlab,ylab,xlo,xhi,ylo,yhi,fmtY){
   return s;
 }
 
+function profileCI(maxLL){
+  // every p whose log-likelihood is within 1.92 of the maximum
+  let lo=null,hi=null;
+  for(let p=0.001;p<1;p+=0.001){ if(logL(p)>=maxLL-1.92){ if(lo===null) lo=p; hi=p; } }
+  return [lo,hi];
+}
 function drawLike(){
   const s=axes({},720,300,50,14,14,40,'p (success probability)','',0,1,0,0,()=>'');
   // likelihood on natural scale, normalized to max=1
@@ -177,18 +186,44 @@ function drawLike(){
   for(let p=0.005;p<1;p+=0.005){const ll=logL(p); if(ll>maxLL)maxLL=ll;}
   for(let p=0.005;p<1;p+=0.005){xs.push(p);ys.push(Math.exp(logL(p)-maxLL));}
   const pw=720-50-14,ph=300-14-40,ml=50,mt=14; const py=v=>mt+ph-v*ph;
-  let pts=xs.map((p,i)=>`${s.px(p)},${py(ys[i])}`).join(' ');
-  s.v+=`<polyline points="${pts}" fill="none" stroke="#D73F09" stroke-width="3"/>`;
   const mle=K/N;
-  s.v+=`<line x1="${s.px(mle)}" y1="${mt}" x2="${s.px(mle)}" y2="${mt+ph}" stroke="#111" stroke-dasharray="3 3"/>`;
-  s.v+=`<text x="${s.px(mle)+4}" y="${mt+12}" font-size="11" fill="#111">MLE = ${mle.toFixed(3)}</text>`;
-  s.v+=`<line x1="${s.px(P)}" y1="${mt}" x2="${s.px(P)}" y2="${mt+ph}" stroke="#1F5B50" stroke-width="1.5"/>`;
-  s.v+=`<circle cx="${s.px(P)}" cy="${py(Math.exp(logL(P)-maxLL))}" r="5" fill="#1F5B50"/>`;
+  const [clo,chi]=profileCI(maxLL);
+  const se=Math.sqrt(Math.max(mle*(1-mle),1e-12)/N), wlo=Math.max(0,mle-1.96*se), whi=Math.min(1,mle+1.96*se);
+  if(!SHOWLL){
+    let pts=xs.map((p,i)=>`${s.px(p)},${py(ys[i])}`).join(' ');
+    s.v+=`<polyline points="${pts}" fill="none" stroke="#D73F09" stroke-width="3"/>`;
+    s.v+=`<line x1="${s.px(mle)}" y1="${mt}" x2="${s.px(mle)}" y2="${mt+ph}" stroke="#111" stroke-dasharray="3 3"/>`;
+    s.v+=`<text x="${s.px(mle)+4}" y="${mt+12}" font-size="11" fill="#111">MLE = ${mle.toFixed(3)}</text>`;
+    s.v+=`<line x1="${s.px(P)}" y1="${mt}" x2="${s.px(P)}" y2="${mt+ph}" stroke="#1F5B50" stroke-width="1.5"/>`;
+    s.v+=`<circle cx="${s.px(P)}" cy="${py(Math.exp(logL(P)-maxLL))}" r="5" fill="#1F5B50"/>`;
+    s.v+=`<text x="${ml+pw-4}" y="${mt+12}" font-size="11" fill="#666" text-anchor="end">relative likelihood L(p)/L(p̂)</text>`;
+  } else {
+    // log-likelihood relative to its maximum, clipped at -8 so the tails stay readable
+    const floor=-8; const pyl=v=>mt+ph-((v-floor)/(0-floor))*ph;
+    const lls=xs.map(p=>Math.max(floor,logL(p)-maxLL));
+    let pts=xs.map((p,i)=>`${s.px(p)},${pyl(lls[i])}`).join(' ');
+    // shade the profile interval
+    if(clo!==null) s.v+=`<rect x="${s.px(clo)}" y="${mt}" width="${s.px(chi)-s.px(clo)}" height="${ph}" fill="#D73F09" opacity="0.08"/>`;
+    s.v+=`<polyline points="${pts}" fill="none" stroke="#D73F09" stroke-width="3"/>`;
+    s.v+=`<line x1="${ml}" y1="${pyl(-1.92)}" x2="${ml+pw}" y2="${pyl(-1.92)}" stroke="#111" stroke-dasharray="6 4"/>`;
+    s.v+=`<text x="${ml+6}" y="${pyl(-1.92)-5}" font-size="11" fill="#111">ℓ(p̂) − 1.92</text>`;
+    for(let t=0;t>=floor;t-=2) s.v+=`<text x="${ml-6}" y="${pyl(t)+4}" font-size="10" fill="#666" text-anchor="end">${t}</text>`;
+    s.v+=`<line x1="${s.px(mle)}" y1="${mt}" x2="${s.px(mle)}" y2="${mt+ph}" stroke="#111" stroke-dasharray="3 3"/>`;
+    s.v+=`<text x="${s.px(mle)+4}" y="${mt+12}" font-size="11" fill="#111">MLE = ${mle.toFixed(3)}</text>`;
+    if(clo!==null){ s.v+=`<line x1="${s.px(clo)}" y1="${pyl(-1.92)}" x2="${s.px(clo)}" y2="${mt+ph}" stroke="#D73F09" stroke-width="1.5"/><line x1="${s.px(chi)}" y1="${pyl(-1.92)}" x2="${s.px(chi)}" y2="${mt+ph}" stroke="#D73F09" stroke-width="1.5"/>`; }
+    s.v+=`<line x1="${s.px(P)}" y1="${mt}" x2="${s.px(P)}" y2="${mt+ph}" stroke="#1F5B50" stroke-width="1.5"/>`;
+    s.v+=`<circle cx="${s.px(P)}" cy="${pyl(Math.max(floor,logL(P)-maxLL))}" r="5" fill="#1F5B50"/>`;
+    s.v+=`<text x="${ml+pw-4}" y="${mt+12}" font-size="11" fill="#666" text-anchor="end">log-likelihood ℓ(p) − ℓ(p̂)</text>`;
+  }
   document.getElementById('likechart').innerHTML=s.v;
   const hint=(Math.abs(P-K/N)<0.02?'You are essentially at the MLE.':'Drag toward the peak to reach the MLE.');
+  const ciText = clo===null ? '' :
+    ` 95% profile-likelihood interval (ℓ within 1.92 of the peak): <b>(${clo.toFixed(3)}, ${chi.toFixed(3)})</b>; `+
+    `Wald interval p̂ ± 1.96·SE: (${wlo.toFixed(3)}, ${whi.toFixed(3)})`+
+    (Math.abs((chi-mle)-(mle-clo))>0.01?`. The profile interval is lopsided (${(mle-clo).toFixed(3)} below the MLE, ${(chi-mle).toFixed(3)} above); the Wald interval cannot be.`:`. Here the two nearly coincide because the likelihood is close to symmetric.`);
   document.getElementById('likeout').innerHTML=
     `At p = <b>${P.toFixed(2)}</b>: log-likelihood = <b>${logL(P).toFixed(2)}</b>, `+
-    `relative likelihood = <b>${Math.exp(logL(P)-maxLL).toFixed(3)}</b> of the peak. `+hint;
+    `relative likelihood = <b>${Math.exp(logL(P)-maxLL).toFixed(3)}</b> of the peak. `+hint+ciText;
 
   // ---- spoken readout + text alternative for the likelihood curve ----
   // The "within 10% of the peak" span is read off the same xs/ys grid the curve
@@ -323,6 +358,7 @@ function refreshData(){
 document.getElementById('k').addEventListener('input',e=>{K=+e.target.value; if(K>N){N=K;document.getElementById('n').value=N;} refreshData(); resetChain();});
 document.getElementById('n').addEventListener('input',e=>{N=+e.target.value; if(K>N){K=N;document.getElementById('k').value=K;} refreshData(); resetChain();});
 document.getElementById('p').addEventListener('input',e=>{P=+e.target.value; document.getElementById('v_p').textContent=P.toFixed(2); syncValueText(); drawLike();});
+document.getElementById('showll').addEventListener('change',e=>{SHOWLL=e.target.checked; drawLike();});
 document.getElementById('step').addEventListener('input',e=>{STEP=+e.target.value; document.getElementById('v_step').textContent=STEP.toFixed(2); syncValueText(); draw();});
 document.getElementById('run').addEventListener('click',function(){
   const live=document.getElementById('srMcmc');

@@ -120,7 +120,7 @@
 <main class="content" id="main-content" tabindex="-1">
 
 <h1>Data manipulation with dplyr, visualized</h1>
-<p class="lede">There are two ways to reshape data in R, and you will meet both this week. <a href="apply_family.html">The apply family</a> works on vectors, lists and matrices; dplyr works on data frames, and reads much more like a sentence. This page is the companion to that one: same idea, same worked data, different tools. Where the two do the same job, it says so.</p>
+<p class="lede">There are two ways to reshape data in R, and you will meet both this week. <a href="apply_family.html">The apply family</a> works on vectors, lists and matrices; dplyr works on data frames, and reads much more like a sentence. This page is the companion to that one, with the same idea, the same worked data, and different tools. Where the two do the same job, it says so.</p>
 
 <section id="idea">
 <h2>The one idea</h2>
@@ -146,7 +146,7 @@
   <span class="fn">group_by</span>(site) |&gt;
   <span class="fn">summarise</span>(mean = <span class="fn">mean</span>(count))</pre>
 <div class="callout key"><p class="callout-label">Key idea</p><strong>Two pipes, same meaning.</strong> <code>|&gt;</code> is built into R (4.1 and later) and needs no packages. <code>%&gt;%</code> comes from magrittr and arrives with dplyr; you will see it in older code and in this course's Day 5 scripts. For everything in this page they are interchangeable. Prefer <code>|&gt;</code> in new work, since it always exists.</div>
-<div class="callout warn"><p class="callout-label">Watch out</p><strong>One habit that will save you.</strong> Inside dplyr verbs you write column names <em>bare</em> &mdash; <code>count</code>, not <code>surveys$count</code> and not <code>"count"</code>. That is the convenience of dplyr and also its strangeness: those names are not objects in your workspace, and they only mean anything inside the verb. It is why a stray <code>surveys$</code> inside <code>filter()</code> so often gives a baffling result rather than an error.</div>
+<div class="callout warn"><p class="callout-label">Watch out</p><strong>One habit that will save you.</strong> Inside dplyr verbs you write column names <em>bare</em>: <code>count</code>, not <code>surveys$count</code> and not <code>"count"</code>. That is the convenience of dplyr and also its strangeness. Those names are not objects in your workspace, and they only mean anything inside the verb. It is why a stray <code>surveys$</code> inside <code>filter()</code> so often gives a baffling result rather than an error.</div>
 </section>
 
 <section id="verbs">
@@ -174,10 +174,10 @@ surveys &lt;- <span class="fn">tibble</span>(
 <div class="triage">
   <div class="triage-h">Reach for&hellip;</div>
   <ul>
-    <li><code>filter()</code> to keep <em>rows</em>, <code>select()</code> to keep <em>columns</em> &mdash; the two are constantly confused</li>
+    <li><code>filter()</code> to keep <em>rows</em>, <code>select()</code> to keep <em>columns</em>, and the two are constantly confused</li>
     <li><code>mutate()</code> to add or change a column, keeping every row</li>
     <li><code>summarise()</code> to collapse many rows into one</li>
-    <li><code>group_by()</code> before <code>summarise()</code> to collapse into <em>one row per group</em> &mdash; the workhorse</li>
+    <li><code>group_by()</code> before <code>summarise()</code> to collapse into <em>one row per group</em>, the workhorse</li>
     <li><code>arrange()</code> to sort, <code>count()</code> to tally</li>
     <li><code>across()</code> to do the same thing to several columns at once</li>
     <li><code>pivot_longer()</code> / <code>pivot_wider()</code> when the data is the wrong shape entirely</li>
@@ -196,7 +196,7 @@ surveys &lt;- <span class="fn">tibble</span>(
 #&gt; 4 C     forest      3     9   1.5
 #&gt; 5 C     forest      4     8   2</span></pre>
   <p>Several conditions separated by commas are joined with AND: <code>filter(surveys, count &gt; 4, habitat == "forest")</code>. Use <code>|</code> for OR. Note <code>==</code>, not <code>=</code>.</p>
-  <p><b>Watch for <code>NA</code>.</b> <code>filter()</code> keeps only rows where the condition is definitely <code>TRUE</code>, so rows where it is <code>NA</code> are dropped &mdash; which is usually what you want, but silently loses data if you did not expect missing values.</p>
+  <p><b>Watch for <code>NA</code>.</b> <code>filter()</code> keeps only rows where the condition is definitely <code>TRUE</code>, so rows where it is <code>NA</code> are dropped, which is usually what you want, but silently loses data if you did not expect missing values.</p>
   <button class="goto" data-goto="busy">Watch it run &#9654;</button>
 </div>
 
@@ -218,7 +218,7 @@ surveys &lt;- <span class="fn">tibble</span>(
 
 <div class="fncard">
   <h3><code>mutate()</code> <span class="purpose">add or change a column, keep every row</span></h3>
-  <p><b>Reach for it when</b> you need a derived variable. The row count never changes &mdash; that is the difference between <code>mutate()</code> and <code>summarise()</code>, and it is the whole distinction.</p>
+  <p><b>Reach for it when</b> you need a derived variable. The row count never changes. That is the difference between <code>mutate()</code> and <code>summarise()</code>, and it is the whole distinction.</p>
   <pre class="rcode"><span class="fn">mutate</span>(surveys, rate = count / hours)
 <span class="cm">#&gt; # A tibble: 10 x 6
 #&gt;   site  habitat visit count hours  rate
@@ -226,14 +226,14 @@ surveys &lt;- <span class="fn">tibble</span>(
 #&gt; 2 A     forest      2     5   2     2.5
 #&gt; 3 A     forest      3     4   1     4
 #&gt; ... 7 more rows</span></pre>
-  <p>The calculation is <strong>vectorised</strong>: <code>count / hours</code> divides all ten pairs at once. This is why you almost never need <code>mapply()</code> in a data frame &mdash; the parallel walk over two columns is what <code>mutate()</code> already does.</p>
+  <p>The calculation is <strong>vectorised</strong>: <code>count / hours</code> divides all ten pairs at once. This is why you almost never need <code>mapply()</code> in a data frame, because the parallel walk over two columns is what <code>mutate()</code> already does.</p>
   <p>Use <code>case_when()</code> inside <code>mutate()</code> for conditional recoding, and <code>if_else()</code> for a simple two-way split.</p>
   <button class="goto" data-goto="rate">Watch it run &#9654;</button>
 </div>
 
 <div class="fncard">
   <h3><code>arrange()</code> <span class="purpose">reorder the rows</span></h3>
-  <p><b>Reach for it when</b> you want to see the largest or smallest first. It changes only the order &mdash; no rows or columns are gained or lost.</p>
+  <p><b>Reach for it when</b> you want to see the largest or smallest first. It changes only the order, and no rows or columns are gained or lost.</p>
   <pre class="rcode"><span class="fn">arrange</span>(surveys, <span class="fn">desc</span>(count))
 <span class="cm">#&gt; # A tibble: 10 x 5
 #&gt;   site  habitat visit count hours
@@ -247,12 +247,12 @@ surveys &lt;- <span class="fn">tibble</span>(
 
 <div class="fncard">
   <h3><code>summarise()</code> <span class="purpose">collapse many rows into one</span></h3>
-  <p><b>Reach for it when</b> you want a number that describes the whole table. On its own it returns a single row, which is rarely what you want &mdash; its real use is with <code>group_by()</code>, below.</p>
+  <p><b>Reach for it when</b> you want a number that describes the whole table. On its own it returns a single row, which is rarely what you want. Its real use is with <code>group_by()</code>, below.</p>
   <pre class="rcode"><span class="fn">summarise</span>(surveys, n = <span class="fn">n</span>(), mean = <span class="fn">mean</span>(count))
 <span class="cm">#&gt; # A tibble: 1 x 2
 #&gt;       n  mean
 #&gt;      10   4.5</span></pre>
-  <p><code>n()</code> is special: it counts the rows in the current group and can only be used inside these verbs. <code>summarise</code> and <code>summarize</code> are the same function.</p>
+  <p><code>n()</code> is special. It counts the rows in the current group and can only be used inside these verbs. <code>summarise</code> and <code>summarize</code> are the same function.</p>
   <button class="goto" data-goto="persite">Watch it run &#9654;</button>
 </div>
 
@@ -268,8 +268,8 @@ surveys &lt;- <span class="fn">tibble</span>(
 #&gt; 2 B          2     1   0.5
 #&gt; 3 C          4    30   7.5
 #&gt; 4 D          1     2   2</span></pre>
-  <p><code>group_by()</code> changes nothing you can see &mdash; it only attaches a note saying "treat these rows as belonging together." The next verb is what acts on it. In the app below, watch the table stay exactly the same at the <code>group_by</code> step and then collapse at the <code>summarise</code> step; that is the point.</p>
-  <p>Those four means &mdash; 4, 0.5, 7.5, 2 &mdash; are the same four numbers <code>sapply(sites, mean)</code> produces on the <a href="apply_family.html">apply page</a>, from the same data in a different shape.</p>
+  <p><code>group_by()</code> changes nothing you can see. It only attaches a note saying "treat these rows as belonging together." The next verb is what acts on it. In the app below, watch the table stay exactly the same at the <code>group_by</code> step and then collapse at the <code>summarise</code> step; that is the point.</p>
+  <p>Those four means (4, 0.5, 7.5, 2) are the same four numbers <code>sapply(sites, mean)</code> produces on the <a href="apply_family.html">apply page</a>, from the same data in a different shape.</p>
   <button class="goto" data-goto="persite">Watch it run &#9654;</button>
 </div>
 
@@ -324,7 +324,7 @@ surveys |&gt; <span class="fn">group_by</span>(habitat) |&gt; <span class="fn">s
 
 <div class="fncard helper">
   <h3><code>left_join()</code> <span class="purpose">bring columns from another table</span></h3>
-  <p><b>Reach for it when</b> the information you need lives in a second table &mdash; species traits, site coordinates, observer names &mdash; keyed by a shared column.</p>
+  <p><b>Reach for it when</b> the information you need lives in a second table, species traits, site coordinates, observer names, keyed by a shared column.</p>
   <pre class="rcode">effort &lt;- <span class="fn">tibble</span>(site = <span class="fn">c</span>(<span class="st">"A"</span>,<span class="st">"B"</span>,<span class="st">"C"</span>,<span class="st">"D"</span>), observer = <span class="fn">c</span>(<span class="st">"Kim"</span>,<span class="st">"Lee"</span>,<span class="st">"Kim"</span>,<span class="st">"Ana"</span>))
 
 <span class="fn">left_join</span>(surveys, effort, by = <span class="st">"site"</span>)
@@ -333,13 +333,13 @@ surveys |&gt; <span class="fn">group_by</span>(habitat) |&gt; <span class="fn">s
 #&gt; 1 A     forest      1     3   1.5 Kim
 #&gt; 2 A     forest      2     5   2   Kim
 #&gt; ... 8 more rows</span></pre>
-  <p><code>left_join</code> keeps every row of the left table and fills <code>NA</code> where the right table has no match &mdash; the safe default, because your data never silently shrinks. Check <code>nrow()</code> before and after anyway: if the right table has duplicate keys, rows <em>multiply</em>, which is the most common way a join goes wrong.</p>
+  <p><code>left_join</code> keeps every row of the left table and fills <code>NA</code> where the right table has no match, the safe default, because your data never silently shrinks. Check <code>nrow()</code> before and after anyway. If the right table has duplicate keys, rows <em>multiply</em>, which is the most common way a join goes wrong.</p>
 </div>
 </section>
 
 <section id="viz">
 <h2>Watch a pipeline run</h2>
-<p>Pick a task, then step through it one verb at a time. The highlighted line is the verb being applied; the table shows what it did. Watch the row and column counts under the table &mdash; that is what each verb is really changing.</p>
+<p>Pick a task, then step through it one verb at a time. The highlighted line is the verb being applied; the table shows what it did. Watch the row and column counts under the table. That is what each verb is really changing.</p>
 
 <div class="widget">
   <div class="fnpick" id="pipepick" role="tablist" aria-label="pipeline"></div>
@@ -358,7 +358,7 @@ surveys |&gt; <span class="fn">group_by</span>(habitat) |&gt; <span class="fn">s
 
 <section id="base">
 <h2>The same job in base R</h2>
-<p>Neither idiom is more correct. dplyr reads better and is easier to chain; base R has no dependencies and works on objects that are not data frames &mdash; matrices, lists, MCMC output &mdash; which is why this course uses both. What matters is recognising the same job in either dialect.</p>
+<p>Neither idiom is more correct. dplyr reads better and is easier to chain; base R has no dependencies and works on objects that are not data frames, matrices, lists, MCMC output, which is why this course uses both. What matters is recognising the same job in either dialect.</p>
 <div class="scroll">
 <table class="cheat">
 <thead><tr><th scope="col">The job</th><th scope="col">dplyr</th><th scope="col">base R</th></tr></thead>
@@ -372,7 +372,7 @@ surveys |&gt; <span class="fn">group_by</span>(habitat) |&gt; <span class="fn">s
 <tr><td>Same summary, several columns</td><td><code>summarise(across(c(x, y), mean))</code></td><td><code>sapply(d[c("x","y")], mean)</code></td></tr>
 <tr><td>Split into groups, keep the pieces</td><td><code>group_split(d, g)</code></td><td><code>split(d, d$g)</code></td></tr>
 <tr><td>Do something complicated per group</td><td><code>d |&gt; group_by(g) |&gt; group_modify(...)</code></td><td><code>do.call(rbind, lapply(split(d, d$g), f))</code></td></tr>
-<tr><td>Element-wise over two columns</td><td><code>mutate(z = f(x, y))</code> &mdash; vectorised</td><td><code>mapply(f, d$x, d$y)</code></td></tr>
+<tr><td>Element-wise over two columns</td><td><code>mutate(z = f(x, y))</code>, vectorised</td><td><code>mapply(f, d$x, d$y)</code></td></tr>
 <tr><td>Bring in another table</td><td><code>left_join(d, e, by = "site")</code></td><td><code>merge(d, e, by = "site", all.x = TRUE)</code></td></tr>
 <tr><td>Long &harr; wide</td><td><code>pivot_longer()</code> / <code>pivot_wider()</code></td><td><code>reshape()</code>, or <code>as.data.frame(as.table(m))</code></td></tr>
 </tbody>
@@ -399,9 +399,9 @@ surveys |&gt; <span class="fn">group_by</span>(habitat) |&gt; <span class="fn">s
 #&gt; 4.0 0.5 7.5 2.0</span></pre>
   </div>
 </div>
-<p>Same four numbers. The difference in the <em>result</em> is the thing to notice: dplyr gives you back a data frame with the grouping variable as a column, so the next verb can keep working on it. <code>tapply</code> gives you a named vector, which is compact and immediately printable but awkward to build on &mdash; you would need <code>as.data.frame()</code> and some naming before you could join or plot it.</p>
+<p>Same four numbers. The difference in the <em>result</em> is the thing to notice. dplyr gives you back a data frame with the grouping variable as a column, so the next verb can keep working on it. <code>tapply</code> gives you a named vector, which is compact and immediately printable but awkward to build on. You would need <code>as.data.frame()</code> and some naming before you could join or plot it.</p>
 
-<div class="callout key"><p class="callout-label">Key idea</p><strong>When to reach for which.</strong> Use dplyr when the object is a data frame and the work is a chain of steps you want to read back later &mdash; cleaning, summarising, preparing something to plot. Use the apply family when the object is <em>not</em> a data frame: a matrix of MCMC draws, a list of model fits, a simulation you are running a thousand times. Days 4 and 5 are full of the second kind, which is why <code>apply()</code> and <code>sapply()</code> show up there and dplyr does not.</div>
+<div class="callout key"><p class="callout-label">Key idea</p><strong>When to reach for which.</strong> Use dplyr when the object is a data frame and the work is a chain of steps you want to read back later, such as cleaning, summarising, or preparing something to plot. Use the apply family when the object is <em>not</em> a data frame: a matrix of MCMC draws, a list of model fits, a simulation you are running a thousand times. Days 4 and 5 are full of the second kind, which is why <code>apply()</code> and <code>sapply()</code> show up there and dplyr does not.</div>
 </section>
 
 <section id="traps">
@@ -417,7 +417,7 @@ surveys |&gt; <span class="fn">group_by</span>(habitat) |&gt; <span class="fn">s
 <p><code>NA &gt; 4</code> is <code>NA</code>, not <code>TRUE</code>, and <code>filter()</code> keeps only definite <code>TRUE</code>. So rows with a missing value in the tested column vanish without comment. If that matters, be explicit: <code>filter(d, count &gt; 4 | is.na(count))</code>.</p>
 
 <h3>3. <code>select()</code> and <code>filter()</code> get swapped</h3>
-<p>They sound interchangeable in English and are not. <strong>filter takes rows, select takes columns.</strong> If a call errors with "object not found", check you have not asked <code>filter()</code> for a column name. The mnemonic that sticks: you fil<em>ter</em> a liquid to remove some of what is in it (rows), and you se<em>lect</em> from a menu of names (columns).</p>
+<p>They sound interchangeable in English and are not. <strong>filter takes rows, select takes columns.</strong> If a call errors with "object not found", check you have not asked <code>filter()</code> for a column name. The mnemonic that sticks is that you fil<em>ter</em> a liquid to remove some of what is in it (rows), and you se<em>lect</em> from a menu of names (columns).</p>
 
 <h3>4. Masking: dplyr and base R both have <code>filter()</code></h3>
 <p>Loading dplyr prints a message that <code>filter()</code> and <code>lag()</code> now mask the stats versions. Usually harmless, but if a time-series function starts misbehaving, that is why. Be explicit when it matters: <code>dplyr::filter()</code> or <code>stats::filter()</code>.</p>
@@ -435,9 +435,8 @@ surveys |&gt; <span class="fn">group_by</span>(habitat) |&gt; <span class="fn">s
 <tr><td>Day 1</td><td><code>sims |&gt; pivot_longer(everything(), names_to="model", values_to="y")</code></td><td>stacks four simulated model columns into one long column, so they can be grouped</td></tr>
 <tr><td>Day 1</td><td><code>group_by(model) |&gt; summarise(mean = mean(y), var = var(y))</code></td><td>one row of summary statistics per simulated model</td></tr>
 <tr><td>Day 1</td><td><code>tibble(...)</code></td><td>builds the simulation results table in the first place</td></tr>
-<tr><td>Day 2</td><td><code>select(...)</code></td><td>trims columns before fitting</td></tr>
 <tr><td>Day 5</td><td><code>N2OEmission %&gt;% group_by(group.index) %&gt;% summarise(mean = mean(carbon))</code></td><td>site-level carbon means, used as a predictor in the multilevel model</td></tr>
-<tr><td>Day 5</td><td><code>... %&gt;% arrange(group.index)</code></td><td>sorts so the summary lines up with the model's group indices &mdash; an easy thing to get wrong</td></tr>
+<tr><td>Day 5</td><td><code>... %&gt;% arrange(group.index)</code></td><td>sorts so the summary lines up with the model's group indices, an easy thing to get wrong</td></tr>
 </tbody>
 </table>
 </div>
@@ -446,11 +445,11 @@ surveys |&gt; <span class="fn">group_by</span>(habitat) |&gt; <span class="fn">s
 
 <section id="check">
 <h2>Check yourself</h2>
-<p>Shape questions again &mdash; how many rows and columns come back.</p>
+<p>Shape questions again: how many rows and columns come back.</p>
 
 <div class="quiz">
 <p><strong>1.</strong> <code>surveys</code> has 10 rows. How many rows does <code>mutate(surveys, rate = count / hours)</code> return?</p>
-<label><input type="radio" name="t1" data-correct="true" /> 10 &mdash; <code>mutate()</code> never changes the number of rows</label>
+<label><input type="radio" name="t1" data-correct="true" /> 10, because <code>mutate()</code> never changes the number of rows</label>
 <label><input type="radio" name="t1" /> 1, because it computes a single value</label>
 <label><input type="radio" name="t1" /> 4, one per site</label>
 <label><input type="radio" name="t1" /> it depends on how many rows have non-missing <code>hours</code></label>
@@ -490,7 +489,7 @@ surveys |&gt; <span class="fn">group_by</span>(habitat) |&gt; <span class="fn">s
 
 <div class="quiz">
 <p><strong>5.</strong> After <code>pivot_wider()</code> on these data, some cells are <code>NA</code>. Why?</p>
-<label><input type="radio" name="t5" /> a bug &mdash; <code>values_fill</code> should have been set</label>
+<label><input type="radio" name="t5" /> a bug; <code>values_fill</code> should have been set</label>
 <label><input type="radio" name="t5" data-correct="true" /> sites were visited different numbers of times, so the rectangle has cells for visits that never happened</label>
 <label><input type="radio" name="t5" /> <code>pivot_wider()</code> always introduces <code>NA</code> in the last column</label>
 <label><input type="radio" name="t5" /> the <code>count</code> column contained <code>NA</code> already</label>

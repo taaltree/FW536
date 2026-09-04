@@ -1,5 +1,5 @@
 ---
-title: "FW 536 — Day 2 morning lab (Continuous distributions) — Your Name"
+title: "FW 536 · Day 2 morning lab (Continuous distributions) · Your Name"
 author: "Your Name Here"
 date: "`r Sys.Date()`"
 output:
@@ -16,7 +16,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 ```
 
-# Day 2 morning lab — Continuous distributions problem set
+# Day 2 morning lab · Continuous distributions problem set
 
 This template matches the **morning** section (Problems 1–4) of
 [`problem_set.html`](problem_set.html). Read each problem statement there,
@@ -25,7 +25,7 @@ matching Canvas assignment.
 
 Problem 4 loads a real dataset from this Day's `data/` folder:
 
-- `data/sockeye_adult.csv` — daily sockeye counts and flow-corrected qPCR eDNA
+- `data/sockeye_adult.csv`, daily sockeye counts and flow-corrected qPCR eDNA
   (Levi et al. 2019). Filter to `Sockeyetype == "Sockeye_Adults"`.
 
 Keep the `.Rmd` in this folder so the `read.csv("data/...")` paths resolve.
@@ -47,7 +47,7 @@ library(emmeans)
 
 ---
 
-# Problem 1 — Which distribution for a right-skewed body-size sample?
+# Problem 1 · Which distribution for a right-skewed body-size sample?
 
 > Body weight (g) from a creel survey: strictly positive, strongly
 > right-skewed. Choose a distribution and justify; compute the lognormal
@@ -65,7 +65,7 @@ library(emmeans)
 
 ---
 
-# Problem 2 — Length–weight allometry and the power law
+# Problem 2 · Length–weight allometry and the power law
 
 > Chinook length (cm) vs weight (g). Contrast `lm(weight ~ length)` with
 > `lm(log(weight) ~ log(length))`; interpret the log–log slope
@@ -84,7 +84,7 @@ library(emmeans)
 
 ---
 
-# Problem 3 — Line-transect detection as an exponential process
+# Problem 3 · Line-transect detection as an exponential process
 
 > Exponential detection function with rate $\lambda = 0.02$/m, where the
 > latent detection range is $X \sim \mathrm{Exponential}(\lambda)$ and an
@@ -105,7 +105,7 @@ library(emmeans)
 
 ---
 
-# Problem 4 — Are the sockeye counts Poisson? Diagnose overdispersion
+# Problem 4 · Are the sockeye counts Poisson? Diagnose overdispersion
 
 > Load `data/sockeye_adult.csv`, subset to `Sockeye_Adults`. Compute the
 > mean, variance, and dispersion ratio of `Count`; solve for the NB size $k$

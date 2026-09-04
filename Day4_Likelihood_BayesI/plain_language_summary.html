@@ -39,25 +39,25 @@
 <main class="content">
 <header class="lab-header">
  <div class="eyebrow">Day 4 · Plain-language summary</div>
- <h1>Likelihood, priors, posteriors, and MCMC — in normal English</h1>
- <p class="lede">Read this <em>before</em> tackling the Day 4 lab. It explains every idea — maximum likelihood, Bayes' rule, MCMC, <span class="pill nimble">Nimble</span> — with as little math as possible.</p>
+ <h1>Likelihood, priors, posteriors, and MCMC, in normal English</h1>
+ <p class="lede">Read this <em>before</em> tackling the Day 4 lab. It explains every idea (maximum likelihood, Bayes' rule, MCMC, <span class="pill nimble">Nimble</span>) with as little math as possible.</p>
 </header>
 
 <section id="what">
 <h2>What we did today, in one paragraph</h2>
 <div class="callout plain">
-We learned two ways of asking the question <em>"what parameter values do my data suggest?"</em> In the <strong>morning</strong> we did maximum likelihood: pick the parameter values that make the data we actually saw as plausible as possible. In the <strong>afternoon</strong> we did Bayes: combine those same plausibilities (the likelihood) with what we knew before (the prior) to get a full probability distribution over the parameters (the posterior). We saw how to compute posteriors in two cases by hand (Beta–Binomial, Gamma–Poisson) and how to use Markov chain Monte Carlo — implemented in <span class="pill nimble">Nimble</span> — to compute posteriors for any model.
+We learned two ways of asking the question <em>"what parameter values do my data suggest?"</em> In the <strong>morning</strong> we did maximum likelihood, picking the parameter values that make the data we actually saw as plausible as possible. In the <strong>afternoon</strong> we did Bayes, combining those same plausibilities (the likelihood) with what we knew before (the prior) to get a full probability distribution over the parameters (the posterior). We saw how to compute posteriors in two cases by hand (Beta–Binomial, Gamma–Poisson) and how to use Markov chain Monte Carlo, implemented in <span class="pill nimble">Nimble</span>, to compute posteriors for any model.
 </div>
 </section>
 
 <section id="likelihood">
 <h2>What is a likelihood?</h2>
 
-<p>A <strong>likelihood</strong> is a number — well, a function — that tells you how compatible your data are with a particular guess about the parameters. It uses the same formula as the probability of seeing the data, but it is read differently:</p>
+<p>A <strong>likelihood</strong> is a number, well, a function, that tells you how compatible your data are with a particular guess about the parameters. It uses the same formula as the probability of seeing the data, but it is read differently:</p>
 
 <ul>
 <li><em>Probability:</em> Hold the parameter fixed, ask "how likely is each possible dataset?" Sum/integrate over datasets.</li>
-<li><em>Likelihood:</em> Hold the data fixed (at what you actually observed), ask "how compatible is each possible parameter value with this dataset?" Do <strong>not</strong> sum/integrate over parameters — it isn't a probability over parameters.</li>
+<li><em>Likelihood:</em> Hold the data fixed (at what you actually observed), ask "how compatible is each possible parameter value with this dataset?" Do <strong>not</strong> sum/integrate over parameters, because it isn't a probability over parameters.</li>
 </ul>
 
 <div class="callout key">
@@ -68,12 +68,12 @@ A likelihood is not a probability about parameters. That sentence is the most im
 <section id="mle">
 <h2>What is a maximum-likelihood estimate?</h2>
 
-<p>The <strong>MLE</strong> is the parameter value that makes the data as plausible as possible. If you watched 50 cars and 30 ran the red light, the MLE for the probability of running the light is 30/50 = 0.6. If you weighed 100 fish and want $L_\infty$ for a Von Bertalanffy growth curve, the MLE is the value of $L_\infty$ that minimizes the squared distance between the curve and the points (when the noise is Gaussian — exactly the case where MLE and least-squares give the same answer).</p>
+<p>The <strong>MLE</strong> is the parameter value that makes the data as plausible as possible. If you watched 50 cars and 30 ran the red light, the MLE for the probability of running the light is 30/50 = 0.6. If you weighed 100 fish and want $L_\infty$ for a Von Bertalanffy growth curve, the MLE is the value of $L_\infty$ that minimizes the squared distance between the curve and the points (when the noise is Gaussian, exactly the case where MLE and least-squares give the same answer).</p>
 
-<p>For complicated models the MLE doesn't have a closed form. We use a computer to <em>numerically optimize</em> the log-likelihood. R's <code>mle()</code> and <code>optim()</code> functions do this for us; they also give back standard errors based on the curvature of the log-likelihood at the maximum (the second derivative — the "Hessian").</p>
+<p>For complicated models the MLE doesn't have a closed form. We use a computer to <em>numerically optimize</em> the log-likelihood. R's <code>mle()</code> and <code>optim()</code> functions do this for us; they also give back standard errors based on the curvature of the log-likelihood at the maximum (the second derivative, the "Hessian").</p>
 
 <div class="callout bio">
-<strong>Why ecologists love MLE.</strong> It gives a single best estimate, a standard error, and a CI. It is computationally cheap for moderate-size problems. It plays well with information criteria (AIC) and likelihood-ratio tests. Most published ecological models are MLE fits — anything that says <code>lm</code>, <code>glm</code>, or <code>nlme</code> is using MLE under the hood.
+<strong>Why ecologists love MLE.</strong> It gives a single best estimate, a standard error, and a CI. It is computationally cheap for moderate-size problems. It plays well with information criteria (AIC) and likelihood-ratio tests. Most published ecological models are MLE fits. Anything that says <code>lm</code>, <code>glm</code>, or <code>nlme</code> is using MLE under the hood.
 </div>
 </section>
 
@@ -84,45 +84,45 @@ A likelihood is not a probability about parameters. That sentence is the most im
 
 <h3>The likelihood-ratio test: is the bigger model worth it?</h3>
 
-<p>Suppose you fit two models to the same data. The <strong>simple</strong> one says one growth curve describes every fish in the file. The <strong>complicated</strong> one gives each sex its own curve — two extra parameters. The complicated model will <em>always</em> fit at least as well, because it contains the simple one as a special case: it can always just set the two curves equal. So "it fit better" proves nothing on its own. The real question is whether it fit <em>enough</em> better to justify the two extra parameters.</p>
+<p>Suppose you fit two models to the same data. The <strong>simple</strong> one says one growth curve describes every fish in the file. The <strong>complicated</strong> one gives each sex its own curve, two extra parameters. The complicated model will <em>always</em> fit at least as well, because it contains the simple one as a special case. It can always just set the two curves equal. So "it fit better" proves nothing on its own. The real question is whether it fit <em>enough</em> better to justify the two extra parameters.</p>
 
-<p>The <strong>likelihood-ratio test</strong> (LRT) answers that. Take the log-likelihood of each fit — the number that says how well each model explains the data — and compute</p>
+<p>The <strong>likelihood-ratio test</strong> (LRT) answers that. Take the log-likelihood of each fit, the number that says how well each model explains the data, and compute</p>
 
 <div class="eq-block">$\Lambda = 2\,\big(\ell_{\text{complicated}} - \ell_{\text{simple}}\big).$</div>
 
-<p>Big $\Lambda$ means the extra parameters bought you a lot. The useful fact is that we know how big $\Lambda$ gets <em>by luck alone</em> when the simple model is actually true: it follows a $\chi^2$ distribution with degrees of freedom equal to the number of extra parameters. So you compare your $\Lambda$ to that reference and read off a p-value. In the Day 4 growth example $\Lambda = 75.4$ on 2 df, which gives $p \approx 4\times10^{-17}$ — luck is not a plausible explanation, and the sexes really do grow differently.</p>
+<p>Big $\Lambda$ means the extra parameters bought you a lot. The useful fact is that we know how big $\Lambda$ gets <em>by luck alone</em> when the simple model is actually true. It follows a $\chi^2$ distribution with degrees of freedom equal to the number of extra parameters. So you compare your $\Lambda$ to that reference and read off a p-value. In the Day 4 growth example $\Lambda = 75.4$ on 2 df, which gives $p \approx 4\times10^{-17}$, so luck is not a plausible explanation and the sexes really do grow differently.</p>
 
 <div class="callout warn">
-<strong>The one rule you must not break: the models have to be <em>nested</em>.</strong> Nested means the simple model is a special case of the complicated one, reachable by fixing some of its parameters. One-curve-for-all is nested inside a-curve-per-sex (set the two curves equal). A Poisson model is <em>not</em> nested inside a lognormal one. If the models are not nested the $\chi^2$ reference is simply wrong and the p-value is meaningless. That is precisely the gap <strong>AIC</strong> fills: AIC ranks any set of models fit to the same data, nested or not — but it gives you a ranking, not a test, and never a p-value. Use the LRT when you want a yes/no on a specific added effect; use AIC when you want to sort a collection of candidates.
+<strong>The one rule you must not break: the models have to be <em>nested</em>.</strong> Nested means the simple model is a special case of the complicated one, reachable by fixing some of its parameters. One-curve-for-all is nested inside a-curve-per-sex (set the two curves equal). A Poisson model is <em>not</em> nested inside a lognormal one. If the models are not nested the $\chi^2$ reference is simply wrong and the p-value is meaningless. That is precisely the gap <strong>AIC</strong> fills: AIC ranks any set of models fit to the same data, nested or not, but it gives you a ranking, not a test, and never a p-value. Use the LRT when you want a yes/no on a specific added effect; use AIC when you want to sort a collection of candidates.
 </div>
 
 <h3>Profile likelihood: a confidence interval that does not lie</h3>
 
-<p>The quick way to get a 95% CI is "estimate $\pm$ 1.96 standard errors." That recipe quietly assumes the likelihood is a symmetric hill around its peak. For a mean of a large sample, fine. For nonlinear parameters like a growth coefficient $\kappa$, a rate, or a variance, the hill is usually lopsided — steep on one side, with a long shallow shoulder on the other — and the symmetric interval then puts its bounds in the wrong places. It can even hand you a negative lower bound for a quantity that cannot be negative.</p>
+<p>The quick way to get a 95% CI is "estimate $\pm$ 1.96 standard errors." That recipe quietly assumes the likelihood is a symmetric hill around its peak. For a mean of a large sample, fine. For nonlinear parameters like a growth coefficient $\kappa$, a rate, or a variance, the hill is usually lopsided, steep on one side, with a long shallow shoulder on the other, and the symmetric interval then puts its bounds in the wrong places. It can even hand you a negative lower bound for a quantity that cannot be negative.</p>
 
-<p>The <strong>profile likelihood</strong> fixes that by simply looking at the actual shape of the hill. Pick a candidate value for the parameter you care about, say $\kappa = 0.22$. Freeze it there, and re-fit <em>everything else</em> — let all the other parameters move to their best values given that $\kappa$. Record how much worse the fit got. Do that across a grid of $\kappa$ values and you have traced a curve. The 95% CI is every value whose fit is within <strong>1.92</strong> log-likelihood units of the best one. (1.92 is not arbitrary: it is half of $\chi^2_{1,\,0.95} = 3.84$ — the same LRT arithmetic, run one parameter at a time.) In R, <code>confint()</code> on an <code>mle()</code> fit does exactly this for you.</p>
+<p>The <strong>profile likelihood</strong> fixes that by simply looking at the actual shape of the hill. Pick a candidate value for the parameter you care about, say $\kappa = 0.22$. Freeze it there, and re-fit <em>everything else</em>, letting all the other parameters move to their best values given that $\kappa$. Record how much worse the fit got. Do that across a grid of $\kappa$ values and you have traced a curve. The 95% CI is every value whose fit is within <strong>1.92</strong> log-likelihood units of the best one. (1.92 is not arbitrary. It is half of $\chi^2_{1,\,0.95} = 3.84$, the same LRT arithmetic, run one parameter at a time.) In R, <code>confint()</code> on an <code>mle()</code> fit does exactly this for you.</p>
 
 <div class="callout key">
-The words "re-fit everything else" are the whole idea, and the commonest way to get this wrong is to skip them. If you hold the other parameters <em>frozen</em> at their best-fit values while you slide $\kappa$, you are not profiling — you are taking a slice — and the interval comes out too narrow. Day 4's lab shows this happening on purpose: a grid over $\kappa$ with $L_\infty$ nailed to 100 reports $\kappa \approx 0.15$, while letting $L_\infty$ move returns $\kappa = 0.259$ on the same fish.
+The words "re-fit everything else" are the whole idea, and the commonest way to get this wrong is to skip them. If you hold the other parameters <em>frozen</em> at their best-fit values while you slide $\kappa$, you are not profiling, you are taking a slice, and the interval comes out too narrow. Day 4's lab shows this happening on purpose. A grid over $\kappa$ with $L_\infty$ nailed to 100 reports $\kappa \approx 0.15$, while letting $L_\infty$ move returns $\kappa = 0.259$ on the same fish.
 </div>
 
 <div class="callout bio">
-<strong>The Bayesian echo.</strong> Both tools exist because maximum likelihood gives you a point and then has to work to describe the uncertainty around it. In the afternoon you get a whole posterior distribution, so the "interval" is just a question you ask of the draws you already have. That is the same trade-off you will meet again with derived quantities such as MSY: awkward for likelihood, free for Bayes.
+<strong>The Bayesian echo.</strong> Both tools exist because maximum likelihood gives you a point and then has to work to describe the uncertainty around it. In the afternoon you get a whole posterior distribution, so the "interval" is just a question you ask of the draws you already have. That is the same trade-off you will meet again with derived quantities such as MSY, awkward for likelihood and free for Bayes.
 </div>
 </section>
 
 <section id="prior-post">
 <h2>From prior to posterior, in pictures</h2>
 
-<p>Bayes does something the MLE cannot: it gives you a <em>distribution</em> over the parameter, not just a point. Three ingredients:</p>
+<p>Bayes does something the MLE cannot. It gives you a <em>distribution</em> over the parameter, not just a point. Three ingredients:</p>
 
 <ol>
-<li><strong>Prior $p(\theta)$:</strong> what you believed about $\theta$ before seeing the data. Often "I don't know much" — a wide, weakly informative distribution.</li>
+<li><strong>Prior $p(\theta)$:</strong> what you believed about $\theta$ before seeing the data. Often "I don't know much", a wide, weakly informative distribution.</li>
 <li><strong>Likelihood $p(y \mid \theta)$:</strong> exactly the same likelihood as the morning.</li>
 <li><strong>Posterior $p(\theta \mid y)$:</strong> what you believe now. By Bayes' rule, $\text{posterior} \propto \text{prior} \times \text{likelihood}$.</li>
 </ol>
 
-<p>If the prior is uniform and the likelihood is peaked, the posterior looks like the likelihood — and the posterior mode is the MLE. If the prior is strong, it pulls (or "shrinks") the posterior toward what you previously believed. As you get more data, the likelihood gets sharper and dominates: the prior becomes less and less important.</p>
+<p>If the prior is uniform and the likelihood is peaked, the posterior looks like the likelihood, and the posterior mode is the MLE. If the prior is strong, it pulls (or "shrinks") the posterior toward what you previously believed. As you get more data, the likelihood gets sharper and dominates, and the prior becomes less and less important.</p>
 
 <div class="callout key">
 Priors are a feature, not a bug. They let you encode <em>real prior knowledge</em> (e.g. "survival in this species is biologically plausible only between 0.2 and 0.8") and they regularize unstable estimates. They are also the thing reviewers question hardest, so always justify them.
@@ -132,20 +132,20 @@ Priors are a feature, not a bug. They let you encode <em>real prior knowledge</e
 <section id="flip">
 <h2>The big Bayesian flip</h2>
 
-<p>Frequentist statistics computes things like $P(\text{data} \mid H_0)$ — the famous p-value — and then asks you to translate that into a verdict on a hypothesis. Bayes computes the thing you actually wanted in the first place:</p>
+<p>Frequentist statistics computes things like $P(\text{data} \mid H_0)$, the famous p-value, and then asks you to translate that into a verdict on a hypothesis. Bayes computes the thing you actually wanted in the first place:</p>
 
 <div class="callout plain">
 <p><strong>Frequentist:</strong> "If the null hypothesis is true, the data I observed (or anything more extreme) would happen in 3% of repetitions."</p>
 <p><strong>Bayesian:</strong> "Given the data I observed, there is a 97% probability that the effect is positive."</p>
 </div>
 
-<p>Notice that the Bayesian sentence puts the probability where you wanted it all along — on the hypothesis. That is the payoff for buying into the prior + posterior framework.</p>
+<p>Notice that the Bayesian sentence puts the probability where you wanted it all along, on the hypothesis. That is the payoff for buying into the prior + posterior framework.</p>
 </section>
 
 <section id="mcmc">
 <h2>What does MCMC actually do?</h2>
 
-<p>For real models — anything with more than one or two parameters, or a non-conjugate likelihood — we cannot write the posterior down in closed form. <strong>Markov chain Monte Carlo</strong> is a clever algorithm that generates a long sequence of random samples whose long-run frequency <em>is</em> the posterior. You don't compute the posterior; you draw from it.</p>
+<p>For real models (anything with more than one or two parameters, or a non-conjugate likelihood) we cannot write the posterior down in closed form. <strong>Markov chain Monte Carlo</strong> is a clever algorithm that generates a long sequence of random samples whose long-run frequency <em>is</em> the posterior. You don't compute the posterior; you draw from it.</p>
 
 <p>The simplest version (Metropolis):</p>
 <ol>
@@ -161,22 +161,22 @@ Priors are a feature, not a bug. They let you encode <em>real prior knowledge</e
 <li>posterior mean of $r$? <code>mean(r_samples)</code></li>
 <li>95% credible interval? <code>quantile(r_samples, c(.025, .975))</code></li>
 <li>probability $r > 0.22$? <code>mean(r_samples > 0.22)</code></li>
-<li>posterior of $K/2$? Compute $K/2$ for every sample of $K$ — that's the posterior of $K/2$.</li>
+<li>posterior of $K/2$? Compute $K/2$ for every sample of $K$. That is the posterior of $K/2$.</li>
 </ul>
 </section>
 
 <section id="nimble">
 <h2>Where does <span class="pill nimble">Nimble</span> fit in?</h2>
 
-<p>You don't want to write Metropolis by hand for every new model. <strong>Nimble</strong> (and JAGS, Stan, etc.) take a BUGS-style description of your model — priors and likelihood — and automatically:</p>
+<p>You don't want to write Metropolis by hand for every new model. <strong>Nimble</strong> (and JAGS, Stan, etc.) take a BUGS-style description of your model, priors and likelihood, and automatically:</p>
 <ul>
 <li>build the computational graph,</li>
 <li>pick a sensible sampler for each parameter,</li>
-<li>run several independent chains from different starting values (<code>nimbleMCMC()</code> runs them one after another by default — true parallel execution takes extra setup),</li>
+<li>run several independent chains from different starting values (<code>nimbleMCMC()</code> runs them one after another by default; true parallel execution takes extra setup),</li>
 <li>return posterior samples for whatever quantities you ask to monitor.</li>
 </ul>
 
-<p>Why Nimble specifically (instead of JAGS)? Nimble's BUGS dialect is nearly identical to JAGS — most JAGS code runs unchanged inside a <code>nimbleCode({...})</code> block — but it is much more extensible: you can write custom samplers, custom distributions, and compile to fast C++ all from R. Whole subfields (ecological state-space, capture-recapture, spatial models) have migrated to Nimble for this reason.</p>
+<p>Why Nimble specifically (instead of JAGS)? Nimble's BUGS dialect is nearly identical to JAGS (most JAGS code runs unchanged inside a <code>nimbleCode({...})</code> block), but it is much more extensible. You can write custom samplers, custom distributions, and compile to fast C++ all from R. Whole subfields (ecological state-space, capture-recapture, spatial models) have migrated to Nimble for this reason.</p>
 
 <div class="callout plain">
 <p><strong>JAGS → Nimble in three changes:</strong></p>
@@ -185,7 +185,7 @@ Priors are a feature, not a bug. They let you encode <em>real prior knowledge</e
 <li>One <code>data</code> list → two lists: <code>constants</code> (sample sizes, indices, fixed covariates) and <code>data</code> (the observed random variables).</li>
 <li><code>jags.model()</code> + <code>update()</code> + <code>coda.samples()</code> → one call to <code>nimbleMCMC(code=, constants=, data=, inits=, monitors=, nchains=, nburnin=, niter=)</code>.</li>
 </ol>
-<p>The model body — <code>dnorm</code>, <code>dunif</code>, <code>dbeta</code>, <code>dbinom</code>, <code>dpois</code>, loops, derived quantities — translates verbatim.</p>
+<p>The model body (<code>dnorm</code>, <code>dunif</code>, <code>dbeta</code>, <code>dbinom</code>, <code>dpois</code>, loops, derived quantities) translates verbatim.</p>
 </div>
 </section>
 
@@ -193,15 +193,15 @@ Priors are a feature, not a bug. They let you encode <em>real prior knowledge</e
 <h2>Common confusions to avoid</h2>
 
 <div class="callout warn">
-<p><strong>"The MLE is unbiased."</strong> Not always! MLEs are <em>consistent</em> (right answer with infinite data) but can be biased in finite samples. Variance components in mixed models, for example, have MLEs that are systematically too small — which is why REML exists.</p>
+<p><strong>"The MLE is unbiased."</strong> Not always! MLEs are <em>consistent</em> (right answer with infinite data) but can be biased in finite samples. Variance components in mixed models, for example, have MLEs that are systematically too small, which is why REML exists.</p>
 </div>
 
 <div class="callout warn">
-<p><strong>"A 95% confidence interval has a 95% chance of containing the true parameter."</strong> No. A 95% CI is a procedure that, in repeated sampling, would cover the true parameter 95% of the time. Once you have a specific CI from a specific dataset, it either contains the parameter or it doesn't — no probability statement applies. The Bayesian credible interval <em>does</em> support that natural reading; that's part of why people switch.</p>
+<p><strong>"A 95% confidence interval has a 95% chance of containing the true parameter."</strong> No. A 95% CI is a procedure that, in repeated sampling, would cover the true parameter 95% of the time. Once you have a specific CI from a specific dataset, it either contains the parameter or it doesn't, and no probability statement applies. The Bayesian credible interval <em>does</em> support that natural reading; that's part of why people switch.</p>
 </div>
 
 <div class="callout warn">
-<p><strong>"My MCMC has run 50,000 iterations, so it must have converged."</strong> Iteration count alone tells you nothing. Look at trace plots (multiple chains should overlap), $\hat R$ values (should be very close to 1), and effective sample sizes (should be at least a few hundred for the parameters you care about). MCMC failure is silent — diagnose every run.</p>
+<p><strong>"My MCMC has run 50,000 iterations, so it must have converged."</strong> Iteration count alone tells you nothing. Look at trace plots (multiple chains should overlap), $\hat R$ values (should be very close to 1), and effective sample sizes (should be at least a few hundred for the parameters you care about). MCMC failure is silent, so diagnose every run.</p>
 </div>
 
 <div class="callout warn">
@@ -212,7 +212,7 @@ Priors are a feature, not a bug. They let you encode <em>real prior knowledge</e
 <section id="tomorrow">
 <h2>Looking ahead to Day 5</h2>
 
-<p>Tomorrow we take the Bayesian machinery you just learned and apply it to harder, more realistic models: hierarchical (random-effects) models, occupancy models, capture-recapture, and state-space models. Same <span class="pill nimble">Nimble</span> syntax, deeper biology. The morning's maximum likelihood and the afternoon's conjugacy and logistic-growth fit you did today are the building blocks; everything tomorrow plugs together pieces you already understand.</p>
+<p>Tomorrow we take the Bayesian machinery you just learned and apply it to harder, more realistic models, hierarchical (random-effects) models, occupancy models, capture-recapture, and state-space models. Same <span class="pill nimble">Nimble</span> syntax, deeper biology. The morning's maximum likelihood and the afternoon's conjugacy and logistic-growth fit you did today are the building blocks; everything tomorrow plugs together pieces you already understand.</p>
 
 <p>Things to keep in your back pocket going into Day 5:</p>
 <ul>

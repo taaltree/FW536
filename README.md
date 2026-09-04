@@ -1,8 +1,8 @@
-# FW 536 — Statistical Modeling for Ecology and Conservation
+# FW 536 · Statistical Modeling for Ecology and Conservation
 
 Course materials for the 5-day pre-fall workshop at Oregon State University.
 
-Open [`index.html`](index.html) in any browser — it links to every artifact.
+Open [`index.html`](index.html) in any browser. It links to every artifact.
 [`syllabus.html`](syllabus.html) has the schedule, grading, and policies. A
 screen-reader-optimized edition lives in [`accessible/`](accessible/index.html).
 
@@ -12,7 +12,7 @@ screen-reader-optimized edition lives in [`accessible/`](accessible/index.html).
 - **Each session** has a lecture followed by a hands-on lab.
 - **Each session's graded work** is a single 20-point problem set, submitted as a
   knitted R Markdown HTML on Canvas.
-- **Pre-course exam** at the start of Day 1 morning — a generously-scored
+- **Pre-course exam** at the start of Day 1 morning, a generously-scored
   diagnostic used to gauge where the class is starting from. Day 5 afternoon is
   open lab time to finish any unfinished problem sets.
 
@@ -20,10 +20,10 @@ screen-reader-optimized edition lives in [`accessible/`](accessible/index.html).
 
 Students complete two setup steps first, linked from the landing page:
 
-1. [`install_jags_nimble.html`](install_jags_nimble.html) — install R, RStudio,
-   the compiler toolchain, JAGS, and Nimble on Windows or Mac, with a
+1. [`install_jags_nimble.html`](install_jags_nimble.html) installs R, RStudio,
+   the compiler toolchain, and Nimble on Windows or Mac (JAGS optional), with a
    verification step.
-2. [`rmarkdown_tutorial.html`](rmarkdown_tutorial.html) — the R Markdown workflow
+2. [`rmarkdown_tutorial.html`](rmarkdown_tutorial.html) teaches the R Markdown workflow
    used for every hand-in.
 
 ## Each day folder
@@ -46,17 +46,16 @@ The practice lab and the graded problem set both use anchored `#morning` and
 `#afternoon` sections so the two sessions stay clearly separated.
 
 **Day 5 is the exception.** Its afternoon is open lab time rather than a new
-topic, so `Day5_BayesII/` has only a `#morning` section — no
-`afternoon_lab_template.Rmd` and no `explore_*.html` of its own.
+topic, so `Day5_BayesII/` has only a `#morning` section, with no `afternoon_lab_template.Rmd` and no `explore_*.html` of its own.
 
 ## Interactive visualizations
 
 Days 1–4 each link a self-contained browser widget (no install needed):
 
-- Day 1 — discrete distribution explorer (Binomial / Poisson / Negative Binomial).
-- Day 2 — link-function & logit visualizer (identity / log / logit).
-- Day 3 — shrinkage / partial-pooling demo.
-- Day 4 — likelihood curve + live Metropolis MCMC sampler.
+- Day 1: discrete distribution explorer (Binomial / Poisson / Negative Binomial).
+- Day 2: link-function & logit visualizer (identity / log / logit).
+- Day 3: shrinkage / partial-pooling demo.
+- Day 4: likelihood curve + live Metropolis MCMC sampler.
 
 Day 5 has no widget of its own; its lab reuses the Day 4 MCMC and conjugate
 explorers.
@@ -64,7 +63,7 @@ explorers.
 ## Answer keys (instructor-only)
 
 Graded problem-set keys (`problem_set_KEY.html`) and exam keys
-(`*_exam_KEY.html`) are **git-ignored** — they stay on the instructor's local
+(`*_exam_KEY.html`) are **git-ignored**. They stay on the instructor's local
 copy and are never published. Release them via Canvas after grading. The
 practice-lab `answer_key.html` files are public by design (the practice lab
 already shows its answers).
@@ -78,12 +77,11 @@ descriptions. See [`accessible/README.md`](accessible/README.md).
 
 ## Maintenance tools
 
-The `_tools/` scripts regenerate derived artifacts so the two editions stay in
-sync — run them after changing slides or standard-site content:
+The `_tools/` scripts regenerate derived artifacts so the two editions stay in sync. Run them after changing slides or standard-site content:
 
-- `build_accessible_pptx.py` — write image alt text into `*_accessible.pptx`.
-- `build_lecture_notes.py` — regenerate accessible lecture-notes transcripts.
-- `update_accessible.py` — regenerate the accessible content pages from the
+- `build_accessible_pptx.py` writes image alt text into `*_accessible.pptx`.
+- `build_lecture_notes.py` regenerates accessible lecture-notes transcripts.
+- `update_accessible.py` regenerates the accessible content pages from the
   standard site.
 
 See [`RECOMMENDATIONS.md`](RECOMMENDATIONS.md) for a course review and prioritized

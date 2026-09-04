@@ -2,7 +2,7 @@
 <html lang="en" data-a11y="done">
 <head>
 <meta charset="UTF-8" />
-<title>Pre-course setup: R, JAGS &amp; Nimble | FW 536</title>
+<title>Pre-course setup: R &amp; Nimble | FW 536</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="stylesheet" href="_Shared/css/accessible.css" />
 <script defer src="_Shared/js/accessible.js"></script>
@@ -15,14 +15,14 @@
 
 <aside class="sidebar">
   <p class="brand"><a href="index.html" title="Back to course home">FW 536 · Setup</a></p>
-  <div class="subtitle">Install R, JAGS &amp; Nimble</div>
+  <div class="subtitle">Install R &amp; Nimble</div>
   <nav aria-label="On this page and related documents">
     <div class="section">Before you arrive</div>
     <ul>
       <li><a href="#overview">What you need</a></li>
       <li><a href="#step1">1. R &amp; RStudio</a></li>
       <li><a href="#step2">2. Compiler toolchain</a></li>
-      <li><a href="#step3">3. Install JAGS</a></li>
+      <li><a href="#step3">3. Install JAGS (optional)</a></li>
       <li><a href="#step4">4. R packages</a></li>
       <li><a href="#verify">5. Verify it works</a></li>
       <li><a href="#trouble">6. Troubleshooting</a></li>
@@ -40,8 +40,8 @@
 <main class="content" id="main-content" tabindex="-1">
 <header class="lab-header">
   <div class="eyebrow">Pre-course preparation</div>
-  <h1>Setting up R, JAGS, and Nimble on Windows and Mac</h1>
-  <p class="lede">Do this before Day 1. Bayesian labs (Days 4&ndash;5) use JAGS and Nimble, and Nimble compiles C++, so a working compiler toolchain must be in place. Budget 30&ndash;60 minutes and finish the verification step.</p>
+  <h1>Setting up R and Nimble on Windows and Mac</h1>
+  <p class="lede">Do this before Day 1. Every Bayesian model in the course (Days 4&ndash;5) is fit in Nimble, and Nimble compiles C++, so a working compiler toolchain must be in place. JAGS is optional; a few walkthrough scripts include a JAGS version of the same model for comparison. Budget 30&ndash;60 minutes and finish the verification step.</p>
 </header>
 
 <section id="overview">
@@ -52,12 +52,12 @@
 <tr><td>R (≥ 4.3)</td><td>the language</td><td>CRAN installer</td><td>CRAN installer (pick Intel or Apple-Silicon build)</td></tr>
 <tr><td>RStudio</td><td>the IDE we use in class</td><td>Posit installer</td><td>Posit installer</td></tr>
 <tr><td>Compiler toolchain</td><td>Nimble compiles models to C++</td><td>Rtools</td><td>Xcode Command Line Tools</td></tr>
-<tr><td>JAGS</td><td>a Bayesian sampler used alongside Nimble</td><td>JAGS installer (.exe)</td><td>JAGS installer (.dmg) or Homebrew</td></tr>
-<tr><td>R packages</td><td><code>nimble</code>, <code>rjags</code>, <code>R2jags</code>, <code>coda</code>, <code>MCMCvis</code>, <code>HDInterval</code></td><td colspan="2"><code>install.packages(...)</code> (same on both)</td></tr>
+<tr><td>JAGS (optional)</td><td>a second Bayesian sampler, used only in comparison scripts</td><td>JAGS installer (.exe)</td><td>JAGS installer (.dmg) or Homebrew</td></tr>
+<tr><td>R packages</td><td><code>nimble</code>, <code>coda</code>, <code>MCMCvis</code>, <code>HDInterval</code> and the modelling packages listed in step 4 (<code>rjags</code> only if you install JAGS)</td><td colspan="2"><code>install.packages(...)</code> (same on both)</td></tr>
 </table>
 
 <div class="callout key"><p class="callout-label">Key idea</p>
-<p>Order matters. Install <strong>R first</strong>, then the <strong>compiler toolchain</strong>, then <strong>JAGS</strong>, then the <strong>R packages</strong>. Installing <code>rjags</code> before JAGS, or <code>nimble</code> before the compiler, is the most common cause of "it won't install" problems.</p>
+<p>Order matters. Install <strong>R first</strong>, then the <strong>compiler toolchain</strong>, then the <strong>R packages</strong>. If you also want JAGS, install it before <code>rjags</code>. Installing <code>nimble</code> before the compiler, or <code>rjags</code> before JAGS, is the most common cause of "it won't install" problems.</p>
 </div>
 </section>
 
@@ -102,7 +102,7 @@
 </div>
 
 <div class="tab-panel active">
-<h3>Windows — Rtools</h3>
+<h3>Windows (Rtools)</h3>
 <ol>
 <li>Go to <a href="https://cran.r-project.org/bin/windows/Rtools/" target="_blank" rel="noopener">cran.r-project.org/bin/windows/Rtools</a>.</li>
 <li>Download the Rtools version that <strong>matches your R version</strong> (e.g., Rtools45 for R 4.5.x, Rtools44 for R 4.4.x). Run the installer with defaults.</li>
@@ -115,7 +115,7 @@ If <code>pkgbuild</code> is missing, run <code>install.packages("pkgbuild")</cod
 </div>
 
 <div class="tab-panel">
-<h3>Mac — Xcode Command Line Tools</h3>
+<h3>Mac (Xcode Command Line Tools)</h3>
 <ol>
 <li>Open <strong>Terminal</strong> (Applications → Utilities → Terminal) and run:
 <div class="code-label">Terminal</div>
@@ -136,7 +136,8 @@ clang --version        <span class="cm"># prints the compiler version</span></co
 </section>
 
 <section id="step3">
-<h2>3. Install JAGS</h2>
+<h2>3. Install JAGS (optional)</h2>
+<p>You can skip this step. Every graded model runs in Nimble. Install JAGS only if you want to run the JAGS versions of the Day 4 and Day 5 comparison scripts (<code>Jags_logistic_rK_Lab1.R</code>, <code>lizzard.R</code>), or if you already use JAGS in your own work.</p>
 
 <div class="tabs">
 <div class="tab-buttons">
@@ -149,18 +150,18 @@ clang --version        <span class="cm"># prints the compiler version</span></co
 <ol>
 <li>Download the JAGS installer from <a href="https://sourceforge.net/projects/mcmc-jags/files/JAGS/4.x/Windows/" target="_blank" rel="noopener">SourceForge (JAGS 4.x, Windows)</a>. Choose the latest <code>JAGS-4.x.x.exe</code>.</li>
 <li>Run it with default options. It installs to <code>C:\Program Files\JAGS\JAGS-4.x.x</code> by default.</li>
-<li>No PATH editing is normally required &mdash; <code>rjags</code> finds JAGS through the registry. (If it doesn't, see Troubleshooting.)</li>
+<li>No PATH editing is normally required, because <code>rjags</code> finds JAGS through the registry. (If it doesn't, see Troubleshooting.)</li>
 </ol>
 </div>
 
 <div class="tab-panel">
 <h3>Mac</h3>
-<p><strong>Option A — installer (simplest):</strong></p>
+<p><strong>Option A, the installer (simplest)</strong></p>
 <ol>
 <li>Download the JAGS <code>.dmg</code> from <a href="https://sourceforge.net/projects/mcmc-jags/files/JAGS/4.x/Mac%20OS%20X/" target="_blank" rel="noopener">SourceForge (JAGS 4.x, Mac OS X)</a>.</li>
 <li>Open the <code>.dmg</code> and run the <code>.pkg</code> installer.</li>
 </ol>
-<p><strong>Option B — Homebrew</strong> (if you use it):</p>
+<p><strong>Option B, Homebrew</strong> (if you use it)</p>
 <div class="code-label">Terminal</div>
 <pre><code>brew install jags</code></pre>
 </div>
@@ -172,24 +173,28 @@ clang --version        <span class="cm"># prints the compiler version</span></co
 <p>In the RStudio Console (same on Windows and Mac):</p>
 <div class="code-label">R console</div>
 <pre><code><span class="fn">install.packages</span>(<span class="kw">c</span>(
-  <span class="st">"coda"</span>, <span class="st">"rjags"</span>, <span class="st">"R2jags"</span>,
-  <span class="st">"nimble"</span>, <span class="st">"MCMCvis"</span>, <span class="st">"HDInterval"</span>,
-  <span class="st">"ggplot2"</span>, <span class="st">"dplyr"</span>,
+  <span class="st">"nimble"</span>, <span class="st">"coda"</span>, <span class="st">"MCMCvis"</span>, <span class="st">"HDInterval"</span>,
+  <span class="st">"rmarkdown"</span>, <span class="st">"knitr"</span>,
+  <span class="st">"ggplot2"</span>, <span class="st">"dplyr"</span>, <span class="st">"tidyr"</span>,
   <span class="st">"lme4"</span>, <span class="st">"nlme"</span>, <span class="st">"emmeans"</span>, <span class="st">"effects"</span>,
-  <span class="st">"AICcmodavg"</span>, <span class="st">"MuMIn"</span>, <span class="st">"MASS"</span>, <span class="st">"boot"</span>
-))</code></pre>
+  <span class="st">"AICcmodavg"</span>, <span class="st">"MuMIn"</span>, <span class="st">"MASS"</span>, <span class="st">"boot"</span>,
+  <span class="st">"RLRsim"</span>, <span class="st">"glmmTMB"</span>
+))
+<span class="cm"># Only if you installed JAGS in step 3:</span>
+<span class="fn">install.packages</span>(<span class="kw">c</span>(<span class="st">"rjags"</span>, <span class="st">"R2jags"</span>))</code></pre>
 <p>Notes:</p>
 <ul>
-<li><code>rjags</code> must be installed <em>after</em> JAGS, or it will fail to load.</li>
+<li><code>rjags</code> is optional and must be installed <em>after</em> JAGS, or it will fail to load.</li>
 <li><code>nimble</code> is large and may take several minutes; it does not fully compile until you build your first model (that's the verification below).</li>
+<li><code>glmmTMB</code> also compiles C++ on some systems and can take a few minutes. <code>RLRsim</code> and <code>glmmTMB</code> are only used on Day 3, so if either one fails to install, carry on and ask on Day 1.</li>
 </ul>
 </section>
 
 <section id="verify">
 <h2>5. Verify everything works</h2>
-<p>Run each block. If all three succeed, you are ready for the Bayesian labs.</p>
+<p>Run each block. Block (b) is the one that matters; if (b) and (c) succeed, you are ready for the Bayesian labs. Block (a) only applies if you installed JAGS.</p>
 
-<h3>a. JAGS + rjags</h3>
+<h3>a. JAGS + rjags (optional, only if you installed JAGS)</h3>
 <div class="code-label">R console</div>
 <pre><code><span class="kw">library</span>(rjags)
 <span class="fn">cat</span>(<span class="st">"model { p ~ dbeta(1,1); y ~ dbin(p, 10) }"</span>, file = <span class="st">"m.bug"</span>)
@@ -205,21 +210,22 @@ code &lt;- <span class="fn">nimbleCode</span>({
   y ~ <span class="fn">dbinom</span>(p, size = <span class="nu">10</span>)
 })
 fit &lt;- <span class="fn">nimbleMCMC</span>(code = code, data = <span class="kw">list</span>(y = <span class="nu">7</span>),
-                  inits = <span class="kw">list</span>(p = <span class="nu">0.5</span>),
-                  monitors = <span class="st">"p"</span>, niter = <span class="nu">2000</span>, nburnin = <span class="nu">500</span>)
-<span class="fn">mean</span>(fit[, <span class="st">"p"</span>])          <span class="cm"># near 0.67; if this compiles, your toolchain works</span></code></pre>
+                  inits = <span class="kw">list</span>(<span class="kw">list</span>(p = <span class="nu">0.3</span>), <span class="kw">list</span>(p = <span class="nu">0.5</span>), <span class="kw">list</span>(p = <span class="nu">0.8</span>)),
+                  monitors = <span class="st">"p"</span>, nchains = <span class="nu">3</span>, niter = <span class="nu">2000</span>, nburnin = <span class="nu">500</span>,
+                  samplesAsCodaMCMC = <span class="kw">TRUE</span>)
+<span class="fn">mean</span>(<span class="fn">as.matrix</span>(fit)[, <span class="st">"p"</span>])   <span class="cm"># near 0.67; if this compiles, your toolchain works</span></code></pre>
 
 <h3>c. MCMCvis (we use it to summarize posteriors)</h3>
 <div class="code-label">R console</div>
 <pre><code><span class="kw">library</span>(MCMCvis)
-<span class="fn">MCMCsummary</span>(s)             <span class="cm"># tidy table with mean, sd, 95% CI, Rhat, n.eff</span></code></pre>
+<span class="fn">MCMCsummary</span>(fit)           <span class="cm"># tidy table with mean, sd, 95% CI, Rhat, n.eff</span></code></pre>
 <div class="code-label">Output</div>
 <pre><code>       mean        sd      2.5%       50%     97.5% Rhat n.eff
 p 0.6691019 0.1272098 0.4078615 0.6802727 0.8862891    1  4003</code></pre>
-<p>Your digits will differ slightly &mdash; the samplers are stochastic and the blocks above set no seed. What matters is that the table prints: the mean sits near 0.67 and <code>Rhat</code> is about 1.00. The three chains in block (a) are what make <code>Rhat</code> computable; with a single chain it comes back <code>NA</code> and MCMCvis warns.</p>
+<p>Your digits will differ slightly, because the samplers are stochastic and the blocks above set no seed. What matters is that the table prints, the mean sits near 0.67 and <code>Rhat</code> is about 1.00. The three chains in block (b) are what make <code>Rhat</code> computable; with a single chain it comes back <code>NA</code> and MCMCvis warns.</p>
 
 <div class="callout key"><p class="callout-label">Key idea</p>
-<p>If block (b) prints a posterior mean without errors, your C++ toolchain is correctly installed &mdash; that is the step most likely to fail, so this is the one that matters most.</p>
+<p>If block (b) prints a posterior mean without errors, your C++ toolchain is correctly installed. That is the step most likely to fail, so this is the one that matters most.</p>
 </div>
 </section>
 
@@ -257,8 +263,7 @@ p 0.6691019 0.1272098 0.4078615 0.6802727 0.8862891    1  4003</code></pre>
 <ul>
 <li>R and RStudio open and report a version.</li>
 <li>Compiler toolchain present (Rtools on Windows / Xcode CLT on Mac).</li>
-<li>JAGS installed.</li>
-<li><code>library(rjags)</code>, <code>library(nimble)</code>, <code>library(MCMCvis)</code> all load without error.</li>
+<li><code>library(nimble)</code> and <code>library(MCMCvis)</code> load without error (and <code>library(rjags)</code>, if you installed JAGS).</li>
 <li>The Nimble verification block (5b) compiled and printed a posterior mean.</li>
 <li>You have also worked through the <a href="rmarkdown_tutorial.html">R Markdown tutorial</a>, since all assignments are submitted as knitted HTML.</li>
 </ul>

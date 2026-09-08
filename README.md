@@ -12,9 +12,7 @@ screen-reader-optimized edition lives in [`accessible/`](accessible/index.html).
 - **Each session** has a lecture followed by a hands-on lab.
 - **Each session's graded work** is a single 20-point problem set, submitted as a
   knitted R Markdown HTML on Canvas.
-- **Pre-course exam** at the start of Day 1 morning, a generously-scored
-  diagnostic used to gauge where the class is starting from. Day 5 afternoon is
-  open lab time to finish any unfinished problem sets.
+- **Day 5 afternoon** is open lab time to finish any unfinished problem sets.
 
 ## Before the course
 
@@ -62,8 +60,7 @@ explorers.
 
 ## Answer keys (instructor-only)
 
-Graded problem-set keys (`problem_set_KEY.html`) and exam keys
-(`*_exam_KEY.html`) are **git-ignored**. They stay on the instructor's local
+Graded problem-set keys (`problem_set_KEY.html`) are **git-ignored**. They stay on the instructor's local
 copy and are never published. Release them via Canvas after grading. The
 practice-lab `answer_key.html` files are public by design (the practice lab
 already shows its answers).

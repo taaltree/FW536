@@ -23,12 +23,14 @@ ACC = os.path.join(ROOT, "accessible")
 DAYS = ["Day1_Probability", "Day2_GLM", "Day3_MixedModels_ModelSelection",
         "Day4_Likelihood_BayesI", "Day5_BayesII"]
 
-ROOT_HTML = ["syllabus.html", "pre_course_exam.html",
+ROOT_HTML = ["syllabus.html",
              "rmarkdown_tutorial.html", "install_jags_nimble.html",
              "apply_family.html", "tidyverse_dplyr.html"]
 # root-level files retired from the course; remove any stale accessible copies
 ROOT_RETIRED = ["post_course_exam.html", "post_course_exam.Rmd",
-                "post_course_exam_KEY.html", "post_course_exam_off.html"]
+                "post_course_exam_KEY.html", "post_course_exam_off.html",
+                "pre_course_exam.html", "pre_course_exam.Rmd",
+                "pre_course_exam_KEY.html"]
 DAY_HTML = ["lab.html", "problem_set.html", "plain_language_summary.html",
             "log_logit_intuition.html",
             # interactive explorers — screen-reader usable, so they ship here too

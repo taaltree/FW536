@@ -11,17 +11,14 @@
   .hero h1 { font-size: 44px; line-height: 1.1; margin: 8px 0 12px; }
   .hero .eyebrow { font-family: 'Helvetica Neue', Arial, sans-serif; color: var(--osu-orange); letter-spacing: 2px; text-transform: uppercase; font-size: 14px; font-weight: 700; }
   .hero p { font-size: 20px; color: var(--osu-stone); line-height: 1.5; max-width: 950px; }
-  .quicklinks { padding: 0 60px 10px; max-width: 1200px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 14px; }
-  .quicklink { display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 8px; background: white; border: 1px solid var(--border); color: var(--osu-black); text-decoration: none; font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 14px; font-weight: 600; }
-  .quicklink:hover { background: var(--osu-orange); color: white; border-color: var(--osu-orange); }
-  .quicklink.primary { background: var(--osu-orange); color: white; border-color: var(--osu-orange); }
-  .quicklink.primary:hover { background: var(--osu-orange-dark); }
   .prep { max-width: 1200px; margin: 14px auto 0; padding: 0 60px; }
   .prep-box { background: #11304A; color: #fff; border-radius: 12px; padding: 20px 26px; }
   .prep-box h2 { color:#fff; border:none; margin:0 0 6px; font-size:20px; }
   .prep-box p { margin:0 0 12px; color:#dbe6ef; font-size:15px; }
   .prep-box a { display:inline-block; margin:0 10px 8px 0; padding:8px 15px; border-radius:7px; background:#FFE08A; color:#11304A; text-decoration:none; font-family:'Helvetica Neue',Arial,sans-serif; font-weight:700; font-size:14px; }
   .prep-box a:hover { background:#fff; }
+  .prep-box a.ref { background:transparent; color:#FFE08A; border:2px solid #FFE08A; padding:6px 13px; }
+  .prep-box a.ref:hover { background:#FFE08A; color:#11304A; }
   .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 22px; padding: 26px 60px; max-width: 1200px; margin: 0 auto; }
   .card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); border-top: 5px solid var(--osu-orange); }
   .card .day-num-link { font-family: 'Helvetica Neue', Arial, sans-serif; color: var(--osu-orange); font-size: 12px; letter-spacing: 2px; text-transform: uppercase; font-weight: 700; text-decoration: none; display: inline-block; }
@@ -72,16 +69,6 @@
   <p>A five-day intensive workshop covering probability, distributions, GLMs, mixed models, model selection, maximum likelihood, and Bayesian hierarchical modeling, using R and Nimble.</p>
 </div>
 
-<div class="quicklinks">
-  <a class="quicklink primary" href="syllabus.html">Syllabus</a>
-  <a class="quicklink" href="install_jags_nimble.html">Setup: R &amp; Nimble</a>
-  <a class="quicklink" href="rmarkdown_tutorial.html">R Markdown tutorial</a>
-    <a class="quicklink" href="apply_family.html">The apply family, visualized</a>
-    <a class="quicklink" href="tidyverse_dplyr.html">dplyr &amp; the tidyverse</a>
-  <a class="quicklink" href="pre_course_exam.html">Pre-course exam</a>
-  <a class="quicklink" href="accessible/index.html">Accessible version (screen-reader optimized)</a>
-</div>
-
 <div class="prep">
   <div class="prep-box">
     <h2>Before the course, do this first</h2>
@@ -90,6 +77,7 @@
     <a href="rmarkdown_tutorial.html">2 · R Markdown tutorial</a>
     <a href="apply_family.html">3 · The apply family, loops the R way</a>
     <a href="tidyverse_dplyr.html">4 · dplyr &amp; the tidyverse for data manipulation</a>
+    <a class="ref" href="syllabus.html">Syllabus · schedule, grading, policies</a>
   </div>
 </div>
 
@@ -107,7 +95,8 @@
     </a>
 
     <div class="session-block">
-      <div class="session-label"><a href="Day1_Probability/lab.html#morning">Morning · Probability · 20 pts · pre-course exam at start</a></div>
+      <div class="session-label"><a href="Day1_Probability/lab.html#morning">Morning · Probability · 20 pts</a></div>
+      <div class="activity-row"><span class="tag exam">Exam</span><span><a href="pre_course_exam.html">Pre-course exam</a> · <a href="pre_course_exam.Rmd">pre_course_exam.Rmd</a> <span class="note">at the start, 50 pts</span></span></div>
       <div class="activity-row"><span class="tag lecture">Lecture</span><span><a href="Day1_Probability/FW536_Day1_Morning_intro%20to%20probability_nosoln_accessible.pptx">Slides: intro to probability (PPT)</a></span></div>
       <div class="activity-row"><span class="tag practice">Practice</span><span><a href="Day1_Probability/lab.html#morning">In-class walkthrough</a> <span class="note">answers visible</span></span></div>
       <div class="activity-row"><span class="tag assessed">Graded</span><span><a href="Day1_Probability/problem_set.html#morning">Morning problem set</a></span></div>

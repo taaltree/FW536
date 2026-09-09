@@ -66,6 +66,7 @@
 <p>Every sampler below only ever needs the posterior <em>up to a constant</em>, i.e. prior × likelihood, because the unknown constant cancels in every accept/reject ratio. That is the whole trick.</p>
 </div>
 <p>The target here is a two-parameter posterior shaped like a tilted ellipse (a correlated bivariate normal; think of two parameters, like a slope and an intercept, whose estimates are correlated). Correlation is what makes samplers struggle, so you can dial it up and watch each sampler cope.</p>
+<p>The square panel is the <strong>joint</strong> posterior, the thing the chain actually walks around in. The strip along the top and the strip along the right are the <strong>marginal</strong> posteriors of the two parameters, and they are what you would report. Every iteration drops one count into each strip, which is all a marginal is: the joint cloud flattened onto one axis, throwing the other parameter away. The dashed curve on each strip is the marginal you are trying to recover.</p>
 </section>
 
 <section id="explorer">
@@ -78,8 +79,8 @@
 
   <div class="layout">
     <div>
-      <svg id="plot" viewBox="0 0 500 500" width="100%" role="img" aria-label="2D parameter space with target contours and the sampler's path"></svg>
-      <svg id="trace" viewBox="0 0 500 130" width="100%" role="img" aria-label="Trace plot of the first parameter over the last 300 iterations"></svg>
+      <svg id="plot" viewBox="0 0 500 500" width="100%" role="img" aria-label="Two-parameter space with the target contours, the sampler's path, and a marginal distribution for each parameter along the top and right edges"></svg>
+      <svg id="trace" viewBox="0 0 500 130" width="100%" role="img" aria-label="Trace plot of both parameters over the last 300 iterations"></svg>
     </div>
     <div>
       <div class="controls" id="controls"></div>
@@ -135,7 +136,9 @@
 <li><strong>Mis-tune Metropolis.</strong> Set its step size very small (chain barely moves, acceptance near 100% but useless) then very large (almost every proposal rejected). Find the middle where acceptance is ~20–40%.</li>
 <li><strong>Watch Gibbs turn corners.</strong> Gibbs only ever moves horizontally then vertically, so you can see the right-angle staircase. Under high correlation those steps get tiny.</li>
 <li><strong>HMC trajectories.</strong> With HMC, each proposal is the end of a curved glide across the posterior (shown faintly). Increase the leapfrog steps $L$ and each move reaches further.</li>
-<li><strong>Count what you actually got.</strong> The readout estimates the effective sample size (ESS) of the x-coordinate from its autocorrelation. Run each sampler for 500 iterations at ρ = 0.9 and compare ESS. A chain that took 500 steps but is worth 30 independent draws has told you exactly how badly it mixed, which the trace plot also shows as slow, sticky wandering.</li>
+<li><strong>Watch a marginal fill in.</strong> Start from Reset and step a few times. Each draw drops one tick onto the top strip and one onto the right strip, and the filled shape climbs toward the dashed curve. Keep going and the two agree; stop early and the marginal is visibly lumpy, which is what a short chain buys you.</li>
+<li><strong>Correlation does not touch the marginals.</strong> Slide ρ from 0 to 0.95 and the joint cloud goes from a round blob to a thin diagonal ridge, but the dashed marginal curves never move: both parameters are standard normal at every ρ. What changes is how hard the sampler has to work to <em>reproduce</em> them. At high ρ, Metropolis and Gibbs give ragged, lopsided marginals after the same number of iterations that leave HMC's looking smooth.</li>
+<li><strong>Count what you actually got.</strong> The readout estimates the effective sample size (ESS) of each parameter from its autocorrelation, alongside the sampled marginal mean and SD (the truth is 0 and 1). Run each sampler for 500 iterations at ρ = 0.9 and compare. A chain that took 500 steps but is worth 30 independent draws has told you exactly how badly it mixed, which the trace plot shows as slow, sticky wandering and the marginal shows as a shape that has not settled.</li>
 </ol>
 </div>
 <p><a href="explore_likelihood_mcmc.html">← See the 1D version (likelihood → posterior → MCMC)</a> · <a href="lab.html">Day 4 lab</a></p>
@@ -249,20 +252,56 @@ function acf(v,m,c0,k){ let s=0; for(let i=0;i<v.length-k;i++) s+=(v[i]-m)*(v[i+
 
 function drawTrace(){
   const W=500,H=130,ml=34,mr=8,mt=10,mb=22,pw=W-ml-mr,ph=H-mt-mb;
-  const show=chain.slice(-300).map(p=>p[0]);
+  const tail=chain.slice(-300);
+  const sx=tail.map(p=>p[0]), sy=tail.map(p=>p[1]);
   let v=`<rect width="${W}" height="${H}" fill="white"/>`;
   v+=`<line x1="${ml}" y1="${mt}" x2="${ml}" y2="${mt+ph}" stroke="#999"/><line x1="${ml}" y1="${mt+ph}" x2="${ml+pw}" y2="${mt+ph}" stroke="#999"/>`;
   [-3,0,3].forEach(t=>{ const yy=mt+ph-((t+4)/8)*ph; v+=`<text x="${ml-4}" y="${yy+3}" font-size="9" fill="#666" text-anchor="end">${t}</text>`; });
-  v+=`<text x="${ml+pw/2}" y="${H-4}" font-size="11" fill="#444" text-anchor="middle">trace of x, last ${show.length} iterations</text>`;
-  if(show.length>1){
-    const px=i=>ml+(i/(show.length-1))*pw, py=val=>mt+ph-((Math.max(-4,Math.min(4,val))+4)/8)*ph;
-    v+=`<polyline points="${show.map((val,i)=>`${px(i)},${py(val)}`).join(' ')}" fill="none" stroke="#1F5B50" stroke-width="1.2"/>`;
+  v+=`<text x="${ml+pw/2}" y="${H-4}" font-size="11" fill="#444" text-anchor="middle">trace, last ${tail.length} iterations</text>`;
+  if(tail.length>1){
+    const px=i=>ml+(i/(tail.length-1))*pw, py=val=>mt+ph-((Math.max(-4,Math.min(4,val))+4)/8)*ph;
+    v+=`<polyline points="${sy.map((val,i)=>`${px(i)},${py(val)}`).join(' ')}" fill="none" stroke="#8FC3B5" stroke-width="1.1"/>`;
+    v+=`<polyline points="${sx.map((val,i)=>`${px(i)},${py(val)}`).join(' ')}" fill="none" stroke="#1F5B50" stroke-width="1.2"/>`;
   }
+  v+=`<text x="${ml+pw-2}" y="${mt+10}" font-size="10" fill="#1F5B50" text-anchor="end">x</text>`;
+  v+=`<text x="${ml+pw-2}" y="${mt+22}" font-size="10" fill="#8FC3B5" text-anchor="end">y</text>`;
   document.getElementById('trace').innerHTML=v;
+  document.getElementById('trace').setAttribute('aria-label',
+    tail.length<2
+      ? 'Trace plot of both parameters against iteration. The chain has not run yet, so there is nothing to show.'
+      : `Trace plot of x (dark) and y (light) over the last ${tail.length} of ${chain.length} iterations. `+
+        `x is currently ${cur[0].toFixed(2)} and has ranged from ${Math.min(...sx).toFixed(2)} to ${Math.max(...sx).toFixed(2)} `+
+        `over this window; y is currently ${cur[1].toFixed(2)} and has ranged from ${Math.min(...sy).toFixed(2)} to ${Math.max(...sy).toFixed(2)}.`);
 }
 
 // ---------- drawing ----------
-function toPx(x,y,W){ const lo=-4.2,hi=4.2; return [ (x-lo)/(hi-lo)*W, W-(y-lo)/(hi-lo)*W ]; }
+// The square joint panel keeps the bottom-left of the 500x500 canvas. A strip
+// along the top carries the marginal of x and a strip along the right carries the
+// marginal of y, each sharing its axis with the joint panel, so a marginal reads
+// as the shadow the cloud casts onto that axis.
+const PW=500, STRIP=62, GAP=8;
+const JX0=0, JX1=PW-STRIP-GAP;   // joint panel spans x from 0 to 430
+const JY0=STRIP+GAP, JY1=PW;     // joint panel spans y from 70 to 500
+const TY0=4,  TY1=STRIP;         // top strip: baseline at y=62, bars grow up to y=4
+const RX0=JX1+GAP, RX1=PW-4;     // right strip: baseline at x=438, bars grow to x=496
+const LO=-4.2, HI=4.2, NBIN=42;
+
+function toPx(x,y){ return [ JX0+(x-LO)/(HI-LO)*(JX1-JX0), JY1-(y-LO)/(HI-LO)*(JY1-JY0) ]; }
+const dnorm=z=>Math.exp(-0.5*z*z)/Math.sqrt(2*Math.PI);
+
+// Histogram of one coordinate on the density scale, over the same range the joint
+// panel plots, so a bar can be compared directly with the true marginal curve.
+function marginal(vals){
+  const bins=new Array(NBIN).fill(0);
+  for(const v of vals){ const b=Math.floor((v-LO)/(HI-LO)*NBIN); if(b>=0&&b<NBIN) bins[b]++; }
+  if(!vals.length) return bins;
+  const bw=(HI-LO)/NBIN;
+  return bins.map(c=>c/vals.length/bw);
+}
+function sd(vals,m){
+  if(vals.length<2) return null;
+  return Math.sqrt(vals.reduce((a,v)=>a+(v-m)*(v-m),0)/(vals.length-1));
+}
 function ellipse(r){ // Mahalanobis radius r contour of the bivariate normal
   const pts=[]; const a=Math.sqrt(1+rho), b=Math.sqrt(1-rho); // eigen semi-axes dirs (1,1)/(1,-1)
   for(let t=0;t<=Math.PI*2+0.01;t+=0.1){
@@ -285,66 +324,137 @@ function render(){
   draw();
 }
 function draw(){
-  const W=500;
-  let s=`<rect width="${W}" height="${W}" fill="white"/>`;
-  // axes through origin
-  const o=toPx(0,0,W);
-  s+=`<line x1="0" y1="${o[1]}" x2="${W}" y2="${o[1]}" stroke="#eee"/>`;
-  s+=`<line x1="${o[0]}" y1="0" x2="${o[0]}" y2="${W}" stroke="#eee"/>`;
+  // Post-burn-in draws feed every summary on the page, the marginals included, so
+  // the picture and the numbers below it always describe the same sample.
+  const post=chain.slice(Math.floor(chain.length*0.2));
+  const xs=post.map(p=>p[0]), ys=post.map(p=>p[1]);
+  const dX=marginal(xs), dY=marginal(ys);
+  // Fixed density scale, shared by both strips and the true curve. Auto-scaling
+  // would let the first few draws (one draw in a bin is a density of 5) squash the
+  // N(0,1) curve flat against the baseline, and would make the target appear to
+  // move while the chain runs. A fixed ceiling puts the true peak at about half
+  // the strip height and simply clips the early spikes, which is honest: a
+  // clipped bar means too few draws, not a different posterior.
+  const dmax=0.80;
+
+  let s=`<rect width="${PW}" height="${PW}" fill="white"/>`;
+  s+=`<defs>`+
+     `<linearGradient id="mgx" x1="0" y1="1" x2="0" y2="0">`+
+       `<stop offset="0%" stop-color="#1F5B50" stop-opacity="0.55"/>`+
+       `<stop offset="100%" stop-color="#63B0A0" stop-opacity="0.10"/></linearGradient>`+
+     `<linearGradient id="mgy" x1="0" y1="0" x2="1" y2="0">`+
+       `<stop offset="0%" stop-color="#1F5B50" stop-opacity="0.55"/>`+
+       `<stop offset="100%" stop-color="#63B0A0" stop-opacity="0.10"/></linearGradient>`+
+     `</defs>`;
+
+  // ---------- joint panel ----------
+  s+=`<rect x="${JX0}" y="${JY0}" width="${JX1-JX0}" height="${JY1-JY0}" fill="#FDFCFA"/>`;
+  const o=toPx(0,0);
+  s+=`<line x1="${JX0}" y1="${o[1]}" x2="${JX1}" y2="${o[1]}" stroke="#EAE5DA"/>`;
+  s+=`<line x1="${o[0]}" y1="${JY0}" x2="${o[0]}" y2="${JY1}" stroke="#EAE5DA"/>`;
+  [-3,3].forEach(t=>{ const p=toPx(t,t);
+    s+=`<text x="${p[0]}" y="${JY1-5}" font-size="9" fill="#B0A791" text-anchor="middle">${t}</text>`;
+    s+=`<text x="${JX0+4}" y="${p[1]-3}" font-size="9" fill="#B0A791">${t}</text>`; });
   // target contours
   [1,2,3].forEach(r=>{
-    const pts=ellipse(r).map(([x,y])=>{const p=toPx(x,y,W);return p[0]+','+p[1];}).join(' ');
+    const pts=ellipse(r).map(([x,y])=>{const p=toPx(x,y);return p[0]+','+p[1];}).join(' ');
     s+=`<polyline points="${pts}" fill="none" stroke="#C9B79A" stroke-width="1.5"/>`;
   });
-  s+=`<text x="8" y="16" font-size="12" fill="#8a7a5c">target posterior (contours)</text>`;
+  s+=`<text x="8" y="${JY0+16}" font-size="12" fill="#8a7a5c">target posterior (contours)</text>`;
   // HMC trajectory (faint) / Gibbs right-angle staircase for the last sweep
   if(lastTraj && sampler==='hmc'){
-    const tp=lastTraj.map(([x,y])=>{const p=toPx(x,y,W);return p[0]+','+p[1];}).join(' ');
+    const tp=lastTraj.map(([x,y])=>{const p=toPx(x,y);return p[0]+','+p[1];}).join(' ');
     s+=`<polyline points="${tp}" fill="none" stroke="#9AAEC9" stroke-width="1.5" stroke-dasharray="3 3"/>`;
   }
   if(lastTraj && sampler==='gibbs'){
-    const tp=lastTraj.map(([x,y])=>{const p=toPx(x,y,W);return p[0]+','+p[1];}).join(' ');
+    const tp=lastTraj.map(([x,y])=>{const p=toPx(x,y);return p[0]+','+p[1];}).join(' ');
     s+=`<polyline points="${tp}" fill="none" stroke="#9AAEC9" stroke-width="2.5"/>`;
   }
   // chain path (last 250)
   const tail=chain.slice(-250);
-  const pathPts=tail.map(([x,y])=>{const p=toPx(x,y,W);return p[0]+','+p[1];}).join(' ');
+  const pathPts=tail.map(([x,y])=>{const p=toPx(x,y);return p[0]+','+p[1];}).join(' ');
   s+=`<polyline points="${pathPts}" fill="none" stroke="#1F5B50" stroke-width="1" opacity="0.7"/>`;
-  // recent points
-  tail.forEach(([x,y],i)=>{ if(i%3&&i<tail.length-1)return; const p=toPx(x,y,W);
+  tail.forEach(([x,y],i)=>{ if(i%3&&i<tail.length-1)return; const p=toPx(x,y);
     s+=`<circle cx="${p[0]}" cy="${p[1]}" r="1.6" fill="#1F5B50" opacity="0.5"/>`; });
-  // current point
-  const c=toPx(cur[0],cur[1],W);
+
+  // ---------- marginal of x, along the top ----------
+  const bwx=(JX1-JX0)/NBIN, hT=TY1-TY0;
+  let dxPath=`M ${JX0} ${TY1}`;
+  for(let i=0;i<NBIN;i++){ const yy=(TY1-Math.min(1,dX[i]/dmax)*hT).toFixed(2);
+    dxPath+=` L ${(JX0+i*bwx).toFixed(2)} ${yy} L ${(JX0+(i+1)*bwx).toFixed(2)} ${yy}`; }
+  dxPath+=` L ${JX1} ${TY1} Z`;
+  s+=`<path d="${dxPath}" fill="url(#mgx)" stroke="#1F5B50" stroke-width="1" stroke-linejoin="round"/>`;
+  // Both marginals of this target are exactly N(0,1) whatever the correlation is,
+  // which is the point: correlation reshapes the joint, never the margins.
+  const trueX=[]; for(let x=LO;x<=HI+1e-9;x+=0.1){ const p=toPx(x,0);
+    trueX.push(`${p[0].toFixed(2)},${(TY1-dnorm(x)/dmax*hT).toFixed(2)}`); }
+  s+=`<polyline points="${trueX.join(' ')}" fill="none" stroke="#111" stroke-width="1.5" stroke-dasharray="4 3"/>`;
+  s+=`<line x1="${JX0}" y1="${TY1}" x2="${JX1}" y2="${TY1}" stroke="#C3BBAA"/>`;
+  s+=`<text x="${JX0+3}" y="${TY0+9}" font-size="9.5" fill="#5C7A72">marginal of x · filled = chain, dashed = true N(0,1)</text>`;
+
+  // ---------- marginal of y, along the right ----------
+  const bhy=(JY1-JY0)/NBIN, wR=RX1-RX0;
+  let dyPath=`M ${RX0} ${JY1}`;
+  for(let i=0;i<NBIN;i++){ const xx=(RX0+Math.min(1,dY[i]/dmax)*wR).toFixed(2);
+    dyPath+=` L ${xx} ${(JY1-i*bhy).toFixed(2)} L ${xx} ${(JY1-(i+1)*bhy).toFixed(2)}`; }
+  dyPath+=` L ${RX0} ${JY0} Z`;
+  s+=`<path d="${dyPath}" fill="url(#mgy)" stroke="#1F5B50" stroke-width="1" stroke-linejoin="round"/>`;
+  const trueY=[]; for(let y=LO;y<=HI+1e-9;y+=0.1){ const p=toPx(0,y);
+    trueY.push(`${(RX0+dnorm(y)/dmax*wR).toFixed(2)},${p[1].toFixed(2)}`); }
+  s+=`<polyline points="${trueY.join(' ')}" fill="none" stroke="#111" stroke-width="1.5" stroke-dasharray="4 3"/>`;
+  s+=`<line x1="${RX0}" y1="${JY0}" x2="${RX0}" y2="${JY1}" stroke="#C3BBAA"/>`;
+  s+=`<text x="${RX0}" y="18" font-size="9.5" fill="#5C7A72">marginal</text>`;
+  s+=`<text x="${RX0}" y="30" font-size="9.5" fill="#5C7A72">of y</text>`;
+  s+=`<text x="${RX0}" y="46" font-size="9.5" fill="#8a7a5c">${post.length} draw${post.length===1?'':'s'}</text>`;
+
+  // ---------- the current draw, projected onto each margin ----------
+  // Dropping a tick onto both strips every iteration is what makes a marginal read
+  // as "one count per draw" rather than as a curve that appeared from nowhere.
+  const c=toPx(cur[0],cur[1]);
+  s+=`<line x1="${c[0]}" y1="${c[1]}" x2="${c[0]}" y2="${TY1}" stroke="#D73F09" stroke-width="1" stroke-dasharray="2 3" opacity="0.4"/>`;
+  s+=`<line x1="${c[0]}" y1="${c[1]}" x2="${RX0}" y2="${c[1]}" stroke="#D73F09" stroke-width="1" stroke-dasharray="2 3" opacity="0.4"/>`;
+  s+=`<line x1="${c[0]}" y1="${TY1-2}" x2="${c[0]}" y2="${TY1+7}" stroke="#D73F09" stroke-width="2"/>`;
+  s+=`<line x1="${RX0-7}" y1="${c[1]}" x2="${RX0+2}" y2="${c[1]}" stroke="#D73F09" stroke-width="2"/>`;
   s+=`<circle cx="${c[0]}" cy="${c[1]}" r="5" fill="#D73F09"/>`;
   document.getElementById('plot').innerHTML=s;
 
   const accRate=iters?accepts/iters:0;
-  const post=chain.slice(Math.floor(chain.length*0.2));
-  const mx=post.reduce((a,b)=>a+b[0],0)/(post.length||1), my=post.reduce((a,b)=>a+b[1],0)/(post.length||1);
-  const e=ess(post.map(p=>p[0]));
+  const mx=xs.reduce((a,b)=>a+b,0)/(xs.length||1), my=ys.reduce((a,b)=>a+b,0)/(ys.length||1);
+  const sx=sd(xs,mx), sy=sd(ys,my);
+  const ex=ess(xs), ey=ess(ys);
   document.getElementById('readout').innerHTML=
     `Iterations: <b>${iters}</b><br>`+
     (sampler==='gibbs'?`Acceptance: <b>100%</b> (Gibbs never rejects)`:`Acceptance rate: <b>${(accRate*100).toFixed(0)}%</b>`)+`<br>`+
     `Posterior mean estimate: <b>(${mx.toFixed(2)}, ${my.toFixed(2)})</b><br>`+
-    `<span style="color:var(--muted)">true posterior mean = (0, 0)</span><br>`+
-    (e===null?`Effective sample size: <b>—</b> (run at least 25 iterations)`:
-     `Effective sample size of x: <b>${Math.round(e)}</b> from ${post.length} post-burn-in draws (<b>${(e/post.length).toFixed(2)}</b> per iteration)`);
+    `Marginal SD estimate: <b>(${sx===null?'—':sx.toFixed(2)}, ${sy===null?'—':sy.toFixed(2)})</b><br>`+
+    `<span style="color:var(--muted)">true marginals are both N(0, 1), so mean = (0, 0) and SD = (1.00, 1.00) whatever ρ is</span><br>`+
+    (ex===null?`Effective sample size: <b>—</b> (run at least 25 iterations)`:
+     `Effective sample size: <b>${Math.round(ex)}</b> for x, <b>${ey===null?'—':Math.round(ey)}</b> for y, from ${post.length} post-burn-in draws (<b>${(ex/post.length).toFixed(2)}</b> per iteration for x)`);
   drawTrace();
   document.getElementById('note').textContent=NOTE[sampler];
-  describe(accRate,mx,my);
+  describe(accRate,mx,my,sx,sy,post.length);
 }
 
 // Spoken readout + text alternative to the 2D picture. The table lists the chain's
 // recent moves, which is where the samplers actually differ: Gibbs moves along one
 // axis at a time, a rejected Metropolis proposal repeats the previous point, and
 // HMC covers a long distance in a single iteration.
-function describe(accRate,mx,my){
+function describe(accRate,mx,my,sx,sy,nPost){
   const tilt = Math.abs(rho)<0.05 ? 'almost circular contours (the two parameters are barely correlated)'
              : `${Math.abs(rho)>0.7?'a strongly':'a moderately'} tilted elliptical ridge running `+
                `${rho>0?'from bottom-left to top-right':'from top-left to bottom-right'} `+
                `(correlation ${rho.toFixed(2)})`;
   const acc = sampler==='gibbs' ? 'Acceptance 100 percent — Gibbs never rejects.'
                                 : `Acceptance rate ${(accRate*100).toFixed(0)} percent.`;
+  // The two marginal strips are the new information in the picture, so say what
+  // they show and how far they have converged rather than just naming them.
+  const marg = (sx===null||sy===null)
+    ? 'A strip along the top builds the marginal distribution of x and a strip along the right builds the marginal of y, one count per draw. Both are still empty.'
+    : `A strip along the top builds the marginal distribution of x and a strip along the right builds the marginal of y, one count per draw, `+
+      `each against the true standard normal marginal drawn as a dashed curve. `+
+      `From ${nPost} post-burn-in draws the sampled marginals have mean ${mx.toFixed(2)} and ${my.toFixed(2)} against a true 0, `+
+      `and standard deviation ${sx.toFixed(2)} and ${sy.toFixed(2)} against a true 1. `+
+      `Both marginals are standard normal at every correlation, so only the tilt of the joint cloud changes as you move the slider.`;
   // Gibbs' defining move is axis-aligned, but `chain` only stores the end of a full
   // sweep, so spell the two half-steps out from the recorded staircase.
   const gibbsNote = (sampler==='gibbs' && lastTraj)
@@ -361,12 +471,12 @@ function describe(accRate,mx,my){
       ? 'The chain has not run yet — press Run or Step to start. The true posterior mean it should recover is 0, 0.'
       : `${iters} iteration${iters===1?'':'s'}. ${acc} `+
         `Posterior mean estimate ${mx.toFixed(2)}, ${my.toFixed(2)}, against the true 0, 0. `+
-        `The chain is currently at ${cur[0].toFixed(2)}, ${cur[1].toFixed(2)}.`+gibbsNote);
+        `The chain is currently at ${cur[0].toFixed(2)}, ${cur[1].toFixed(2)}.`+gibbsNote+' '+marg);
   document.getElementById('plot').setAttribute('aria-label',
     `Two-parameter space from about minus 4 to 4 on each axis, showing the target posterior as `+
     `${tilt}, plus the ${SAMPNAME[sampler]} chain's path. `+
     (iters===0 ? 'The chain is still at its starting point, minus 2.5, 2.5.'
-               : `The chain has taken ${iters} iteration${iters===1?'':'s'} and is now at ${cur[0].toFixed(2)}, ${cur[1].toFixed(2)}.`+gibbsNote));
+               : `The chain has taken ${iters} iteration${iters===1?'':'s'} and is now at ${cur[0].toFixed(2)}, ${cur[1].toFixed(2)}.`+gibbsNote)+' '+marg);
   // table: the chain's most recent moves
   const tail=chain.slice(-12);
   const first=chain.length-tail.length;

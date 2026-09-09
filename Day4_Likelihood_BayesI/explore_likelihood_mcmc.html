@@ -41,7 +41,7 @@
 <header class="lab-header">
   <div class="eyebrow">Day 4 · Interactive</div>
   <h1>From likelihood to posterior to MCMC</h1>
-  <p class="lede">One running example (you observed <em>k</em> successes in <em>n</em> trials) shown three ways: the likelihood curve and its peak (the MLE), and a live Metropolis sampler whose histogram builds up the Bayesian posterior.</p>
+  <p class="lede">One running example (you observed <em>k</em> successes in <em>n</em> trials) shown three ways: the likelihood curve and its peak (the MLE), and a live Metropolis sampler whose draws pile up, one tick at a time, into the marginal posterior.</p>
 </header>
 
 <div class="widget">
@@ -70,7 +70,7 @@
 </section>
 
 <section id="mcmc">
-<h2>2. A Metropolis sampler builds the posterior</h2>
+<h2>2. A Metropolis sampler builds the marginal posterior</h2>
 <div class="callout key">
 <p><strong>What the sampler does, one step at a time.</strong> It wanders over values of $p$, and the values it visits pile up into the posterior. Each step:</p>
 <ol>
@@ -80,6 +80,7 @@
 </ol>
 <p>That is the entire algorithm. Downhill moves are sometimes accepted, which is what lets the chain explore the whole posterior instead of just climbing to the peak. Run it and watch the histogram fill in the exact posterior curve without ever computing the integral in Bayes' rule.</p>
 </div>
+<p>The lower panel is the <strong>marginal posterior</strong> of $p$: take every draw the chain has made, sort them into bins, and that shape is your answer. The orange tick on the axis marks where the newest draw landed, so you can watch single draws turning into a distribution. With one parameter the marginal posterior is the whole posterior; in the <a href="explore_mcmc.html">two-parameter version</a> the marginals are shadows of a joint cloud, and reporting one means throwing the other parameter away.</p>
 <div class="widget">
   <div class="controls">
     <div class="ctl"><label for="step">Proposal step size<span class="val" id="v_step"></span></label><input id="step" type="range" min="0.01" max="0.5" step="0.01" value="0.1"></div>
@@ -91,7 +92,7 @@
   </div>
   <div class="sr-readout" id="srMcmc" role="status" aria-live="polite" aria-atomic="true"></div>
   <svg id="tracechart" viewBox="0 0 720 200" width="100%" role="img" aria-label="MCMC trace plot"></svg>
-  <svg id="histchart" viewBox="0 0 720 260" width="100%" role="img" aria-label="Histogram of MCMC samples with the analytic posterior overlaid"></svg>
+  <svg id="histchart" viewBox="0 0 720 260" width="100%" role="img" aria-label="Marginal posterior of p, as a histogram of MCMC draws with the analytic posterior overlaid"></svg>
   <details class="data-table-details">
     <summary>Show the plotted values as a table</summary>
     <div class="data-table-wrap" id="mcmcTable"></div>
@@ -106,7 +107,8 @@
 <ol>
 <li><strong>The peak is the MLE.</strong> Drag p in panel 1 to the top of the likelihood curve. It lands on k/n.</li>
 <li><strong>The 1.92 rule.</strong> Tick the log-likelihood box. Every p whose log-likelihood is within 1.92 of the peak is inside the 95% profile interval (1.92 is half of the 3.84 chi-square cutoff). Set k = 3, n = 10 and compare that lopsided interval with the symmetric Wald interval printed beside it.</li>
-<li><strong>MCMC recovers the posterior.</strong> Hit Run and watch the orange histogram in panel 2 fill in the dashed black posterior curve. The MCMC never computes that curve. It just wanders and the samples pile up in the right shape.</li>
+<li><strong>MCMC recovers the posterior.</strong> Hit Run and watch the teal histogram in panel 2 fill in the dashed black posterior curve. The MCMC never computes that curve. It just wanders and the samples pile up in the right shape.</li>
+<li><strong>Read the interval off the draws.</strong> The shaded band is the middle 95% of the draws themselves, which is the credible interval you would report. Step slowly from Reset and watch it lurch about while the chain is short, then settle as the marginal fills in. Nothing here is computed from the analytic curve, which is the point: the same recipe works for posteriors that have no formula.</li>
 <li><strong>Step size matters.</strong> Set the step very small: the chain crawls and the acceptance rate is high but mixing is slow. Set it very large: most proposals are rejected (low acceptance) and the chain gets stuck. A middling step (acceptance ≈ 20–45%) works best.</li>
 <li><strong>More data → tighter posterior.</strong> Raise n (keeping k/n fixed) and both the likelihood and the posterior get narrower.</li>
 </ol>
@@ -285,24 +287,67 @@ function drawHist(){
   const binw=1/nb; const dens=bins.map(c=> samp.length? c/samp.length/binw : 0);
   // analytic posterior curve
   let post=[],pmax=0; for(let p=0.005;p<1;p+=0.005){const d=postDens(p); post.push([p,d]); if(d>pmax)pmax=d;}
-  const ymax=Math.max(pmax, ...dens, 0.1)*1.1;
+  // Scale off the analytic posterior, not off the bars. Auto-scaling let the first
+  // few draws (one draw in a bin of width 1/40 is a density of 40) squash the target
+  // curve flat, and made the curve appear to move while the chain ran. A fixed
+  // ceiling keeps the target still and simply clips the early spikes.
+  const ymax=Math.max(pmax,0.1)*1.35;
   const px=x=>ml+x*pw, py=d=>mt+ph-(d/ymax)*ph;
+  // The interval you would actually report, read straight off the draws rather
+  // than off the analytic curve, so it tightens as the chain accumulates.
+  const sorted=samp.slice().sort((a,b)=>a-b);
+  const quant=t=> sorted.length ? sorted[Math.min(sorted.length-1,Math.max(0,Math.round(t*(sorted.length-1))))] : null;
+  const clo=quant(0.025), chi=quant(0.975), enoughCI = sorted.length>=40;
+  const smean = samp.length ? samp.reduce((a,b)=>a+b,0)/samp.length : null;
+
   let v=`<rect width="${W}" height="${H}" fill="white"/>`;
+  v+=`<defs><linearGradient id="hbar" x1="0" y1="1" x2="0" y2="0">`+
+     `<stop offset="0%" stop-color="#1F5B50" stop-opacity="0.78"/>`+
+     `<stop offset="100%" stop-color="#63B0A0" stop-opacity="0.30"/></linearGradient></defs>`;
+  if(enoughCI){
+    v+=`<rect x="${px(clo)}" y="${mt}" width="${px(chi)-px(clo)}" height="${ph}" fill="#D73F09" opacity="0.07"/>`;
+    v+=`<line x1="${px(clo)}" y1="${mt}" x2="${px(clo)}" y2="${mt+ph}" stroke="#D73F09" stroke-width="1.2" opacity="0.6"/>`;
+    v+=`<line x1="${px(chi)}" y1="${mt}" x2="${px(chi)}" y2="${mt+ph}" stroke="#D73F09" stroke-width="1.2" opacity="0.6"/>`;
+  }
   v+=`<line x1="${ml}" y1="${mt+ph}" x2="${ml+pw}" y2="${mt+ph}" stroke="#999"/>`;
   v+=`<line x1="${ml}" y1="${mt}" x2="${ml}" y2="${mt+ph}" stroke="#999"/>`;
-  v+=`<text x="${ml+pw/2}" y="${H-4}" font-size="12" fill="#444" text-anchor="middle">p — histogram of samples vs. analytic posterior (dashed)</text>`;
-  for(let b=0;b<nb;b++){const x0=px(b*binw), bw=pw/nb;
-    v+=`<rect x="${x0+bw*0.08}" y="${py(dens[b])}" width="${bw*0.84}" height="${mt+ph-py(dens[b])}" fill="#D73F09" opacity="0.75"/>`;}
+  for(let t=0;t<=5;t++){ const xv=t/5;
+    v+=`<line x1="${px(xv)}" y1="${mt+ph}" x2="${px(xv)}" y2="${mt+ph+4}" stroke="#999"/>`;
+    v+=`<text x="${px(xv)}" y="${mt+ph+16}" font-size="10" fill="#666" text-anchor="middle">${xv.toFixed(1)}</text>`; }
+  for(let t=1;t<=4;t++){ const d=ymax*t/4;
+    v+=`<text x="${ml-6}" y="${py(d)+4}" font-size="10" fill="#666" text-anchor="end">${d.toFixed(1)}</text>`; }
+  v+=`<text transform="translate(13,${mt+ph/2}) rotate(-90)" font-size="11" fill="#444" text-anchor="middle">density</text>`;
+  v+=`<text x="${ml+pw/2}" y="${H-4}" font-size="12" fill="#444" text-anchor="middle">marginal posterior of p — the chain's draws (bars) against the analytic posterior (dashed)</text>`;
+  for(let b=0;b<nb;b++){ if(dens[b]<=0) continue; const x0=px(b*binw), bw=pw/nb;
+    const top=Math.max(mt, py(dens[b]));   // clip the tall spikes a short chain throws up
+    v+=`<rect x="${x0+bw*0.08}" y="${top}" width="${bw*0.84}" height="${mt+ph-top}" fill="url(#hbar)" stroke="#1F5B50" stroke-width="0.6"/>`;}
   v+=`<polyline points="${post.map(([p,d])=>`${px(p)},${py(d)}`).join(' ')}" fill="none" stroke="#111" stroke-width="2.5" stroke-dasharray="5 4"/>`;
+  if(smean!==null){
+    v+=`<line x1="${px(smean)}" y1="${mt+ph}" x2="${px(smean)}" y2="${mt}" stroke="#D73F09" stroke-width="1.6" stroke-dasharray="4 3" opacity="0.85"/>`;
+    // Park the key in whichever top corner the posterior is not sitting in, so it
+    // never lands on the bars and never runs off the edge.
+    const left = smean>0.5;
+    const lx = left ? ml+8 : ml+pw-8, anch = left ? 'start' : 'end';
+    if(enoughCI) v+=`<text x="${lx}" y="${mt+12}" font-size="10.5" fill="#A8330A" text-anchor="${anch}">`+
+       `shaded band = 95% credible interval from the draws, ${clo.toFixed(3)} to ${chi.toFixed(3)}</text>`;
+    v+=`<text x="${lx}" y="${mt+(enoughCI?26:12)}" font-size="10.5" fill="#A8330A" text-anchor="${anch}">`+
+       `dashed orange = posterior mean of the draws, ${smean.toFixed(3)}</text>`;
+  }
+  // Where the newest draw landed. One tick per iteration is the whole idea: the
+  // marginal is nothing but these ticks, sorted into bins.
+  v+=`<line x1="${px(Math.max(0,Math.min(1,cur)))}" y1="${mt+ph-2}" x2="${px(Math.max(0,Math.min(1,cur)))}" y2="${mt+ph+8}" stroke="#D73F09" stroke-width="2.5"/>`;
   document.getElementById('histchart').innerHTML=v;
 
   // ---- text alternative for the histogram: the two curves at 11 grid points ----
   const a=K+1, b=N-K+1;
   const dAt=p=>dens[Math.min(nb-1,Math.max(0,Math.floor(p*nb)))];
+  const qs=samp.slice().sort((x,y)=>x-y);
+  const qAt=t=> qs.length ? qs[Math.min(qs.length-1,Math.max(0,Math.round(t*(qs.length-1))))] : null;
   document.getElementById('histchart').setAttribute('aria-label',
     samp.length<2
-      ? `Histogram of MCMC samples of p with the analytic Beta(${a}, ${b}) posterior overlaid as a dashed curve. The chain has not been run yet, so the histogram is empty.`
-      : `Histogram of ${samp.length} post-burn-in MCMC samples of p, with the analytic Beta(${a}, ${b}) posterior overlaid as a dashed curve. `+
+      ? `Marginal posterior of p as a histogram of MCMC draws, with the analytic Beta(${a}, ${b}) posterior overlaid as a dashed curve. The chain has not been run yet, so the histogram is empty.`
+      : `Marginal posterior of p as a histogram of ${samp.length} post-burn-in MCMC draws, with the analytic Beta(${a}, ${b}) posterior overlaid as a dashed curve `+
+        `and the middle 95 percent of the draws, ${qAt(0.025).toFixed(3)} to ${qAt(0.975).toFixed(3)}, shaded. `+
         `The sampled mean is ${(samp.reduce((s,x)=>s+x,0)/samp.length).toFixed(3)} against the analytic posterior mean ${(a/(a+b)).toFixed(3)}; `+
         `the bars track the dashed curve to within ${Math.max(...post.map(([p,d])=>Math.abs(dAt(p)-d))).toFixed(2)} density units at worst.`);
   let rows='';
@@ -323,10 +368,15 @@ function draw(){
   const accRate=iters?accepts/iters:0;
   const burn=Math.floor(chain.length*0.2), samp=chain.slice(burn);
   const mean=samp.length?samp.reduce((a,b)=>a+b,0)/samp.length:0;
+  const sorted=samp.slice().sort((a,b)=>a-b);
+  const quant=t=> sorted.length ? sorted[Math.min(sorted.length-1,Math.max(0,Math.round(t*(sorted.length-1))))] : null;
+  const clo=quant(0.025), chi=quant(0.975), haveCI = sorted.length>=40;
   document.getElementById('mcmcout').innerHTML=
     `Iterations: <b>${iters}</b> &nbsp; Acceptance rate: <b>${(accRate*100).toFixed(0)}%</b> &nbsp; `+
     `Posterior mean (post-burn-in): <b>${samp.length?mean.toFixed(3):'—'}</b> &nbsp; `+
-    `Analytic posterior mean = (k+1)/(n+2) = <b>${((K+1)/(N+2)).toFixed(3)}</b>`;
+    `Analytic posterior mean = (k+1)/(n+2) = <b>${((K+1)/(N+2)).toFixed(3)}</b><br>`+
+    `95% credible interval from the draws: <b>${haveCI?`(${clo.toFixed(3)}, ${chi.toFixed(3)})`:'—'}</b> `+
+    `<span style="color:var(--muted)">${haveCI?'the middle 95% of the marginal posterior above':'(run at least 50 iterations)'}</span>`;
   // The same numbers as a sentence. While the chain is running this element's
   // aria-live is switched off (see the Run handler) — a free-running sampler
   // redraws ~16 times a second and would otherwise bury a screen reader. The
@@ -343,7 +393,8 @@ function draw(){
         `The analytic posterior mean it should recover is (k+1)/(n+2) = ${((K+1)/(N+2)).toFixed(3)}.`
       : `${iters} iteration${iters===1?'':'s'}, acceptance rate ${(accRate*100).toFixed(0)} percent. `+
         `Posterior mean after burn-in ${mean.toFixed(3)}, against the analytic posterior mean `+
-        `(k+1)/(n+2) = ${((K+1)/(N+2)).toFixed(3)}.`)+tune;
+        `(k+1)/(n+2) = ${((K+1)/(N+2)).toFixed(3)}. `+
+        (haveCI?`The marginal posterior of p built from ${sorted.length} draws gives a 95 percent credible interval of ${clo.toFixed(3)} to ${chi.toFixed(3)}.`:''))+tune;
 }
 
 function refreshData(){

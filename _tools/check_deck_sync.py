@@ -48,10 +48,10 @@ def paragraphs(slide):
 
 
 def pairs():
-    for master in sorted(glob.glob('Day*/*_accessible.pptx')):
-        if '_nosoln' in master:
+    for master in sorted(glob.glob('Day*/*.pptx')):
+        if master.endswith(('_nosoln.pptx', '_accessible.pptx')):
             continue
-        nosoln = master.replace('_accessible.pptx', '_nosoln_accessible.pptx')
+        nosoln = master.replace('.pptx', '_nosoln.pptx')
         if os.path.exists(nosoln):
             yield master, nosoln
 
@@ -70,7 +70,7 @@ def main():
                            if not any(p in m for m in master_slides)]
                 bad.append((i, orphans))
 
-        name = os.path.basename(master).replace('FW536_', '').replace('_accessible.pptx', '')
+        name = os.path.basename(master).replace('FW536_', '').replace('.pptx', '')
         counts = f"{len(master_slides)} → {len(nosoln_slides)}"
         if bad:
             drifted += 1

@@ -37,7 +37,7 @@ DayN_Topic/
   explore_*.html                 — interactive visualization (Days 1–4)
   data/                          — datasets the problems analyze
   *.R                            — supporting R / Nimble scripts (Days 2, 4, 5)
-  FW536_DayN_*.pptx              — lecture slides (+ *_accessible.pptx with alt text)
+  FW536_DayN_*.pptx              — lecture slides (+ *_nosoln.pptx, the no-solution copy students get, Days 1–2)
 ```
 
 The practice lab and the graded problem set both use anchored `#morning` and
@@ -76,7 +76,8 @@ descriptions. See [`accessible/README.md`](accessible/README.md).
 
 The `_tools/` scripts regenerate derived artifacts so the two editions stay in sync. Run them after changing slides or standard-site content:
 
-- `build_accessible_pptx.py` writes image alt text into `*_accessible.pptx`.
+- `build_accessible_pptx.py` writes image alt text into `*_accessible.pptx`. The accessible decks
+  were retired from the repo in September 2026 and archived outside it, in `../FW536_2026_Accessible/`.
 - `build_lecture_notes.py` regenerates accessible lecture-notes transcripts.
 - `update_accessible.py` regenerates the accessible content pages from the
   standard site.

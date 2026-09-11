@@ -3,8 +3,7 @@
 Course materials for the 5-day pre-fall workshop at Oregon State University.
 
 Open [`index.html`](index.html) in any browser. It links to every artifact.
-[`syllabus.html`](syllabus.html) has the schedule, grading, and policies. A
-screen-reader-optimized edition lives in [`accessible/`](accessible/index.html).
+[`syllabus.html`](syllabus.html) has the schedule, grading, and policies.
 
 ## Course at a glance
 
@@ -65,22 +64,16 @@ copy and are never published. Release them via Canvas after grading. The
 practice-lab `answer_key.html` files are public by design (the practice lab
 already shows its answers).
 
-## Accessible edition
-
-[`accessible/`](accessible/index.html) is a screen-reader-first copy: single-column
-reading order, skip links, ARIA landmarks, MathJax with navigable MathML, text
-labels on callouts, and accessible lecture-notes transcripts with figure
-descriptions. See [`accessible/README.md`](accessible/README.md).
-
 ## Maintenance tools
 
-The `_tools/` scripts regenerate derived artifacts so the two editions stay in sync. Run them after changing slides or standard-site content:
+- `_tools/check_deck_sync.py` checks that each no-solution deck (`*_nosoln.pptx`) still agrees
+  with its master. Run it after editing either one; it exits 1 if they have drifted.
+- `_tools/build_answer_key_review.py` builds one-page question-and-answer review pages for vetting
+  exercises. It currently reads the practice labs.
 
-- `build_accessible_pptx.py` writes image alt text into `*_accessible.pptx`. The accessible decks
-  were retired from the repo in September 2026 and archived outside it, in `../FW536_2026_Accessible/`.
-- `build_lecture_notes.py` regenerates accessible lecture-notes transcripts.
-- `update_accessible.py` regenerates the accessible content pages from the
-  standard site.
+The accessible edition (the `accessible/` screen-reader mirror, the `*_accessible.pptx` decks, and
+the three scripts that built them) was retired in September 2026 and archived outside the repo, in
+`../FW536_2026_Accessible/`.
 
 See [`RECOMMENDATIONS.md`](RECOMMENDATIONS.md) for a course review and prioritized
 suggestions for further improvement.

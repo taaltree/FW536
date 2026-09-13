@@ -207,9 +207,11 @@ sapply(list(M1=M1, M3=M3, M4=M4, M7=M7, M8=M8), lme4::isSingular)
 
 # Problem 6 · Nested random effects + overdispersion
 
-> Diagram the nesting, write the Poisson GLMM, distinguish `(1 | unit/transect)`
-> from `(1 | unit) + (1 | transect)`, and give the Pearson-dispersion check plus
-> two fixes for overdispersion.
+> Diagram the nesting, write the Poisson GLMM, and say what an observation-level
+> random effect adds and why it is legitimate in a Poisson model. Distinguish
+> `(1 | unit/transect)` from `(1 | unit) + (1 | transect)`. Give the overdispersion
+> check, `deviance(m) / df.residual(m)` for the model without the observation-level
+> effect, and say why it must come first. Name two fixes for overdispersion.
 
 **My work:**
 

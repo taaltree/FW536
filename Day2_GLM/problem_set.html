@@ -25,14 +25,16 @@
  </ul>
  <div class="section">Afternoon · linear models & GLMs</div>
  <ul>
- <li><a href="#p5">5. Simulating no interaction</a></li>
- <li><a href="#p6">6. Simulating an interaction</a></li>
- <li><a href="#p7">7. Interactions III: link vs response scale</a></li>
- <li><a href="#p8">8. Poisson log-link interpretation</a></li>
- <li><a href="#p9">9. Interaction &amp; crossover</a></li>
- <li><a href="#p10">10. Offsets &amp; effort</a></li>
- <li><a href="#p11">11. Logit threshold &amp; marginal effects</a></li>
- <li><a href="#p12">12. Back-transforming a CI</a></li>
+ <li><a href="#p5">5. Simulating with and without an interaction</a></li>
+ <li><a href="#p6">6. Interactions II: link vs response scale</a></li>
+ <li><a href="#p7">7. Poisson log-link interpretation</a></li>
+ <li><a href="#p8">8. Interaction &amp; crossover</a></li>
+ <li><a href="#p9">9. Offsets &amp; effort</a></li>
+ </ul>
+ <div class="section">Optional · extra credit</div>
+ <ul>
+ <li><a href="#p10">10. Logit threshold &amp; marginal effects</a></li>
+ <li><a href="#p11">11. Back-transforming a CI</a></li>
  </ul>
  <div class="section">Day 2 docs</div>
  <ul>
@@ -65,7 +67,7 @@
 <div class="data-section">
   <div class="data-row"><a href="data/sockeye_adult.csv" download><code>sockeye_adult.csv</code></a><span class="data-desc">Daily adult sockeye counts and flow-corrected eDNA (Qcorr_qPCR = qPCR eDNA concentration × stream flow), 2015&ndash;2016 (Levi et al. 2019). Long format; filter to <code>Sockeyetype == "Sockeye_Adults"</code>. Used in Problem 4 only.</span></div>
 </div>
-<p style="margin-top:10px"><em>Problems 5&ndash;7 need no data file. Each one generates its own data in the code block given with the problem, and Problems 8&ndash;12 work from coefficient tables in the problem statement.</em></p>
+<p style="margin-top:10px"><em>Problems 5 and 6 need no data file. Each generates its own data in the code given with the problem, and Problems 7&ndash;11 work from coefficient tables in the problem statement.</em></p>
 </section>
 
 <a id="morning"></a>
@@ -166,84 +168,68 @@ Report both dispersion numbers. The first compares the variance of the pooled co
 <!-- ========================== AFTERNOON ======================= -->
 <!-- ============================================================ -->
 <a id="afternoon"></a>
-<div class="practice-banner"><div class="label">Afternoon · 20 pts</div><h3>Linear models &amp; GLMs</h3><p>Problems 5&ndash;12. Write your work in <a class="hand-in" href="afternoon_lab_template.Rmd"><code>afternoon_lab_template.Rmd</code> &darr;</a></p></div>
+<div class="practice-banner"><div class="label">Afternoon · 20 pts</div><h3>Linear models &amp; GLMs</h3><p>Problems 5&ndash;9, plus optional extra-credit Problems 10 and 11. Write your work in <a class="hand-in" href="afternoon_lab_template.Rmd"><code>afternoon_lab_template.Rmd</code> &darr;</a></p></div>
 
 <!-- =========================== PROBLEM 5 =========================== -->
 <div class="exercise" id="p5">
-<span class="ex-tag">Problem 5</span><span class="difficulty easy"> · interactions I, the additive baseline</span>
-<h3>Simulating no interaction</h3>
-<p>Problems 5&ndash;7 build one idea in three steps: <em>an interaction means the effect of one predictor depends on the value of another</em>. Everything you need is generated in the code block, so no data file is required. Work them in order.</p>
-<div class="callout key"><strong>The idea, stated once.</strong> For a two-predictor model, ask what happens to the fitted response when you nudge $x_1$ up by one unit. If the answer is the same number no matter where $x_2$ sits, the predictors act independently and the model is <em>additive</em>. If the answer changes with $x_2$, they interact. That question, find the slope in $x_1$ and look for $x_2$ in the result, is the whole of what follows. You can get that slope by differentiating, or by factoring $x_1$ out of the fitted mean and reading off whatever multiplies it; Problem 6 shows both.</div>
-<p>Start with data built with <em>no</em> interaction, and deliberately fit a model that allows one anyway:</p>
+<span class="ex-tag">Problem 5</span><span class="difficulty medium"> · interactions I, with and without a product term</span>
+<h3>Simulating with and without an interaction</h3>
+<p>Problems 5 and 6 build one idea in two steps: <em>an interaction means the effect of one predictor depends on the value of another</em>. Everything you need is generated in the code blocks, so no data file is required. Work them in order.</p>
+<div class="callout key"><strong>The idea, stated once.</strong> For a two-predictor model, ask what happens to the fitted response when you nudge $x_1$ up by one unit. If the answer is the same number no matter where $x_2$ sits, the predictors act independently and the model is <em>additive</em>. If the answer changes with $x_2$, they interact. That question, find the slope in $x_1$ and look for $x_2$ in the result, is the whole of what follows. You can get that slope by differentiating, or by factoring $x_1$ out of the fitted mean and reading off whatever multiplies it; part (c) shows both.</div>
+<p>Simulate two datasets with the same design and sample size. The first is built with <em>no</em> interaction and the second with a genuine product term. Then fit a model that allows an interaction to each one.</p>
 <pre><code>set.seed(123)
-d5 &lt;- data.frame(x1 = runif(200, -2, 2), x2 = runif(200, -2, 2))
-d5$y &lt;- 1 + 1.5*d5$x1 - 1*d5$x2 + rnorm(200, 0, 1)   # note: no x1*x2 term
+d_none &lt;- data.frame(x1 = runif(200, -2, 2), x2 = runif(200, -2, 2))
+d_none$y &lt;- 1 + 1.5*d_none$x1 - 1*d_none$x2 + rnorm(200, 0, 1)   # no x1*x2 term
+m_none &lt;- lm(y ~ x1 * x2, data = d_none)    # x1 * x2 expands to x1 + x2 + x1:x2
+summary(m_none)
 
-m5 &lt;- lm(y ~ x1 * x2, data = d5)    # x1 * x2 expands to x1 + x2 + x1:x2
-summary(m5)</code></pre>
+set.seed(456)
+d_int &lt;- data.frame(x1 = runif(200, -2, 2), x2 = runif(200, -2, 2))
+d_int$y &lt;- 2 + 1.5*d_int$x1 - 1*d_int$x2 + 2*d_int$x1*d_int$x2 + rnorm(200, 0, 1)   # a genuine x1*x2 term
+m_int &lt;- lm(y ~ x1 * x2, data = d_int)
+summary(m_int)</code></pre>
 <ol type="a">
-<li>Report the four estimated coefficients against the values used to build the data (1, 1.5, &minus;1, and no product term). What does the fitted <code>x1:x2</code> coefficient come out as, and is it distinguishable from zero?</li>
-<li>Write the full statistical model in mathematical notation, giving the distribution of $y_i$, its mean as a function of $x_{1i}$ and $x_{2i}$, and what each parameter is.</li>
-<li>Differentiate the fitted mean with respect to $x_1$, and show your working. Why that is the right thing to differentiate is that the derivative <em>is</em> the change in $\hat y$ produced by a one-unit step in $x_1$, which is what anyone means by &ldquo;the effect of $x_1$.&rdquo; So asking whether $x_2$ turns up in it is asking whether that effect depends on where $x_2$ sits. Does $x_2$ appear anywhere in the result?</li>
-<li>Using your fitted coefficients, compute the slope of $y$ on $x_1$ at $x_2 = -1$ and again at $x_2 = +1$. Report both. Why are they not <em>exactly</em> equal, given that the data were built with no interaction?</li>
-<li>Suppose the interaction coefficient were exactly zero, as it is in the equation that generated these data, so the fitted mean is $\hat y = \hat\beta_0 + \hat\beta_1 x_1 + \hat\beta_2 x_2$. If you plotted that surface over the $(x_1, x_2)$ plane, what shape would it be? Name it in one word, and say what the contour lines of equal $\hat y$ would look like.</li>
+<li>Report the four estimated coefficients for each model against the values used to build its data, which are 1, 1.5, &minus;1 and no product term for <code>m_none</code>, and 2, 1.5, &minus;1 and 2 for <code>m_int</code>. In each model, is the fitted <code>x1:x2</code> coefficient distinguishable from zero?</li>
+<li>Write the full statistical model in mathematical notation, giving the distribution of $y_i$, its mean as a function of $x_{1i}$ and $x_{2i}$, and what each parameter is. Explain why this one model statement describes both fits.</li>
+<li>Find the slope of the fitted mean in $x_1$. That slope is the change in $\hat y$ produced by a one-unit step in $x_1$, which is exactly what anyone means by &ldquo;the effect of $x_1$.&rdquo; You can differentiate the fitted mean with respect to $x_1$. Or, with no calculus, gather the two terms that contain $x_1$ and factor it out, so the fitted mean reads $\hat y = (\beta_0 + \beta_2 x_2) + (\beta_1 + \beta_3 x_2)\,x_1$; whatever multiplies $x_1$ <em>is</em> the slope. Write the slope as a formula in $x_2$, then evaluate it with each model&rsquo;s fitted coefficients, for <code>m_none</code> at $x_2 = -1$ and $x_2 = +1$, and for <code>m_int</code> at $x_2 = -1$, $0$ and $+1$. Why are the two <code>m_none</code> slopes not <em>exactly</em> equal, given that its data were built with no interaction? And what happens to the <code>m_int</code> slope between $x_2 = -1$ and $x_2 = +1$?</li>
+<li>For <code>m_int</code>, solve for the value of $x_2$ at which the effect of $x_1$ vanishes entirely. Compare your fitted answer to the value implied by the parameters used to build the data.</li>
+<li>Your collaborator writes about <code>m_int</code>: &ldquo;<em>the effect of $x_1$ on $y$ is 1.52.</em>&rdquo; Using your answer to (c), explain in two sentences why that sentence cannot be written for this model, and what it would have to say instead.</li>
+<li>Picture each fitted mean as a surface over the $(x_1, x_2)$ plane. First suppose the interaction coefficient were exactly zero, as it is in the equation that generated <code>d_none</code>, so that $\hat y = \hat\beta_0 + \hat\beta_1 x_1 + \hat\beta_2 x_2$. What shape is that surface, in one word, and what do its contour lines of equal $\hat y$ look like? Then describe the surface for <code>m_int</code>, and say what happened to its contour lines.</li>
 </ol>
-<div class="callout try"><strong>Your answer goes in the R Markdown hand-in.</strong> Report the coefficient table, the model in mathematical notation, the derivative, the two slopes from (d), and the surface description.</div>
+<div class="callout try"><strong>Your answer goes in the R Markdown hand-in.</strong> Report both coefficient tables, the model in mathematical notation, the slope formula with its five evaluations, the $x_2$ where the effect vanishes, the two-sentence correction, and both surface descriptions.</div>
 </div>
 
 <!-- =========================== PROBLEM 6 =========================== -->
 <div class="exercise" id="p6">
-<span class="ex-tag">Problem 6</span><span class="difficulty medium"> · interactions II, a slope that moves</span>
-<h3>Simulating an interaction</h3>
-<p>Same design, same sample size, one change. The response is now built with a genuine product term.</p>
-<pre><code>set.seed(456)
-d6 &lt;- data.frame(x1 = runif(200, -2, 2), x2 = runif(200, -2, 2))
-d6$y &lt;- 2 + 1.5*d6$x1 - 1*d6$x2 + 2*d6$x1*d6$x2 + rnorm(200, 0, 1)
-
-m6 &lt;- lm(y ~ x1 * x2, data = d6)
-summary(m6)</code></pre>
-<ol type="a">
-<li>Report the four coefficients against the truth (2, 1.5, &minus;1, 2).</li>
-<li>Write out the full statistical model in mathematical notation, as in Problem 5(b).</li>
-<li>Find the slope of the fitted mean in $x_1$ again. This time $x_2$ survives. Differentiate if you are comfortable doing that, but there is a route with no calculus in it. Gather the two terms containing $x_1$ and factor it out, so the fitted mean reads $\hat y = (\beta_0 + \beta_2 x_2) + (\beta_1 + \beta_3 x_2)\,x_1$. Whatever multiplies $x_1$ <em>is</em> the slope, and written that way you can read straight off it how the slope depends on $x_2$. Either way, write the slope as a formula in $x_2$, then evaluate it at $x_2 = -1$, $x_2 = 0$ and $x_2 = +1$. Something happens between the first and the last. Say what.</li>
-<li>Solve for the value of $x_2$ at which the effect of $x_1$ vanishes entirely. Compare your fitted answer to the value implied by the parameters used to build the data.</li>
-<li>Your collaborator writes: &ldquo;<em>the effect of $x_1$ on $y$ is 1.52.</em>&rdquo; Using your answer to (c), explain in two sentences why that sentence cannot be written for this model, and what it would have to say instead.</li>
-<li>What shape is the fitted surface now, and what happened to the contour lines of equal $\hat y$ compared with Problem 5(e)?</li>
-</ol>
-<div class="callout try"><strong>Your answer goes in the R Markdown hand-in.</strong> Report the coefficient table, the slope formula and its three evaluations, the $x_2$ where the effect vanishes, the two-sentence correction, and the surface description.</div>
-</div>
-
-<!-- =========================== PROBLEM 7 =========================== -->
-<div class="exercise" id="p7">
-<span class="ex-tag">Problem 7</span><span class="difficulty hard"> · interactions III, link scale vs response scale</span>
+<span class="ex-tag">Problem 6</span><span class="difficulty hard"> · interactions II, link scale vs response scale</span>
 <h3>The interaction you did not put in the model</h3>
-<p>Now the same idea with a binary response, which is where interactions stop being straightforward. As in Problem 5, the data are built with <em>no</em> interaction, and you fit a model that allows one anyway:</p>
+<p>Now the same idea with a binary response, which is where interactions stop being straightforward. As with <code>d_none</code> in Problem 5, the data are built with <em>no</em> interaction, and you fit a model that allows one anyway:</p>
 <pre><code>set.seed(789)
-d7 &lt;- data.frame(x1 = runif(200, -2, 2), x2 = runif(200, -2, 2))
-eta &lt;- -1 + 1.2*d7$x1 - 0.8*d7$x2      # note: no x1*x2 term
-d7$ybin &lt;- rbinom(200, 1, plogis(eta))
+d6 &lt;- data.frame(x1 = runif(200, -2, 2), x2 = runif(200, -2, 2))
+eta &lt;- -1 + 1.2*d6$x1 - 0.8*d6$x2      # note: no x1*x2 term
+d6$ybin &lt;- rbinom(200, 1, plogis(eta))
 
-m7 &lt;- glm(ybin ~ x1 * x2, data = d7, family = binomial)
-summary(m7)</code></pre>
+m6 &lt;- glm(ybin ~ x1 * x2, data = d6, family = binomial)
+summary(m6)</code></pre>
 <ol type="a">
 <li>Report the four coefficients against the values used to build the data ($-1$, $1.2$, $-0.8$, and no product term). Is the <code>x1:x2</code> term distinguishable from zero? Which scale are the coefficients on, probability, odds, or log-odds?</li>
 <li>Write the full model in mathematical notation, including the link function.</li>
-<li>On the log-odds scale, the slope in $x_1$ is the same kind of formula you found in Problem 6(c). Write it down and evaluate it at $x_2 = -1$ and $x_2 = +1$. Are the two slopes close, and given how the data were built, should they be?</li>
+<li>On the log-odds scale, the slope in $x_1$ is the same kind of formula you found in Problem 5(c). Write it down and evaluate it at $x_2 = -1$ and $x_2 = +1$. Are the two slopes close, and given how the data were built, should they be?</li>
 <li>Now refit the same data with <strong>no interaction term at all</strong>:
-<pre><code>m7add &lt;- glm(ybin ~ x1 + x2, data = d7, family = binomial)   # additive on the log-odds scale
-coef(m7add)</code></pre>
+<pre><code>m6add &lt;- glm(ybin ~ x1 + x2, data = d6, family = binomial)   # additive on the log-odds scale
+coef(m6add)</code></pre>
 This model is additive by construction. On the log-odds scale, the effect of $x_1$ is one number that does not involve $x_2$. On the <em>probability</em> scale it is not, and here is the formula you need, taken as given:
 $$\frac{\partial p}{\partial x_1} = p(1-p)\,(\beta_1 + \beta_3 x_2).$$
 The $p(1-p)$ factor is the logistic curve's own steepness, biggest at $p = 0.5$ and shrinking toward zero at either end, so the same step on the log-odds scale moves the probability by different amounts depending on where you started. Using that formula with $\beta_3 = 0$, compute $\partial p/\partial x_1$ at $x_1 = 0$ for $x_2 = -1$ and for $x_2 = +1$. Report both, and their ratio.</li>
 <li>You just found that the effect of $x_1$ on the probability depends on $x_2$, for data built with no interaction and a model containing no interaction term. Explain in three or four sentences why this happens, and what it implies for a reader who wants to know whether two predictors &ldquo;interact&rdquo; in a GLM. Your answer should distinguish clearly between the two scales.</li>
 </ol>
-<div class="callout warn"><strong>Watch out.</strong> Part (e) is the point of the whole sequence, and it is easy to state too strongly in either direction. A nonlinear link does not create an interaction in the model. The log-odds really are additive in <code>m7add</code>. What it does is make additivity on one scale disagree with additivity on the other, so &ldquo;do these predictors interact?&rdquo; is only a well-posed question once you say which scale you mean.</div>
+<div class="callout warn"><strong>Watch out.</strong> Part (e) is the point of the whole sequence, and it is easy to state too strongly in either direction. A nonlinear link does not create an interaction in the model. The log-odds really are additive in <code>m6add</code>. What it does is make additivity on one scale disagree with additivity on the other, so &ldquo;do these predictors interact?&rdquo; is only a well-posed question once you say which scale you mean.</div>
 <div class="callout try"><strong>Your answer goes in the R Markdown hand-in.</strong> Report both coefficient tables, the log-odds slopes from (c), the two marginal effects and their ratio from (d), and your explanation in (e).</div>
 </div>
 
-<!-- =========================== PROBLEM 8 =========================== -->
-<div class="exercise" id="p8">
-<span class="ex-tag">Problem 8</span><span class="difficulty medium"> · Poisson regression, log-link interpretation</span>
+<!-- =========================== PROBLEM 7 =========================== -->
+<div class="exercise" id="p7">
+<span class="ex-tag">Problem 7</span><span class="difficulty medium"> · Poisson regression, log-link interpretation</span>
 <h3>Reading a Poisson coefficient table as biology</h3>
 <p>From 120 ten-minute point counts in oak woodland you fit</p>
 <pre><code>glm(warblers ~ canopy_oak + elev_km, family = poisson, data = pc)</code></pre>
@@ -257,9 +243,9 @@ The $p(1-p)$ factor is the logistic curve's own steepness, biggest at $p = 0.5$ 
 <div class="callout try"><strong>Your answer goes in the R Markdown hand-in.</strong> Report the intercept back-transform, the oak-canopy multiplier, the elevation half-decay, and the manuscript sentence.</div>
 </div>
 
-<!-- =========================== PROBLEM 9 =========================== -->
-<div class="exercise" id="p9">
-<span class="ex-tag">Problem 9</span><span class="difficulty hard"> · interaction, crossover on the log scale</span>
+<!-- =========================== PROBLEM 8 =========================== -->
+<div class="exercise" id="p8">
+<span class="ex-tag">Problem 8</span><span class="difficulty hard"> · interaction, crossover on the log scale</span>
 <h3>When the sign of an effect flips between groups</h3>
 <p>Macroinvertebrate counts per Surber sample from 90 collections are modeled as Poisson with predictors discharge (m&sup3;/s, continuous) and season (factor: <em>spring</em> reference, <em>fall</em>):</p>
 <pre><code>glm(macros ~ discharge * season, family = poisson, data = samps)</code></pre>
@@ -273,9 +259,9 @@ The $p(1-p)$ factor is the logistic curve's own steepness, biggest at $p = 0.5$ 
 <div class="callout try"><strong>Your answer goes in the R Markdown hand-in.</strong> Report both seasonal slopes as multiplicative effects, the fall intercept back-transform, the crossover discharge, and one sentence on why the interaction matters biologically.</div>
 </div>
 
-<!-- =========================== PROBLEM 10 =========================== -->
-<div class="exercise" id="p10">
-<span class="ex-tag">Problem 10</span><span class="difficulty hard"> · offsets and effort</span>
+<!-- =========================== PROBLEM 9 =========================== -->
+<div class="exercise" id="p9">
+<span class="ex-tag">Problem 9</span><span class="difficulty hard"> · offsets and effort</span>
 <h3>Turning counts into rates with an offset</h3>
 <p>Across 200 longline sets, the number of hooks varies from 500 to 5000. You record bycatch counts of yelloweye rockfish per set. Two analysts:</p>
 <ul>
@@ -291,9 +277,12 @@ The $p(1-p)$ factor is the logistic curve's own steepness, biggest at $p = 0.5$ 
 <div class="callout try"><strong>Your answer goes in the R Markdown hand-in.</strong> Explain the offset intercept, justify the log scale, give the per-hook rate sentence, and state the direction of Analyst A's bias.</div>
 </div>
 
-<!-- =========================== PROBLEM 11 =========================== -->
-<div class="exercise" id="p11">
-<span class="ex-tag">Problem 11</span><span class="difficulty hard"> · logit threshold + marginal effects</span>
+<a id="extra-credit"></a>
+<div class="practice-banner"><div class="label">Optional · extra credit</div><h3>Extra-credit problems</h3><p>Problems 10 and 11 are optional. If you want the extra credit, answer them in the same <a class="hand-in" href="afternoon_lab_template.Rmd"><code>afternoon_lab_template.Rmd</code></a>. Skipping them costs you nothing.</p></div>
+
+<!-- =========================== PROBLEM 10 =========================== -->
+<div class="exercise" id="p10">
+<span class="ex-tag">Problem 10</span><span class="difficulty hard"> · optional extra credit · logit threshold + marginal effects</span>
 <h3>Occupancy thresholds and choosing a management lever</h3>
 <p>Presence/absence of hermit thrush at 300 sites is modeled as <code>glm(present ~ basal_area + shrub_cover, family = binomial)</code>, giving intercept $-3.0$, basal-area slope $+0.08$ per m&sup2;/ha, and shrub slope $+0.04$ per percent shrub.</p>
 <div class="callout key"><strong>Two tools you will need for parts (c)&ndash;(d).</strong>
@@ -310,9 +299,9 @@ The $p(1-p)$ factor is the logistic curve's own steepness, biggest at $p = 0.5$ 
 <div class="callout try"><strong>Your answer goes in the R Markdown hand-in.</strong> Report both threshold basal areas, the marginal effect at $p = 0.5$, the two intervention gains, and one management-relevant sentence.</div>
 </div>
 
-<!-- =========================== PROBLEM 12 =========================== -->
-<div class="exercise" id="p12">
-<span class="ex-tag">Problem 12</span><span class="difficulty medium"> · back-transforming a coefficient and its CI</span>
+<!-- =========================== PROBLEM 11 =========================== -->
+<div class="exercise" id="p11">
+<span class="ex-tag">Problem 11</span><span class="difficulty medium"> · optional extra credit · back-transforming a coefficient and its CI</span>
 <h3>From a log-scale contrast to a percent change with uncertainty</h3>
 <p>Eelgrass above-ground biomass is regressed on sediment type (a factor with <em>medium</em> as the reference level) using a Gamma GLM with a log link. The "fine sediment vs medium sediment" contrast returns a coefficient $\hat\beta = -0.65$ with a 95% Wald CI of $(-0.95,\,-0.35)$ on the log scale.</p>
 <ol type="a">

@@ -163,12 +163,12 @@ fit_nlme <- nlme(Length ~ Linf*(1-exp(-Kappa*(Age-Tzero))),
 > Fit M1, M3, M4, M7 and M8 and rank them with `aictab()`. (a) Why are Lake and
 > Fish_Species random-effect candidates, and what would push you the other way?
 > (b) Count and name the parameters in the variance–covariance matrix for
-> `(1 + Z_Length | Fish_Species)`, and say what a positive correlation would mean. (c) Report the table, then run `isSingular()` on all
-> five fits. (d) Read the correlation off `VarCorr(M8)`, run the two
-> three-point simulations, and explain which parameter broke and why. (e) Fit
-> `M8u` with the `||` form and compare its SDs with M8's. (f) Decide which model
-> to report and justify it. (g) Say when you would switch species to a fixed
-> effect and what that costs.
+> `(1 + Z_Length | Fish_Species)`, and say what a positive correlation would
+> mean. (c) Report the table, run `isSingular()` on all five fits, and read
+> `VarCorr(M8)` to see which parameter broke and why. (d) Fit
+> `M8u` with the `||` form, note the parameter it drops, and compare its SDs with
+> M8's. (e) Decide which model to report and justify it. (f) Say when you would
+> switch species to a fixed effect and what that costs.
 
 **My work:**
 
@@ -180,7 +180,7 @@ M7 <- lmer(Z_TP ~ Z_Length + (1|Fish_Species) + (1+Z_Length|Lake), data=dat, REM
 M8 <- lmer(Z_TP ~ Z_Length + (1+Z_Length|Fish_Species) + (1|Lake), data=dat, REML=TRUE)
 aictab(list(M1=M1, M3=M3, M4=M4, M7=M7, M8=M8))
 sapply(list(M1=M1, M3=M3, M4=M4, M7=M7, M8=M8), lme4::isSingular)
-# Your VarCorr(M8), the three-point simulations, and M8u here
+# Your VarCorr(M8) reading and the M8u fit here
 ```
 
 **Answer / biological interpretation:**

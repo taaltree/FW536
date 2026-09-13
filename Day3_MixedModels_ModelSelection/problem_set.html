@@ -236,27 +236,8 @@ The diagonal holds the variance of the species intercepts, $\sigma_0^2$, and of 
 
 <li>Report the AICc table and name the winner. Then run <code>isSingular()</code> on all five fits:
 <pre><code><span class="fn">sapply</span>(<span class="kw">list</span>(M1=M1,M3=M3,M4=M4,M7=M7,M8=M8), lme4::isSingular)</code></pre>
-Two of them come back <code>TRUE</code>, and one of those two is the model that just won. What did R print when you fitted them, and did you notice it at the time?</li>
-
-<li><strong>Find the parameter that broke.</strong> Run <code>VarCorr(M8)</code> and look at the <code>Corr</code> column. The estimated correlation between species intercepts and species slopes is exactly $1.000$, not "close to 1" but sitting precisely on the largest value a correlation is allowed to take. That is what <em>boundary (singular) fit</em> means.
-<p style="margin:8px 0">Why did the <em>correlation</em> break rather than one of the two variances? You have three species, so three (intercept, slope) pairs, which is three points. Rather than reason about it in the abstract, watch what three points can and cannot tell you. Both simulations below use data with a <strong>known</strong> answer:</p>
-<pre><code><span class="fn">set.seed</span>(<span class="nu">4</span>)
-
-<span class="cm"># Correlation from 3 points, when the TRUE correlation is zero</span>
-r3 &lt;- <span class="fn">replicate</span>(<span class="nu">20000</span>, <span class="fn">cor</span>(<span class="fn">rnorm</span>(<span class="nu">3</span>), <span class="fn">rnorm</span>(<span class="nu">3</span>)))
-<span class="fn">median</span>(<span class="fn">abs</span>(r3))        <span class="cm"># the typical |r| you get from three points</span>
-<span class="fn">mean</span>(<span class="fn">abs</span>(r3) &gt; <span class="nu">0.9</span>)     <span class="cm"># how often it looks nearly perfect</span>
-
-<span class="cm"># Standard deviation from 3 points, when the TRUE sd is 1</span>
-s3 &lt;- <span class="fn">replicate</span>(<span class="nu">20000</span>, <span class="fn">sd</span>(<span class="fn">rnorm</span>(<span class="nu">3</span>)))
-<span class="fn">median</span>(s3)
-<span class="fn">mean</span>(<span class="fn">abs</span>(s3 - <span class="nu">1</span>) &lt; <span class="nu">0.25</span>)  <span class="cm"># how often it lands within 25% of the truth</span></code></pre>
-<ol type="i" style="margin-bottom:6px">
-<li>Run the first block. Every one of those 20,000 correlations came from data with <em>no</em> relationship at all. What is the typical $|r|$, and how often does it come back above 0.9?</li>
-<li>Run the second. How far off is a standard deviation estimated from three points, and how often is it roughly right?</li>
-<li>Now put the two together. In two or three sentences, say why M8's correlation was the parameter that failed. Which of the two quantities can three groups say something useful about, and which one will happily return an extreme answer no matter what the truth is?</li>
-</ol>
-<p style="margin:8px 0">If you want to see it directly, plot one of the samples: <code>plot(rnorm(3), rnorm(3))</code>. Three points often look like a line.</p></li>
+Two of them come back <code>TRUE</code>, and one of those two is the model that just won. What did R print when you fitted them, and did you notice it at the time?
+<p style="margin:8px 0"><strong>Which parameter broke?</strong> Run <code>VarCorr(M8)</code> and look at the <code>Corr</code> column. The estimated correlation between species intercepts and species slopes is exactly $1.000$, not &ldquo;close to 1&rdquo; but sitting on the largest value a correlation can take. That is what a <em>boundary (singular) fit</em> means. It is the correlation that broke because M8 has only three species, and so only three (intercept, slope) pairs to learn it from. Three values are enough for a rough idea of how spread out the intercepts are, or the slopes. They say almost nothing about a correlation, because three points often fall close to a straight line even when there is no relationship at all, so the estimate can run to $\pm 1$ whatever the truth is. Report the correlation and the two species standard deviations, and say which of the three you would trust.</p></li>
 
 <li><strong>Ask for less: the <code>||</code> notation.</strong> Writing a double bar instead of a single one keeps both random effects but forces their correlation to zero, so the model estimates two parameters instead of three:
 <pre><code><span class="cm"># (1 + Z_Length | Fish_Species)   intercepts, slopes, AND their correlation  — 3 parameters</span>
@@ -265,15 +246,15 @@ s3 &lt;- <span class="fn">replicate</span>(<span class="nu">20000</span>, <span 
 M8u &lt;- <span class="fn">lmer</span>(Z_TP ~ Z_Length + (<span class="nu">1</span>+Z_Length||Fish_Species) + (<span class="nu">1</span>|Lake), data=dat, REML=<span class="kw">TRUE</span>)
 lme4::<span class="fn">isSingular</span>(M8u)
 <span class="fn">VarCorr</span>(M8u)</code></pre>
-Does it converge? Compare its two standard deviations with M8's. Has dropping the correlation cost you anything you actually wanted to know?</li>
+The correlation is a genuinely estimated parameter, so dropping it lowers the parameter count by exactly one. You will see that as $K = 6$ for <code>M8u</code> against $K = 7$ for M8 in the AICc table, and as 1 degree of freedom in a likelihood-ratio test between them. Does <code>M8u</code> converge? Compare its two standard deviations with M8's. Has dropping the correlation cost you anything you actually wanted to know?</li>
 
-<li><strong>The judgment call.</strong> Add <code>M8u</code> to the AICc table. M8 still comes out ahead by about 6 AICc units, and <code>anova(M8u, M8, refit = FALSE)</code> returns $p = 0.004$, so both criteria say the correlation parameter is "worth it". Yet that parameter is pinned at its boundary.
+<li><strong>The judgment call.</strong> Add <code>M8u</code> to the AICc table. M8 still comes out ahead by about 6 AICc units, and <code>anova(M8u, M8, refit = FALSE)</code> returns $p = 0.004$, so both criteria say the correlation parameter is "worth it". Yet that parameter is pinned at its boundary, and AICc charged M8 a full parameter for a correlation stuck at 1.000.
 <p style="margin:8px 0">Which model do you report, and why? Your answer should say what a likelihood-ratio test and an AICc difference can and cannot tell you about a parameter sitting on the edge of its allowed range.</p></li>
 
 <li>Three species and six lakes is on the edge of what should be treated as random at all. When would you switch species to a fixed effect instead, and what would you lose by doing so?</li>
 </ol>
 <div class="callout key" style="margin-top:12px"><strong>Carry this forward.</strong> You will meet <code>||</code> again in the afternoon walkthrough, where the same species-slope model appears in a model-comparison exercise. The habit worth forming today is that after every <code>lmer</code> fit with a random slope, check <code>isSingular()</code> before you believe anything the model tells you.</div>
-<div class="callout try" style="margin-top: 12px;"><strong>Your answer goes in the R Markdown hand-in.</strong> Report the AICc table, the singularity check, the correlation from <code>VarCorr(M8)</code>, the converging <code>M8u</code> fit, and your reasoning in (d), (f) and (g).</div>
+<div class="callout try" style="margin-top: 12px;"><strong>Your answer goes in the R Markdown hand-in.</strong> Report the AICc table, the singularity check and the <code>VarCorr(M8)</code> estimates in (c), the converging <code>M8u</code> fit in (d), and your reasoning in (e) and (f).</div>
 </div>
 
 

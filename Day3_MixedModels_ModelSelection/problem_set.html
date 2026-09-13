@@ -187,7 +187,7 @@ fit_nlme &lt;- <span class="fn">nlme</span>(Length ~ Linf*(<span class="nu">1</s
 <ol type="a">
 <li><strong>What does each fit say the measurement error is?</strong> Run <code>summary(fit_nls)$sigma</code> and <code>VarCorr(fit_nlme)</code>. You built the data with a measurement error of 3 and a fish-to-fish SD of 12. Which fit recovers both numbers, and what does the other one report instead?</li>
 
-<li><strong>Work out where that wrong number came from.</strong> No calculus needed. Just look at the growth equation. Length is $L_\infty$ <em>multiplied by</em> the factor $(1 - e^{-\kappa a})$, and that factor is the fraction of its final size a fish has reached by age $a$.
+<li><strong>Work out where that wrong number from <code>nls()</code> came from.</strong> No calculus needed. Just look at the growth equation. Length is $L_\infty$ <em>multiplied by</em> the factor $(1 - e^{-\kappa a})$, and that factor is the fraction of its final size a fish has reached by age $a$.
 <p style="margin:8px 0">So two fish whose $L_\infty$ differ by 12 are <em>not</em> 12 apart at every age. At age $a$ they are $12 \times (\text{that fraction})$ apart, close together when young and far apart when old.</p>
 <ol type="i" style="margin-bottom:6px">
 <li>Compute the fraction at each age: <code>1 - exp(-0.25 * 1:8)</code>. How far apart are two such fish at age 1? At age 8?</li>
@@ -230,7 +230,9 @@ M8 &lt;- <span class="fn">lmer</span>(Z_TP ~ Z_Length + (<span class="nu">1</spa
 <ol type="a">
 <li>Why are <em>both</em> Lake and Fish_Species candidates for random effects rather than fixed? Give the argument that would push you the other way.</li>
 
-<li>What does the term <code>(1 + Z_Length | Fish_Species)</code> assume about the population of slopes across species? Write out the implied bivariate Normal for the (intercept, slope) pair, and count how many parameters that costs. Two variances plus what?</li>
+<li><strong>What two random effects estimate.</strong> The term <code>(1 + Z_Length | Fish_Species)</code> gives each species its own deviation from the overall intercept, $b_{0j}$, and from the overall slope, $b_{1j}$. The model does not estimate those three species&rsquo; deviations as free parameters. It estimates how such deviations vary across a population of species, and that variation is summarized by a <strong>variance&ndash;covariance matrix</strong>:
+$$\begin{pmatrix}\sigma_0^2 & \rho\,\sigma_0\sigma_1\\ \rho\,\sigma_0\sigma_1 & \sigma_1^2\end{pmatrix}$$
+The diagonal holds the variance of the species intercepts, $\sigma_0^2$, and of the species slopes, $\sigma_1^2$. The off-diagonal is their covariance, built from $\rho$, the correlation between a species&rsquo; intercept and its slope. <code>VarCorr(M8)</code> reports $\sigma_0$ and $\sigma_1$ in its <code>Std.Dev.</code> column and $\rho$ in its <code>Corr</code> column. How many parameters does this matrix cost, and what are they? What would a positive $\rho$ mean for these fish?</li>
 
 <li>Report the AICc table and name the winner. Then run <code>isSingular()</code> on all five fits:
 <pre><code><span class="fn">sapply</span>(<span class="kw">list</span>(M1=M1,M3=M3,M4=M4,M7=M7,M8=M8), lme4::isSingular)</code></pre>

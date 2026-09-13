@@ -53,15 +53,13 @@ dat$Z_Length     <- scale(dat$Fish_Length)[, 1]
 
 # Problem 7 · How often does each criterion pick noise as "best"? (simulation)
 
-> (a) Bring across the walkthrough loop (response unrelated to three predictors,
-> `set.seed(126)`, 500 reps) and its four proportions. (b) Add the strict rule:
-> accept the AICc winner only if it beats the runner-up by more than 2 units.
-> Record how often a winner is more than 2 clear, how often that winner still
-> holds a noise predictor, and the overall rate. (c) Explain how the strict rule
-> lowers the false-positive rate, using the median gap. (d) Repeat for BIC and
-> fill in the comparison table. (e) Explain why BIC declares a clear winner more
-> often, and how it can be both more trustworthy when it commits and more often
-> confidently wrong overall.
+> (a) Run the walkthrough loop (response unrelated to three predictors,
+> `set.seed(126)`, 500 reps) and report its four proportions. (b) Record, for
+> each run, the AICc gap between the best and second-best model and the delta of
+> the intercept-only model; report the median gap, how often the best model is
+> more than 2 units clear, and how often the intercept-only model is within 2
+> units of the best. (c) Explain why "ranked first" is weak evidence that a
+> predictor matters, and name the numbers a reader needs.
 
 **My work:**
 
@@ -70,7 +68,7 @@ set.seed(126)
 n <- 50; a <- 5; sdy <- 3
 nummodels <- 500
 pstor <- AICstor <- AICcstor <- BICstor <- rep(NA, nummodels)
-noise_top <- gap <- rep(NA, nummodels)
+gap <- null_d <- rep(NA, nummodels)
 for (i in 1:nummodels) {
   y <- rnorm(n, mean = a, sd = sdy)
   x1 <- runif(n); x2 <- runif(n); x3 <- runif(n)
@@ -80,13 +78,13 @@ for (i in 1:nummodels) {
   AICstor[i]  <- sum(!is.na(dredge(reg, rank = "AIC")[1, 2:4]))
   dd          <- dredge(reg, rank = "AICc")
   AICcstor[i] <- sum(!is.na(dd[1, 2:4]))
-  noise_top[i] <- AICcstor[i]
-  gap[i]       <- dd$AICc[2] - dd$AICc[1]
+  gap[i]      <- dd$AICc[2] - dd$AICc[1]                     # best vs runner-up
+  null_d[i]   <- dd$delta[rowSums(!is.na(dd[, 2:4])) == 0]   # intercept-only model's delta
   BICstor[i]  <- sum(!is.na(dredge(reg, rank = "BIC")[1, 2:4]))
 }
 data.frame(p = mean(pstor > 0), AIC = mean(AICstor > 0),
            AICc = mean(AICcstor > 0), BIC = mean(BICstor > 0))
-# Your strict-rule summaries and the BIC comparison here
+# Your summaries of gap and null_d for (b) here
 ```
 
 **Answer / biological interpretation:**

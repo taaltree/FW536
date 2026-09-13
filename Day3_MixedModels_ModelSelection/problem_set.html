@@ -348,14 +348,18 @@ m &lt;- <span class="fn">lm</span>(y ~ strong + modest + weak, data=d)
 <ol type="a">
 <li>Run the single simulation. Which predictors does each criterion retain in its top model?</li>
 <li>Wrap it in a 500-rep loop (resampling <code>y</code> and the predictors each time) and report the proportion of reps in which each criterion retains <code>weak</code>. Do the same for <code>modest</code> and <code>strong</code>.</li>
-<li>Which criterion would you use if the science question is "is the weak predictor worth studying further?", and which if it is "does the weak signal generalize out of sample?" Justify each choice.</li>
+<li><strong>Two criteria, two questions.</strong> AIC is <em>efficient</em>: it estimates how well a model will predict new observations, and for large samples it ranks models the same way leave-one-out cross-validation does. BIC is <em>consistent</em>: if the model that generated the data is among the candidates, BIC selects it with probability approaching 1 as the sample size grows, and a difference in BIC between two models approximates the log of a Bayes factor, a measure of the evidence for one model over the other.
+<ol type="i">
+<li>Which criterion answers &ldquo;does including <code>weak</code> improve prediction of new observations?&rdquo;, and which answers &ldquo;do the data provide evidence that <code>weak</code> belongs in the model that generated them?&rdquo; Justify each match.</li>
+<li>Using your retention rates from (b), say how far each answer can be trusted at $n = 60$. In particular, if BIC leaves <code>weak</code> out, is that evidence that <code>weak</code> has no effect?</li>
+</ol></li>
 <li><strong>Now change the sample size.</strong> Run the loop from (b) again with <code>n = 500</code>, and also rerun the pure-noise loop from Problem 7 at <code>n = 500</code>. Fill in this table with the rate at which each criterion keeps the weak-but-real predictor (its power, one minus the Type II error) and the rate at which it keeps at least one pure-noise predictor (its Type I error):
 <pre><code>                keeps weak (real)      keeps noise (Type I)
                 n = 60    n = 500      n = 50    n = 500
 AIC             ____      ____         ____      ____
 AICc            ____      ____         ____      ____
 BIC             ____      ____         ____      ____</code></pre>
-One criterion's Type I error barely moves with $n$ and one collapses. Explain both from the size of the penalties, $2$ against $\ln n$, and then say what that means for a criterion's ability to find a weak effect as data accumulate. Which of the two behaviours would you want from a criterion used for inference, and which for prediction?</li>
+One criterion's Type I error barely moves with $n$ and one collapses. Explain both from the size of the penalties, $2$ against $\ln n$, and then say what that means for a criterion's ability to find a weak effect as data accumulate. Which behaviour is the consistency described in (c), and which is the price AIC pays for being efficient? Which would you want when the goal is to identify the predictors in the model that generated the data, and which when the goal is to predict new observations?</li>
 </ol>
 <div class="callout try" style="margin-top: 12px;"><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
 </div>

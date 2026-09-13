@@ -97,11 +97,13 @@ data.frame(p = mean(pstor > 0), AIC = mean(AICstor > 0),
 > Three predictors with known effects (strong 0.8, modest −0.4, weak 0.1;
 > `set.seed(11)`, n = 60). (a) Run the single simulation and report which
 > predictors each criterion keeps. (b) Wrap it in a 500-rep loop and report the
-> retention proportion of each predictor under AIC, AICc and BIC. (c) Say which
-> criterion you would use for "is the weak predictor worth studying further?"
-> and which for "does the weak signal generalize?". (d) Rerun (b) and the
-> Problem 7 noise loop at n = 500, fill in the power / Type I table, and explain
-> the two behaviours from the penalties 2 and ln n.
+> retention proportion of each predictor under AIC, AICc and BIC. (c) Match AIC
+> (efficient: predictive accuracy) and BIC (consistent: evidence for the
+> data-generating model) to the questions "does weak improve prediction?" and
+> "is weak in the model that generated the data?", then judge how far each
+> answer can be trusted at n = 60. (d) Rerun (b) and the Problem 7 noise loop at
+> n = 500, fill in the power / Type I table, explain the two behaviours from the
+> penalties 2 and ln n, and link them to consistency and efficiency.
 
 **My work:**
 

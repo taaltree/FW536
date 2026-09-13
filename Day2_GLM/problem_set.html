@@ -20,7 +20,6 @@
  <ul>
  <li><a href="#p1">1. Which distribution? (lognormal)</a></li>
  <li><a href="#p2">2. Allometry as a power law</a></li>
- <li><a href="#p3">3. Exponential detection function</a></li>
  <li><a href="#p4">4. Overdispersed counts (data)</a></li>
  </ul>
  <div class="section">Afternoon · linear models & GLMs</div>
@@ -69,7 +68,7 @@
 </section>
 
 <a id="morning"></a>
-<div class="practice-banner"><div class="label">Morning · 20 pts</div><h3>Continuous distributions</h3><p>Problems 1&ndash;4. Write your work in <a class="hand-in" href="morning_lab_template.Rmd"><code>morning_lab_template.Rmd</code> &darr;</a></p></div>
+<div class="practice-banner"><div class="label">Morning · 20 pts</div><h3>Continuous distributions</h3><p>Problems 1, 2 and 4. Write your work in <a class="hand-in" href="morning_lab_template.Rmd"><code>morning_lab_template.Rmd</code> &darr;</a></p></div>
 
 <!-- =========================== PROBLEM 1 =========================== -->
 <div class="exercise" id="p1">
@@ -105,31 +104,6 @@
 $$\text{mean} = \exp\!\left(\hat\mu + \tfrac{\sigma^2}{2}\right) = e^{\hat\mu} \times e^{\sigma^2/2}, \qquad \hat\mu = \hat\beta_0 + \hat\beta_1 \log(L).$$
 <p>The factor $e^{\sigma^2/2}$ is the <strong>half-variance correction</strong>. It is always above 1, and it grows with the scatter on the log scale: the more individual fish spread around the line, the further the heavy ones drag the average above the median. It is the same $e^{\mu + \sigma^2/2}$ you used in Problem 1(b).</p></div>
 <div class="callout try"><strong>Your answer goes in the R Markdown hand-in.</strong> Give the allometric interpretation of $b = 3.05$, both multiplicative effects, which of mean and median the back-transform estimates, and the size of the correction for $\hat\sigma = 0.12$ and for $\sigma = 0.8$.</div>
-</div>
-
-<!-- =========================== PROBLEM 3 =========================== -->
-<div class="exercise" id="p3">
-<span class="ex-tag">Problem 3</span><span class="difficulty medium"> · Exponential, survival function</span>
-<h3>Line-transect detection of spider monkeys</h3>
-<p>Spider monkeys (<em>Ateles</em>) are surveyed by walking straight transect lines through the forest and recording the monkeys seen on either side. Spider monkeys travel in small subgroups that split and merge through the day, so a survey records each subgroup as one detection and measures its perpendicular distance from the line to the centre of the subgroup. Throughout this problem, the thing being detected is a subgroup.</p>
-<p>Subgroups close to the line are almost always seen, and subgroups far from it are often missed. The <strong>detection function</strong> $g(x)$ describes that decline: $g(x)$ is the probability that a subgroup at perpendicular distance $x$ from the line is detected. It is highest on the line and falls toward zero as $x$ grows.</p>
-<p>Be clear about what $g(x)$ is <em>not</em>. It is not a probability distribution over distances. Each value $g(x)$ is a separate probability, seen or missed, for a subgroup at that one distance, so the curve has no reason to integrate to 1 across all distances. A model for $g(x)$ only has to supply a sensible <em>shape</em> for the decline, and this problem borrows that shape from the Exponential distribution.</p>
-<p>Here is how the borrowing works. At the moment the observer walks past, every subgroup has a <strong>detection range</strong> $X$, the farthest perpendicular distance at which the observer would still pick that subgroup up. Even within this one species, detection ranges vary a great deal. A large subgroup feeding and calling in a tall fruiting tree can be spotted from far away, while two monkeys resting silently in dense mid-canopy foliage can be missed close to the line. Subgroup size, height in the canopy, activity, and the thickness of the vegetation all change $X$, from one subgroup to the next and for the same subgroup from one moment to the next. So $X$ is a random variable, and we model how it varies with $X \sim \text{Exponential}(\lambda)$, where $\lambda = 0.02$ per meter. A subgroup at distance $x$ is seen exactly when its detection range reaches that far, $X \ge x$, so</p>
-$$g(x) = P(X \ge x).$$
-<p>So $X$ has a genuine probability distribution, describing how conspicuous spider monkey subgroups are, and $g(x)$ is a curve read off that distribution. The Exponential is chosen because it is the simplest distribution with this job, one parameter and nothing else; part (d) asks what that simplicity assumes.</p>
-<ol type="a">
-<li>A <strong>survival function</strong> gives the probability that a random quantity is at least a given value, $S(x) = P(X \ge x) = 1 - F(x)$, where $F$ is the cumulative distribution function. The name comes from its most familiar use in biology: if $X$ is age at death, $S(t)$ is the probability an individual is still alive at age $t$, the curve plotted from a life table or a Kaplan&ndash;Meier analysis. Nest survival, time to seed germination, and time until a tagged fish leaves a reach use the same idea. Here distance plays the role of age, and $g(x) = S(x)$ is the probability that a subgroup's detection range "survives" out to distance $x$. Write $S(x)$ for $X \sim \text{Exponential}(\lambda)$, check that $S(0) = 1$ and say what that means for a subgroup directly on the line, and state the mean detection range $E[X]$.</li>
-<li>Compute the probability of <em>missing</em> a subgroup that is 50 m off the transect line. (Careful: $S(50)$ is the probability the subgroup <em>is seen</em>.)</li>
-<li>At what perpendicular distance does the detection process reach its "half-life" (the distance at which $S(x) = 0.5$)? Show that this equals $\ln 2 / \lambda$.</li>
-<li>The Exponential is <strong>memoryless</strong>. The idea is easiest to see with numbers first, then in general.
-  <ol type="i">
-  <li>Compute $P(X \ge 60 \mid X \ge 50)$, the probability that a subgroup still detectable at 50 m is also detectable at 60 m. Use $P(A \mid B) = P(A \cap B)/P(B)$, and notice that $X \ge 60$ already guarantees $X \ge 50$. Then compute $P(X \ge 10)$, the probability that a subgroup is detectable 10 m out. Compare the two numbers.</li>
-  <li>Show that the match is no coincidence. Using $S(x) = e^{-\lambda x}$, show that $P(X \ge x + s \mid X \ge x) = e^{-\lambda s}$ for any starting distance $x$ and any extra distance $s$. In words, a subgroup that is still detectable at distance $x$ has the same chance of staying detectable over the next $s$ meters as a subgroup starting on the line: the distribution has no memory of the distance already covered. Ecologists put this in terms of the <em>hazard</em>, the rate at which detectability is lost per meter among the subgroups still detectable at that distance. Explain why memorylessness means the hazard is the same constant, $\lambda$, at every distance.</li>
-  <li>Now apply it at the trackline. Compute $g(2)$ and $g(10)$. What fraction of subgroups only 2 m from the line, almost directly overhead, does this model say the observer misses? Experienced observers detect nearly every subgroup within the first few meters of the line, so real detection functions stay flat near 1 for a while before they fall, a feature called a <em>shoulder</em>. In one or two sentences, explain why a memoryless model cannot have a shoulder, and what that assumption commits you to biologically.</li>
-  </ol>
-</li>
-</ol>
-<div class="callout try"><strong>Your answer goes in the R Markdown hand-in.</strong> Show $S(x)$ with its check at zero and the mean detection range, the miss probability at 50 m, the half-distance, and all three steps of (d).</div>
 </div>
 
 <!-- =========================== PROBLEM 4 =========================== -->

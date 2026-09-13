@@ -18,7 +18,7 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 
 # Day 2 morning lab · Continuous distributions problem set
 
-This template matches the **morning** section (Problems 1–4) of
+This template matches the **morning** section (Problems 1, 2 and 4) of
 [`problem_set.html`](problem_set.html). Read each problem statement there,
 write your work below, **Knit** to HTML, and upload the `.html` to the
 matching Canvas assignment.
@@ -75,31 +75,6 @@ library(emmeans)
 > change; use the note in the problem set to say whether the back-transform
 > estimates the mean or the median, and size the half-variance correction for
 > $\hat\sigma = 0.12$ against Problem 1's $\sigma = 0.8$.
-
-**My work:**
-
-```{r}
-# Your R code here
-```
-
-**Answer / biological interpretation:**
-
-
----
-
-# Problem 3 · Line-transect detection of spider monkeys
-
-> Spider monkey subgroups on a line transect. The detection function $g(x)$ is
-> the probability a subgroup at perpendicular distance $x$ is seen; it is a curve,
-> not a probability distribution. Each subgroup has a detection range
-> $X \sim \mathrm{Exponential}(\lambda)$ with $\lambda = 0.02$/m, and
-> $g(x) = P(X \ge x)$. (a) Define the survival function,
-> write $S(x)$ for the Exponential, check $S(0) = 1$, and give $E[X]$.
-> (b) Probability of *missing* a subgroup at 50 m. (c) Half-distance
-> $\ln 2/\lambda$. (d) Memorylessness in three steps: (i) compare
-> $P(X \ge 60 \mid X \ge 50)$ with $P(X \ge 10)$; (ii) show
-> $P(X \ge x + s \mid X \ge x) = e^{-\lambda s}$ and explain the constant hazard;
-> (iii) compute $g(2)$ and $g(10)$ and explain why a memoryless model has no shoulder.
 
 **My work:**
 

@@ -71,6 +71,7 @@
 <span class="ex-tag">Problem 1</span><span class="difficulty medium"> · simulation · shrinkage and effort</span>
 <h3>Which streams get pulled hardest toward the mean?</h3>
 <p>The walkthrough used a balanced design, with every stream sampled the same number of times. Real survey effort is never balanced, and the imbalance is exactly where partial pooling earns its keep. Here you simulate an unbalanced design, so you know the truth, and watch what the model does with it.</p>
+<p>The setup code uses four base-R helpers you may not have met, <code>seq_along()</code>, <code>lapply()</code>, <code>do.call()</code> and <code>tapply()</code>. The comments in the code say what each one does here, and the <a href="../apply_family.html">apply family tutorial</a> walks through them with pictures.</p>
 <div class="code-label">Setup: 24 streams, deliberately unequal effort</div>
 <pre><code><span class="kw">library</span>(nlme)
 <span class="fn">set.seed</span>(<span class="nu">413</span>)
@@ -79,15 +80,25 @@ nvisit &lt;- <span class="kw">c</span>(<span class="fn">rep</span>(<span class="
 tau &lt;- <span class="nu">12</span>;  sig &lt;- <span class="nu">20</span>;  mu &lt;- <span class="nu">80</span>              <span class="cm"># TRUE among-stream SD, within SD, grand mean</span>
 
 stream_mean &lt;- <span class="fn">rnorm</span>(<span class="fn">length</span>(nvisit), mu, tau)      <span class="cm"># each stream's real density</span>
+<span class="cm"># Build one table holding every visit to every stream, in three nested steps:</span>
+<span class="cm">#  seq_along(nvisit) is the sequence 1, 2, ..., 24, one number per stream.</span>
+<span class="cm">#  lapply() runs function(i) once for each stream number i and collects the 24</span>
+<span class="cm">#    results in a list. Each result is a small data frame of that stream's</span>
+<span class="cm">#    nvisit[i] simulated visits.</span>
+<span class="cm">#  do.call(rbind, ...) stacks all 24 data frames in that list into one, exactly</span>
+<span class="cm">#    as if you had typed rbind(df1, df2, ..., df24).</span>
 Streams &lt;- <span class="fn">do.call</span>(rbind, <span class="fn">lapply</span>(<span class="fn">seq_along</span>(nvisit), <span class="kw">function</span>(i)
   <span class="fn">data.frame</span>(Stream = <span class="fn">factor</span>(i),
              Density = <span class="fn">rnorm</span>(nvisit[i], stream_mean[i], sig))))
 
 m &lt;- <span class="fn">lme</span>(Density ~ <span class="nu">1</span>, random = ~ <span class="nu">1</span> | Stream, data = Streams)
 
-nopool  &lt;- <span class="fn">tapply</span>(Streams$Density, Streams$Stream, mean)   <span class="cm"># each stream on its own</span>
+<span class="cm"># tapply(x, group, f) splits x into one piece per group and applies f to each</span>
+<span class="cm"># piece. Here it returns the mean Density of each stream on its own, one number</span>
+<span class="cm"># per stream: the no-pooling estimates.</span>
+nopool  &lt;- <span class="fn">tapply</span>(Streams$Density, Streams$Stream, mean)
 partial &lt;- <span class="fn">coef</span>(m)[, <span class="nu">1</span>]                                    <span class="cm"># partially pooled</span>
-n_i     &lt;- <span class="fn">as.numeric</span>(<span class="fn">table</span>(Streams$Stream))</code></pre>
+n_i     &lt;- <span class="fn">as.numeric</span>(<span class="fn">table</span>(Streams$Stream))       <span class="cm"># number of visits to each stream</span></code></pre>
 <ol type="a">
 <li><strong>Predict before you compute.</strong> Partial pooling keeps a fraction $B_i$ of each stream's own mean and pulls the rest toward the grand mean, where
 <div class="eq-block">$B_i = \dfrac{\tau^2}{\tau^2 + \sigma^2/n_i}$</div>
@@ -130,10 +141,18 @@ LenW &lt;- <span class="fn">data.frame</span>(TheData); LenW$Subject &lt;- <span
 m1  &lt;- <span class="fn">lme</span>(Weight ~ Length, data=LenW, random = ~ <span class="nu">1</span> | Subject, method=<span class="st">"REML"</span>)
 m1b &lt;- <span class="fn">lmer</span>(Weight ~ Length + (<span class="nu">1</span> | Subject), data=LenW)   <span class="cm"># same model, lme4 syntax</span></code></pre>
 <ol type="a" start="2">
-<li>Report the within-subject residual SD and compute the ICC. Contrast it with the ICC implied by Problem 1's <em>true</em> values ($\tau = 12$, $\sigma = 20$) and explain what the difference tells you about the two designs.</li>
+<li>Report the within-subject residual SD from <code>m1</code>, and compute the ICC, $\tau^2/(\tau^2 + \sigma^2)$, where $\tau$ is the among-subject SD and $\sigma$ is the residual SD. Then use those variance components to answer a design question.
+<p>A new study can afford exactly 60 measurements. It could measure 6 groups 10 times each, or 30 groups twice each. Its goal is the <em>population</em> mean of the response, the average across all groups rather than the mean of any one group, so here &ldquo;better&rdquo; means estimating that population mean more precisely, with a smaller standard error. For $g$ groups each measured $n$ times, that standard error is</p>
+$$\text{SE} = \sqrt{\dfrac{\tau^2}{g} + \dfrac{\sigma^2}{g\,n}}.$$
+<ol type="i">
+<li>Compute the SE for both allocations using your length&ndash;weight estimates of $\tau$ and $\sigma$.</li>
+<li>Repeat with the true values from Problem 1, $\tau = 12$ and $\sigma = 20$. The two datasets are unrelated. Problem 1 is used only because its variation splits differently: its ICC is $12^2/(12^2 + 20^2) = 0.26$, well below the length&ndash;weight ICC. Working both cases shows whether the best design depends on the ICC.</li>
+<li>In each case, which allocation is better, and by what percentage does it shrink the SE? Explain the result using the two terms under the square root: which one gets smaller when the 60 measurements are spread over more groups, which one stays the same, and how the ICC decides how much there is to gain.</li>
+</ol>
+</li>
 <li>Fit a random-slope model <code>lmer(Weight ~ Length + (1 + Length | Subject))</code> and compare it to <code>m1b</code> with <code>anova(m1b, m_slope, refit = FALSE)</code>. Is the random slope supported? Explain why <code>refit = FALSE</code> is correct here.</li>
 </ol>
-<div class="callout try" style="margin-top: 12px;"><strong>Your answer goes in the R Markdown hand-in.</strong> Report the ICC and interpretation for the nestling output, the ICC comparison in (b), and the random-slope verdict with your reasoning about <code>refit</code>.</div>
+<div class="callout try" style="margin-top: 12px;"><strong>Your answer goes in the R Markdown hand-in.</strong> Report the ICC and interpretation for the nestling output, the ICC and both design calculations in (b), and the random-slope verdict with your reasoning about <code>refit</code>.</div>
 </div>
 
 

@@ -76,13 +76,18 @@ set.seed(413)
 nvisit <- c(rep(2, 8), rep(5, 8), rep(30, 8))
 tau <- 12;  sig <- 20;  mu <- 80
 stream_mean <- rnorm(length(nvisit), mu, tau)
+# seq_along(nvisit) is 1, 2, ..., 24, one number per stream.
+# lapply() runs function(i) for each stream and collects a list of 24 small
+#   data frames, each holding that stream's simulated visits.
+# do.call(rbind, ...) stacks that list into one data frame, like rbind(df1, ..., df24).
+# See ../apply_family.html for a visual walkthrough.
 Streams <- do.call(rbind, lapply(seq_along(nvisit), function(i)
   data.frame(Stream = factor(i),
              Density = rnorm(nvisit[i], stream_mean[i], sig))))
 m <- lme(Density ~ 1, random = ~ 1 | Stream, data = Streams)
-nopool  <- tapply(Streams$Density, Streams$Stream, mean)
+nopool  <- tapply(Streams$Density, Streams$Stream, mean)   # mean Density per stream (no pooling)
 partial <- coef(m)[, 1]
-n_i     <- as.numeric(table(Streams$Stream))
+n_i     <- as.numeric(table(Streams$Stream))              # visits per stream
 # Your B_i calculations and the table for (b) here
 ```
 
@@ -96,8 +101,12 @@ n_i     <- as.numeric(table(Streams$Stream))
 > (a) From the printed nestling output alone: compute the ICC and say it in a
 > sentence, interpret the brood-size effect and its uncertainty, and give one
 > reason "brood size doesn't matter" is premature. (b) Back to `LenW`: report
-> the residual SD and ICC from `m1`, and contrast with the ICC implied by
-> Problem 1's true values. (c) Fit the random-slope model and compare it to
+> the residual SD and ICC from `m1`. Then, for a study limited to 60
+> measurements, compute the standard error of the population mean for 6 groups
+> measured 10 times versus 30 groups measured twice, first with the
+> length–weight estimates and then with Problem 1's true $\tau = 12$ and
+> $\sigma = 20$. Say which allocation is better in each case, by how much, and
+> why. (c) Fit the random-slope model and compare it to
 > `m1b` with `anova(m1b, m_slope, refit = FALSE)`; explain why `refit = FALSE`.
 
 **My work:**

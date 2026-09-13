@@ -60,7 +60,12 @@ explorers.
 ## Answer keys (instructor-only)
 
 Graded problem-set keys (`problem_set_KEY.html`) are **git-ignored**. They stay on the instructor's local
-copy and are never published. Release them via Canvas after grading. The
+copy and are never published. Release them via Canvas after grading. Because git cannot restore them,
+back them up before any bulk edit.
+
+Each key shows every problem's question, exactly as students see it, directly above the worked solution.
+Those question blocks are generated from `problem_set.html`, so edit the problem set, never the block in
+the key, and then run `python3 _tools/sync_key_questions.py`. The
 practice-lab `answer_key.html` files are public by design (the practice lab
 already shows its answers).
 
@@ -70,6 +75,11 @@ already shows its answers).
   with its master. Run it after editing either one; it exits 1 if they have drifted.
 - `_tools/build_answer_key_review.py` builds one-page question-and-answer review pages for vetting
   exercises. It currently reads the practice labs.
+- `_tools/sync_key_questions.py` copies each graded question from `problem_set.html` into
+  `problem_set_KEY.html`, directly above its solution, matched on the problem id. Run it after every edit to
+  a problem set; re-running replaces the old copy. `--check` writes nothing and exits 1 if any key has
+  fallen behind its problem set. It copies questions only, so if you add, remove, or reword a lettered part,
+  update the worked solution to match as well.
 
 The accessible edition (the `accessible/` screen-reader mirror, the `*_accessible.pptx` decks, and
 the three scripts that built them) was retired in September 2026 and archived outside the repo, in

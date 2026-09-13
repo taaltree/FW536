@@ -129,16 +129,34 @@
 <section id="concepts">
 <h2>Core concepts (the conceptual scaffolding)</h2>
 
-<h3>1. Probability axioms</h3>
+<h3>1. Events, "and" and "or", and the probability axioms</h3>
+<p>An <strong>event</strong> is a set of possible outcomes from the sample space $\Omega$, such as "the camera records a deer tonight." Events combine in three ways, and each has a set-theory symbol for a word you already use.</p>
+<table>
+<tr><th>Symbol</th><th>Name</th><th>Read it as</th><th>It happens when</th></tr>
+<tr><td>$A \cup B$</td><td>union</td><td>$A$ <strong>or</strong> $B$</td><td>$A$ happens, $B$ happens, or both do</td></tr>
+<tr><td>$A \cap B$</td><td>intersection</td><td>$A$ <strong>and</strong> $B$</td><td>$A$ and $B$ both happen</td></tr>
+<tr><td>$A^c$</td><td>complement</td><td><strong>not</strong> $A$</td><td>$A$ does not happen</td></tr>
+</table>
+<p>The "or" in probability is always the inclusive or, so $A \cup B$ includes the outcomes where both happen. A memory aid: $\cup$ is a cup that collects everything in either event, and $\cap$ is a cap that keeps only the part the two events share. Two events are <strong>mutually exclusive</strong> when they cannot both happen, which in symbols is $A \cap B = \varnothing$, the empty set.</p>
+<p><em>Example.</em> On a given night a trail camera can record a deer ($A$), an elk ($B$), both, or neither. $A \cup B$ is the event that it records a deer or an elk, which counts the nights with both. $A \cap B$ is the event that it records a deer and an elk. These two events are not mutually exclusive, because a deer and an elk can both walk past on the same night. "Deer is the first animal recorded" and "elk is the first animal recorded" are mutually exclusive.</p>
+
+<p>Every rule of probability follows from three axioms.</p>
 <ul>
 <li><strong>Non-negativity:</strong> $P(A) \ge 0$ for every event $A$. Probabilities cannot be negative.</li>
 <li><strong>Normalization:</strong> $P(\Omega) = 1$. Something in the sample space happens.</li>
 <li><strong>Additivity:</strong> If $A$ and $B$ are mutually exclusive, $P(A \cup B) = P(A) + P(B)$.</li>
 </ul>
 
+<p>Most events in ecology overlap, so the rule you will actually use for "or" is the <strong>general addition rule</strong>, which holds for any two events:</p>
+<div class="eq-block">$P(A \cup B) = P(A) + P(B) - P(A \cap B)$</div>
+<p>It is not a fourth axiom, because it follows from the three above. Adding $P(A)$ and $P(B)$ counts the outcomes where both events happen twice, once inside each, so you subtract that overlap once. When the events are mutually exclusive the overlap is empty, $P(A \cap B) = 0$, and the rule reduces to the additivity axiom.</p>
+<p>With the camera, suppose $P(\text{deer}) = 0.30$, $P(\text{elk}) = 0.20$, and $P(\text{deer and elk}) = 0.05$. Then $P(\text{deer or elk}) = 0.30 + 0.20 - 0.05 = 0.45$. Adding without the subtraction gives $0.50$, which counts every night with both animals twice.</p>
+<p>One more consequence of the axioms does a great deal of work: the <strong>complement rule</strong>, $P(A^c) = 1 - P(A)$. It is usually the fastest route to "at least one" questions, because "at least one detection" is the complement of "no detections."</p>
+<p>The pattern to carry forward: an <strong>or</strong> question is a union and uses the addition rule; an <strong>and</strong> question is an intersection and uses the multiplication rule in the next section.</p>
+
 <h3>2. Conditional probability and independence</h3>
 <div class="eq-block">$P(A \mid B) = \dfrac{P(A \cap B)}{P(B)}, \qquad P(A \cap B) = P(A \mid B)\, P(B)$</div>
-<p>Events are <strong>independent</strong> when $P(A \mid B) = P(A)$, which means that knowing $B$ tells you nothing about $A$. Almost nothing in ecology is fully independent; recognizing that drives the whole rest of the course (mixed models, autocorrelation, beta-binomial...).</p>
+<p>The second form is the <strong>multiplication rule</strong>, the "and" counterpart of the addition rule. Events are <strong>independent</strong> when $P(A \mid B) = P(A)$, which means that knowing $B$ tells you nothing about $A$. For independent events the multiplication rule simplifies to $P(A \cap B) = P(A)\,P(B)$. Almost nothing in ecology is fully independent; recognizing that drives the whole rest of the course (mixed models, autocorrelation, beta-binomial...).</p>
 
 <h3>3. Bayes' rule (preview of Day 4–5)</h3>
 <div class="eq-block">$P(A \mid B) = \dfrac{P(B \mid A)\, P(A)}{P(B)}$</div>

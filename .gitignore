@@ -38,3 +38,8 @@ Rplots.pdf
 
 # JAGS model file written at runtime by Jags_logistic_rK_Lab1.R (sink -> jags.model)
 LogisticJAGS.R
+
+# Instructor-only vetting reports, session handoffs, and model-run logs. They
+# discuss answer-key defects, so like PREPUB_* they must never be published.
+reports/
+logs/

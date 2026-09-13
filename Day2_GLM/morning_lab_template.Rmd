@@ -87,14 +87,15 @@ library(emmeans)
 
 ---
 
-# Problem 3 · Line-transect detection as an exponential process
+# Problem 3 · Line-transect detection of spider monkeys
 
-> The detection function $g(x)$ is the probability an animal at perpendicular
-> distance $x$ is seen; it is a curve, not a probability distribution. Each
-> animal has a detection range $X \sim \mathrm{Exponential}(\lambda)$ with
-> $\lambda = 0.02$/m, and $g(x) = P(X \ge x)$. (a) Define the survival function,
+> Spider monkey subgroups on a line transect. The detection function $g(x)$ is
+> the probability a subgroup at perpendicular distance $x$ is seen; it is a curve,
+> not a probability distribution. Each subgroup has a detection range
+> $X \sim \mathrm{Exponential}(\lambda)$ with $\lambda = 0.02$/m, and
+> $g(x) = P(X \ge x)$. (a) Define the survival function,
 > write $S(x)$ for the Exponential, check $S(0) = 1$, and give $E[X]$.
-> (b) Probability of *missing* an animal at 50 m. (c) Half-distance
+> (b) Probability of *missing* a subgroup at 50 m. (c) Half-distance
 > $\ln 2/\lambda$. (d) Memorylessness in three steps: (i) compare
 > $P(X \ge 60 \mid X \ge 50)$ with $P(X \ge 10)$; (ii) show
 > $P(X \ge x + s \mid X \ge x) = e^{-\lambda s}$ and explain the constant hazard;

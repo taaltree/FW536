@@ -25,8 +25,8 @@
  </ul>
  <div class="section">Afternoon · linear models & GLMs</div>
  <ul>
- <li><a href="#p5">5. Interactions I: additive baseline</a></li>
- <li><a href="#p6">6. Interactions II: a slope that moves</a></li>
+ <li><a href="#p5">5. Simulating no interaction</a></li>
+ <li><a href="#p6">6. Simulating an interaction</a></li>
  <li><a href="#p7">7. Interactions III: link vs response scale</a></li>
  <li><a href="#p8">8. Poisson log-link interpretation</a></li>
  <li><a href="#p9">9. Interaction &amp; crossover</a></li>
@@ -75,9 +75,9 @@
 <div class="exercise" id="p1">
 <span class="ex-tag">Problem 1</span><span class="difficulty easy"> · continuous distribution choice</span>
 <h3>Which distribution for a right-skewed body-size sample?</h3>
-<p>You record body weight (g) for every fish kept in a 30-day creel survey on a coastal river. Most fish are sub-legal-size cutthroat (small), with a long right tail of large hatchery steelhead retained in the same fishery. The empirical distribution is strictly positive and strongly right-skewed. (The same reasoning applies to tree DBH, seed mass, or any size variable built up by multiplicative growth.)</p>
+<p>You record body weight (g) for every rainbow trout kept in a 30-day creel survey on a mountain lake. A histogram of the weights has almost no fish near zero. It rises to a single peak at roughly 80 g and then trails off in a long right tail of a few much larger fish approaching a kilogram. The distribution is strictly positive and strongly right-skewed, but its most common value sits well above zero. (The same reasoning applies to tree DBH, seed mass, or any size variable built up by multiplicative growth.)</p>
 <ol type="a">
-<li>Which of {Normal, Lognormal, Gamma, Exponential, Beta} would you choose, and what is the <em>data-generating story</em> that justifies it in one sentence?</li>
+<li>Which of {Normal, Lognormal, Gamma, Exponential, Beta} would you choose, and what is the <em>data-generating story</em> that justifies it in one sentence? Which candidate does the peak above zero rule out, and why?</li>
 <li>If $\log(\text{weight}) \sim \mathcal{N}(5.0,\,0.8^2)$, what is the expected weight on the raw scale? (Recall the lognormal mean is $e^{\mu + \sigma^2/2}$.)</li>
 <li>What is the median weight? Why does it differ from the mean, and which is larger?</li>
 <li>If you mistakenly fit a Normal to these weights and reported a 95% prediction interval centered at the mean, why would the lower endpoint be biological nonsense?</li>
@@ -98,30 +98,44 @@
 <li>Describe what Analyst A's residuals-vs-fitted plot would look like, and name the assumption it violates.</li>
 <li>Analyst B finds $\hat\beta_1 = 3.05$. Connect this slope to the standard allometric equation $W = a L^b$ and interpret $b$ biologically. Why is $b = 3$ (the "cube law") the natural null?</li>
 <li>What multiplicative effect on weight corresponds to a 25% increase in length? To a doubling of length?</li>
-<li>Analyst B back-transforms $\hat\beta_0 + \hat\beta_1 \log(L)$ by exponentiating to predict weight at a given length. What does that back-transformed value give you, the mean or the median weight, and what correction turns it into the other one?</li>
+<li>Analyst B back-transforms $\hat\beta_0 + \hat\beta_1 \log(L)$ by exponentiating to predict weight at a given length. Read the note below first. Does that back-transformed value estimate the mean or the median weight at that length? Analyst B's residual standard deviation on the log scale is $\hat\sigma = 0.12$. By what percentage does the mean weight exceed the plain back-transformed value? Compare that with the trout in Problem 1, where $\sigma = 0.8$, and say what makes the correction matter so much more there.</li>
 </ol>
-<div class="callout try"><strong>Your answer goes in the R Markdown hand-in.</strong> Give the allometric interpretation of $b = 3.05$, both multiplicative effects, and one sentence on the mean-vs-median back-transform correction.</div>
+<div class="callout key"><p><strong>Why a back-transformed log model needs a correction.</strong> A regression on $\log(W)$ predicts the <em>average of the log weights</em> at a given length. Exponentiating that average does not give the average weight, because exponentiating stretches large values far more than it lifts small ones. Two fish whose log weights sit equally far either side of 5, at 4.2 and 5.8, show why. Exponentiating the middle value gives $e^{5} = 148$ g. The fish themselves weigh $e^{4.2} = 67$ g and $e^{5.8} = 330$ g, and their average is 198 g. The heavy fish pulls the average up by more than the light fish pulls it down, so exponentiating the average log gives something smaller than the average weight. What it does give is the <strong>median</strong> weight, because exponentiating never changes which value is in the middle.</p>
+<p>When the scatter around the line on the log scale is Normal with standard deviation $\sigma$, the average weight is</p>
+$$\text{mean} = \exp\!\left(\hat\mu + \tfrac{\sigma^2}{2}\right) = e^{\hat\mu} \times e^{\sigma^2/2}, \qquad \hat\mu = \hat\beta_0 + \hat\beta_1 \log(L).$$
+<p>The factor $e^{\sigma^2/2}$ is the <strong>half-variance correction</strong>. It is always above 1, and it grows with the scatter on the log scale: the more individual fish spread around the line, the further the heavy ones drag the average above the median. It is the same $e^{\mu + \sigma^2/2}$ you used in Problem 1(b).</p></div>
+<div class="callout try"><strong>Your answer goes in the R Markdown hand-in.</strong> Give the allometric interpretation of $b = 3.05$, both multiplicative effects, which of mean and median the back-transform estimates, and the size of the correction for $\hat\sigma = 0.12$ and for $\sigma = 0.8$.</div>
 </div>
 
 <!-- =========================== PROBLEM 3 =========================== -->
 <div class="exercise" id="p3">
 <span class="ex-tag">Problem 3</span><span class="difficulty medium"> · Exponential, survival function</span>
 <h3>Line-transect detection as an exponential process</h3>
-<p>On a line transect the probability of detecting an animal declines with perpendicular distance $x$. Model detection with an exponential detection function at rate $\lambda = 0.02$ per meter. Give each animal a latent <em>detection range</em> $X \sim \text{Exponential}(\lambda)$, the farthest perpendicular distance at which the observer would still have picked it up, so an animal at distance $x$ is seen exactly when $X \ge x$, and the detection function $g(x)$ is the survival function of $X$.</p>
+<p>On a line transect an observer walks a straight line and records the animals seen on either side. Animals close to the line are almost always seen, and animals far from it are often missed. The <strong>detection function</strong> $g(x)$ describes that decline: $g(x)$ is the probability that an animal sitting at perpendicular distance $x$ from the line is detected. It is highest on the line and falls toward zero as $x$ grows.</p>
+<p>Be clear about what $g(x)$ is <em>not</em>. It is not a probability distribution over distances. Each value $g(x)$ is a separate probability, seen or missed, for an animal at that one distance, so the curve has no reason to integrate to 1 across all distances. A model for $g(x)$ only has to supply a sensible <em>shape</em> for the decline, and this problem borrows that shape from the Exponential distribution.</p>
+<p>Here is how the borrowing works. Give every animal its own <strong>detection range</strong> $X$, the farthest perpendicular distance at which the observer would still pick that particular animal up. A deer standing in open grass has a long detection range; a grouse frozen in brush has a short one. Detection ranges vary from animal to animal, so $X$ is a random variable, and we model how it varies with $X \sim \text{Exponential}(\lambda)$, where $\lambda = 0.02$ per meter. An animal at distance $x$ is seen exactly when its detection range reaches that far, $X \ge x$, so</p>
+$$g(x) = P(X \ge x).$$
+<p>So $X$ has a genuine probability distribution, and $g(x)$ is a curve read off that distribution. The Exponential is chosen because it is the simplest distribution with this job, one parameter and nothing else; part (d) asks what that simplicity assumes.</p>
 <ol type="a">
-<li>Write the survival function $S(x) = P(X \ge x)$ for an Exponential$(\lambda)$ and state its mean.</li>
+<li>A <strong>survival function</strong> gives the probability that a random quantity is at least a given value, $S(x) = P(X \ge x) = 1 - F(x)$, where $F$ is the cumulative distribution function. The name comes from its most familiar use in biology: if $X$ is age at death, $S(t)$ is the probability an individual is still alive at age $t$, the curve plotted from a life table or a Kaplan&ndash;Meier analysis. Nest survival, time to seed germination, and time until a tagged fish leaves a reach use the same idea. Here distance plays the role of age, and $g(x) = S(x)$ is the probability that an animal's detection range "survives" out to distance $x$. Write $S(x)$ for $X \sim \text{Exponential}(\lambda)$, check that $S(0) = 1$ and say what that means for an animal on the line, and state the mean detection range $E[X]$.</li>
 <li>Compute the probability of <em>missing</em> an animal that is 50 m off the transect line. (Careful: $S(50)$ is the probability the animal <em>is seen</em>.)</li>
 <li>At what perpendicular distance does the detection process reach its "half-life" (the distance at which $S(x) = 0.5$)? Show that this equals $\ln 2 / \lambda$.</li>
-<li>The Exponential is memoryless. Explain what memorylessness implies about the detection hazard as perpendicular distance increases, and what that assumption commits you to biologically for an animal sitting almost on the trackline.</li>
+<li>The Exponential is <strong>memoryless</strong>. The idea is easiest to see with numbers first, then in general.
+  <ol type="i">
+  <li>Compute $P(X \ge 60 \mid X \ge 50)$, the probability that an animal still detectable at 50 m is also detectable at 60 m. Use $P(A \mid B) = P(A \cap B)/P(B)$, and notice that $X \ge 60$ already guarantees $X \ge 50$. Then compute $P(X \ge 10)$, the probability that an animal is detectable 10 m out. Compare the two numbers.</li>
+  <li>Show that the match is no coincidence. Using $S(x) = e^{-\lambda x}$, show that $P(X \ge x + s \mid X \ge x) = e^{-\lambda s}$ for any starting distance $x$ and any extra distance $s$. In words, an animal that is still detectable at distance $x$ has the same chance of staying detectable over the next $s$ meters as an animal starting on the line: the distribution has no memory of the distance already covered. Ecologists put this in terms of the <em>hazard</em>, the rate at which detectability is lost per meter among the animals still detectable at that distance. Explain why memorylessness means the hazard is the same constant, $\lambda$, at every distance.</li>
+  <li>Now apply it at the trackline. Compute $g(2)$ and $g(10)$. What fraction of animals only 2 m from the line does this model say the observer misses? Real observers see nearly every animal within the first few meters, so real detection functions stay flat near 1 for a while before they fall, a feature called a <em>shoulder</em>. In one or two sentences, explain why a memoryless model cannot have a shoulder, and what that assumption commits you to biologically.</li>
+  </ol>
+</li>
 </ol>
-<div class="callout try"><strong>Your answer goes in the R Markdown hand-in.</strong> Show $S(x)$, the miss probability at 50 m, the half-distance, and one or two sentences on memorylessness.</div>
+<div class="callout try"><strong>Your answer goes in the R Markdown hand-in.</strong> Show $S(x)$ with its check at zero and the mean detection range, the miss probability at 50 m, the half-distance, and all three steps of (d).</div>
 </div>
 
 <!-- =========================== PROBLEM 4 =========================== -->
 <div class="exercise" id="p4">
 <span class="ex-tag">Problem 4</span><span class="difficulty hard"> · overdispersion, Poisson vs NB · loads real data</span>
 <h3>Are the sockeye counts Poisson? Diagnose overdispersion</h3>
-<p>Load the adult sockeye counts and look at them <em>before</em> fitting any predictors. This problem is about the marginal count distribution.</p>
+<p>Load the adult sockeye counts and look at them <em>before</em> fitting any predictors. Parts (a)&ndash;(d) are about the <em>marginal</em> count distribution: every day&rsquo;s count pooled together, with nothing in the model to explain why one day differs from another. Part (e) asks what changes once a predictor enters the picture.</p>
 <pre><code>d &lt;- read.csv("data/sockeye_adult.csv", stringsAsFactors = FALSE)
 d &lt;- subset(d, Sockeyetype == "Sockeye_Adults")
 d &lt;- d[!is.na(d$Count), ]
@@ -131,8 +145,18 @@ mean(d$Count); var(d$Count)</code></pre>
 <li>Solve for the negative-binomial size parameter $k$ that reproduces the empirical variance under $\text{Var} = \mu + \mu^2/k$. (Use the empirical mean for $\mu$.)</li>
 <li>Simulate 5000 draws from both <code>rpois(mu)</code> and <code>rnbinom(mu, size = k)</code> with your $\mu$ and $k$. Compare $P(\text{count} = 0)$ and the probability of a large "bumper run" (e.g. count &gt; 400) between the two.</li>
 <li>Name a biological mechanism that would generate this overdispersion in daily salmon counts, and say in one sentence what would go wrong if you reported Poisson-based confidence intervals for the mean daily count.</li>
+<li><strong>Overdispersed counts do not always mean a Poisson regression is wrong.</strong> A salmon run builds, peaks, and fades over the season, so different days have very different expected counts. Simulate a season in which every day&rsquo;s count is <em>exactly</em> Poisson given that day&rsquo;s expected count, with the expected count following a run-timing curve that peaks at about 400 fish:
+<pre><code>set.seed(2026)
+day &lt;- 1:90
+mu  &lt;- exp(6 - ((day - 45) / 20)^2)   # expected count on each day
+y   &lt;- rpois(90, mu)                  # each day's count is exactly Poisson
+var(y) / mean(y)                      # dispersion ratio of the pooled counts
+
+m &lt;- glm(y ~ day + I(day^2), family = poisson)
+sum(residuals(m, type = "pearson")^2) / df.residual(m)   # dispersion after accounting for day</code></pre>
+Report both dispersion numbers. The first compares the variance of the pooled counts with their mean, exactly as in (a). The second makes the same comparison <em>after</em> the model has accounted for day, using how far each count falls from its own day&rsquo;s fitted mean; a value near 1 means the counts scatter around their fitted means just as much as a Poisson says they should, and no more. Why do the pooled counts look heavily overdispersed when every single count is Poisson? (Hint: where does the variation in <code>y</code> come from when different days have different expected counts?) What does this mean for the conclusion you drew about the sockeye counts in (a)?</li>
 </ol>
-<div class="callout try"><strong>Your answer goes in the R Markdown hand-in.</strong> Report the dispersion ratio, your $k$, the two simulated tail probabilities, and the one-sentence biological + inferential consequence.</div>
+<div class="callout try"><strong>Your answer goes in the R Markdown hand-in.</strong> Report the dispersion ratio, your $k$, the two simulated tail probabilities, the one-sentence biological + inferential consequence, and the two dispersion numbers from (e) with your explanation.</div>
 </div>
 
 <!-- ============================================================ -->
@@ -144,7 +168,7 @@ mean(d$Count); var(d$Count)</code></pre>
 <!-- =========================== PROBLEM 5 =========================== -->
 <div class="exercise" id="p5">
 <span class="ex-tag">Problem 5</span><span class="difficulty easy"> · interactions I, the additive baseline</span>
-<h3>What &ldquo;no interaction&rdquo; actually buys you</h3>
+<h3>Simulating no interaction</h3>
 <p>Problems 5&ndash;7 build one idea in three steps: <em>an interaction means the effect of one predictor depends on the value of another</em>. Everything you need is generated in the code block, so no data file is required. Work them in order.</p>
 <div class="callout key"><strong>The idea, stated once.</strong> For a two-predictor model, ask what happens to the fitted response when you nudge $x_1$ up by one unit. If the answer is the same number no matter where $x_2$ sits, the predictors act independently and the model is <em>additive</em>. If the answer changes with $x_2$, they interact. That question, find the slope in $x_1$ and look for $x_2$ in the result, is the whole of what follows. You can get that slope by differentiating, or by factoring $x_1$ out of the fitted mean and reading off whatever multiplies it; Problem 6 shows both.</div>
 <p>Start with data built with <em>no</em> interaction, and deliberately fit a model that allows one anyway:</p>
@@ -159,7 +183,7 @@ summary(m5)</code></pre>
 <li>Write the full statistical model in mathematical notation, giving the distribution of $y_i$, its mean as a function of $x_{1i}$ and $x_{2i}$, and what each parameter is.</li>
 <li>Differentiate the fitted mean with respect to $x_1$, and show your working. Why that is the right thing to differentiate is that the derivative <em>is</em> the change in $\hat y$ produced by a one-unit step in $x_1$, which is what anyone means by &ldquo;the effect of $x_1$.&rdquo; So asking whether $x_2$ turns up in it is asking whether that effect depends on where $x_2$ sits. Does $x_2$ appear anywhere in the result?</li>
 <li>Using your fitted coefficients, compute the slope of $y$ on $x_1$ at $x_2 = -1$ and again at $x_2 = +1$. Report both. Why are they not <em>exactly</em> equal, given that the data were built with no interaction?</li>
-<li>If you plotted the fitted surface over the $(x_1, x_2)$ plane, what shape would it be? Name it in one word, and say what the contour lines of equal $\hat y$ would look like.</li>
+<li>Suppose the interaction coefficient were exactly zero, as it is in the equation that generated these data, so the fitted mean is $\hat y = \hat\beta_0 + \hat\beta_1 x_1 + \hat\beta_2 x_2$. If you plotted that surface over the $(x_1, x_2)$ plane, what shape would it be? Name it in one word, and say what the contour lines of equal $\hat y$ would look like.</li>
 </ol>
 <div class="callout try"><strong>Your answer goes in the R Markdown hand-in.</strong> Report the coefficient table, the model in mathematical notation, the derivative, the two slopes from (d), and the surface description.</div>
 </div>
@@ -167,7 +191,7 @@ summary(m5)</code></pre>
 <!-- =========================== PROBLEM 6 =========================== -->
 <div class="exercise" id="p6">
 <span class="ex-tag">Problem 6</span><span class="difficulty medium"> · interactions II, a slope that moves</span>
-<h3>When the effect of one predictor rides on another</h3>
+<h3>Simulating an interaction</h3>
 <p>Same design, same sample size, one change. The response is now built with a genuine product term.</p>
 <pre><code>set.seed(456)
 d6 &lt;- data.frame(x1 = runif(200, -2, 2), x2 = runif(200, -2, 2))
@@ -190,25 +214,25 @@ summary(m6)</code></pre>
 <div class="exercise" id="p7">
 <span class="ex-tag">Problem 7</span><span class="difficulty hard"> · interactions III, link scale vs response scale</span>
 <h3>The interaction you did not put in the model</h3>
-<p>Now the same structure with a binary response, which is where interactions stop being straightforward. Fit the model with the product term first:</p>
+<p>Now the same idea with a binary response, which is where interactions stop being straightforward. As in Problem 5, the data are built with <em>no</em> interaction, and you fit a model that allows one anyway:</p>
 <pre><code>set.seed(789)
 d7 &lt;- data.frame(x1 = runif(200, -2, 2), x2 = runif(200, -2, 2))
-eta &lt;- -1 + 1.2*d7$x1 - 0.8*d7$x2 + 1.5*d7$x1*d7$x2
+eta &lt;- -1 + 1.2*d7$x1 - 0.8*d7$x2      # note: no x1*x2 term
 d7$ybin &lt;- rbinom(200, 1, plogis(eta))
 
 m7 &lt;- glm(ybin ~ x1 * x2, data = d7, family = binomial)
 summary(m7)</code></pre>
 <ol type="a">
-<li>Report the four coefficients. Which scale are they on, probability, odds, or log-odds?</li>
+<li>Report the four coefficients against the values used to build the data ($-1$, $1.2$, $-0.8$, and no product term). Is the <code>x1:x2</code> term distinguishable from zero? Which scale are the coefficients on, probability, odds, or log-odds?</li>
 <li>Write the full model in mathematical notation, including the link function.</li>
-<li>On the log-odds scale, the slope in $x_1$ is the same kind of formula you found in Problem 6(c). Write it down and evaluate it at $x_2 = -1$ and $x_2 = +1$.</li>
+<li>On the log-odds scale, the slope in $x_1$ is the same kind of formula you found in Problem 6(c). Write it down and evaluate it at $x_2 = -1$ and $x_2 = +1$. Are the two slopes close, and given how the data were built, should they be?</li>
 <li>Now refit the same data with <strong>no interaction term at all</strong>:
 <pre><code>m7add &lt;- glm(ybin ~ x1 + x2, data = d7, family = binomial)   # additive on the log-odds scale
 coef(m7add)</code></pre>
 This model is additive by construction. On the log-odds scale, the effect of $x_1$ is one number that does not involve $x_2$. On the <em>probability</em> scale it is not, and here is the formula you need, taken as given:
 $$\frac{\partial p}{\partial x_1} = p(1-p)\,(\beta_1 + \beta_3 x_2).$$
 The $p(1-p)$ factor is the logistic curve's own steepness, biggest at $p = 0.5$ and shrinking toward zero at either end, so the same step on the log-odds scale moves the probability by different amounts depending on where you started. Using that formula with $\beta_3 = 0$, compute $\partial p/\partial x_1$ at $x_1 = 0$ for $x_2 = -1$ and for $x_2 = +1$. Report both, and their ratio.</li>
-<li>You just found that the effect of $x_1$ on the probability depends on $x_2$ in a model containing no interaction term. Explain in three or four sentences why this happens, and what it implies for a reader who wants to know whether two predictors &ldquo;interact&rdquo; in a GLM. Your answer should distinguish clearly between the two scales.</li>
+<li>You just found that the effect of $x_1$ on the probability depends on $x_2$, for data built with no interaction and a model containing no interaction term. Explain in three or four sentences why this happens, and what it implies for a reader who wants to know whether two predictors &ldquo;interact&rdquo; in a GLM. Your answer should distinguish clearly between the two scales.</li>
 </ol>
 <div class="callout warn"><strong>Watch out.</strong> Part (e) is the point of the whole sequence, and it is easy to state too strongly in either direction. A nonlinear link does not create an interaction in the model. The log-odds really are additive in <code>m7add</code>. What it does is make additivity on one scale disagree with additivity on the other, so &ldquo;do these predictors interact?&rdquo; is only a well-posed question once you say which scale you mean.</div>
 <div class="callout try"><strong>Your answer goes in the R Markdown hand-in.</strong> Report both coefficient tables, the log-odds slopes from (c), the two marginal effects and their ratio from (d), and your explanation in (e).</div>

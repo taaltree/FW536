@@ -49,8 +49,9 @@ library(emmeans)
 
 # Problem 1 · Which distribution for a right-skewed body-size sample?
 
-> Body weight (g) from a creel survey: strictly positive, strongly
-> right-skewed. Choose a distribution and justify; compute the lognormal
+> Rainbow trout body weight (g) from a creel survey: strictly positive,
+> strongly right-skewed, with a single peak well above zero. Choose a
+> distribution, justify it, and say which candidate the peak rules out; compute the lognormal
 > mean and median for $\log(\text{weight}) \sim \mathcal{N}(5.0, 0.8^2)$;
 > explain why a Normal prediction interval would dip below zero.
 
@@ -71,7 +72,9 @@ library(emmeans)
 > `lm(log(weight) ~ log(length))`; interpret the log–log slope
 > $\hat\beta_1 = 3.05$ as the allometric exponent $b$ in $W = a L^b$;
 > give the multiplicative weight effects of a 25% and a doubling length
-> change; explain the mean-vs-median back-transform.
+> change; use the note in the problem set to say whether the back-transform
+> estimates the mean or the median, and size the half-variance correction for
+> $\hat\sigma = 0.12$ against Problem 1's $\sigma = 0.8$.
 
 **My work:**
 
@@ -86,13 +89,16 @@ library(emmeans)
 
 # Problem 3 · Line-transect detection as an exponential process
 
-> Exponential detection function with rate $\lambda = 0.02$/m, where the
-> latent detection range is $X \sim \mathrm{Exponential}(\lambda)$ and an
-> animal at distance $x$ is seen when $X \ge x$. Write the survival function
-> $S(x) = e^{-\lambda x}$ and its mean; compute the probability of *missing*
-> an animal at 50 m (remember $S(50)$ is the probability it is *seen*); find
-> the half-distance $\ln 2/\lambda$; explain what memorylessness implies
-> about the detection hazard with distance.
+> The detection function $g(x)$ is the probability an animal at perpendicular
+> distance $x$ is seen; it is a curve, not a probability distribution. Each
+> animal has a detection range $X \sim \mathrm{Exponential}(\lambda)$ with
+> $\lambda = 0.02$/m, and $g(x) = P(X \ge x)$. (a) Define the survival function,
+> write $S(x)$ for the Exponential, check $S(0) = 1$, and give $E[X]$.
+> (b) Probability of *missing* an animal at 50 m. (c) Half-distance
+> $\ln 2/\lambda$. (d) Memorylessness in three steps: (i) compare
+> $P(X \ge 60 \mid X \ge 50)$ with $P(X \ge 10)$; (ii) show
+> $P(X \ge x + s \mid X \ge x) = e^{-\lambda s}$ and explain the constant hazard;
+> (iii) compute $g(2)$ and $g(10)$ and explain why a memoryless model has no shoulder.
 
 **My work:**
 
@@ -111,7 +117,10 @@ library(emmeans)
 > mean, variance, and dispersion ratio of `Count`; solve for the NB size $k$
 > under $\mathrm{Var} = \mu + \mu^2/k$; simulate Poisson vs NB and compare
 > $P(\text{count}=0)$ and $P(\text{count}>400)$; name a mechanism and the
-> inferential consequence of using Poisson CIs.
+> inferential consequence of using Poisson CIs. (e) Simulate Poisson counts
+> around a run-timing curve (the block in the problem set), then compare the
+> pooled dispersion ratio with the Pearson dispersion of a Poisson GLM on day,
+> and explain why they differ.
 
 **My work:**
 
@@ -122,6 +131,8 @@ sock <- subset(sock, Sockeyetype == "Sockeye_Adults")
 sock <- sock[!is.na(sock$Count), ]
 
 # mean, variance, dispersion ratio, and NB size k go here
+
+# (e) paste the run-timing simulation from the problem set here
 ```
 
 **Answer / biological interpretation:**

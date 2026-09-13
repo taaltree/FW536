@@ -128,12 +128,11 @@
 </div>
 
 <div class="exercise" id="p5">
-<span class="ex-tag">Problem 5</span><span class="difficulty medium"> · total probability + Bayes</span>
+<span class="ex-tag">Problem 5</span><span class="difficulty medium"> · total probability</span>
 <h3>Grizzly bear DNA from hair snares</h3>
 <p>A hair-snare grid has 40 stations. At a station where a bear is actually present, the probability of collecting at least one usable hair sample in one visit is $p = 0.18$; where no bear is present, no usable sample is collected. Bears are present at $60\%$ of stations.</p>
 <ol type="a">
 <li>For a randomly chosen station, what is the probability of collecting at least one usable sample in one visit? (Condition on presence. This is the law of total probability.)</li>
-<li>Given that a station <em>did</em> yield at least one sample, what is the probability a bear was present there? Explain why the answer takes the value it does.</li>
 <li>If you visit every station three times (visits independent given presence), what is the per-station probability of at least one sample across the three visits, both conditional on presence and marginally over presence?</li>
 </ol>
 <div class="callout bio">Detection is conditional on presence, and presence is uncertain. Nearly every occupancy and capture&ndash;recapture model in the course is built on exactly this two-layer structure, a process that decides presence and a detection process laid on top of it.</div>
@@ -244,7 +243,7 @@ v   &lt;- <span class="fn">var</span>(coyote$scats)
 <li>Solve for the smallest $n$ that delivers $95\%$ detection probability, algebraically using logs, and confirm in R.</li>
 <li>Repeat for a prevalence of $0.02$. Comment on how required sample size scales as the disease becomes rarer.</li>
 </ol>
-<div class="callout bio">"Freedom from disease" and rare-species-detection sample-size calculations are exactly this computation. The same $1 - (1-p)^n \ge 0.95$ logic sizes the effort needed to be confident you would have caught something if it were there.</div>
+<div class="callout bio">"Freedom from disease" and rare-species-detection sample-size calculations are exactly this computation. The same logic sizes the effort needed to be confident you would have caught something if it were there.</div>
 <div class="callout try"><strong>Your answer goes in the R Markdown hand-in.</strong> Show the inequality, the closed-form $n$, and the R confirmation in <code>afternoon_lab_template.Rmd</code> under Problem 12.</div>
 </div>
 

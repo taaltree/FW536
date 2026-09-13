@@ -121,8 +121,8 @@ set.seed(1)
 # Problem 5 · Grizzly bear DNA from hair snares
 
 > Detection given a bear is present p = 0.18; bears present at 60% of stations; no
-> false positives. (a) P(at least one sample) at a random station. (b) P(present | at
-> least one). (c) P(at least one across 3 visits), conditional on presence and marginally.
+> false positives. (a) P(at least one sample) at a random station. (b) P(at least one
+> sample across 3 visits), conditional on presence and marginally.
 
 **My work:**
 

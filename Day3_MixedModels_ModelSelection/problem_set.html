@@ -150,7 +150,7 @@ $$\text{SE} = \sqrt{\dfrac{\tau^2}{g} + \dfrac{\sigma^2}{g\,n}}.$$
 <li>In each case, which allocation is better, and by what percentage does it shrink the SE? Explain the result using the two terms under the square root: which one gets smaller when the 60 measurements are spread over more groups, which one stays the same, and how the ICC decides how much there is to gain.</li>
 </ol>
 </li>
-<li>Fit a random-slope model <code>lmer(Weight ~ Length + (1 + Length | Subject))</code> and compare it to <code>m1b</code> with <code>anova(m1b, m_slope, refit = FALSE)</code>. Is the random slope supported? Explain why <code>refit = FALSE</code> is correct here.</li>
+<li>Fit a random-slope model <code>lmer(Weight ~ Length + (1 + Length | Subject))</code> and compare it to <code>m1b</code> with <code>anova(m1b, m_slope, refit = FALSE)</code>. Is the random slope supported? Explain why <code>refit = FALSE</code> is correct here given that refitting would use ML.</li>
 </ol>
 <div class="callout try" style="margin-top: 12px;"><strong>Your answer goes in the R Markdown hand-in.</strong> Report the ICC and interpretation for the nestling output, the ICC and both design calculations in (b), and the random-slope verdict with your reasoning about <code>refit</code>.</div>
 </div>

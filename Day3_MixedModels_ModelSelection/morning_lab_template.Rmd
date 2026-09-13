@@ -107,7 +107,7 @@ n_i     <- as.numeric(table(Streams$Stream))              # visits per stream
 > length–weight estimates and then with Problem 1's true $\tau = 12$ and
 > $\sigma = 20$. Say which allocation is better in each case, by how much, and
 > why. (c) Fit the random-slope model and compare it to
-> `m1b` with `anova(m1b, m_slope, refit = FALSE)`; explain why `refit = FALSE`.
+> `m1b` with `anova(m1b, m_slope, refit = FALSE)`; explain why `refit = FALSE` is correct given that refitting would use ML.
 
 **My work:**
 

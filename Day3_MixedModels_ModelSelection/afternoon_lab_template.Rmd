@@ -151,21 +151,19 @@ data.frame(cv_MSE = round(cv, 4), AICc = round(aicc, 1))
 
 ---
 
-# Problem 10 · Model averaging, evidence ratios, and asking the right question
+# Problem 10 · Model averaging and asking the right question
 
 > From the four-model AICc table: (a) write the Akaike-weight formula, confirm
 > the weights, and list the models "competitive" by the 2-unit rule. (b)
 > Explain why averaging coefficients can mislead but averaging predictions is
-> usually safer. (c) Compute the summed weight of models with temperature vs
-> without and interpret it as an evidence ratio. (d) Interpret
-> $\hat\beta_T = 0.03$ (SE 0.02) and name the single extra number you would
-> report.
+> usually safer. (c) Interpret $\hat\beta_T = 0.03$ (SE 0.02) and name the
+> single extra number you would report.
 
 **My work:**
 
 ```{r}
 delta <- c(M3 = 0, M1 = 0.6, M2 = 1.9, M0 = 4.7)
-# Your weights and evidence ratio here
+# Your weights here
 ```
 
 **Answer / biological interpretation:**

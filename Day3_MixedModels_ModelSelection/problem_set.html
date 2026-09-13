@@ -398,7 +398,7 @@ aicc &lt;- <span class="fn">sapply</span>(forms, <span class="kw">function</span
 
 <div class="exercise" id="p10">
 <span class="ex-tag">Problem 10</span><span class="difficulty hard"> · multimodel inference · the "right question" trap</span>
-<h3>Model averaging, evidence ratios, and asking the right question</h3>
+<h3>Model averaging and asking the right question</h3>
 <p>A size-at-age analysis is fit with four competing candidate models. M1 has a fixed temperature effect, M2 a fixed regional effect, M3 both, and M0 is intercept-only. The AICc table:</p>
 <pre><code>Model   K   AICc     deltaAICc   weight
 M3      5   1240.0   0.0         0.45
@@ -408,7 +408,6 @@ M0      3   1244.7   4.7         0.04</code></pre>
 <ol type="a">
 <li>Write the Akaike-weight formula. Confirm the weights in the table from the $\Delta$AICc column, and list which models are "competitive" by the $\Delta\text{AICc} &lt; 2$ rule.</li>
 <li>Why can model-averaging <em>coefficients</em> mislead when the candidate models contain different, correlated predictors? Why is model-averaging <em>predictions</em> usually safer?</li>
-<li>The biologist's actual question is "does temperature affect size-at-age?" Re-frame the table to answer <em>that</em> question directly. Compute the summed weight of models containing temperature vs those without, and interpret it as an evidence ratio rather than "which model wins."</li>
 <li>If the temperature coefficient in M3 is $\hat\beta_T = 0.03$ with SE 0.02, what does that say about the practical importance of temperature, regardless of which model "wins"? What single number would you also report so a reader can judge how much of the inference rides on one model?</li>
 </ol>
 <div class="callout try" style="margin-top: 12px;"><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>

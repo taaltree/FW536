@@ -173,7 +173,8 @@ and leave them blank if you do not.
 # Problem 10 · Occupancy thresholds and choosing a management lever (optional extra credit)
 
 > Logistic `present ~ basal_area + shrub_cover`: intercept $-3.0$, BA $+0.08$,
-> shrub $+0.04$. Threshold BA at 25% and 50% shrub; marginal effect at
+> shrub $+0.04$. Threshold BA, where $p = 0.5$ and so the log-odds equal 0, at
+> 25% and 50% shrub; marginal effect at
 > $p = 0.5$ (and divide-by-4 check); which of two interventions gives the
 > larger gain at $p = 0.3$.
 

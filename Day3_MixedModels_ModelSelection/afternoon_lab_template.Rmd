@@ -127,9 +127,8 @@ dredge(m, rank = "AIC"); dredge(m, rank = "AICc"); dredge(m, rank = "BIC")
 > Rank the six candidate fixed-effect models by AICc and by LOOCV MSE
 > (`cv.glm`). (a) Report the table; do the two criteria agree? (b) Compute
 > $\Delta$AICc and Akaike weights; is there a cluster within 2 units? (c)
-> Compare the best model's LOOCV MSE to `var(dat$Trophic_Pos)`. (d) Say which
-> criterion you would trust for pure prediction, and one way AICc could mislead
-> at this sample size.
+> Compare the best model's LOOCV MSE to `var(dat$Trophic_Pos)`. (d) If AICc and
+> LOOCV disagreed, which would you trust for a pure prediction task, and why?
 
 **My work:**
 

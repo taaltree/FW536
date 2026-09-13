@@ -20,6 +20,7 @@
  <ul>
  <li><a href="#p1">1. Which distribution? (lognormal)</a></li>
  <li><a href="#p2">2. Allometry as a power law</a></li>
+ <li><a href="#p3">3. Bat passes (Exponential &amp; Poisson)</a></li>
  <li><a href="#p4">4. Overdispersed counts (data)</a></li>
  </ul>
  <div class="section">Afternoon · linear models & GLMs</div>
@@ -68,7 +69,7 @@
 </section>
 
 <a id="morning"></a>
-<div class="practice-banner"><div class="label">Morning · 20 pts</div><h3>Continuous distributions</h3><p>Problems 1, 2 and 4. Write your work in <a class="hand-in" href="morning_lab_template.Rmd"><code>morning_lab_template.Rmd</code> &darr;</a></p></div>
+<div class="practice-banner"><div class="label">Morning · 20 pts</div><h3>Continuous distributions</h3><p>Problems 1&ndash;4. Write your work in <a class="hand-in" href="morning_lab_template.Rmd"><code>morning_lab_template.Rmd</code> &darr;</a></p></div>
 
 <!-- =========================== PROBLEM 1 =========================== -->
 <div class="exercise" id="p1">
@@ -104,6 +105,33 @@
 $$\text{mean} = \exp\!\left(\hat\mu + \tfrac{\sigma^2}{2}\right) = e^{\hat\mu} \times e^{\sigma^2/2}, \qquad \hat\mu = \hat\beta_0 + \hat\beta_1 \log(L).$$
 <p>The factor $e^{\sigma^2/2}$ is the <strong>half-variance correction</strong>. It is always above 1, and it grows with the scatter on the log scale: the more individual fish spread around the line, the further the heavy ones drag the average above the median. It is the same $e^{\mu + \sigma^2/2}$ you used in Problem 1(b).</p></div>
 <div class="callout try"><strong>Your answer goes in the R Markdown hand-in.</strong> Give the allometric interpretation of $b = 3.05$, both multiplicative effects, which of mean and median the back-transform estimates, and the size of the correction for $\hat\sigma = 0.12$ and for $\sigma = 0.8$.</div>
+</div>
+
+<!-- =========================== PROBLEM 3 =========================== -->
+<div class="exercise" id="p3">
+<span class="ex-tag">Problem 3</span><span class="difficulty medium"> · Exponential and Poisson, memorylessness</span>
+<h3>Bat passes at an acoustic detector</h3>
+<p>An ultrasonic detector on a forest edge logs every bat that flies past. Through a summer night, passes arrive at random at an average rate of $\lambda = 4$ per hour, each independent of the others. That one assumption describes the same process in two ways.</p>
+<ul>
+<li>The <strong>number of passes</strong> in a window of $t$ hours is Poisson with mean $\lambda t$.</li>
+<li>The <strong>waiting time</strong> $T$ until the next pass is Exponential with rate $\lambda$, with density $f(t) = \lambda e^{-\lambda t}$ and cumulative distribution function $F(t) = P(T \le t) = 1 - e^{-\lambda t}$ for $t \ge 0$.</li>
+</ul>
+<p>Work in hours, converting minutes as you go, so 30 minutes is $t = 0.5$.</p>
+<ol type="a">
+<li>What are the mean and the median waiting time between passes, in minutes? (The median is the $t$ at which $F(t) = 0.5$.) Which is larger, and what about the shape of the Exponential makes it so?</li>
+<li>Find the probability that 30 minutes go by with no bat at all, in two ways. First use the Poisson, as the probability of zero passes in half an hour. Then use the Exponential, as the probability that the wait for the next pass is longer than half an hour. Explain in one sentence why the two answers have to be identical.</li>
+<li>The detector has already been silent for 20 minutes. What is the probability that it stays silent for at least another 30 minutes, that is, $P(T > 50 \text{ min} \mid T > 20 \text{ min})$? Compare your answer with (b). This is <strong>memorylessness</strong>: under a constant rate, having already waited 20 minutes tells you nothing about how much longer you will wait. In one or two sentences, say what memorylessness requires of the bats, and give one biological reason real bat passes might not be memoryless.</li>
+<li>Check the connection by simulation. Generate waiting times, turn them into the clock time of each pass, and count the passes in each hour:
+<pre><code>set.seed(11)
+gaps   &lt;- rexp(5000, rate = 4)                       # waiting times between passes, in hours
+times  &lt;- cumsum(gaps)                               # clock time of each pass
+times  &lt;- times[times &lt; 1000]                        # keep the first 1000 hours
+counts &lt;- tabulate(floor(times) + 1, nbins = 1000)   # passes in each hour
+mean(counts); var(counts)</code></pre>
+Report the mean and variance of the hourly counts. Which distribution do those two numbers point to, and why?</li>
+</ol>
+<div class="callout bio">The same link sits behind camera-trap density estimation and the herring spawning example from lecture. Counts of events in a window and the waiting times between events are two views of one process, so a claim about one is a claim about the other. When the constant-rate assumption fails in real data, the counts stop looking Poisson, which is what Problem 4 diagnoses.</div>
+<div class="callout try"><strong>Your answer goes in the R Markdown hand-in.</strong> Report the mean and median waits, both versions of the 30-minute calculation with your one-sentence reason, the memorylessness comparison with your biological reason, and the simulated mean and variance.</div>
 </div>
 
 <!-- =========================== PROBLEM 4 =========================== -->

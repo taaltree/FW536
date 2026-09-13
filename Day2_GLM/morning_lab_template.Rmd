@@ -18,7 +18,7 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 
 # Day 2 morning lab · Continuous distributions problem set
 
-This template matches the **morning** section (Problems 1, 2 and 4) of
+This template matches the **morning** section (Problems 1–4) of
 [`problem_set.html`](problem_set.html). Read each problem statement there,
 write your work below, **Knit** to HTML, and upload the `.html` to the
 matching Canvas assignment.
@@ -80,6 +80,28 @@ library(emmeans)
 
 ```{r}
 # Your R code here
+```
+
+**Answer / biological interpretation:**
+
+
+---
+
+# Problem 3 · Bat passes at an acoustic detector
+
+> Bat passes arrive at random at $\lambda = 4$ per hour, so counts in $t$ hours
+> are Poisson($\lambda t$) and the waiting time $T$ to the next pass is
+> Exponential($\lambda$). Work in hours. (a) Mean and median wait in minutes,
+> and why they differ. (b) P(no pass in 30 min) from the Poisson and from the
+> Exponential, and why they must match. (c) $P(T > 50 \text{ min} \mid T > 20 \text{ min})$
+> compared with (b); say what memorylessness requires of the bats and give one
+> reason real passes might break it. (d) Simulate the gaps, count passes per
+> hour, and report the mean and variance.
+
+**My work:**
+
+```{r}
+# Your R code here, including the (d) simulation block from the problem set
 ```
 
 **Answer / biological interpretation:**

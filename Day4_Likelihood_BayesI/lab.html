@@ -701,6 +701,12 @@ posterior &lt;- <span class="fn">dbeta</span>(theta, <span class="nu">8</span>, 
 
 <p>The posterior just adds <em>successes</em> to $\alpha$ and <em>failures</em> to $\beta$.</p>
 
+<p>The mean of a $\text{Beta}(\alpha, \beta)$ distribution shows why that is the right way to read it:</p>
+<div class="eq-block">$\mathbb{E}[p] = \dfrac{\alpha}{\alpha + \beta}, \qquad \mathbb{E}[p \mid y] = \dfrac{\alpha + y}{\alpha + \beta + n}.$</div>
+<p>The prior mean has exactly the form of a success proportion, $\alpha$ successes out of $\alpha + \beta$ trials. The posterior mean is the same proportion after the real data are added: $y$ more successes on top, and $n$ more trials underneath. So the prior behaves as if you had already watched $\alpha + \beta$ trials and seen $\alpha$ successes. The posterior mean is also a weighted average of the prior mean and the observed proportion $y/n$,</p>
+<div class="eq-block">$\mathbb{E}[p \mid y] = \underbrace{\dfrac{\alpha+\beta}{\alpha+\beta+n}}_{\text{weight on prior}}\cdot\dfrac{\alpha}{\alpha+\beta} \;+\; \underbrace{\dfrac{n}{\alpha+\beta+n}}_{\text{weight on data}}\cdot\dfrac{y}{n},$</div>
+<p>so the more real trials you have compared with $\alpha + \beta$, the more the data dominate.</p>
+
 <div class="callout try"><strong>Play with it.</strong> The <a href="explore_conjugate.html">interactive conjugate prior/posterior explorer</a> lets you drag a Beta prior and binomial data (or a Gamma&ndash;Poisson rate, or a Normal&ndash;Normal mean) and watch the prior × likelihood → posterior update live.</div>
 
 <div class="callout key">
@@ -718,8 +724,13 @@ priors &lt;- <span class="kw">list</span>(
  informative = <span class="kw">c</span>(<span class="nu">30</span>, <span class="nu">10</span>) <span class="cm"># tight, centered at 0.75</span>
 )
 <span class="fn">par</span>(mfrow = <span class="kw">c</span>(<span class="nu">1</span>, <span class="nu">3</span>))
+<span class="cm"># names(priors) returns the list's labels, c("flat", "skeptical", "informative"),</span>
+<span class="cm"># so the loop runs once per prior with nm holding that prior's name.</span>
 <span class="kw">for</span> (nm <span class="kw">in</span> <span class="fn">names</span>(priors)) {
- ab &lt;- priors[[nm]]; post &lt;- <span class="kw">c</span>(ab[<span class="nu">1</span>] + y, ab[<span class="nu">2</span>] + n - y)
+ <span class="cm"># Double brackets pull out the element itself: priors[["flat"]] is the vector c(1, 1).</span>
+ <span class="cm"># Single brackets, priors["flat"], would instead return a one-item list still wrapping it.</span>
+ ab &lt;- priors[[nm]]                              <span class="cm"># ab[1] = alpha, ab[2] = beta</span>
+ post &lt;- <span class="kw">c</span>(ab[<span class="nu">1</span>] + y, ab[<span class="nu">2</span>] + n - y)          <span class="cm"># add successes to alpha, failures to beta</span>
  <span class="fn">plot</span>(theta, <span class="fn">dbeta</span>(theta, post[<span class="nu">1</span>], post[<span class="nu">2</span>]), type = <span class="st">"l"</span>, lwd = <span class="nu">2</span>,
  main = <span class="fn">paste</span>(nm, <span class="st">": Beta("</span>, post[<span class="nu">1</span>], <span class="st">", "</span>, post[<span class="nu">2</span>], <span class="st">")"</span>, sep = <span class="st">""</span>),
  xlab = expression(theta), ylab = <span class="st">"posterior density"</span>)
@@ -768,14 +779,16 @@ lam &lt;- <span class="fn">seq</span>(<span class="nu">0</span>, <span class="nu
 <li>Awkward likelihoods (mixtures, occupancy, capture-recapture, state-space).</li>
 </ul>
 
-<p>For these models the marginal $p(y) = \int p(y,\theta)\,d\theta$ is intractable. <strong>MCMC</strong> sidesteps the integral by generating dependent samples from the unnormalized posterior; the long-run frequency of those samples is the posterior itself. The two algorithms you will meet today and tomorrow:</p>
+<p>For these models the marginal $p(y) = \int p(y,\theta)\,d\theta$ is intractable. <strong>MCMC</strong> sidesteps the integral by generating dependent samples from the unnormalized posterior; the long-run frequency of those samples is the posterior itself. These are the samplers you will meet today and tomorrow:</p>
 
 <table>
-<tr><th>Algorithm</th><th>Idea</th><th>When you'd use it</th></tr>
-<tr><td>Metropolis(-Hastings)</td><td>Propose, accept/reject by a posterior ratio</td><td>Any density; pedagogical, slower for high-d</td></tr>
-<tr><td>Gibbs</td><td>Sample each parameter from its full conditional</td><td>Conjugate sub-blocks (default in JAGS)</td></tr>
-<tr><td>Adaptive block / slice / HMC</td><td>What Nimble &amp; Stan use by default</td><td>Production work</td></tr>
+<tr><th>Algorithm</th><th>Idea</th><th>When it is used</th></tr>
+<tr><td>Metropolis&ndash;Hastings</td><td>Propose a move, then accept or reject it using the ratio of posterior densities</td><td>Works for any posterior. Nimble&rsquo;s default for continuous parameters that have no conjugate update is an <em>adaptive random-walk</em> Metropolis&ndash;Hastings sampler, which tunes its own proposal size during the run.</td></tr>
+<tr><td>Gibbs</td><td>Draw each parameter directly from its distribution given all the others (its <em>full conditional</em>)</td><td>Only possible when that conditional has a closed form, which in practice means a conjugate prior&ndash;likelihood pair like the two above. Nimble detects these automatically and uses a conjugate sampler for them.</td></tr>
+<tr><td>Slice sampling</td><td>Sample uniformly from the region under the posterior density curve, stepping out until the region is covered</td><td>Nimble&rsquo;s default for discrete parameters without a small, fixed set of possible values, such as an unknown population size.</td></tr>
+<tr><td>Hamiltonian Monte Carlo</td><td>Use the slope of the log-posterior to make long, informed moves</td><td>The default in Stan. Available in Nimble through the separate <code>nimbleHMC</code> package, but not used unless you ask for it.</td></tr>
 </table>
+<p>So a single Nimble model can mix samplers: each parameter gets whichever one fits it. <code>configureMCMC(model, print = TRUE)</code> lists what Nimble chose.</p>
 </section>
 
 <!-- ============ METROPOLIS HOMEMADE ============== -->
@@ -817,12 +830,15 @@ accept &lt;- <span class="nu">0</span>; s &lt;- <span class="nu">0.35</span>    
 <p>That runs, and its posterior mean of <strong>0.686</strong> sits right on the closed-form Beta(11, 5) mean of 0.688. Note there is no <code>min(1, ...)</code> anywhere. If <code>alpha</code> exceeds 1 then <code>runif(1) &lt; alpha</code> is certain, so the comparison already <em>is</em> the minimum.</p>
 
 <div class="callout warn">
-<p><strong>Why every real sampler does this in logs.</strong> The toy above is safe because the aggregated Binomial pmf is a single moderate number; <code>dbinom(75000, 100000, 0.75)</code> is still 0.0029. But real likelihoods are <em>products over observations</em>, and those collapse fast. Take the same 75%-success data kept one row per bird:</p>
-<pre><code><span class="fn">prod</span>(<span class="fn">dbinom</span>(y, <span class="nu">1</span>, <span class="nu">0.75</span>))   <span class="cm"># n =  200  -&gt;  1.4e-49</span>
-                           <span class="cm"># n =  700  -&gt;  1.1e-171</span>
-                           <span class="cm"># n = 1400  -&gt;  0            underflowed</span></code></pre>
+<p><strong>Why every real sampler does this in logs.</strong> The toy above is safe because the aggregated Binomial pmf is a single moderate number; <code>dbinom(75000, 100000, 0.75)</code> is still 0.0029. But real likelihoods are <em>products over observations</em>, and those collapse fast. Suppose that instead of 12 spotted-owl nests you had monitored many more, with the same 75% of them fledging (9 of 12 is 75%). Record each nest as its own row, 1 if it fledged and 0 if it failed, so the likelihood is the product of one Bernoulli probability per nest:</p>
+<pre><code>n &lt;- <span class="nu">200</span>                                               <span class="cm"># then try 700 and 1400</span>
+y_nests &lt;- <span class="fn">rep</span>(<span class="kw">c</span>(<span class="nu">1</span>, <span class="nu">0</span>), times = <span class="kw">c</span>(<span class="nu">0.75</span> * n, <span class="nu">0.25</span> * n))   <span class="cm"># 1 = fledged, 0 = failed</span>
+<span class="fn">prod</span>(<span class="fn">dbinom</span>(y_nests, size = <span class="nu">1</span>, prob = <span class="nu">0.75</span>))
+<span class="cm"># n =  200  -&gt;  1.4e-49</span>
+<span class="cm"># n =  700  -&gt;  1.1e-171</span>
+<span class="cm"># n = 1400  -&gt;  0            underflowed</span></code></pre>
 <p>The smallest positive number R can hold is about $2.2 \times 10^{-308}$. Past that the product is not merely small, it is <em>exactly zero</em>, so the acceptance ratio becomes <code>0/0</code>, which is <code>NaN</code>, and the chain dies. Normal data underflows sooner still: 400 observations is enough, and Bonus walk-through 9 below fits 120 of them. So this is not a hypothetical.</p>
-<p>Logs fix it because they turn those doomed products into sums that stay ordinary-sized. The $n = 1400$ product above is just $-1687$ in logs. There are exactly three translations:</p>
+<p>Logs fix it because they turn those doomed products into sums that stay ordinary-sized. The $n = 1400$ product above is just $-787.3$ in logs. There are exactly three translations:</p>
 <ul>
 <li><strong>Multiplication becomes addition.</strong> $\log(\text{prior} \times \text{likelihood}) = \log\text{prior} + \log\text{likelihood}$, so <code>dbeta(...) * dbinom(...)</code> becomes <code>dbeta(..., log = TRUE) + dbinom(..., log = TRUE)</code>. Use each density's own <code>log = TRUE</code> rather than wrapping the product in <code>log()</code>: R then works in logs throughout and never forms the doomed number at all.</li>
 <li><strong>The ratio becomes a difference.</strong> $\log(a/b) = \log a - \log b$, so <code>post(prop) / post(cur)</code> becomes <code>log_post(prop) - log_post(cur)</code>. That quantity is now $\log\alpha$, not $\alpha$.</li>
@@ -906,15 +922,15 @@ N_grid &lt;- <span class="fn">seq</span>(<span class="nu">0</span>, <span class=
 })</code></pre>
 
 <div class="callout warn">
-<strong>What a monitor costs, and the one habit that saves you.</strong> The run below keeps $3 \times (25{,}000 - 5{,}000) = 60{,}000$ draws. Each monitored node is therefore a column of 60,000 doubles, about 0.46 MB. That is nothing for a scalar like <code>MSY</code>, which is why you should put scalar derived quantities straight into the model code and monitor them.
+<strong>What a monitor costs, and the one habit that saves you.</strong> The run below keeps $3 \times (25{,}000 - 5{,}000) = 60{,}000$ draws. Each monitored quantity is therefore stored as a column of 60,000 numbers. R keeps each number in 8 bytes, so a column is about 0.46 MB. That is nothing for a scalar like <code>MSY</code>, which is why you should put scalar derived quantities straight into the model code and monitor them.
 
-<p>It is <em>not</em> nothing for a vector. The obvious way to get the $dN/dt$ curve is to pass the grid in as constants (<code>N</code>, <code>nN</code>), add <code>for (j in 1:nN) { dNdt[j] &lt;- r * N[j] * (1 - N[j] / K) }</code> to the model, and monitor <code>dNdt</code>. With a 151-point grid, plus the 50 fitted <code>mu[i]</code>, that is 206 columns, a <strong>94.3 MB</strong> posterior object instead of a 2.3 MB one, slow to summarise and slow to save.</p>
+<p>It is <em>not</em> nothing for a vector. The obvious way to get the $dN/dt$ curve is to give the model the list of population sizes you want to plot, the 151 values in <code>N_grid</code> (1, 10, 20, &hellip;, 1500), as constants named <code>N</code> and <code>nN</code>, then add <code>for (j in 1:nN) { dNdt[j] &lt;- r * N[j] * (1 - N[j] / K) }</code> to the model, and monitor <code>dNdt</code>. With those 151 population sizes, plus the 50 fitted <code>mu[i]</code>, that is 206 columns, a <strong>94.3 MB</strong> posterior object instead of a 2.3 MB one, slow to summarise and slow to save.</p>
 
-<p>You do not have to choose between the curve and the memory. <code>dNdt[j]</code> and <code>mu[i]</code> are <em>deterministic</em> functions of $r$ and $K$, so evaluating them draw-by-draw in R on the saved $r$ and $K$ columns gives back the identical posterior, identical to floating-point, not approximately, at zero storage cost. <strong>Rule of thumb. Monitor scalars in the model; for a long prediction grid, save the parameters and rebuild the grid afterwards in R.</strong> <code>Logistic_BayesianGrowth_Nimble.R</code> does exactly this.</p>
+<p>You do not have to choose between the curve and the memory. <code>dNdt[j]</code> and <code>mu[i]</code> are <em>deterministic</em> functions of $r$ and $K$, so evaluating them draw-by-draw in R on the saved $r$ and $K$ columns gives back exactly the same numbers Nimble would have stored, not an approximation, at zero storage cost. <strong>Rule of thumb. Monitor scalars in the model; for a long sequence of predictions, save the parameters and compute the predictions afterwards in R.</strong> <code>Logistic_BayesianGrowth_Nimble.R</code> does exactly this.</p>
 </div>
 
 <div class="code-label">R · constants vs data, inits, MCMC</div>
-<pre><code><span class="cm"># Nimble splits the JAGS "data" list into:</span>
+<pre><code><span class="cm"># Nimble takes the inputs to a model as two lists:</span>
 <span class="cm"># constants : sizes, indices, fixed covariates (things that are not random variables)</span>
 <span class="cm"># data : observed stochastic nodes (y[i] here)</span>
 constants &lt;- <span class="kw">list</span>(
@@ -942,16 +958,6 @@ samples &lt;- <span class="fn">nimbleMCMC</span>(
  thin = <span class="nu">1</span>,
  samplesAsCodaMCMC = <span class="kw">TRUE</span>
 )</code></pre>
-
-<div class="callout warn">
-<strong>JAGS → <span class="pill nimble">Nimble</span> translation checklist:</strong>
-<ul>
-<li><code>cat("model{...}", file="x.txt")</code> + <code>jags.model()</code> + <code>coda.samples()</code> &nbsp;→&nbsp; <code>nimbleCode({...})</code> + <code>nimbleMCMC(code=, constants=, data=, inits=, monitors=, nchains=, nburnin=, niter=)</code></li>
-<li>The body of the model (priors, likelihood, derived) translates <em>verbatim</em>: same <code>dnorm</code>, <code>dunif</code>, <code>dbeta</code>, <code>dbinom</code>, <code>dpois</code>; same precision parameterization for <code>dnorm(mu, tau)</code>.</li>
-<li>One JAGS <code>data</code> list splits into Nimble's <code>constants</code> (sizes/indices/fixed covariates) and <code>data</code> (observed RVs).</li>
-<li><code>nimbleMCMC</code> returns a list of MCMC matrices (or a coda <code>mcmc.list</code> with <code>samplesAsCodaMCMC=TRUE</code>). <code>MCMCvis</code> functions (<code>MCMCsummary</code>, <code>MCMCtrace</code>, <code>MCMCchains</code>) work unchanged on either.</li>
-</ul>
-</div>
 
 <div class="code-label">R · diagnostics, summaries, derived quantities</div>
 <pre><code><span class="fn">MCMCtrace</span>(samples, params = <span class="kw">c</span>(<span class="st">"K"</span>, <span class="st">"r"</span>, <span class="st">"sigma"</span>), pdf = <span class="kw">FALSE</span>, Rhat = <span class="kw">TRUE</span>, n.eff = <span class="kw">TRUE</span>)

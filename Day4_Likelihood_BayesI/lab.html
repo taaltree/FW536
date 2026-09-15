@@ -491,24 +491,54 @@ The point of this example is not the ZIP per se. It is that mixture likelihoods 
 
 <!-- Exercise M1 -->
 <div class="exercise" id="ex-1">
-<span class="ex-tag">Practice Exercise M1</span><span class="difficulty easy"> · MLE by hand</span>
+<span class="ex-tag">Practice Exercise M1</span><span class="difficulty easy"> · MLE, Wald and profile intervals</span>
 <h3>Bernoulli MLE from scratch</h3>
 <p>You observe $y_1, \dots, y_n$ independent Bernoulli($p$) trials with $s = \sum y_i$ successes.</p>
 <ol type="a">
-<li>Write the joint likelihood $L(p)$ as a function of $p$, $s$, and $n$.</li>
-<li>Take the log and the derivative; show that the MLE is $\hat p = s/n$.</li>
-<li>Take the second derivative of $\ell(p)$ at $\hat p$. Show that the Fisher information is $I(\hat p) = n / [\hat p(1-\hat p)]$ and hence the Wald SE is $\sqrt{\hat p(1-\hat p)/n}$.</li>
-<li>Compute the MLE, its Wald SE, and a 95% profile-likelihood CI for the red-light data: $s = 30, n = 50$. (Use <code>mle()</code> for the profile.)</li>
+<li>Write the joint likelihood $L(p)$ as a function of $p$, $s$, and $n$. If you have seen the Binomial probability $\binom{n}{s} p^s (1-p)^{n-s}$, why can you leave the $\binom{n}{s}$ out?</li>
+<li>Take the log and the derivative, and show that the MLE is $\hat p = s/n$.</li>
+<li><strong>Two new tools.</strong> The <em>observed Fisher information</em> is the curvature of the log-likelihood at its peak, $I(\hat p) = -\ell''(\hat p)$. A sharply peaked log-likelihood carries a lot of information about $p$; a flat one carries little. It turns directly into a standard error, $\text{SE} = 1/\sqrt{I(\hat p)}$, and the <em>Wald</em> 95% confidence interval is $\hat p \pm 1.96\,\text{SE}$. Take the second derivative of $\ell(p)$, show that $I(\hat p) = n / [\hat p(1-\hat p)]$, and so $\text{SE} = \sqrt{\hat p(1-\hat p)/n}$.</li>
+<li>For the red-light data, $s = 30$ and $n = 50$, compute $\hat p$, its SE, the Wald 95% CI, and the 95% profile-likelihood CI from <code>confint()</code> on an <code>mle()</code> fit (the 1.92 rule from Walk-through 5). How close are the two intervals?</li>
+<li>Now repeat for a rare event, $s = 1$ and then $s = 0$, both with $n = 20$. What goes wrong with the Wald interval? Why does the profile interval not have the same problem? In one or two sentences, say when a Wald interval can be trusted.</li>
 </ol>
 <details class="answer"><summary>Reveal solution</summary><div class="answer-body">
-<p>(a) $L(p) = p^s(1-p)^{n-s}$. (b) $\ell'(p) = s/p - (n-s)/(1-p) = 0 \Rightarrow \hat p = s/n$.</p>
-<p>(c) $\ell''(p) = -s/p^2 - (n-s)/(1-p)^2$, so $-\ell''(\hat p) = n/[\hat p(1-\hat p)]$.</p>
-<p>(d) $\hat p = 0.6$, Wald SE $= \sqrt{0.6 \cdot 0.4/50} \approx 0.069$. Profile CI from <code>confint(mle(...))</code> ≈ (0.462, 0.728).</p>
-<pre><code><span class="kw">library</span>(stats4)
-nll &lt;- <span class="kw">function</span>(p) -(<span class="nu">30</span> * <span class="fn">log</span>(p) + <span class="nu">20</span> * <span class="fn">log</span>(<span class="nu">1</span> - p))
-fit &lt;- <span class="fn">mle</span>(nll, start = <span class="kw">list</span>(p = <span class="nu">0.5</span>),
- method = <span class="st">"L-BFGS-B"</span>, lower = <span class="nu">0.001</span>, upper = <span class="nu">0.999</span>)
-<span class="fn">summary</span>(fit); <span class="fn">confint</span>(fit)</code></pre>
+<p><strong>(a) Where the likelihood comes from.</strong> One Bernoulli trial has probability $p^{y_i}(1-p)^{1-y_i}$, which is $p$ for a success and $1-p$ for a failure. The trials are independent, so the probability of the whole data set is the product of those terms, and the exponents add up to $s$ successes and $n-s$ failures:</p>
+<div class="eq-block">$L(p) = \prod_{i=1}^{n} p^{y_i}(1-p)^{1-y_i} = p^s(1-p)^{n-s}.$</div>
+<p>The Binomial coefficient $\binom{n}{s}$ counts the orderings in which $s$ successes could have occurred. It does not contain $p$, so it only multiplies the likelihood by a constant, and adds a constant to the log-likelihood. That constant cannot move the peak, cannot change the curvature, and cancels in every likelihood ratio, which is all we ever use. So it can be dropped; a likelihood is only ever needed up to a constant.</p>
+<p><strong>(b)</strong> $\ell(p) = s\log p + (n-s)\log(1-p)$, so $\ell'(p) = s/p - (n-s)/(1-p) = 0 \Rightarrow \hat p = s/n$.</p>
+<p><strong>(c)</strong> $\ell''(p) = -s/p^2 - (n-s)/(1-p)^2$. Substituting $s = n\hat p$ gives $-\ell''(\hat p) = n/\hat p + n/(1-\hat p) = n/[\hat p(1-\hat p)]$, so $\text{SE} = \sqrt{\hat p(1-\hat p)/n}$. More data means a sharper peak, more information, and a smaller SE, shrinking like $1/\sqrt{n}$.</p>
+<p><strong>(d)</strong> $\hat p = 0.6$ and SE $= 0.069$. Wald CI $(0.464, 0.736)$; profile CI $(0.462, 0.728)$. They nearly agree. With 50 trials and $\hat p$ well away from 0 and 1, the log-likelihood near its peak is close to a parabola, and a parabola is exactly the shape the Wald interval assumes.</p>
+<p><strong>(e)</strong> The comparison, from the code below:</p>
+<pre><code>  s  n  phat   Wald CI            profile CI
+ 30 50  0.60   (0.464, 0.736)     (0.462, 0.728)
+  1 20  0.05   (-0.046, 0.146)    (0.003, 0.202)
+  0 20  0.00   (0.000, 0.000)     (0.000, 0.092)</code></pre>
+<p>With one success the Wald interval runs below zero, an impossible probability, and it is symmetric even though the log-likelihood is lopsided against the boundary at 0. With no successes the curvature formula gives SE $= 0$, so the Wald interval collapses to a single point and claims perfect certainty from 20 trials. The profile interval follows the actual shape of the log-likelihood, keeping every value of $p$ within 1.92 log-likelihood units of the peak, so it stays inside $(0, 1)$ and becomes asymmetric exactly when the likelihood is. (<code>mle()</code> cannot profile at $\hat p = 0$, which is why the code reads the interval off a grid.)</p>
+<p><strong>When Wald works, and why you will still see it everywhere.</strong> A Wald interval needs only the MLE and the curvature at one point, so it is cheap, and it is the default almost everywhere. The standard errors, $z$ or $t$ values, and p-values in <code>summary()</code> for <code>lm</code>, <code>glm</code> and <code>lmer</code> fits are all Wald, and so is <code>confint.default()</code>. It is trustworthy when the log-likelihood is close to a parabola near its peak: plenty of data, an estimate well away from any boundary (such as a probability near 0 or 1, or a variance near 0), and a parameter on a scale where its likelihood is symmetric. That last condition is why GLMs report Wald statistics on the log or logit scale, where they behave well, rather than on the probability scale. Distrust Wald with small samples, rare events, estimates near a boundary, variance components, and nonlinear parameters like the Von Bertalanffy $\kappa$ in Exercise M2. There, use the profile interval (<code>confint()</code> on an <code>mle</code> or <code>glm</code> fit profiles) or, this afternoon, a Bayesian credible interval.</p>
+<pre><code>library(stats4)
+
+# (d) red-light data: s = 30 successes in n = 50 trials
+s &lt;- 30; n &lt;- 50
+nll &lt;- function(p) -(s * log(p) + (n - s) * log(1 - p))
+fit &lt;- mle(nll, start = list(p = 0.5), method = "L-BFGS-B", lower = 0.001, upper = 0.999)
+phat &lt;- coef(fit)
+se   &lt;- sqrt(diag(vcov(fit)))         # Wald SE from the curvature (inverse Hessian)
+c(phat = phat, se = se)
+c(lower = phat - 1.96 * se, upper = phat + 1.96 * se)   # Wald 95% CI
+confint(fit)                                            # profile 95% CI
+
+# (e) a rare event: compare both intervals as successes become scarce
+wald_vs_profile &lt;- function(s, n) {
+  nll  &lt;- function(p) -(s * log(p) + (n - s) * log(1 - p))
+  phat &lt;- s / n
+  se   &lt;- sqrt(phat * (1 - phat) / n)
+  grid &lt;- seq(0.0001, 0.9999, by = 0.0001)
+  keep &lt;- grid[nll(grid) - min(nll(grid)) &lt;= 1.92]      # profile interval, read off a grid
+  round(c(s = s, n = n, phat = phat,
+          wald_lo = phat - 1.96 * se, wald_hi = phat + 1.96 * se,
+          prof_lo = min(keep), prof_hi = max(keep)), 3)
+}
+rbind(wald_vs_profile(30, 50), wald_vs_profile(1, 20), wald_vs_profile(0, 20))</code></pre>
 </div></details>
 </div>
 
@@ -545,7 +575,7 @@ best &lt;- <span class="fn">min</span>(prof)
 <div class="exercise" id="ex-3">
 <span class="ex-tag">Practice Exercise M3</span><span class="difficulty medium"> · LRT + AIC</span>
 <h3>Sex-specific VBGF revisited</h3>
-<p>Use the LRT code from the walk-through above. Report (a) the LRT statistic and p-value, (b) AIC for both models, (c) your conclusion. Then refit Model B with $L_\infty$ shared but $\kappa$ sex-specific (4 parameters) and run a second LRT against the same null. Comment on what you learn.</p>
+<p>Use the LRT code from Walk-through 5. Report (a) the LRT statistic and p-value, (b) AIC for both models, (c) your conclusion. Then refit Model B with $L_\infty$ shared but $\kappa$ sex-specific (4 parameters) and run a second LRT against the same null. Comment on what you learn.</p>
 <details class="answer"><summary>Reveal worked solution (actual R run)</summary><div class="answer-body">
 <p><em>Deterministic MLE fit (<code>stats4::mle</code>, L-BFGS-B) on the full <code>data/vonbert.csv</code> ($n = 100$, 50 per sex), model $L_a = L_\infty(1 - e^{-\kappa a})$, no seed needed.</em></p>
 <p>(a) <strong>Full (Model B, 5 param) vs null (Model A, 3 param), 2 df:</strong> $\Lambda = 2(\ell_B - \ell_A) = 75.4$, $p \approx 4\times10^{-17}$: the null of a single shared growth curve is decisively rejected.</p>
@@ -563,10 +593,50 @@ best &lt;- <span class="fn">min</span>(prof)
 <ol type="a">
 <li>Fit a plain Poisson and a ZIP. Compare AIC.</li>
 <li>Compute and report the proportion of zeros under each fitted model and compare to the observed proportion.</li>
-<li>Why is the gap between Poisson and ZIP largest at small $\lambda$?</li>
+<li>How does the AIC gap between the Poisson and ZIP fits change as $\lambda$ increases, and why?</li>
 </ol>
-<details class="answer"><summary>Reveal</summary><div class="answer-body">
-<p>(c) When $\lambda$ is small, the Poisson already produces many zeros, so the extra zero inflation looks like "Poisson with smaller mean." The ZIP and Poisson likelihoods become hard to distinguish, and you need a lot of data to detect the inflation. When $\lambda$ is large, the Poisson predicts essentially no zeros, so any zero inflation jumps out.</p>
+<details class="answer"><summary>Reveal solution</summary><div class="answer-body">
+<p><strong>(a) and (b)</strong> Each data set uses the walk-through&rsquo;s <code>set.seed(11)</code> and $n = 300$. The Poisson has one parameter and the ZIP has two, so AIC charges the ZIP 2 extra units:</p>
+<pre><code>              proportion of zeros           fitted lambda        ZIP             AIC
+              observed  Poisson   ZIP       Poisson   ZIP        pi      Poisson     ZIP   Poisson - ZIP
+lambda = 1      0.563    0.512   0.563       0.670   0.927     0.278      681.0    672.4        8.6
+lambda = 2.5    0.357    0.190   0.357       1.663   2.335     0.288     1104.6   1023.0       81.6
+lambda = 8      0.310    0.004   0.310       5.500   7.968     0.310     2214.3   1363.1      851.2</code></pre>
+<p>The ZIP wins on AIC in all three data sets and reproduces the observed proportion of zeros exactly, which an MLE with a free zero-inflation parameter is expected to do. The Poisson falls short on zeros, and it also underestimates $\lambda$, because the only way it can make more zeros is to lower the mean of every count.</p>
+<p><strong>(c)</strong> The gap grows with $\lambda$: 8.6 AIC units at $\lambda = 1$, 82 at $\lambda = 2.5$, and 851 at $\lambda = 8$. When $\lambda$ is small, the Poisson already produces many zeros ($e^{-1} = 0.37$ of counts at $\lambda = 1$), so extra structural zeros look much like a Poisson with a slightly smaller mean: here it predicts 51% zeros against 56% observed. The two likelihoods are hard to tell apart, and it takes a lot of data to detect the inflation. When $\lambda$ is large, a Poisson predicts almost no zeros ($e^{-8} \approx 0.0003$; 0.4% even at its lowered mean of 5.5), so 31% zeros are impossible to explain without the inflation, and the ZIP wins by hundreds of units.</p>
+<pre><code>library(stats4)
+
+fit_both &lt;- function(lam_true, pi_true = 0.35, n = 300) {
+  set.seed(11)
+  z &lt;- rbinom(n, 1, pi_true)                     # 1 = structural zero
+  y &lt;- ifelse(z == 1, 0, rpois(n, lam_true))
+
+  # (a) plain Poisson: one parameter
+  nll_pois &lt;- function(lambda) -sum(dpois(y, lambda, log = TRUE))
+  fit_p &lt;- mle(nll_pois, start = list(lambda = mean(y)),
+               method = "L-BFGS-B", lower = 0.001, upper = 100)
+
+  # (a) ZIP: two parameters, same NLL as the walk-through
+  nll_zip &lt;- function(p, lambda) {
+    if (p &lt;= 0 || p &gt;= 1 || lambda &lt;= 0) return(1e10)
+    prob_zero &lt;- p + (1 - p) * exp(-lambda)
+    ll &lt;- ifelse(y == 0, log(prob_zero), log(1 - p) + dpois(y, lambda, log = TRUE))
+    -sum(ll)
+  }
+  fit_z &lt;- mle(nll_zip, start = list(p = 0.2, lambda = 1),
+               method = "L-BFGS-B", lower = c(0.001, 0.001), upper = c(0.999, 50))
+
+  lam_p &lt;- coef(fit_p)[["lambda"]]
+  p_z &lt;- coef(fit_z)[["p"]]; lam_z &lt;- coef(fit_z)[["lambda"]]
+  round(c(lambda_true = lam_true,
+          obs_zeros   = mean(y == 0),
+          pois_zeros  = dpois(0, lam_p),                   # (b) zeros predicted by Poisson
+          zip_zeros   = p_z + (1 - p_z) * exp(-lam_z),     # (b) zeros predicted by ZIP
+          pois_lambda = lam_p, zip_lambda = lam_z, zip_pi = p_z,
+          AIC_pois = AIC(fit_p), AIC_zip = AIC(fit_z),
+          dAIC = AIC(fit_p) - AIC(fit_z)), 3)
+}
+t(sapply(c(1, 2.5, 8), fit_both))</code></pre>
 </div></details>
 </div>
 

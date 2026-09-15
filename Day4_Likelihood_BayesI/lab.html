@@ -1062,10 +1062,14 @@ surv_samps &lt;- <span class="fn">nimbleMCMC</span>(
 
 <div class="callout bio">
 A common student question: "If I had no prior information, would I get the MLE?" Almost, and the gap is worth understanding. A Beta(1,1) (Uniform) prior gives a posterior whose <strong>mode</strong> is exactly the MLE, $y/n = 0.72$. But the number <code>MCMCsummary()</code> prints is the posterior <strong>mean</strong>, and that is $19/27 = 0.704$, not 0.72. Students who compare the two and find them different have not made a mistake.
-<p>The reason is that Beta(1,1) is not "no information". It is one pseudo-success and one pseudo-failure, a pseudo-sample size of 2. Those two cancel at the peak, so the mode is untouched, but they still count in the average:</p>
-<div class="eq-block">$\text{posterior mean} = \dfrac{\alpha_0 + y}{\alpha_0 + \beta_0 + n} = \underbrace{\tfrac{2}{27}}_{\text{prior}} \times 0.5 \;+\; \underbrace{\tfrac{25}{27}}_{\text{data}} \times 0.72 \;=\; 0.704,$</div>
-<p>so the mean is dragged slightly toward the prior mean of 0.5, while the mode is not. The pull fades as data accumulate. The gap is 0.016 at $n = 25$, 0.004 at $n = 100$, and 0.0002 at $n = 2000$. If you want the Bayesian summary that reproduces the MLE, report the posterior mode; if you report the mean, as almost everyone does, expect it to sit a little toward the prior.</p>
-<p>The prior we used here (Beta(9,11)) <em>shrinks</em> the estimate much harder, from 0.72 toward 0.45. The closer your prior pseudo-sample size to your actual data, the more shrinkage you get. With $n=25$ and prior "sample size" 20, you can see almost 50% shrinkage.</p>
+<p>The reason is that Beta(1,1) is not &ldquo;no information&rdquo;. It is one pseudo-success and one pseudo-failure, a pseudo-sample size of 2. Add the data and the posterior is $\text{Beta}(1 + 18,\; 1 + 7) = \text{Beta}(19, 8)$. Now compare the formulas for the peak and the average of a $\text{Beta}(\alpha, \beta)$:</p>
+<div class="eq-block">$\text{mode} = \dfrac{\alpha - 1}{\alpha + \beta - 2}, \qquad \text{mean} = \dfrac{\alpha}{\alpha + \beta}.$</div>
+<p>The mode subtracts 1 from $\alpha$ and 2 from $\alpha + \beta$, which is exactly the one pseudo-success and two pseudo-trials that Beta(1,1) added. So they cancel at the peak: $\text{mode} = (19 - 1)/(27 - 2) = 18/25 = 0.72$, the MLE. The mean has no such subtraction, so the pseudo-observations stay in: $\text{mean} = 19/27 = 0.704$.</p>
+<p>The weighted-average form of the posterior mean from Conjugacy 1 shows where the 0.704 comes from. Here $\alpha_0 = 1$ and $\beta_0 = 1$ are the prior&rsquo;s parameters, and $y = 18$ survivors out of $n = 25$ birds are the data:</p>
+<div class="eq-block">$\text{posterior mean} = \dfrac{\alpha_0 + y}{\alpha_0 + \beta_0 + n} = \underbrace{\dfrac{\alpha_0+\beta_0}{\alpha_0+\beta_0+n}}_{\text{weight on prior}} \times \underbrace{\dfrac{\alpha_0}{\alpha_0+\beta_0}}_{\text{prior mean}} \;+\; \underbrace{\dfrac{n}{\alpha_0+\beta_0+n}}_{\text{weight on data}} \times \underbrace{\dfrac{y}{n}}_{\text{MLE}}$</div>
+<div class="eq-block">$= \dfrac{2}{27} \times \dfrac{1}{2} \;+\; \dfrac{25}{27} \times \dfrac{18}{25} \;=\; \dfrac{2}{27} \times 0.5 \;+\; \dfrac{25}{27} \times 0.72 \;=\; \dfrac{19}{27} = 0.704.$</div>
+<p>The 2 in $2/27$ is the prior&rsquo;s pseudo-sample size, the 25 in $25/27$ is the real sample size, and 27 is their total. The prior mean of Beta(1,1) is 0.5 and the MLE is 0.72. So the posterior mean is 0.72 pulled a little toward 0.5, with the prior getting 2 parts in 27 of the say. That pull fades as data accumulate: the gap between mean and MLE is 0.016 at $n = 25$, 0.004 at $n = 100$, and 0.0002 at $n = 2000$. If you want the Bayesian summary that reproduces the MLE, report the posterior mode; if you report the mean, as almost everyone does, expect it to sit a little toward the prior.</p>
+<p>The prior we used here, Beta(9,11), <em>shrinks</em> the estimate much harder. Its pseudo-sample size is 20 against 25 real birds, so the prior gets $20/45 = 0.44$ of the weight, and the posterior mean is $0.44 \times 0.45 + 0.56 \times 0.72 = 0.60$. The larger the prior&rsquo;s pseudo-sample size relative to your data, the more shrinkage you get.</p>
 </div>
 </section>
 
@@ -1073,103 +1077,110 @@ A common student question: "If I had no prior information, would I get the MLE?"
 <section id="bayes-regression">
 <h2>Bonus walk-through 9 · Bayesian Normal regression, with posterior predictive checks</h2>
 
-<p>Body mass as a function of body length in Pacific giant salamanders. We will (i) think carefully about priors on the scale of the data, (ii) fit the regression in <span class="pill nimble">Nimble</span>, and (iii) do a posterior predictive check by simulating replicate datasets from the posterior and comparing them to the real one. This is the workflow you should use on every Bayesian model you fit.</p>
+<p>Body mass as a function of body length in Pacific giant salamanders. We will (i) fit the regression in <span class="pill nimble">Nimble</span>, (ii) use the posterior to predict new salamanders, and (iii) use those predictions to check whether the model can produce data that look like the real data. This is the workflow you should use on Bayesian models.</p>
 
-<div class="code-label">R · simulate + priors</div>
-<pre><code><span class="fn">set.seed</span>(<span class="nu">21</span>)
-n &lt;- <span class="nu">120</span>
-length_mm &lt;- <span class="fn">runif</span>(n, <span class="nu">80</span>, <span class="nu">250</span>)
-true_int &lt;- -<span class="nu">35</span>
-true_slope &lt;- <span class="nu">0.32</span>
-true_sigma &lt;- <span class="nu">6.0</span>
-mass_g &lt;- true_int + true_slope * length_mm + <span class="fn">rnorm</span>(n, <span class="nu">0</span>, true_sigma)
-<span class="fn">plot</span>(length_mm, mass_g, pch = <span class="nu">19</span>, xlab = <span class="st">"length (mm)"</span>, ylab = <span class="st">"mass (g)"</span>)
+<div class="code-label">R · simulate the data</div>
+<pre><code>library(nimble); library(MCMCvis)
 
-<span class="cm"># Prior reasoning:</span>
-<span class="cm"># * intercept: at length=0 the mean mass should be plausibly small; N(0, 100^2) is mild.</span>
-<span class="cm"># * slope: a mm of length should add at most a few grams; N(0, 1) is very wide on this scale.</span>
-<span class="cm"># * sigma: residual SD must be positive and on the same scale as mass (grams).</span>
-<span class="cm"># half-N(0, 20) keeps it positive with most mass below 50.</span></code></pre>
+set.seed(21)
+n &lt;- 120
+length_mm &lt;- runif(n, 80, 250)
+true_int   &lt;- -15      # grams
+true_slope &lt;- 0.35     # grams per mm
+true_sigma &lt;- 4        # grams of scatter around the line
+mass_g &lt;- true_int + true_slope * length_mm + rnorm(n, 0, true_sigma)
+plot(length_mm, mass_g, pch = 19, xlab = "length (mm)", ylab = "mass (g)")</code></pre>
 
-<div class="code-label">R · Nimble model with posterior predictive node</div>
-<pre><code>reg_code &lt;- <span class="fn">nimbleCode</span>({
- <span class="cm"># priors</span>
- beta0 ~ <span class="fn">dnorm</span>(<span class="nu">0</span>, sd = <span class="nu">100</span>)
- beta1 ~ <span class="fn">dnorm</span>(<span class="nu">0</span>, sd = <span class="nu">1</span>)
- sigma ~ <span class="fn">T</span>(<span class="fn">dnorm</span>(<span class="nu">0</span>, sd = <span class="nu">20</span>), <span class="nu">0</span>, ) <span class="cm"># half-normal via truncation</span>
+<div class="code-label">R · fit the regression in Nimble</div>
+<pre><code>reg_code &lt;- nimbleCode({
+  # priors, chosen on the scale of the data
+  beta0 ~ dnorm(0, sd = 100)             # mean mass at length 0: very wide
+  beta1 ~ dnorm(0, sd = 1)               # grams added per mm: a few tenths is plausible
+  sigma ~ T(dnorm(0, sd = 20), 0, )      # scatter in grams, kept positive
 
- <span class="cm"># likelihood + posterior predictive draws</span>
- <span class="kw">for</span> (i <span class="kw">in</span> <span class="nu">1</span>:n) {
- mu[i] &lt;- beta0 + beta1 * length_mm[i]
- mass[i] ~ <span class="fn">dnorm</span>(mu[i], sd = sigma)
- mass_rep[i] ~ <span class="fn">dnorm</span>(mu[i], sd = sigma) <span class="cm"># replicate dataset</span>
- }
-
- <span class="cm"># No discrepancy statistics in here. sd(mass) is a constant — putting it in the</span>
- <span class="cm"># model re-computes it every iteration and monitors a number that never moves.</span>
- <span class="cm"># We compute discrepancies in R below from mu and mass_rep, so we can try</span>
- <span class="cm"># several of them without refitting.</span>
+  # likelihood
+  for (i in 1:n) {
+    mu[i] &lt;- beta0 + beta1 * length_mm[i]
+    mass[i] ~ dnorm(mu[i], sd = sigma)
+  }
 })
 
-constants &lt;- <span class="kw">list</span>(n = n, length_mm = length_mm)
-data &lt;- <span class="kw">list</span>(mass = mass_g)
-inits &lt;- <span class="kw">list</span>(
- <span class="kw">list</span>(beta0 = <span class="nu">0</span>, beta1 = <span class="nu">0</span>, sigma = <span class="nu">10</span>),
- <span class="kw">list</span>(beta0 = -<span class="nu">50</span>, beta1 = <span class="nu">0.5</span>, sigma = <span class="nu">5</span>),
- <span class="kw">list</span>(beta0 = <span class="nu">20</span>, beta1 = -<span class="nu">0.1</span>, sigma = <span class="nu">15</span>))
+reg_samps &lt;- nimbleMCMC(
+  code = reg_code,
+  constants = list(n = n, length_mm = length_mm),
+  data = list(mass = mass_g),
+  inits = list(list(beta0 = 0,   beta1 = 0,   sigma = 10),
+               list(beta0 = -30, beta1 = 0.5, sigma = 5),
+               list(beta0 = 10,  beta1 = 0.2, sigma = 15)),
+  monitors = c("beta0", "beta1", "sigma"),
+  nchains = 3, nburnin = 3000, niter = 15000,
+  samplesAsCodaMCMC = TRUE)
+MCMCsummary(reg_samps, round = 3)</code></pre>
 
-reg_samps &lt;- <span class="fn">nimbleMCMC</span>(
- code = reg_code,
- constants = constants,
- data = data,
- inits = inits,
- monitors = <span class="kw">c</span>(<span class="st">"beta0"</span>, <span class="st">"beta1"</span>, <span class="st">"sigma"</span>, <span class="st">"mu"</span>, <span class="st">"mass_rep"</span>),
- nchains = <span class="nu">3</span>, nburnin = <span class="nu">3000</span>, niter = <span class="nu">15000</span>,
- samplesAsCodaMCMC = <span class="kw">TRUE</span>)
-<span class="fn">MCMCsummary</span>(reg_samps, params = <span class="kw">c</span>(<span class="st">"beta0"</span>, <span class="st">"beta1"</span>, <span class="st">"sigma"</span>), round = <span class="nu">3</span>)</code></pre>
+<h3>Step 1 · The posterior predictive distribution of one new salamander</h3>
+<p>The posterior tells you which values of $\beta_0$, $\beta_1$ and $\sigma$ are plausible. It does not yet tell you what a new salamander will weigh. Two kinds of uncertainty go into that: uncertainty about where the line is, and the scatter of individual salamanders around the line. The <strong>posterior predictive distribution</strong> includes both, and the recipe is short. For each posterior draw, take that draw&rsquo;s parameter values and simulate one new observation from the likelihood, $\text{Normal}(\beta_0 + \beta_1 x,\ \sigma)$.</p>
 
-<div class="code-label">R · posterior predictive check</div>
-<pre><code>mu_post  &lt;- <span class="fn">MCMCchains</span>(reg_samps, <span class="st">"mu"</span>)        <span class="cm"># fitted mass for each salamander</span>
-rep_post &lt;- <span class="fn">MCMCchains</span>(reg_samps, <span class="st">"mass_rep"</span>)  <span class="cm"># a fake dataset, one per draw</span>
+<div class="code-label">R · predict a new 150 mm salamander</div>
+<pre><code># One row per saved posterior draw; each row is one plausible set of parameter values
+post &lt;- MCMCchains(reg_samps, params = c("beta0", "beta1", "sigma"))
+head(post)
+S &lt;- nrow(post)                        # 36,000 draws
 
-<span class="cm"># Two ways to summarise "how far are the points from the line?":</span>
-<span class="cm">#   SSR          = the total squared distance</span>
-<span class="cm">#   biggest miss = the single worst salamander</span>
-<span class="cm"># Compute each on the real data and on the fake data, at every posterior draw.</span>
-S &lt;- <span class="fn">nrow</span>(mu_post)
-obs_ssr &lt;- <span class="fn">numeric</span>(S)
-rep_ssr &lt;- <span class="fn">numeric</span>(S)
-obs_miss &lt;- <span class="fn">numeric</span>(S)
-rep_miss &lt;- <span class="fn">numeric</span>(S)
+# A new salamander that is 150 mm long
+mu_150  &lt;- post[, "beta0"] + post[, "beta1"] * 150        # average mass of 150 mm salamanders, one value per draw
+new_150 &lt;- rnorm(S, mean = mu_150, sd = post[, "sigma"])   # one simulated 150 mm salamander per draw
 
-<span class="kw">for</span> (s in <span class="nu">1</span>:S) {
- e_obs &lt;- mass_g - mu_post[s, ] <span class="cm"># residuals, real data</span>
- e_rep &lt;- rep_post[s, ] - mu_post[s, ] <span class="cm"># residuals, fake data</span>
+quantile(mu_150,  c(0.025, 0.5, 0.975))   # uncertainty about the AVERAGE 150 mm salamander
+quantile(new_150, c(0.025, 0.5, 0.975))   # where ONE new 150 mm salamander is likely to fall
 
- obs_ssr[s] &lt;- <span class="fn">sum</span>(e_obs^<span class="nu">2</span>)
- rep_ssr[s] &lt;- <span class="fn">sum</span>(e_rep^<span class="nu">2</span>)
- obs_miss[s] &lt;- <span class="fn">max</span>(<span class="fn">abs</span>(e_obs))
- rep_miss[s] &lt;- <span class="fn">max</span>(<span class="fn">abs</span>(e_rep))
-}
+hist(new_150, breaks = 60, col = "grey85", border = "white",
+     main = "Posterior predictive distribution, 150 mm", xlab = "mass (g)")
+abline(v = quantile(mu_150, c(0.025, 0.975)), col = "blue", lwd = 2)    # interval for the average
+abline(v = quantile(new_150, c(0.025, 0.975)), col = "red", lwd = 2)    # interval for one individual</code></pre>
 
-<span class="cm"># Bayesian p-value: how often is the fake data as bad as the real data?</span>
-<span class="fn">mean</span>(rep_ssr &gt;= obs_ssr) <span class="cm"># sum of squared residuals</span>
-<span class="fn">mean</span>(rep_miss &gt;= obs_miss) <span class="cm"># biggest miss</span>
+<p>The two intervals answer different questions. The interval for <code>mu_150</code>, about 36.4 to 38.0 g, is where the <em>average</em> 150 mm salamander sits; it is narrow because 120 salamanders pin the line down well. The interval for <code>new_150</code>, about 29.3 to 45.1 g, is where <em>one</em> new 150 mm salamander is likely to fall; it is much wider because it also includes the individual scatter $\sigma$. A manager asking &ldquo;what will the next salamander we catch weigh?&rdquo; needs the second.</p>
 
-<span class="cm"># Where does the real dataset sit among the fake ones?</span>
-<span class="fn">hist</span>(rep_miss, xlab = <span class="st">"biggest miss in a fake dataset (g)"</span>, main = <span class="st">""</span>)
-<span class="fn">abline</span>(v = <span class="fn">mean</span>(obs_miss), col = <span class="st">"red"</span>, lwd = <span class="nu">2</span>) <span class="cm"># real data: inside the pile, or off in the tail?</span>
+<h3>Step 2 · Fake datasets from the posterior</h3>
+<p>Do the same thing for all 120 real lengths at once and you get a whole <em>fake dataset</em>: the data the model says you could have collected. Each posterior draw gives a different fake dataset.</p>
 
-<span class="cm"># Visual PPC: overlay 100 replicate datasets on the data</span>
-mass_rep_chain &lt;- <span class="fn">MCMCchains</span>(reg_samps, <span class="st">"mass_rep"</span>)
-<span class="fn">plot</span>(length_mm, mass_g, pch = <span class="nu">19</span>, xlab = <span class="st">"length (mm)"</span>, ylab = <span class="st">"mass (g)"</span>)
-<span class="kw">for</span> (i in <span class="fn">sample</span>(<span class="fn">nrow</span>(mass_rep_chain), <span class="nu">100</span>)) {
- <span class="fn">points</span>(length_mm, mass_rep_chain[i, ], col = <span class="fn">rgb</span>(<span class="nu">0</span>, <span class="nu">0</span>, <span class="nu">0</span>, <span class="nu">0.04</span>), pch = <span class="nu">19</span>, cex = <span class="nu">0.5</span>)
-}
-<span class="fn">points</span>(length_mm, mass_g, pch = <span class="nu">19</span>, col = <span class="st">"red"</span>)</code></pre>
+<div class="code-label">R · one fake dataset, then 1,000 of them</div>
+<pre><code># A whole fake dataset: one posterior draw, one simulated mass for each of the 120 real lengths
+s &lt;- 1
+fake &lt;- rnorm(n, mean = post[s, "beta0"] + post[s, "beta1"] * length_mm, sd = post[s, "sigma"])
+
+par(mfrow = c(1, 2))
+plot(length_mm, mass_g, pch = 19, main = "real data", xlab = "length (mm)", ylab = "mass (g)")
+plot(length_mm, fake,   pch = 19, main = "one fake dataset", xlab = "length (mm)", ylab = "mass (g)")
+par(mfrow = c(1, 1))
+
+# Now 1,000 fake datasets, each from a different posterior draw (one per row)
+nfake &lt;- 1000
+draws &lt;- sample(S, nfake)
+fake_data &lt;- matrix(NA, nrow = nfake, ncol = n)
+for (k in 1:nfake) {
+  s &lt;- draws[k]
+  fake_data[k, ] &lt;- rnorm(n, mean = post[s, "beta0"] + post[s, "beta1"] * length_mm,
+                          sd = post[s, "sigma"])
+}</code></pre>
+
+<h3>Step 3 · The posterior predictive check</h3>
+<p>If the model is adequate, the real data should look like just another one of the fake datasets. To check that, pick a summary you care about, compute it on the real data and on every fake dataset, and see where the real value falls. Here the summary is the standard deviation of mass: can the model reproduce how spread out the real masses are?</p>
+
+<div class="code-label">R · compare the real data with the fake datasets</div>
+<pre><code># Does the model reproduce the spread of the real masses?
+real_sd &lt;- sd(mass_g)                   # one number from the real data
+fake_sd &lt;- apply(fake_data, 1, sd)      # the same summary for each of the 1,000 fake datasets
+
+hist(fake_sd, breaks = 40, col = "grey85", border = "white",
+     main = "SD of mass in 1,000 fake datasets", xlab = "SD of mass (g)")
+abline(v = real_sd, col = "red", lwd = 2)
+
+mean(fake_sd &gt;= real_sd)                # posterior predictive p-value</code></pre>
+
+<p>The real SD, 17.8 g, sits in the middle of the fake SDs, and about 53% of fake datasets are at least as spread out as the real one. Your exact numbers will differ slightly from run to run.</p>
 
 <div class="callout key">
-The recipe is always the same three steps: <strong>(1)</strong> simulate fake datasets from the posterior, <strong>(2)</strong> compute the same summary on the fake data and the real data, <strong>(3)</strong> ask how often the fake is at least as extreme as the real. That fraction is the Bayesian p-value. Near 0.5 means the real data look like something your model would produce. Near 0 or 1 is a red flag. Two different summaries of the same fit can give you two different p-values, so the summary you pick is part of the check. Look at the plot as well as the number.
+<strong>The recipe.</strong> <strong>(1)</strong> For each posterior draw, simulate data from the likelihood using that draw&rsquo;s parameters. <strong>(2)</strong> Compute the same summary on the real data and on each fake dataset. <strong>(3)</strong> Ask how often the fake value is at least as large as the real one. That fraction is the <em>posterior predictive p-value</em>. Near 0.5 means the real data look like something the model would produce; near 0 or 1 means the model misses that feature of the data. This model passes because the data were simulated from it. On real data, choose summaries tied to what matters biologically, such as the largest counts, the number of zeros, or the spread, and look at the histogram as well as the number.
 </div>
 </section>
 

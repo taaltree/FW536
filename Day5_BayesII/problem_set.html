@@ -22,12 +22,11 @@
  <li><a href="#p2">2. Link-scale prior sensitivity (ants)</a></li>
  <li><a href="#p3">3. Pooling spectrum (N2O)</a></li>
  <li><a href="#p4">4. Group-level covariate (N2O)</a></li>
- <li><a href="#p5">5. Bayesian logistic (lizards)</a></li>
- <li><a href="#p6">6. Derived probability difference (lizards)</a></li>
- <li><a href="#p7">7. Spawner-recruit &amp; $H_\text{msy}$</a></li>
- <li><a href="#p8">8. Precautionary harvest (derived)</a></li>
- <li><a href="#p9">9. N-mixture &amp; Bayesian p-value</a></li>
- <li><a href="#p10">10. Dynamic occupancy (latent state)</a></li>
+ <li><a href="#p5">5. Bayesian logistic &amp; derived difference (lizards)</a></li>
+  <li><a href="#p6">6. Spawner-recruit &amp; $H_\text{msy}$</a></li>
+ <li><a href="#p7">7. Precautionary harvest (derived)</a></li>
+ <li><a href="#p8">8. N-mixture &amp; Bayesian p-value</a></li>
+ <li><a href="#p9">9. Dynamic occupancy (latent state)</a></li>
  </ul>
  <div class="section">Day 5 docs</div>
  <ul>
@@ -49,7 +48,7 @@
 
 <section>
 <div class="callout plain">
-<p>Five of the ten problems use the real datasets shipped in this Day's <code>data/</code> folder: <code>ants.csv</code>, <code>N2OEmission.csv</code>, and <code>IslandsLizards.csv</code>. Each of those problems shows the <code>read.csv()</code> call you should start from; run it, then build the requested model. The remaining five problems (the prior-predictive draws in Problem 2, spawner-recruit, and the latent-state models) simulate their data in the same code block, following the patterns in the accompanying Nimble scripts.</p>
+<p>Four of the nine problems use the real datasets shipped in this Day's <code>data/</code> folder: <code>ants.csv</code>, <code>N2OEmission.csv</code>, and <code>IslandsLizards.csv</code>. Each of those problems shows the <code>read.csv()</code> call you should start from; run it, then build the requested model. The remaining five problems (the prior-predictive draws in Problem 2, spawner-recruit, and the latent-state models) simulate their data in the same code block, following the patterns in the accompanying Nimble scripts.</p>
 <p>Set <code>samplesAsCodaMCMC = TRUE</code> in every <code>nimbleMCMC()</code> call so <code>coda</code> diagnostics (<code>gelman.diag</code>, <code>effectiveSize</code>) work directly. Report R-hat and effective sample size for the parameters you interpret.</p>
 </div>
 </section>
@@ -172,7 +171,7 @@ group, which is what part (b) makes you check.</p></div>
 
 <!-- Problem 5 -->
 <div class="exercise" id="p5">
-<span class="ex-tag">Problem 5</span><span class="difficulty medium"> · Bayesian logistic · <code>IslandsLizards.csv</code></span>
+<span class="ex-tag">Problem 5</span><span class="difficulty medium"> · Bayesian logistic · derived quantity · <code>IslandsLizards.csv</code></span>
 <h3>Island lizard occupancy vs. perimeter:area ratio</h3>
 <p>Load the island-lizard data and fit logistic regression of <em>presence</em> on the scaled perimeter:area ratio:</p>
 <div class="eq-block">$y_i \sim \text{Bernoulli}(p_i), \quad \text{logit}\,p_i = a + b\, x_i$</div>
@@ -183,33 +182,17 @@ y        &lt;- <span class="fn">as.integer</span>(liz$presence)</code></pre>
 <ol type="a">
  <li>Fit in <span class="pill nimble">NIMBLE</span> with the weakly informative prior $a, b \sim \mathcal{N}(0, \sigma^2{=}2.71)$ (i.e. <code>dnorm(0, 1/2.71)</code>, chosen because it implies a near-uniform prior on $p$). Report R-hat and <code>heidel.diag</code> for $a$ and $b$. Use starting values near 0 (why is that a good idea here?).</li>
  <li>What is the posterior probability that the slope $b$ is negative (i.e., more edge per unit area $\Rightarrow$ lower occupancy)?</li>
- <li>Re-fit with the "vague" prior $a, b \sim \mathcal{N}(0, 10^6)$ on <em>both</em> coefficients, and report the posterior of $b$. This prior is nearly flat on the logit scale. The question is what it says on the <em>probability</em> scale, where occupancy lives, and what that does to the fit.
- <ol type="i">
- <li><strong>What each prior claims, before any data.</strong> Draw 100 pairs $(a, b)$ from each prior, turn each pair into a curve $p = \text{ilogit}(a + b\,x)$ across the range of the scaled ratio, and plot the two priors' curves side by side. What kind of occupancy curve does each prior treat as plausible? What fraction of each prior's implied $P(\text{presence})$ values at the 19 islands falls below 0.01 or above 0.99? (In R, <code>plogis()</code> is the inverse logit, and <code>outer()</code> builds $a + b\,x$ for many draws at once.)</li>
- <li><strong>The fits against the data.</strong> Plot the 19 islands (presence as 0 or 1 against perimeter:area ratio) and overlay, for each prior, the posterior median fitted curve with its 95% band. Where do the two curves differ most? Report each fit's posterior median $P(\text{presence})$ at ratios of 30 and 40.</li>
- <li><strong>The take-home.</strong> Which fit would you trust to predict occupancy on a new island, and why? Look at island 3 (ratio 25.9), where the lizard is present, and at how confident each curve is around that ratio. Explain the difference in terms of what the "vague" prior actually assumes on the probability scale.</li>
- </ol></li>
+ <li><strong>A management-relevant difference.</strong> Add derived quantities <em>inside</em> the model, so MCMC delivers their full posterior:
+ <div class="eq-block">$p_{10} = \text{ilogit}(a + b\, x_{10}), \quad p_{20} = \text{ilogit}(a + b\, x_{20}), \quad \text{diff} = p_{20} - p_{10}$</div>
+ where $x_{10}$ and $x_{20}$ are the scaled versions of raw perimeter:area ratios 10 and 20 (scale them with the same mean and SD you used for the data). $p_{10}$ is the probability that an island with a ratio of 10 is occupied, so its posterior is the posterior distribution of that occupancy probability. It is not a posterior predictive distribution for $y$: that would be a new 0/1 outcome, drawn as <code>y.new ~ dbern(p10)</code>. Report the posterior medians and 95% CIs of $p_{10}$, $p_{20}$ and $\text{diff}$. Does the interval for $\text{diff}$ exclude 0?</li>
+ <li>State in one sentence why computing $\text{diff}$ as a node inside <code>nimbleCode</code> gives correct uncertainty, whereas plugging point estimates of $a$ and $b$ into the formula would not.</li>
 </ol>
 <div class="callout try" style="margin-top: 12px;"><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
 </div>
 
 <!-- Problem 6 -->
 <div class="exercise" id="p6">
-<span class="ex-tag">Problem 6</span><span class="difficulty medium"> · derived quantity · <code>IslandsLizards.csv</code></span>
-<h3>A management-relevant probability difference</h3>
-<p>Building on your Problem 5 fit, compute derived quantities <em>inside</em> the model so their full posterior is delivered by MCMC. Add the deterministic nodes</p>
-<div class="eq-block">$y_{10} = \text{ilogit}(a + b\, x_{10}), \quad y_{20} = \text{ilogit}(a + b\, x_{20}), \quad \text{diff} = y_{20} - y_{10}$</div>
-<p>where $x_{10}$ and $x_{20}$ are the scaled versions of raw perimeter:area ratios 10 and 20 (scale them with the same mean/SD you used for the data).</p>
-<ol type="a">
- <li>Report the posterior median and 95% CI of $\text{diff}$. Does the interval exclude 0?</li>
- <li>State in one sentence why computing $\text{diff}$ as a node inside <code>nimbleCode</code> gives correct uncertainty, whereas plugging point estimates of $a,b$ into the formula would not.</li>
-</ol>
-<div class="callout try" style="margin-top: 12px;"><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
-</div>
-
-<!-- Problem 7 -->
-<div class="exercise" id="p7">
-<span class="ex-tag">Problem 7</span><span class="difficulty medium"> · spawner-recruit + derived $S_\text{msy}$</span>
+<span class="ex-tag">Problem 6</span><span class="difficulty medium"> · spawner-recruit + derived $S_\text{msy}$</span>
 <h3>Beverton-Holt fit with management quantities</h3>
 <p>Simulate a spawner-recruit time series from a known truth, then fit the Beverton-Holt model in <span class="pill nimble">NIMBLE</span> and define the management quantities as deterministic nodes so their posteriors come for free.</p>
 <div class="eq-block">$\log R_t \sim \mathcal{N}\!\big(\log a + \log S_t - \log(1 + \tfrac{a}{b} S_t),\ \sigma^2\big)$</div>
@@ -257,11 +240,11 @@ of the parameters underneath it.</p></div>
 <div class="callout try" style="margin-top: 12px;"><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
 </div>
 
-<!-- Problem 8 -->
-<div class="exercise" id="p8">
-<span class="ex-tag">Problem 8</span><span class="difficulty medium"> · derived quantities, done properly</span>
+<!-- Problem 7 -->
+<div class="exercise" id="p7">
+<span class="ex-tag">Problem 7</span><span class="difficulty medium"> · derived quantities, done properly</span>
 <h3>Why you cannot build a derived quantity from summary numbers</h3>
-<p>You have posterior draws of $a$ and $b$ from Problem 7. Management quantities are functions of those parameters, and there are two ways to produce an interval for them, one right and one that looks reasonable and is not.</p>
+<p>You have posterior draws of $a$ and $b$ from Problem 6. Management quantities are functions of those parameters, and there are two ways to produce an interval for them, one right and one that looks reasonable and is not.</p>
 <ol type="a">
  <li>Compute $S_\text{msy} = b\sqrt{1/a} - b/a$ <strong>once per draw</strong>, then take the 5th, 50th and 95th percentiles of the result. Now do it the other way. Take the 5th, 50th and 95th percentiles of $a$ and of $b$ separately, and substitute those numbers into the formula. Report both sets of three numbers and the percentage difference at the 5th percentile.</li>
  <li>Explain why the two disagree. What does <code>cor(a, b)</code> across your draws have to do with it, and why does summarising each parameter first throw away exactly the information the derived quantity needs?</li>
@@ -273,8 +256,8 @@ of the parameters underneath it.</p></div>
 </div>
 
 
-<div class="exercise" id="p9">
-<span class="ex-tag">Problem 9</span><span class="difficulty hard"> · N-mixture + Bayesian p-value</span>
+<div class="exercise" id="p8">
+<span class="ex-tag">Problem 8</span><span class="difficulty hard"> · N-mixture + Bayesian p-value</span>
 <h3>Repeat-count abundance and a goodness-of-fit check</h3>
 <p>An <strong>N-mixture model</strong> estimates the abundance of unmarked animals when you cannot count every individual. Repeated visits to the same closed site let it separate true abundance ($\lambda$) from detection probability ($p$), which a raw count confounds. (It is the abundance analog of the occupancy model; see the practice lab for a fuller explanation.) Here you will simulate repeated counts, fit the Royle (2004) N-mixture model in <span class="pill nimble">NIMBLE</span>, and then test the Poisson-abundance assumption with a posterior-predictive Bayesian p-value.</p>
 <div class="eq-block">$N_i \sim \text{Poisson}(\lambda), \quad y_{ij} \sim \text{Binomial}(N_i, p)$</div>
@@ -293,9 +276,9 @@ y &lt;- <span class="fn">matrix</span>(<span class="kw">NA</span>, sites, reps)
 <div class="callout try" style="margin-top: 12px;"><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
 </div>
 
-<!-- Problem 10 -->
-<div class="exercise" id="p10">
-<span class="ex-tag">Problem 10</span><span class="difficulty hard"> · latent state · dynamic occupancy</span>
+<!-- Problem 9 -->
+<div class="exercise" id="p9">
+<span class="ex-tag">Problem 9</span><span class="difficulty hard"> · latent state · dynamic occupancy</span>
 <h3>Multi-season occupancy: recover persistence and colonization</h3>
 <p>Simulate a dynamic (multi-season) occupancy dataset and recover the year-specific persistence $\phi_t$ and colonization $\gamma_t$ from replicated detection/non-detection data with imperfect detection.</p>
 <div class="eq-block">$z_{i,t} \sim \text{Bernoulli}\big(z_{i,t-1}\phi_{t-1} + (1-z_{i,t-1})\gamma_{t-1}\big), \quad y_{i,j,t} \sim \text{Bernoulli}(z_{i,t}\, p)$</div>

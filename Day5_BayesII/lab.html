@@ -550,7 +550,7 @@ samples &lt;- <span class="fn">nimbleMCMC</span>(lizardCode, constants=constants
 <span class="ex-tag">Practice Exercise M3</span><span class="difficulty medium"> · R · convergence</span>
 <h3>Lizards: run the model and read the diagnostics properly</h3>
 <p>Run the script <code>Lizards_Nimble.R</code> end to end. This exercise is about the
-<em>diagnostics</em>. The biological inference from this model (the sign of the slope, the occupancy difference between two islands, and how much work the prior is doing with only 19 islands) is <a href="problem_set.html#p5">Problem 5</a> and <a href="problem_set.html#p6">Problem 6</a>,
+<em>diagnostics</em>. The biological inference from this model (the sign of the slope and the difference in occupancy probability between two islands) is <a href="problem_set.html#p5">Problem 5</a>,
 where you write the model yourself.</p>
 <ol type="a">
  <li>Report <code>gelman.diag</code> and <code>heidel.diag</code> for $a$ and $b$ from the first
@@ -875,7 +875,7 @@ what happens when you give the model something better to pull it toward.</p>
 truth ($a=5$, $b=5000$, $\sigma=0.2$) and fits the Beverton-Holt curve. Fit it and interrogate the
 <em>parameters</em> here. The management quantities everyone actually manages by ($N_\text{eq}$, $S_\text{msy}$, $H_\text{msy}$) are nonlinear functions of $a$ and $b$, and
 building them as deterministic nodes so their full posteriors come for free is
-<a href="problem_set.html#p7">Problem 7</a>. Get the fit right first; everything the problem set does
+<a href="problem_set.html#p6">Problem 6</a>. Get the fit right first; everything the problem set does
 rests on it.</p>
 <ol type="a">
  <li>Run the script. Report the posterior median and 95% CI for $a$, $b$ and $\sigma$. Does every
@@ -930,7 +930,7 @@ ceiling of 10. That is the tell. When a posterior presses against a bound you ch
 part of the answer. Productivity is the hardest thing to estimate from a short stock-recruit series,
 because $a$ is the slope of the curve <em>at the origin</em> and 20 years rarely include many
 observations at low spawner abundance, the very region that identifies it. Everything built
-on $a$ inherits that, which is worth remembering when Problem 7 turns $a$ into a harvest rate.</p>
+on $a$ inherits that, which is worth remembering when Problem 6 turns $a$ into a harvest rate.</p>
 <p><strong>(c) More data, tighter posterior, faster than $\sqrt{N}$.</strong> Regenerating
 from the same truth with <code>Nyears = 100</code> shrinks $a$'s 95% interval from
 [3.22, 9.25] (width <strong>6.03</strong>) to [4.58, 6.28] (width <strong>1.71</strong>), a factor of
@@ -1067,7 +1067,7 @@ samples.bad &lt;- <span class="fn">nimbleMCMC</span>(DynOccCode, constants = con
 <span class="fn">MCMCsummary</span>(samples.bad, params = <span class="kw">c</span>(<span class="st">"p"</span>, <span class="st">"psi"</span>), round = <span class="nu">2</span>)</code></pre>
 <p><strong>(a&ndash;c)</strong> The two quantities informed by <em>all</em> the data are recovered well, detection $p$ = 0.63 [0.55, 0.70] (truth 0.60) and baseline occupancy $\psi$ = 0.33 [0.18, 0.51] (truth 0.37). Year-specific persistence and colonization scatter around the 1:1 line but with <strong>very wide 95% CIs</strong>, e.g. $\phi_3$ = 0.52 [0.16, 0.89], $\phi_5$ = 0.08 [0.00, 0.36], $\gamma_1$ = 0.47 [0.26, 0.70] (its truth 0.47, recovered almost exactly; others land anywhere in their wide interval). The derived yearly occupancy $\psi_t$ tracks the true trajectory, including the dip in year 3 (true 0.13, posterior 0.18 [0.08, 0.34]).</p>
 <p><strong>(d)</strong> Replacing the all-ones <code>zst</code> with random 0/1 inits does <em>not</em> stop NIMBLE 1.4.2. Every site-year where a randomly-drawn $z=0$ collides with an observed $y=1$ is logically impossible, so each such observation starts at a $-\infty$ log-density, and NIMBLE says so, printing one <code>warning: logProb of data node y[i, j, t]: logProb is -Inf.</code> line per offending observation before it runs. It then runs to completion, and because $z$ is binary the samplers move those cells to 1 on essentially the first sweep. With a random 0/1 start the posterior comes back the same as with <code>zst</code> (detection $p$ median 0.63 either way). Run the identical model in JAGS and it <em>is</em> fatal: <code>jags.model()</code> aborts with <code>Error in node y[1,1,1]: Node inconsistent with parents</code>. The lesson to take from (d) is therefore not "it crashes" but "read the warnings". A wall of $-\infty$ log-probabilities means your initial values contradict your data; you cannot rely on the sampler rescuing you in a model with continuous latent states, and the all-ones <code>zst</code> makes the whole class of problem disappear.</p>
-<p><strong>Notice what you are left with.</strong> The intervals on the individual $\phi_t$ and $\gamma_t$ are very wide, and R-hat says that is not a convergence problem. The model is being honest about a genuinely small sample. What to do about it is <a href="problem_set.html#p10">Problem 10</a>, where you measure two different fixes and find that one of them can fool you.</p>
+<p><strong>Notice what you are left with.</strong> The intervals on the individual $\phi_t$ and $\gamma_t$ are very wide, and R-hat says that is not a convergence problem. The model is being honest about a genuinely small sample. What to do about it is <a href="problem_set.html#p9">Problem 9</a>, where you measure two different fixes and find that one of them can fool you.</p>
 </div></details>
 </div>
 

@@ -130,8 +130,8 @@ lines(x.grid.raw, p.out.summary[, 3], lty = 2)
 # becomes effectively Bernoulli(p ~ {0, 1}) when back-transformed.
 #
 # We also compute two derived quantities of management interest:
-#   y10 = P(presence | PA = 10),  y20 = P(presence | PA = 20),
-#   diff = y20 - y10  (probability change between two raw-scale conditions).
+#   p10 = P(presence | PA = 10),  p20 = P(presence | PA = 20),
+#   diff = p20 - p10  (probability change between two raw-scale conditions).
 
 lizardCode2 <- nimbleCode({
   # Tighter priors on logit scale
@@ -147,9 +147,9 @@ lizardCode2 <- nimbleCode({
   }
 
   # Derived quantities at two specific PA values
-  y10  <- ilogit(a + b * x10)
-  y20  <- ilogit(a + b * x20)
-  diff <- y20 - y10
+  p10  <- ilogit(a + b * x10)
+  p20  <- ilogit(a + b * x20)
+  diff <- p20 - p10
 })
 
 constants2 <- c(constants, list(x10 = x10, x20 = x20))
@@ -159,14 +159,14 @@ samples2 <- nimbleMCMC(
   constants = constants2,
   data      = data,
   inits     = inits,
-  monitors  = c("a", "b", "p.out", "y10", "y20", "diff"),
+  monitors  = c("a", "b", "p.out", "p10", "p20", "diff"),
   nchains   = 3,
   nburnin   = 1000,
   niter     = 6000,
   samplesAsCodaMCMC = TRUE
 )
 
-MCMCsummary(samples2, params = c("a", "b", "y10", "y20", "diff"))
+MCMCsummary(samples2, params = c("a", "b", "p10", "p20", "diff"))
 
 # Compare posterior densities of slope b under the two priors:
 b1 <- as.matrix(samples1)[, "b"]

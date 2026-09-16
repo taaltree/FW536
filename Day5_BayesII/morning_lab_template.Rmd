@@ -19,7 +19,7 @@ library(MCMCvis)
 library(coda)
 library(ggplot2)
 library(HDInterval)  # hdi() for highest-density intervals (Problems 6 and 7)
-library(MASS)        # rnegbin() for the overdispersed sim in Problem 9
+library(MASS)        # rnegbin() for the overdispersed sim in Problem 8
 library(dplyr)       # site-level summaries for Problem 4
                      # (load dplyr AFTER MASS so dplyr::select is not masked)
 ```
@@ -44,8 +44,8 @@ the course project (`FW536.Rproj`) so the `here::here()` paths find the data.
 ```{r load-data}
 ants <- read.csv(here::here("Day5_BayesII", "data", "ants.csv"))            # Problem 1
 N2O  <- read.csv(here::here("Day5_BayesII", "data", "N2OEmission.csv"))     # Problems 3–4
-liz  <- read.csv(here::here("Day5_BayesII", "data", "IslandsLizards.csv"))  # Problems 5–6
-# Problems 2 and 7–10 simulate their own data (see each problem statement).
+liz  <- read.csv(here::here("Day5_BayesII", "data", "IslandsLizards.csv"))  # Problem 5
+# Problems 2 and 6–9 simulate their own data (see each problem statement).
 ```
 
 ---
@@ -136,10 +136,10 @@ liz  <- read.csv(here::here("Day5_BayesII", "data", "IslandsLizards.csv"))  # Pr
 
 > Fit logistic regression of presence on scaled perimeter:area ratio with the
 > weakly informative prior dnorm(0, 1/2.71). Report diagnostics, the posterior
-> probability that the slope is negative, then refit with the vague prior
-> dnorm(0, 1e-6) on both coefficients. Plot 100 prior curves from each prior, plot
-> both fitted curves with 95% bands over the data, and explain which fit you would
-> trust to predict a new island and why.
+> probability that the slope is negative. Then add derived nodes p10, p20 (the
+> occupancy probability at raw ratios 10 and 20) and diff = p20 − p10 inside the
+> model, report their posteriors, and explain why computing diff inside `nimbleCode`
+> gives correct uncertainty.
 
 **My work:**
 
@@ -152,24 +152,7 @@ liz  <- read.csv(here::here("Day5_BayesII", "data", "IslandsLizards.csv"))  # Pr
 
 ---
 
-# Problem 6 · A management-relevant probability difference
-
-> Add derived nodes y10, y20, and diff = y20 − y10 (scaled versions of PA = 10 and
-> PA = 20) inside your Problem 5 model. Report the posterior of diff and explain
-> why computing it inside `nimbleCode` gives correct uncertainty.
-
-**My work:**
-
-```{r p6}
-# Your R code here
-```
-
-**Answer / biological interpretation:**
-
-
----
-
-# Problem 7 · Beverton-Holt fit with management quantities
+# Problem 6 · Beverton-Holt fit with management quantities
 
 > Simulate 25 years (`set.seed(7)`; $a = 5$, $b = 5000$, $\sigma = 0.3$) and fit
 > Beverton-Holt in NIMBLE with $N_\text{eq}$, $S_\text{msy}$, $H_\text{msy}$ as
@@ -183,7 +166,7 @@ liz  <- read.csv(here::here("Day5_BayesII", "data", "IslandsLizards.csv"))  # Pr
 
 **My work:**
 
-```{r p7}
+```{r p6}
 set.seed(7)
 Nyears <- 25; a.t <- 5; b.t <- 5000; sig.t <- 0.3
 S <- rlnorm(Nyears, 7.5, 0.8)
@@ -198,9 +181,9 @@ for (t in 1:Nyears)
 
 ---
 
-# Problem 8 · Why you cannot build a derived quantity from summary numbers
+# Problem 7 · Why you cannot build a derived quantity from summary numbers
 
-> Using your Problem 7 draws: (a) compute $S_\text{msy}$ once per draw and take
+> Using your Problem 6 draws: (a) compute $S_\text{msy}$ once per draw and take
 > the 5th, 50th and 95th percentiles; then substitute the percentiles of $a$ and
 > $b$ into the formula instead, and report the percentage difference at the 5th
 > percentile. (b) Explain the disagreement through `cor(a, b)`. (c) Repeat for
@@ -209,8 +192,8 @@ for (t in 1:Nyears)
 
 **My work:**
 
-```{r p8}
-# Your R code here (reuse the posterior draws from Problem 7)
+```{r p7}
+# Your R code here (reuse the posterior draws from Problem 6)
 ```
 
 **Answer / biological interpretation:**
@@ -218,7 +201,7 @@ for (t in 1:Nyears)
 
 ---
 
-# Problem 9 · Repeat-count abundance and a goodness-of-fit check
+# Problem 8 · Repeat-count abundance and a goodness-of-fit check
 
 > Simulate overdispersed repeat counts, fit the basic Royle N-mixture in NIMBLE
 > (remember `dbinom(prob, size)` and `N = apply(y, 1, max)`), add posterior
@@ -226,7 +209,7 @@ for (t in 1:Nyears)
 
 **My work:**
 
-```{r p9}
+```{r p8}
 # Your R code here
 ```
 
@@ -235,7 +218,7 @@ for (t in 1:Nyears)
 
 ---
 
-# Problem 10 · Multi-season occupancy: recover persistence and colonization
+# Problem 9 · Multi-season occupancy: recover persistence and colonization
 
 > Simulate the rising-colonization dataset (`set.seed(10)`) and fit the dynamic
 > occupancy model with the z-init trick. (a) Report $\hat R$ for $p$ and the
@@ -248,7 +231,7 @@ for (t in 1:Nyears)
 
 **My work:**
 
-```{r p10}
+```{r p9}
 set.seed(10)
 nS <- 50; nY <- 6; nR <- 3; p.t <- 0.5
 phi.t <- c(0.70, 0.70, 0.80, 0.85, 0.85)

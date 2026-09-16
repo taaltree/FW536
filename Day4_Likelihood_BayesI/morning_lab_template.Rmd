@@ -80,7 +80,7 @@ library(stats4)   # mle() and confint() for profile-likelihood CIs
 
 # Problem 3 · Two-component Poisson mixture for whale blow counts (whale.csv)
 
-> Load `data/whale.csv` (sex, blows). Fit the mixture $f(y) = \pi\,\text{Pois}(y;\lambda_1) + (1-\pi)\text{Pois}(y;\lambda_2)$ with `mle()`; explain why there is no closed-form MLE; refit from the 8 given starting values and judge how robust `mle()` is to the start (relabeling and stalled fits); then validate $\hat\pi$, $\hat\lambda_1$ and $\hat\lambda_2$ against the `sex` column the mixture never used (1 = male, the lower-rate group).
+> Load `data/whale.csv` (sex, blows). Fit the mixture $f(y) = \pi\,\text{Pois}(y;\lambda_1) + (1-\pi)\text{Pois}(y;\lambda_2)$ with `mle()`; explain why the mixture has no closed-form solution and must be fit numerically; refit from the 8 given starting values and judge how robust `mle()` is to the start (relabeling and stalled fits); then validate $\hat\pi$, $\hat\lambda_1$ and $\hat\lambda_2$ against the `sex` column the mixture never used (1 = male, the lower-rate group).
 
 ```{r}
 # Load exactly as in the lab:

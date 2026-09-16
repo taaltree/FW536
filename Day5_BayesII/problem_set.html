@@ -82,8 +82,13 @@ ants$latitude  &lt;- <span class="fn">as.numeric</span>(<span class="fn">scale</
 ants$elevation &lt;- <span class="fn">as.numeric</span>(<span class="fn">scale</span>(ants$elevation))</code></pre>
 <ol type="a">
  <li>Fit the model in <span class="pill nimble">NIMBLE</span> with weakly informative priors ($\beta \sim \mathcal{N}(0, \sigma^2{=}4)$, $\sigma_\epsilon \sim \text{Uniform}(0,5)$). Report posterior medians and 95% CIs for $\beta_1,\beta_2,\beta_3$ and for $\sigma_\epsilon$.</li>
- <li>Look at the posterior of $\sigma_\epsilon$. Does it point to meaningful leftover variation, or is it consistent with values close to 0? Check your answer against the plain Poisson <code>glm()</code> from (c): its residual deviance divided by its residual degrees of freedom should be near 1 when there is no overdispersion (Day 3, Problem 6). What do you conclude about whether the random effect was needed?</li>
- <li>Compare your $\beta$ posterior medians to the frequentist <code>glm(richness ~ forest + latitude + elevation, family = poisson)</code> fit. Where do they agree or differ, and why?</li>
+ <li>Look at the posterior of $\sigma_\epsilon$. Does it point to meaningful leftover variation, or is it consistent with values close to 0? What does that tell you about overdispersion once the covariates are in the model?</li>
+ <li>Now fit the plain Poisson regression without the random effect, <code>glm(richness ~ forest + latitude + elevation, family = poisson)</code>, using the scaled covariates.
+ <ol type="i">
+ <li>Compare your $\beta$ posterior medians and intervals to the <code>glm()</code> estimates. Where do they agree or differ, and why?</li>
+ <li>Is there evidence of overdispersion from the <code>glm()</code> fit? Divide its residual deviance by its residual degrees of freedom; a ratio near 1 means no overdispersion, and a ratio well above 1 means the counts vary more than Poisson allows (Day 3, Problem 6).</li>
+ <li>Does that agree with what you inferred from $\sigma_\epsilon$ in the Bayesian model in (b)? Was the random effect needed?</li>
+ </ol></li>
 </ol>
 <div class="callout try" style="margin-top: 12px;"><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
 </div>
@@ -131,12 +136,12 @@ nsites &lt;- <span class="fn">length</span>(<span class="fn">unique</span>(group
 
 <!-- Problem 4 -->
 <div class="exercise" id="p4">
-<span class="ex-tag">Problem 4</span><span class="difficulty hard"> · group-level regression · <code>N2OEmission.csv</code></span>
-<h3>Modeling the random intercept with a site-level covariate</h3>
-<p>Problem 3's partial-pooling model says <em>that</em> sites differ, through $\sigma_\alpha$, but not <em>why</em>. This problem adds two pieces of structure. They use two different columns, so keep them separate:</p>
+<span class="ex-tag">Problem 4</span><span class="difficulty hard"> · group-level covariate · random slopes · <code>N2OEmission.csv</code></span>
+<h3>A site-level covariate on the random intercept, and a new random slope by fertilizer type</h3>
+<p>Every Bayesian hierarchical model so far today, the lab's N<sub>2</sub>O models and Problem 3, has had <strong>random intercepts only</strong>. In Problem 3 each site got its own intercept $\alpha_j$, but all 563 measurements shared <em>one</em> N-input slope $\beta$: every site and every fertilizer was assumed to respond to added nitrogen at the same rate. Problem 3's model also says <em>that</em> sites differ, through $\sigma_\alpha$, but not <em>why</em>. This problem changes both. The two changes use two different columns, so keep them separate:</p>
 <ul>
 <li><strong>Part (a): explain site differences with soil carbon.</strong> The site-level covariate is $w_j$, one value per site, built from the <code>carbon</code> column. Average <code>carbon</code> within each site to get $c_j$, the site's percent soil organic carbon (36 sites report more than one value), then take its logit, $w_j = \log\big(c_j/(100-c_j)\big)$. State how you scaled $w_j$ (for example, standardized to mean 0 and SD 1).</li>
-<li><strong>Part (b): let the N-input slope differ by fertilizer type.</strong> This uses <code>fert.index</code>, not $w_j$. Fertilizer type is recorded per measurement, not per site (47 sites tested more than one type), so each row $i$ gets the slope of its own type, $\beta_{k[i]}$ with $k[i]$ = <code>fert.index</code>.</li>
+<li><strong>Part (b): add a random slope, so the N-input slope differs by fertilizer type.</strong> This is new for today. Until now only intercepts varied by group; here the <em>slope</em> becomes a random effect too. You fit random slopes with <code>lmer()</code> on Day 3; this is the same idea written out in NIMBLE. The single $\beta$ is replaced by ten fertilizer-specific slopes $\beta_k$, each drawn from a shared distribution $\mathcal{N}(\mu_\beta, \sigma_\beta^2)$, so they are partially pooled toward the average slope $\mu_\beta$ exactly the way site intercepts are pooled toward their mean. The grouping for the slope is <code>fert.index</code>, not the site and not $w_j$. Fertilizer type is recorded per measurement, not per site (47 sites tested more than one type), so each row $i$ gets the slope of its own type, $\beta_{k[i]}$ with $k[i]$ = <code>fert.index</code>.</li>
 </ul>
 <p>Written out in full, with $j[i]$ = <code>group.index</code> and $k[i]$ = <code>fert.index</code> for row $i$:</p>
 <div class="eq-block">$y_i \sim \mathcal{N}\big(\alpha_{j[i]} + \beta_{k[i]}\, x_i,\ \sigma^2\big), \qquad \alpha_j \sim \mathcal{N}(\kappa + \eta\, w_j,\ \sigma_\alpha^2), \qquad \beta_{k} \sim \mathcal{N}(\mu_\beta, \sigma_\beta^2)$</div>
@@ -158,8 +163,8 @@ each. That is precisely the setting in which the largest estimate is most often 
 group, which is what part (b) makes you check.</p></div>
 
 <ol type="a">
- <li>Fit the group-level-regression model in <span class="pill nimble">NIMBLE</span>. Is the posterior of $\eta$ (the effect of the site covariate on baseline emissions) credibly different from 0?</li>
- <li>Now let the N-input slope vary by fertilizer type, $\beta_k \sim \mathcal{N}(\mu_\beta, \sigma_\beta^2)$. Report the posterior of $\sigma_\beta$ and rank the ten types by posterior median slope. Then <em>test the ranking before you believe it</em>: across your draws, count how often the top-ranked type actually holds the largest $\beta_k$ of the ten, and report that probability together with the type's 95% CI and the number of measurements it rests on. On this evidence, would you write &ldquo;fertilizer type X produces the steepest emissions response&rdquo; in a paper? One or two sentences.</li>
+ <li>Fit the model with the site-level covariate in <span class="pill nimble">NIMBLE</span>. Is the posterior of $\eta$ (the effect of the site covariate on baseline emissions) credibly different from 0?</li>
+ <li>Now add the <strong>random slope</strong>: let the N-input slope vary by fertilizer type, $\beta_k \sim \mathcal{N}(\mu_\beta, \sigma_\beta^2)$, alongside the random site intercepts. Report the posterior of $\sigma_\beta$ and rank the ten types by posterior median slope. Then <em>test the ranking before you believe it</em>: across your draws, count how often the top-ranked type actually holds the largest $\beta_k$ of the ten, and report that probability together with the type's 95% CI and the number of measurements it rests on. On this evidence, would you write &ldquo;fertilizer type X produces the steepest emissions response&rdquo; in a paper? One or two sentences.</li>
  <li>Show that writing the covariate as a regression on the intercept, $\alpha_j \sim \mathcal{N}(\kappa+\eta\, w_j,\sigma_\alpha^2)$, is the <em>same model</em> as adding $w_j$ as an ordinary term in the linear predictor with a mean-zero site random effect (substitute $\alpha_j=\kappa+\eta\, w_j+u_j$). Which parameter carries the between-site effect of $w_j$, and why does shrinkage still happen?</li>
 </ol>
 <div class="callout try" style="margin-top: 12px;"><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>

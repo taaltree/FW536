@@ -55,8 +55,9 @@ liz  <- read.csv(here::here("Day5_BayesII", "data", "IslandsLizards.csv"))  # Pr
 > Load `ants.csv`, scale the three predictors, and fit a Poisson regression of
 > richness on forest, latitude, and elevation, adding an observation-level random
 > effect (one Normal nudge per row) on the log mean. Report the coefficient and
-> $\sigma_\epsilon$ posteriors, judge whether any extra-Poisson variation is left
-> once the covariates are in (check the glm's deviance / df too), and compare to `glm()`.
+> $\sigma_\epsilon$ posteriors, and judge whether any extra-Poisson variation is left
+> once the covariates are in. Then fit the plain Poisson `glm()`: compare coefficients,
+> check it for overdispersion (residual deviance / df), and say whether the two agree.
 
 **My work:**
 
@@ -106,11 +107,12 @@ liz  <- read.csv(here::here("Day5_BayesII", "data", "IslandsLizards.csv"))  # Pr
 
 ---
 
-# Problem 4 · Modeling the random intercept with a site-level covariate
+# Problem 4 · A site-level covariate on the random intercept, and a new random slope by fertilizer type
 
 > Extend Problem 3 so $\alpha_j \sim \mathcal{N}(\kappa + \eta\,w_j,\ \sigma_\alpha^2)$
 > with $w_j$ the logit of each site's mean `carbon` (state how you scaled it), and
-> let the N-input slope vary by fertilizer type, $\beta_{k[i]}$ with $k$ = `fert.index`.
+> add a random slope (new today: so far only intercepts varied) so the N-input slope
+> varies by fertilizer type, $\beta_{k[i]}$ with $k$ = `fert.index`.
 > ($\kappa$ and $\eta$ are the intercept and slope of the regression of site
 > intercepts on $w_j$.) (a) Is $\eta$ credibly different from
 > 0? (b) Report $\sigma_\beta$, rank the ten types by median slope, then test the

@@ -114,13 +114,12 @@ liz  <- read.csv(here::here("Day5_BayesII", "data", "IslandsLizards.csv"))  # Pr
 > add a random slope (new today: so far only intercepts varied) so the N-input slope
 > varies by fertilizer type, $\beta_{k[i]}$ with $k$ = `fert.index`.
 > ($\kappa$ and $\eta$ are the intercept and slope of the regression of site
-> intercepts on $w_j$.) (a) Is $\eta$ credibly different from
-> 0? (b) Report $\sigma_\beta$, rank the ten types by median slope, then test the
+> intercepts on $w_j$.) Fit ONE model with both additions. (a) Site-level effect
+> of soil carbon: report $\eta$'s median, 95% CI and Pr(eta > 0), and interpret
+> its direction and size. (b) Random slope, from the same fit: report $\sigma_\beta$, rank the ten types by median slope, then test the
 > ranking: across draws, how often does the top type really hold the largest
 > slope? Report that probability with the type's 95% CI and its sample size, and
-> say whether you would write "type X produces the steepest response". (c) Show
-> the regression-on-the-intercept form is the same model as carrying $w_j$ in
-> the linear predictor with a mean-zero site effect.
+> say whether you would write "type X produces the steepest response".
 
 **My work:**
 

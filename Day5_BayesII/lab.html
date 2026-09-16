@@ -462,7 +462,7 @@ samples &lt;- <span class="fn">nimbleMCMC</span>(lizardCode, constants=constants
 
 <h3>Init gotchas</h3>
 <div class="callout warn">
-<p>If you initialise <code>a = 10, b = -10</code>, then for some islands $\text{logit}^{-1}(a + bx) \approx 0$. If $y_i = 1$ at that island, the Bernoulli likelihood at start is $\log(0) = -\infty$ and the sampler refuses to start. The safe pattern is initial values close to 0. The lab script uses $\{0, 1, -1\}$ for both $a$ and $b$.</p>
+<p>The line <code>logit(p[i]) &lt;- a + b * x[i]</code> means $p_i = \text{logit}^{-1}(a + b x_i)$, and <code>y[i] ~ dbern(p[i])</code> means NIMBLE scores each island by $\log p_i$ (present) or $\log(1-p_i)$ (absent). Both steps happen behind the scenes. If you initialise far from 0, say <code>a = 50, b = -50</code>, an island where the lizard is absent, such as island 9 ($x = -0.38$), gets $a + bx = 69$, and $\text{logit}^{-1}(69)$ is exactly 1 in floating point. That island then scores $\log(1-1) = \log(0) = -\infty$, and so do four other absent islands. NIMBLE does not stop: it prints <code>logProb of data node y[i]: logProb is -Inf</code> for each of them and runs, but the chain cannot move and stays at its starting values for the whole run. A moderate start like <code>a = 10, b = -10</code> still works on these data. The safe pattern is initial values close to 0. The lab script uses $\{0, 1, -1\}$ for both $a$ and $b$.</p>
 </div>
 
 <h3>The tighter-prior fix</h3>

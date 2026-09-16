@@ -145,9 +145,14 @@ blows &lt;- TheData$blows   <span class="cm"># the mixture ignores the sex colum
 <ol type="i">
 <li>How many different NLL values do you get? Where two starts reach the same NLL, are the fitted parameters also the same? If not, how are they related?</li>
 <li>Did any start stop at a worse (higher) NLL? Compare that NLL with the NLL of a single Poisson fit, <code>-sum(dpois(blows, mean(blows), log = TRUE))</code>, and look at the standard errors <code>summary()</code> reports for that fit. What happened to the fit, and what was special about the starting value that caused it?</li>
-<li>In two or three sentences, say what your results show about how robust <code>mle()</code> is to the starting value for this model and these data, and why you would still run several starts when you fit a mixture to a new dataset.</li>
+<li>In two or three sentences, summarize how the answer <code>mle()</code> returns depends on the starting value for this model, and why a mixture should always be fit from several starts, comparing the fitted parameters and not just the NLL.</li>
 </ol></li>
-<li>The two-component mixture is invariant under relabeling: $(\lambda_1,\lambda_2,\pi)$ and $(\lambda_2,\lambda_1,1-\pi)$ are the same model. Explain how this shows up if you <em>don't</em> constrain $\lambda_1 &lt; \lambda_2$ (you may already have seen it in (c)), and why it would corrupt your standard errors.</li>
+<li><p><strong>Label switching.</strong> In (c), starts 5 and 6 returned $(\hat\lambda_1, \hat\lambda_2, \hat\pi) \approx (29.9, 10.2, 0.58)$ instead of $(10.2, 29.9, 0.42)$, with exactly the same NLL.</p>
+<ol type="i">
+<li>Show that $(\lambda_1,\lambda_2,\pi)$ and $(\lambda_2,\lambda_1,1-\pi)$ give the same value of $f(y)$ for every count $y$, and so the same likelihood. The likelihood cannot tell the two labelings apart.</li>
+<li>Nothing in <code>nll_mix</code> says that $\lambda_1$ must be the smaller rate. Starting with $\lambda_1 &lt; \lambda_2$ in (b) made that labeling likely, but did not guarantee it. Explain what goes wrong if you report $\hat\lambda_1$ as &ldquo;the male rate&rdquo; and $\hat\pi$ as &ldquo;the proportion of males&rdquo; from a fit that switched labels, and what would go wrong if you averaged estimates or standard errors across starts that disagree on the labels.</li>
+<li>Enforce the ordering. Rewrite the model with $\lambda_2 = \lambda_1 + \delta$, estimating <code>lam1</code>, <code>delta</code> and <code>p</code>, and give <code>delta</code> a lower bound just above zero. Refit from starts 5 and 6 (use <code>delta = 5</code> in place of their <code>lam2</code>). Do they now agree with starts 1&ndash;4?</li>
+</ol></li>
 <li><strong>Validate against the labels.</strong> Your mixture never used the <code>sex</code> column. It estimated $\hat\pi$, the proportion of whales in the low-rate component, from the counts alone. In this dataset sex is coded <code>1 = male</code>, <code>2 = female</code>, and males are the lower-rate group. Compute the <em>actual</em> proportion of males, <code>mean(TheData$sex == 1)</code>, and compare it to $\hat\pi$. Also compare the observed mean blow count within each sex to $\hat\lambda_1$ and $\hat\lambda_2$. Does the unsupervised mixture recover the real sex structure?</li>
 </ol>
 </div>

@@ -146,7 +146,7 @@
   <span class="pb-cta">Open the summary &rarr;</span>
 </a>
 
-<div class="callout try"><strong>Helpful companions for today.</strong> Three interactive tools pair with this lab, the <a href="explore_likelihood_mcmc.html">likelihood &amp; MCMC explorer</a>, the <a href="explore_conjugate.html">conjugate prior/posterior explorer</a>, and the <a href="explore_mcmc.html">2D MCMC sampler playground</a>.</div>
+<div class="callout try"><strong>Helpful companions for today.</strong> Three interactive tools pair with this lab, the <a href="explore_likelihood_mcmc.html">likelihood &amp; MCMC explorer</a> (which includes a <a href="explore_likelihood_mcmc.html#surface">3D likelihood surface with its profile</a>), the <a href="explore_conjugate.html">conjugate prior/posterior explorer</a>, and the <a href="explore_mcmc.html">2D MCMC sampler playground</a>.</div>
 
 <section id="orient">
 <h2>Morning · Why we care about likelihood</h2>
@@ -389,6 +389,8 @@ pp &lt;- <span class="fn">seq</span>(<span class="nu">0.40</span>, <span class="
 <span class="fn">abline</span>(h = <span class="nu">1.92</span>, lty = <span class="nu">2</span>, col = <span class="st">"red"</span>)
 <span class="fn">abline</span>(v = phat, col = <span class="st">"grey"</span>)</code></pre>
 <p>Read the 95% CI off where the curve crosses the horizontal line at 1.92.</p>
+
+<div class="callout try"><strong>See the profile on a 3D likelihood surface.</strong> With one parameter, as here, the profile is simply the log-likelihood curve. With more parameters there is nothing to &ldquo;just plot&rdquo;, and the profile has to be built by re-fitting the others. The <a href="explore_likelihood_mcmc.html#surface">likelihood surface &amp; profile explorer</a> draws the Von Bertalanffy log-likelihood over $\kappa$ and $L_\infty$ as a hill you can turn. It traces the profile as a path along the ridge and sets it beside a slice that freezes $L_\infty$. Its profile interval for $\kappa$, 0.204 to 0.285, is the one <code>confint()</code> gives in Exercise M2, while the frozen slice gives an interval 26% narrower. Press <em>Side view</em> to see that the profile is the outline of the hill.</div>
 </section>
 
 <!-- ====== ADDITIONAL EXAMPLE 1: LOGISTIC GLM BY HAND ============== -->

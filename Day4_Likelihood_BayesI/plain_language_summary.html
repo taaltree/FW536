@@ -106,6 +106,8 @@ A likelihood is not a probability about parameters. That sentence is the most im
 The words "re-fit everything else" are the whole idea, and the commonest way to get this wrong is to skip them. If you hold the other parameters <em>frozen</em> at their best-fit values while you slide $\kappa$, you are not profiling, you are taking a slice, and the interval comes out too narrow. Day 4's lab shows this happening on purpose. A grid over $\kappa$ with $L_\infty$ nailed to 100 reports $\kappa \approx 0.15$, while letting $L_\infty$ move returns $\kappa = 0.259$ on the same fish.
 </div>
 
+<div class="callout try"><strong>Walk the ridge yourself.</strong> With two parameters the likelihood is a hill, and the <a href="explore_likelihood_mcmc.html#surface">likelihood surface &amp; profile explorer</a> lets you turn it in 3D. The profile for $\kappa$ is the orange path along the top of the ridge: at each $\kappa$, climb to the best $L_\infty$. The slice is the blue line you get by freezing $L_\infty$ instead. Seen from the side, the outline of the hill <em>is</em> the profile. Freeze $L_\infty$ at 100 and watch the slice give the wrong answer, with an interval that is too narrow.</div>
+
 <div class="callout bio">
 <strong>The Bayesian echo.</strong> Both tools exist because maximum likelihood gives you a point and then has to work to describe the uncertainty around it. In the afternoon you get a whole posterior distribution, so the "interval" is just a question you ask of the draws you already have. That is the same trade-off you will meet again with derived quantities such as MSY, awkward for likelihood and free for Bayes.
 </div>

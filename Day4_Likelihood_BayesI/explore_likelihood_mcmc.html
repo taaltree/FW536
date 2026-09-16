@@ -5,6 +5,8 @@
 <title>Interactive: likelihood &amp; MCMC | FW 536 Day 4</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="stylesheet" href="../_Shared/css/lab.css" />
+<script>MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] } };</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <script defer src="../_Shared/js/lab.js"></script>
 <style>
   .widget { background:#fff; border:1px solid var(--border); border-radius:10px; padding:20px 24px; margin:24px 0; box-shadow:0 2px 10px rgba(0,0,0,.05); }
@@ -27,7 +29,7 @@
   <div class="subtitle">Likelihood &amp; MCMC</div>
   <nav>
     <div class="section">This page</div>
-    <ul><li><a href="#like">1. Likelihood &amp; the MLE</a></li><li><a href="#mcmc">2. Metropolis MCMC</a></li><li><a href="#try">Things to try</a></li></ul>
+    <ul><li><a href="#like">1. Likelihood &amp; the MLE</a></li><li><a href="#surface">2. Likelihood surface &amp; profile</a></li><li><a href="#mcmc">3. Metropolis MCMC</a></li><li><a href="#try">Things to try</a></li></ul>
     <div class="section">Day 4</div>
     <ul>
       <li><a href="lab.html">Practice lab</a></li>
@@ -41,7 +43,7 @@
 <header class="lab-header">
   <div class="eyebrow">Day 4 · Interactive</div>
   <h1>From likelihood to posterior to MCMC</h1>
-  <p class="lede">One running example (you observed <em>k</em> successes in <em>n</em> trials) shown three ways: the likelihood curve and its peak (the MLE), and a live Metropolis sampler whose draws pile up, one tick at a time, into the marginal posterior.</p>
+  <p class="lede">One running example (you observed <em>k</em> successes in <em>n</em> trials) shown two ways: the likelihood curve and its peak (the MLE), and a live Metropolis sampler whose draws pile up, one tick at a time, into the marginal posterior. In between, a two-parameter growth model shows what a likelihood <em>surface</em> looks like and how a profile likelihood is read off it.</p>
 </header>
 
 <div class="widget">
@@ -69,8 +71,57 @@
 </div>
 </section>
 
+<section id="surface">
+<h2>2. Two parameters: the likelihood surface and its profile</h2>
+<p>Panel 1 had one parameter, so the likelihood was a curve. Give the model two parameters and the likelihood becomes a <strong>surface</strong>, a hill standing over a map of every pair of parameter values. This panel uses the Von Bertalanffy growth model from the lab, fit to all 100 fish in <code>vonbert.csv</code>: length $= L_\infty(1 - e^{-\kappa\,\text{age}})$ plus normal noise. The map's two directions are the growth coefficient $\kappa$ and the asymptotic length $L_\infty$, and the height is the log-likelihood, measured down from the peak. The top of the hill is the MLE.</p>
+<div class="callout key">
+<p><strong>A profile is a walk along the ridge.</strong> Say you care about $\kappa$ and $L_\infty$ is a nuisance. To profile $\kappa$:</p>
+<ol>
+<li><strong>Fix $\kappa$.</strong> Pick one value. On the map, that is a straight line running across the hill in the $L_\infty$ direction.</li>
+<li><strong>Climb.</strong> Walk along that line to its highest point, which is the best $L_\infty$ for this $\kappa$. Record the height.</li>
+<li><strong>Repeat.</strong> Do that for every $\kappa$. The highest points trace the orange <strong>ridge path</strong> over the hill, and their heights, plotted against $\kappa$, are the <strong>profile likelihood</strong>.</li>
+</ol>
+<p>The 95% profile interval is every $\kappa$ whose ridge height is within 1.92 of the peak, the same rule as panel 1. The mistake the lab warns about is to skip step 2: freeze $L_\infty$ at one value and walk a straight line in the $\kappa$ direction instead. That is a <strong>slice</strong> (blue). Because $\kappa$ and $L_\infty$ trade off against each other, the hill is a tilted, diagonal ridge, and a straight slice cuts across it. The slice falls away faster than the ridge does, so its interval is too narrow, and if the frozen value is wrong it peaks in the wrong place too.</p>
+</div>
+<p>The noise SD $\sigma$ is a third parameter. To draw a surface in three dimensions, $\sigma$ is set to its best value at every point on the map, which is itself a profile over $\sigma$. The profile you see for $\kappa$ is therefore the full three-parameter profile, the one <code>confint()</code> returns in Exercise M2.</p>
+<div class="widget">
+  <div class="controls">
+    <div class="ctl" role="radiogroup" aria-label="Parameter to profile">
+      <label>Parameter to profile</label>
+      <div style="font-family:'Helvetica Neue',Arial,sans-serif; font-size:14px; display:flex; gap:18px; margin-top:6px;">
+        <label style="font-weight:400; display:inline;"><input type="radio" name="interest" value="k" checked> κ (growth rate)</label>
+        <label style="font-weight:400; display:inline;"><input type="radio" name="interest" value="L"> L∞ (asymptotic length)</label>
+      </div>
+    </div>
+    <div class="ctl"><label for="cut"><span id="cutname">Fix κ at</span><span class="val" id="v_cut"></span></label><input id="cut" type="range" min="0" max="1000" step="1" value="500"></div>
+    <div class="ctl"><label for="frozen"><span id="frozenname">Freeze L∞ for the slice at</span><span class="val" id="v_frozen"></span></label><input id="frozen" type="range" min="0" max="1000" step="1" value="500"></div>
+  </div>
+  <div class="btns">
+    <button id="viewTilt" class="sec">Tilted view</button>
+    <button id="viewTop" class="sec">Top down (a contour map)</button>
+    <button id="viewSide" class="sec">Side view along the nuisance</button>
+    <button id="frozenMLE" class="sec">Freeze at the MLE</button>
+  </div>
+  <p class="readout" style="margin:4px 0 8px; color:var(--muted)">Drag the surface to turn it.</p>
+  <div class="sr-readout" id="srSurf" role="status" aria-live="polite" aria-atomic="true"></div>
+  <canvas id="surf3d" width="720" height="460" style="width:100%; height:auto; display:block; touch-action:none; cursor:grab; border-radius:6px;" role="img" aria-label="Three-dimensional log-likelihood surface for kappa and L-infinity"></canvas>
+  <p class="readout" style="font-size:13px; margin-top:4px;">
+    <span style="color:#D73F09; font-weight:700;">━ ridge path (profile)</span> &nbsp;
+    <span style="color:#1D4ED8; font-weight:700;">━ slice (other parameter frozen)</span> &nbsp;
+    <span style="color:#111; font-weight:700;">┅ 1.92 contour</span> &nbsp;
+    <span style="color:#6A3D9A; font-weight:700;">━ your fixed value, climbed to its best point ●</span>
+  </p>
+  <svg id="profchart" viewBox="0 0 720 300" width="100%" role="img" aria-label="Profile likelihood and slice"></svg>
+  <details class="data-table-details">
+    <summary>Show the plotted values as a table</summary>
+    <div class="data-table-wrap" id="surfTable"></div>
+  </details>
+  <div class="readout" id="surfout"></div>
+</div>
+</section>
+
 <section id="mcmc">
-<h2>2. A Metropolis sampler builds the marginal posterior</h2>
+<h2>3. A Metropolis sampler builds the marginal posterior</h2>
 <div class="callout key">
 <p><strong>What the sampler does, one step at a time.</strong> It wanders over values of $p$, and the values it visits pile up into the posterior. Each step:</p>
 <ol>
@@ -107,7 +158,9 @@
 <ol>
 <li><strong>The peak is the MLE.</strong> Drag p in panel 1 to the top of the likelihood curve. It lands on k/n.</li>
 <li><strong>The 1.92 rule.</strong> Tick the log-likelihood box. Every p whose log-likelihood is within 1.92 of the peak is inside the 95% profile interval (1.92 is half of the 3.84 chi-square cutoff). Set k = 3, n = 10 and compare that lopsided interval with the symmetric Wald interval printed beside it.</li>
-<li><strong>MCMC recovers the posterior.</strong> Hit Run and watch the teal histogram in panel 2 fill in the dashed black posterior curve. The MCMC never computes that curve. It just wanders and the samples pile up in the right shape.</li>
+<li><strong>A profile walks the ridge.</strong> In panel 2, press <em>Side view along the nuisance</em>. Looking straight along the $L_\infty$ axis, the outline of the hill is exactly the orange profile curve below it, because every point on that outline is the highest point along one line of sight. Then press <em>Top down</em>: the profile interval is the shadow the dashed 1.92 contour casts on the $\kappa$ axis, and the slice interval is only the stretch of the blue line inside that contour.</li>
+<li><strong>Freezing a nuisance parameter misleads.</strong> Still in panel 2, drag <em>Freeze L∞</em> up to 100, the round number the lab's grid search nailed it to. The slice now peaks at $\kappa = 0.207$ instead of the MLE, $0.241$, and its interval, 0.184 to 0.234, is 38% narrower than the profile interval and misses the MLE entirely. That is the lab's trap in miniature. Press <em>Freeze at the MLE</em> and the slice peaks in the right place but its interval is still too narrow. Only re-fitting $L_\infty$ at every $\kappa$ gets the width right.</li>
+<li><strong>MCMC recovers the posterior.</strong> Hit Run and watch the teal histogram in panel 3 fill in the dashed black posterior curve. The MCMC never computes that curve. It just wanders and the samples pile up in the right shape.</li>
 <li><strong>Read the interval off the draws.</strong> The shaded band is the middle 95% of the draws themselves, which is the credible interval you would report. Step slowly from Reset and watch it lurch about while the chain is short, then settle as the marginal fills in. Nothing here is computed from the analytic curve, which is the point: the same recipe works for posteriors that have no formula.</li>
 <li><strong>Step size matters.</strong> Set the step very small: the chain crawls and the acceptance rate is high but mixing is slow. Set it very large: most proposals are rejected (low acceptance) and the chain gets stuck. A middling step (acceptance ≈ 20–45%) works best.</li>
 <li><strong>More data → tighter posterior.</strong> Raise n (keeping k/n fixed) and both the likelihood and the posterior get narrower.</li>
@@ -436,6 +489,243 @@ function syncValueText(){
 document.getElementById('v_p').textContent=P.toFixed(2);
 document.getElementById('v_step').textContent=STEP.toFixed(2);
 syncValueText(); refreshData(); resetChain();
+</script>
+<script>
+// ===== Panel 2: two-parameter likelihood surface and profile (Von Bertalanffy, all 100 fish) =====
+const VB_AGE=[21.222634,18.165902,11.437182,21.721605,11.963757,5.699322,7.916081,24.109543,5.724022,2.466124,15.762807,1.300296,12.389634,11.57377,19.14227,19.132409,2.124865,10.347117,20.770529,21.890981,15.994228,12.48019,7.01837,3.800428,19.750152,17.438909,24.931264,2.939866,23.137849,15.615475,22.707154,2.411445,4.639155,10.684368,18.892462,21.947482,5.47141,15.00635,10.325449,18.562919,17.421647,18.574171,20.921639,21.259563,17.241141,12.101717,9.470751,20.908064,18.234674,14.688354,8.221519,5.046697,11.639452,14.826557,7.516512,2.359015,22.901686,15.567403,14.97413,15.506363,21.987568,19.25558,7.106155,7.643975,3.678381,2.388314,17.365218,14.852701,23.494601,10.12433,2.728923,7.964696,1.137015,4.274527,5.07215,3.41006,3.175262,18.993735,20.053635,17.660473,3.916335,24.475512,4.600938,6.203883,14.656792,3.666118,24.582128,18.713045,18.472514,4.41473,16.662071,7.889218,23.997563,21.27816,7.968883,10.459035,4.051219,10.317393,1.227454,13.268371];
+const VB_LEN=[100.043181,115.341625,102.44366,99.327879,105.961683,56.508746,88.466878,88.193944,78.528971,54.478832,97.482812,36.79545,91.514145,109.309305,101.372679,91.503434,52.207316,99.441595,93.124808,92.974603,104.928787,104.741738,79.186095,65.54226,93.138882,99.151264,92.290283,68.309894,93.503421,108.222601,117.534527,48.531893,74.623573,81.540782,104.243126,116.69542,92.832353,113.190177,111.644008,86.19721,99.182562,102.972415,118.89638,110.157357,110.882983,95.357819,93.706279,109.863186,97.724985,102.103666,62.984927,67.290143,89.598032,69.996282,63.497635,37.731362,88.151219,83.188247,78.788783,69.408922,80.842166,92.657417,72.268165,56.242781,47.665356,25.501335,88.890713,82.224754,64.097469,90.968825,51.29288,67.217457,15.834656,52.491489,71.646923,59.357193,41.373577,86.830429,87.910942,84.013783,59.369102,83.399774,47.183233,69.841635,78.82903,60.74356,65.905856,78.638982,91.222319,57.600709,81.463017,71.091335,90.158266,78.361293,64.834744,92.657244,44.034753,72.209796,23.828424,82.648932];
+(function(){
+const NF=VB_AGE.length;
+// Log-likelihood with sigma at its best value for this (Linf, kappa): sigma^2 = RSS/n.
+function llAt(L,k){ let rss=0; for(let i=0;i<NF;i++){ const r=VB_LEN[i]-L*(1-Math.exp(-k*VB_AGE[i])); rss+=r*r; }
+  return -NF/2*Math.log(2*Math.PI*rss/NF)-NF/2; }
+// For fixed kappa the best Linf has a closed form (least squares through the origin on 1 - e^(-kappa age)).
+function bestL(k){ let sy=0,sg=0; for(let i=0;i<NF;i++){ const g=1-Math.exp(-k*VB_AGE[i]); sy+=VB_LEN[i]*g; sg+=g*g; } return sy/sg; }
+function golden(f,a,b){ const r=(Math.sqrt(5)-1)/2; let c=b-r*(b-a), d=a+r*(b-a), fc=f(c), fd=f(d);
+  for(let i=0;i<70;i++){ if(fc>fd){ b=d; d=c; fd=fc; c=b-r*(b-a); fc=f(c); } else { a=c; c=d; fc=fd; d=a+r*(b-a); fd=f(d); } }
+  return (a+b)/2; }
+function bestK(L){ return golden(k=>llAt(L,k),0.01,1.5); }
+
+const KHAT=golden(k=>llAt(bestL(k),k),0.01,1.5), LHAT=bestL(KHAT), LLMAX=llAt(LHAT,KHAT);
+const KR=[0.17,0.33], LR=[86,105];           // map extent
+const FLOOR=-10, PFLOOR=-8;                 // surface and profile-panel clipping
+const PAR={k:{name:'κ',lo:KR[0],hi:KR[1],hat:KHAT,dp:3}, L:{name:'L∞',lo:LR[0],hi:LR[1],hat:LHAT,dp:1}};
+let INT='k', CUT=0.30, FROZEN=LHAT, AZ=-0.62, EL=0.52;
+
+const other=()=>INT==='k'?'L':'k';
+const prof=t=> INT==='k' ? llAt(bestL(t),t)-LLMAX : llAt(t,bestK(t))-LLMAX;
+const best=t=> INT==='k' ? bestL(t) : bestK(t);
+const slice=t=> INT==='k' ? llAt(FROZEN,t)-LLMAX : llAt(t,FROZEN)-LLMAX;
+// map (theta of interest, nuisance) -> (kappa, Linf)
+const toKL=(t,u)=> INT==='k' ? [t,u] : [u,t];
+
+// Interval: every theta within 1.92 of the curve's own peak, found by bisection on each side.
+function interval(f,lo,hi){
+  const tpk=golden(f,lo,hi), top=f(tpk), thr=top-1.92;
+  const root=(a,b)=>{ let fa=f(a)-thr; for(let i=0;i<50;i++){ const m=(a+b)/2, fm=f(m)-thr; if((fa<0)===(fm<0)){a=m;fa=fm;} else b=m; } return (a+b)/2; };
+  const L = f(lo)>=thr ? null : root(lo,tpk), H = f(hi)>=thr ? null : root(tpk,hi);
+  return {peak:tpk, top, lo:L, hi:H};
+}
+
+// ---------- 3D surface ----------
+const G=46, grid=[];
+for(let i=0;i<G;i++){ grid.push([]); for(let j=0;j<G;j++){
+  const k=KR[0]+(KR[1]-KR[0])*i/(G-1), L=LR[0]+(LR[1]-LR[0])*j/(G-1);
+  grid[i].push(llAt(L,k)-LLMAX); } }
+const nx=k=>(k-KR[0])/(KR[1]-KR[0])*2-1, ny=L=>(L-LR[0])/(LR[1]-LR[0])*2-1;
+const nz=v=>(Math.max(v,FLOOR)-FLOOR)/(-FLOOR)*1.15-0.6;
+function hcolor(t){ // low teal -> sand -> orange -> dark orange at the peak
+  const stops=[[0,[31,91,80]],[0.45,[99,176,160]],[0.72,[242,193,78]],[0.9,[215,63,9]],[1,[168,51,10]]];
+  for(let s=1;s<stops.length;s++) if(t<=stops[s][0]){ const [a,ca]=stops[s-1],[b,cb]=stops[s], u=(t-a)/(b-a);
+    return ca.map((c,m)=>c+(cb[m]-c)*u); }
+  return stops[stops.length-1][1];
+}
+const cv=document.getElementById('surf3d'), ctx=cv.getContext('2d');
+const CW=720, CH=460;
+function sizeCanvas(){ const dpr=Math.min(2,window.devicePixelRatio||1); cv.width=CW*dpr; cv.height=CH*dpr; ctx.setTransform(dpr,0,0,dpr,0,0); }
+function project(X,Y,Z){
+  const xr=X*Math.cos(AZ)-Y*Math.sin(AZ), yr=X*Math.sin(AZ)+Y*Math.cos(AZ);
+  const up=Z*Math.cos(EL)+yr*Math.sin(EL), depth=yr*Math.cos(EL)-Z*Math.sin(EL);
+  const sc=190; return [CW/2+xr*sc, CH/2-12-up*sc, depth];
+}
+function drawSurface(){
+  ctx.clearRect(0,0,CW,CH); ctx.fillStyle='#fff'; ctx.fillRect(0,0,CW,CH);
+  const items=[];
+  const zb=nz(FLOOR);
+  // floor box edges and tick labels
+  const edge=(a,b,label)=>{ const p=project(...a), q=project(...b); items.push({d:9,draw:()=>{ ctx.strokeStyle='#bbb'; ctx.lineWidth=1; ctx.setLineDash([]); ctx.beginPath(); ctx.moveTo(p[0],p[1]); ctx.lineTo(q[0],q[1]); ctx.stroke(); }}); };
+  edge([-1,-1,zb],[1,-1,zb]); edge([1,-1,zb],[1,1,zb]); edge([1,1,zb],[-1,1,zb]); edge([-1,1,zb],[-1,-1,zb]);
+  // surface quads
+  const light=[-0.4,-0.5,0.77];
+  for(let i=0;i<G-1;i++) for(let j=0;j<G-1;j++){
+    const X=[nx(KR[0]+(KR[1]-KR[0])*i/(G-1)), nx(KR[0]+(KR[1]-KR[0])*(i+1)/(G-1))];
+    const Y=[ny(LR[0]+(LR[1]-LR[0])*j/(G-1)), ny(LR[0]+(LR[1]-LR[0])*(j+1)/(G-1))];
+    const z00=nz(grid[i][j]), z10=nz(grid[i+1][j]), z11=nz(grid[i+1][j+1]), z01=nz(grid[i][j+1]);
+    const P=[project(X[0],Y[0],z00),project(X[1],Y[0],z10),project(X[1],Y[1],z11),project(X[0],Y[1],z01)];
+    const dzdx=((z10-z00)+(z11-z01))/2/(X[1]-X[0]), dzdy=((z01-z00)+(z11-z10))/2/(Y[1]-Y[0]);
+    const nlen=Math.hypot(dzdx,dzdy,1), shade=0.62+0.38*Math.max(0,(-dzdx*light[0]-dzdy*light[1]+light[2])/nlen);
+    const hv=(Math.max(FLOOR,(grid[i][j]+grid[i+1][j]+grid[i+1][j+1]+grid[i][j+1])/4)-FLOOR)/(-FLOOR);
+    const col=hcolor(hv).map(c=>Math.round(Math.min(255,c*shade)));
+    items.push({d:(P[0][2]+P[1][2]+P[2][2]+P[3][2])/4, draw:()=>{
+      ctx.fillStyle=`rgb(${col})`; ctx.strokeStyle=`rgba(255,255,255,0.18)`; ctx.lineWidth=0.5;
+      ctx.beginPath(); ctx.moveTo(P[0][0],P[0][1]); for(let m=1;m<4;m++) ctx.lineTo(P[m][0],P[m][1]); ctx.closePath(); ctx.fill(); ctx.stroke(); }});
+  }
+  // side walls from the surface edge down to the floor, so the hill reads as a solid block
+  const wall=(i1,j1,i2,j2)=>{
+    const X1=nx(KR[0]+(KR[1]-KR[0])*i1/(G-1)), Y1=ny(LR[0]+(LR[1]-LR[0])*j1/(G-1));
+    const X2=nx(KR[0]+(KR[1]-KR[0])*i2/(G-1)), Y2=ny(LR[0]+(LR[1]-LR[0])*j2/(G-1));
+    const P=[project(X1,Y1,zb),project(X2,Y2,zb),project(X2,Y2,nz(grid[i2][j2])),project(X1,Y1,nz(grid[i1][j1]))];
+    items.push({d:(P[0][2]+P[1][2]+P[2][2]+P[3][2])/4+0.02, draw:()=>{ ctx.fillStyle='rgba(214,205,194,0.55)'; ctx.strokeStyle='rgba(214,205,194,0.55)'; ctx.lineWidth=0.6;
+      ctx.beginPath(); ctx.moveTo(P[0][0],P[0][1]); for(let m=1;m<4;m++) ctx.lineTo(P[m][0],P[m][1]); ctx.closePath(); ctx.fill(); ctx.stroke(); }});
+  };
+  for(let s=0;s<G-1;s++){ wall(s,0,s+1,0); wall(s,G-1,s+1,G-1); wall(0,s,0,s+1); wall(G-1,s,G-1,s+1); }
+  // a polyline lying on the surface, lifted a touch and drawn just in front of the quads beneath it
+  const onSurf=(pts,color,width,dash)=>{
+    for(let m=0;m<pts.length-1;m++){
+      const [k1,L1,v1]=pts[m], [k2,L2,v2]=pts[m+1];
+      if(k1<KR[0]||k1>KR[1]||k2<KR[0]||k2>KR[1]||L1<LR[0]||L1>LR[1]||L2<LR[0]||L2>LR[1]) continue;
+      const p=project(nx(k1),ny(L1),nz(v1)+0.012), q=project(nx(k2),ny(L2),nz(v2)+0.012);
+      items.push({d:(p[2]+q[2])/2-0.035, draw:()=>{ ctx.strokeStyle=color; ctx.lineWidth=width; ctx.setLineDash(dash||[]); ctx.lineCap='round';
+        ctx.beginPath(); ctx.moveTo(p[0],p[1]); ctx.lineTo(q[0],q[1]); ctx.stroke(); ctx.setLineDash([]); }});
+    }
+  };
+  const T=PAR[INT], O=PAR[other()], NS=90;
+  const ridge=[], sl=[], cutLine=[];
+  for(let m=0;m<=NS;m++){ const t=T.lo+(T.hi-T.lo)*m/NS;
+    const [k,L]=toKL(t,best(t)); ridge.push([k,L,llAt(L,k)-LLMAX]);
+    const [k2,L2]=toKL(t,FROZEN); sl.push([k2,L2,llAt(L2,k2)-LLMAX]);
+    const u=O.lo+(O.hi-O.lo)*m/NS, [k3,L3]=toKL(CUT,u); cutLine.push([k3,L3,llAt(L3,k3)-LLMAX]); }
+  // the 1.92 contour, by marching squares on the grid
+  const lev=-1.92, cont=[];
+  for(let i=0;i<G-1;i++) for(let j=0;j<G-1;j++){
+    const c=[[i,j],[i+1,j],[i+1,j+1],[i,j+1]], v=c.map(([a,b])=>grid[a][b]), cross=[];
+    for(let e=0;e<4;e++){ const a=v[e], b=v[(e+1)%4]; if((a>=lev)!==(b>=lev)){ const u=(lev-a)/(b-a), [ia,ja]=c[e], [ib,jb]=c[(e+1)%4];
+      const ii=ia+(ib-ia)*u, jj=ja+(jb-ja)*u; cross.push([KR[0]+(KR[1]-KR[0])*ii/(G-1), LR[0]+(LR[1]-LR[0])*jj/(G-1), lev]); } }
+    if(cross.length>=2) cont.push([cross[0],cross[1]]);
+    if(cross.length===4) cont.push([cross[2],cross[3]]);
+  }
+  cont.forEach(seg=>onSurf(seg,'#111',1.6,[4,3]));
+  onSurf(cutLine,'#6A3D9A',2.4);
+  onSurf(sl,'#1D4ED8',3);
+  onSurf(ridge,'#D73F09',3.6);
+  // markers: the MLE and the climbed point for the fixed value
+  const dot=(k,L,v,fill,r,label)=>{ const p=project(nx(k),ny(L),nz(v)+0.02);
+    items.push({d:p[2]-0.2, draw:()=>{ ctx.fillStyle=fill; ctx.strokeStyle='#fff'; ctx.lineWidth=1.8; ctx.beginPath(); ctx.arc(p[0],p[1],r,0,2*Math.PI); ctx.fill(); ctx.stroke();
+      if(label){ ctx.fillStyle='#111'; ctx.font='600 12px Helvetica Neue, Arial, sans-serif'; ctx.textAlign='left'; ctx.fillText(label,p[0]+8,p[1]-8); } }}); };
+  const [kc,Lc]=toKL(CUT,best(CUT));
+  dot(KHAT,LHAT,0,'#111',5,'MLE');
+  dot(kc,Lc,llAt(Lc,kc)-LLMAX,'#6A3D9A',5.5,'');
+  items.sort((a,b)=>b.d-a.d).forEach(it=>it.draw());
+  // axis labels along two floor edges (drawn last so they stay readable). An axis seen
+  // end-on (the side view) gets no labels, since its ticks would pile on top of each other.
+  const nearY = project(0,-1,zb)[2] < project(0,1,zb)[2] ? -1 : 1, nearX = project(-1,0,zb)[2] < project(1,0,zb)[2] ? -1 : 1;
+  const span=(a,b)=>{ const p=project(...a), q=project(...b); return Math.hypot(p[0]-q[0],p[1]-q[1]); };
+  const put=(txt,p,font,col)=>{ ctx.font=font; ctx.fillStyle=col; ctx.textAlign='center';
+    const y=Math.max(14,Math.min(CH-6,p[1]+4)); ctx.fillText(txt, Math.max(60,Math.min(CW-60,p[0])), y); return y; };
+  if(span([-1,nearY,zb],[1,nearY,zb])>120){
+    const ty=[0.20,0.25,0.30].map(k=>put(k.toFixed(2),project(nx(k),nearY*1.1,zb),'11px Helvetica Neue, Arial, sans-serif','#555'));
+    const p=project(0,nearY*1.34,zb); p[1]=Math.max(p[1],Math.max(...ty)+14);
+    put('κ (growth rate)',p,'600 13px Helvetica Neue, Arial, sans-serif','#333'); }
+  if(span([nearX,-1,zb],[nearX,1,zb])>120){
+    const ty=[90,95,100].map(L=>put(String(L),project(nearX*1.1,ny(L),zb),'11px Helvetica Neue, Arial, sans-serif','#555'));
+    const p=project(nearX*1.5,0,zb); if(EL<0.3) p[1]=Math.max(...ty)+14;
+    put('L∞ (asymptotic length)',p,'600 13px Helvetica Neue, Arial, sans-serif','#333'); }
+  ctx.textAlign='left'; ctx.font='11px Helvetica Neue, Arial, sans-serif'; ctx.fillStyle='#666';
+  ctx.fillText('height = log-likelihood − its peak (clipped at '+FLOOR+')',10,16);
+}
+
+// ---------- profile vs slice panel ----------
+function drawProfile(pi,si){
+  const T=PAR[INT], O=PAR[other()], W=720,H=300,ml=50,mr=14,mt=16,mb=44,pw=W-ml-mr,ph=H-mt-mb;
+  const px=t=>ml+(t-T.lo)/(T.hi-T.lo)*pw, py=v=>mt+(0.4-Math.max(PFLOOR,v))/(0.4-PFLOOR)*ph;
+  let v=`<rect width="${W}" height="${H}" fill="white"/>`;
+  if(pi.lo!==null&&pi.hi!==null) v+=`<rect x="${px(pi.lo)}" y="${mt}" width="${px(pi.hi)-px(pi.lo)}" height="${ph}" fill="#D73F09" opacity="0.08"/>`;
+  v+=`<line x1="${ml}" y1="${mt+ph}" x2="${ml+pw}" y2="${mt+ph}" stroke="#999"/><line x1="${ml}" y1="${mt}" x2="${ml}" y2="${mt+ph}" stroke="#999"/>`;
+  for(let t=0;t>=PFLOOR;t-=2) v+=`<text x="${ml-6}" y="${py(t)+4}" font-size="10" fill="#666" text-anchor="end">${t}</text>`;
+  for(let m=0;m<=6;m++){ const t=T.lo+(T.hi-T.lo)*m/6;
+    v+=`<line x1="${px(t)}" y1="${mt+ph}" x2="${px(t)}" y2="${mt+ph+4}" stroke="#999"/><text x="${px(t)}" y="${mt+ph+16}" font-size="10" fill="#666" text-anchor="middle">${t.toFixed(T.dp===3?2:0)}</text>`; }
+  v+=`<text transform="translate(13,${mt+ph/2}) rotate(-90)" font-size="11" fill="#444" text-anchor="middle">ℓ − ℓ(MLE)</text>`;
+  v+=`<text x="${ml+pw/2}" y="${H-6}" font-size="12" fill="#444" text-anchor="middle">${T.name}: profile (orange, ${O.name} re-fit at every point) vs slice (blue dashed, ${O.name} frozen at ${FROZEN.toFixed(O.dp)})</text>`;
+  const NS=160, pp=[], ss=[];
+  for(let m=0;m<=NS;m++){ const t=T.lo+(T.hi-T.lo)*m/NS; pp.push(`${px(t)},${py(prof(t))}`); ss.push(`${px(t)},${py(slice(t))}`); }
+  v+=`<line x1="${ml}" y1="${py(-1.92)}" x2="${ml+pw}" y2="${py(-1.92)}" stroke="#111" stroke-dasharray="6 4"/>`;
+  v+=`<text x="${ml+6}" y="${py(-1.92)-5}" font-size="11" fill="#111">ℓ(MLE) − 1.92</text>`;
+  v+=`<polyline points="${ss.join(' ')}" fill="none" stroke="#1D4ED8" stroke-width="2.5" stroke-dasharray="7 4"/>`;
+  v+=`<polyline points="${pp.join(' ')}" fill="none" stroke="#D73F09" stroke-width="3"/>`;
+  // interval brackets under the curves
+  const bracket=(iv,y,col,lab)=>{ if(iv.lo===null||iv.hi===null) return;
+    v+=`<line x1="${px(iv.lo)}" y1="${y}" x2="${px(iv.hi)}" y2="${y}" stroke="${col}" stroke-width="3"/>`+
+       `<line x1="${px(iv.lo)}" y1="${y-5}" x2="${px(iv.lo)}" y2="${y+5}" stroke="${col}" stroke-width="2"/><line x1="${px(iv.hi)}" y1="${y-5}" x2="${px(iv.hi)}" y2="${y+5}" stroke="${col}" stroke-width="2"/>`+
+       `<text x="${px(iv.hi)+6}" y="${y+4}" font-size="10.5" fill="${col}">${lab}</text>`; };
+  bracket(pi,mt+ph-30,'#D73F09','profile 95% CI');
+  bracket(si,mt+ph-14,'#1D4ED8','slice "CI"');
+  v+=`<line x1="${px(CUT)}" y1="${mt}" x2="${px(CUT)}" y2="${mt+ph}" stroke="#6A3D9A" stroke-width="1.5"/>`;
+  v+=`<circle cx="${px(CUT)}" cy="${py(prof(CUT))}" r="5" fill="#6A3D9A"/>`;
+  v+=`<text x="${ml+pw-4}" y="${mt+12}" font-size="11" fill="#666" text-anchor="end">MLE ${T.name} = ${T.hat.toFixed(T.dp)}</text>`;
+  document.getElementById('profchart').innerHTML=v;
+}
+
+function fmtIv(iv,dp){ return (iv.lo===null?'below the plotted range':iv.lo.toFixed(dp))+' to '+(iv.hi===null?'above the plotted range':iv.hi.toFixed(dp)); }
+function update(){
+  const T=PAR[INT], O=PAR[other()];
+  const pi=interval(prof,T.lo,T.hi), si=interval(slice,T.lo,T.hi);
+  drawSurface(); drawProfile(pi,si);
+  document.getElementById('cutname').textContent=`Fix ${T.name} at`;
+  document.getElementById('frozenname').textContent=`Freeze ${O.name} for the slice at`;
+  document.getElementById('v_cut').textContent=CUT.toFixed(T.dp);
+  document.getElementById('v_frozen').textContent=FROZEN.toFixed(O.dp);
+  document.getElementById('cut').setAttribute('aria-valuetext',`${T.name} fixed at ${CUT.toFixed(T.dp)}`);
+  document.getElementById('frozen').setAttribute('aria-valuetext',`${O.name} frozen at ${FROZEN.toFixed(O.dp)}`);
+  const b=best(CUT), pv=prof(CUT), sv=slice(CUT);
+  const bothIv = pi.lo!==null&&pi.hi!==null&&si.lo!==null&&si.hi!==null;
+  const narrower = bothIv ? 100*(1-(si.hi-si.lo)/(pi.hi-pi.lo)) : null;
+  const offPeak = Math.abs(si.peak-T.hat) > (T.hi-T.lo)*0.01;
+  document.getElementById('surfout').innerHTML=
+    `MLE: κ̂ = <b>${KHAT.toFixed(3)}</b>, L̂∞ = <b>${LHAT.toFixed(1)}</b>. `+
+    `At ${T.name} = <b>${CUT.toFixed(T.dp)}</b> the best ${O.name} is <b>${b.toFixed(O.dp)}</b>, and the ridge there is <b>${(-pv).toFixed(2)}</b> below the peak`+
+    ` (the slice is <b>${(-sv).toFixed(2)}</b> below). ${-pv<=1.92?'That value is inside the profile interval.':'That value is outside the profile interval.'}<br>`+
+    `95% profile interval for ${T.name}: <b>${fmtIv(pi,T.dp)}</b>. `+
+    `Slice with ${O.name} frozen at ${FROZEN.toFixed(O.dp)}: ${fmtIv(si,T.dp)}`+
+    (narrower!==null ? `, <b>${Math.abs(narrower).toFixed(0)}% ${narrower>=0?'narrower':'wider'}</b>` : '')+
+    (offPeak ? `, and it peaks at ${si.peak.toFixed(T.dp)} instead of the MLE, because the frozen ${O.name} is off the ridge.` : '.');
+  document.getElementById('srSurf').textContent=
+    `Profiling ${T.name}. At ${T.name} ${CUT.toFixed(T.dp)} the best ${O.name} is ${b.toFixed(O.dp)}, ${(-pv).toFixed(2)} log-likelihood units below the peak. `+
+    `Profile 95 percent interval ${fmtIv(pi,T.dp)}. Slice with ${O.name} frozen at ${FROZEN.toFixed(O.dp)}: ${fmtIv(si,T.dp)}.`;
+  document.getElementById('surf3d').setAttribute('aria-label',
+    `Log-likelihood surface over kappa from ${KR[0]} to ${KR[1]} and L-infinity from ${LR[0]} to ${LR[1]}. It is a single hill, peaking at kappa ${KHAT.toFixed(3)} and L-infinity ${LHAT.toFixed(1)}, `+
+    `stretched along a diagonal ridge: higher kappa goes with lower L-infinity. The ridge path runs from L-infinity ${bestL(KR[0]).toFixed(1)} at kappa ${KR[0]} down to ${bestL(KR[1]).toFixed(1)} at kappa ${KR[1]}.`);
+  document.getElementById('profchart').setAttribute('aria-label',
+    `Profile log-likelihood and slice for ${T.name}. Profile 95 percent interval ${fmtIv(pi,T.dp)}; slice interval ${fmtIv(si,T.dp)}.`);
+  let rows='';
+  for(let m=0;m<=10;m++){ const t=T.lo+(T.hi-T.lo)*m/10;
+    rows+=`<tr><td>${t.toFixed(T.dp)}</td><td>${best(t).toFixed(O.dp)}</td><td>${prof(t).toFixed(2)}</td><td>${slice(t).toFixed(2)}</td></tr>`; }
+  document.getElementById('surfTable').innerHTML=
+    `<table><caption>Profile and slice log-likelihood for ${T.name}, relative to the peak, at 11 values. The slice freezes ${O.name} at ${FROZEN.toFixed(O.dp)}.</caption>`+
+    `<thead><tr><th scope="col">${T.name}</th><th scope="col">best ${O.name}</th><th scope="col">profile ℓ − ℓ(MLE)</th><th scope="col">slice ℓ − ℓ(MLE)</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+const cutEl=document.getElementById('cut'), frEl=document.getElementById('frozen');
+const toSlider=(v,P)=>Math.round((v-P.lo)/(P.hi-P.lo)*1000), fromSlider=(s,P)=>P.lo+(P.hi-P.lo)*s/1000;
+function syncSliders(){ cutEl.value=toSlider(CUT,PAR[INT]); frEl.value=toSlider(FROZEN,PAR[other()]); }
+cutEl.addEventListener('input',e=>{ CUT=fromSlider(+e.target.value,PAR[INT]); update(); });
+frEl.addEventListener('input',e=>{ FROZEN=fromSlider(+e.target.value,PAR[other()]); update(); });
+document.querySelectorAll('input[name=interest]').forEach(r=>r.addEventListener('change',e=>{
+  INT=e.target.value; CUT = INT==='k' ? 0.30 : 101; FROZEN=PAR[other()].hat; syncSliders(); update(); }));
+document.getElementById('frozenMLE').addEventListener('click',()=>{ FROZEN=PAR[other()].hat; syncSliders(); update(); });
+document.getElementById('viewTilt').addEventListener('click',()=>{ AZ=-0.62; EL=0.52; drawSurface(); });
+document.getElementById('viewTop').addEventListener('click',()=>{ AZ=0; EL=Math.PI/2; drawSurface(); });
+// Looking straight along the nuisance axis, the hill's outline is the profile: every
+// point of that silhouette is the highest point on a line of sight, i.e. the best nuisance value.
+document.getElementById('viewSide').addEventListener('click',()=>{ AZ = INT==='k' ? 0 : -Math.PI/2; EL=0; drawSurface(); });
+let drag=null;
+cv.addEventListener('pointerdown',e=>{ drag=[e.clientX,e.clientY,AZ,EL]; cv.setPointerCapture(e.pointerId); cv.style.cursor='grabbing'; });
+cv.addEventListener('pointermove',e=>{ if(!drag) return; const s=720/cv.getBoundingClientRect().width;
+  AZ=drag[2]+(e.clientX-drag[0])*s*0.008; EL=Math.max(0,Math.min(Math.PI/2,drag[3]+(e.clientY-drag[1])*s*0.008)); drawSurface(); });
+const endDrag=()=>{ drag=null; cv.style.cursor='grab'; };
+cv.addEventListener('pointerup',endDrag); cv.addEventListener('pointercancel',endDrag);
+window.addEventListener('resize',()=>{ sizeCanvas(); drawSurface(); });
+sizeCanvas(); syncSliders(); update();
+})();
 </script>
 </body>
 </html>

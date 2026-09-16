@@ -201,8 +201,11 @@ for (t in 1:Nyears)
 
 > Simulate overdispersed repeat counts, fit the basic Royle N-mixture in NIMBLE
 > (remember `dbinom(prob, size)`, and start the latent abundances at
-> `N = apply(y, 1, max)`, the largest count at each site, so no count exceeds N), add posterior
-> predictive replicates, and compute a Bayesian p-value. Propose a fix.
+> `N = apply(y, 1, max)`, the largest count at each site, so no count exceeds N).
+> Then run the posterior predictive check: simulate new sites inside the model
+> (`N.new`, `y.new`), compare the real data's variance-to-mean ratio, proportion of
+> zeros and largest count with the fake datasets (histograms and p-values), and
+> say what fails, why, and how you would fix it.
 
 **My work:**
 
@@ -221,18 +224,17 @@ for (t in 1:Nyears)
 > occupancy model with the z-init trick. (a) Report $\hat R$ for $p$ and the
 > $\gamma_t$. (b) Plot posterior medians of $\gamma_t$ with 95% intervals and
 > report their mean width. (c) Refit with a hierarchical prior on
-> $\text{logit}(\gamma_t)$ and with a linear trend in year; report mean width
-> and RMSE against `gam.t` for all three fits. (d) Refit with a pure-noise
-> covariate (`set.seed(99)`), report the same two numbers and both slopes, and
-> answer the four questions in the problem statement.
+> $\text{logit}(\gamma_t)$ and with a linear trend in year; report mean 95% width
+> and RMSE, `sqrt(mean((gam.med - gam.t)^2))`, against the true values `gam.t`
+> for all three fits, and say which is most precise and which most accurate.
 
 **My work:**
 
 ```{r p9}
 set.seed(10)
 nS <- 50; nY <- 6; nR <- 3; p.t <- 0.5
-phi.t <- c(0.70, 0.70, 0.80, 0.85, 0.85)
-gam.t <- c(0.05, 0.15, 0.25, 0.30, 0.30)
+phi.t <- c(0.70, 0.70, 0.80, 0.85, 0.85)   # TRUE persistence probabilities
+gam.t <- c(0.05, 0.15, 0.25, 0.30, 0.30)   # TRUE colonization probabilities
 z <- matrix(NA, nS, nY); z[, 1] <- rbinom(nS, 1, 0.2)
 for (i in 1:nS) for (t in 2:nY)
   z[i,t] <- rbinom(1, 1, z[i,t-1]*phi.t[t-1] + (1-z[i,t-1])*gam.t[t-1])

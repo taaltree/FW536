@@ -25,7 +25,7 @@
  <li><a href="#p5">5. Bayesian logistic &amp; derived difference (lizards)</a></li>
   <li><a href="#p6">6. Spawner-recruit &amp; $H_\text{msy}$</a></li>
  <li><a href="#p7">7. Precautionary harvest (derived)</a></li>
- <li><a href="#p8">8. N-mixture &amp; Bayesian p-value</a></li>
+ <li><a href="#p8">8. N-mixture &amp; posterior predictive check</a></li>
  <li><a href="#p9">9. Dynamic occupancy (latent state)</a></li>
  </ul>
  <div class="section">Day 5 docs</div>
@@ -244,9 +244,9 @@ then <em>say</em> to a manager with those posteriors.</p></div>
 
 
 <div class="exercise" id="p8">
-<span class="ex-tag">Problem 8</span><span class="difficulty hard"> · N-mixture + Bayesian p-value</span>
+<span class="ex-tag">Problem 8</span><span class="difficulty hard"> · N-mixture + posterior predictive check</span>
 <h3>Repeat-count abundance and a goodness-of-fit check</h3>
-<p>An <strong>N-mixture model</strong> estimates the abundance of unmarked animals when you cannot count every individual. Repeated visits to the same closed site let it separate true abundance ($\lambda$) from detection probability ($p$), which a raw count confounds. (It is the abundance analog of the occupancy model; see the practice lab for a fuller explanation.) Here you will simulate repeated counts, fit the Royle (2004) N-mixture model in <span class="pill nimble">NIMBLE</span>, and then test the Poisson-abundance assumption with a posterior-predictive Bayesian p-value.</p>
+<p>An <strong>N-mixture model</strong> estimates the abundance of unmarked animals when you cannot count every individual. Repeated visits to the same closed site let it separate true abundance ($\lambda$) from detection probability ($p$), which a raw count confounds. (It is the abundance analog of the occupancy model; see the practice lab for a fuller explanation.) Here you will simulate repeated counts, fit the Royle (2004) N-mixture model in <span class="pill nimble">NIMBLE</span>, and then check, step by step, whether data simulated from the fitted model look like the real counts.</p>
 <div class="eq-block">$N_i \sim \text{Poisson}(\lambda), \quad y_{ij} \sim \text{Binomial}(N_i, p)$</div>
 <div class="code-label">R · simulate overdispersed abundance on purpose</div>
 <pre><code><span class="kw">library</span>(MASS)
@@ -257,8 +257,20 @@ y &lt;- <span class="fn">matrix</span>(<span class="kw">NA</span>, sites, reps)
 <span class="kw">for</span> (i <span class="kw">in</span> <span class="nu">1</span>:sites) y[i, ] &lt;- <span class="fn">rbinom</span>(reps, N[i], p.true)</code></pre>
 <ol type="a">
  <li>Fit the basic (constant $\lambda$, constant $p$) N-mixture. Remember that NIMBLE's binomial is <code>dbinom(prob, size)</code>, the reverse of R's argument order. Give the latent abundances starting values with <code>N = apply(y, 1, max)</code>. Here <code>y</code> is the sites &times; visits matrix of counts, the <code>1</code> means "work across each row" (each site), and <code>max</code> is R's ordinary <code>max()</code> function, so this returns the largest count seen at each site on any visit. The purpose: a binomial count can never exceed its size, so each site's true abundance $N_i$ must start at least as large as every count recorded there. Start it lower and that count is impossible, its log-probability is $-\infty$, and the sampler cannot begin from that point. (See the <a href="../apply_family.html">apply family tutorial</a> for <code>apply()</code>.) Report the posteriors of $\lambda$ and $p$.</li>
- <li>Add posterior-predictive replicates $y^\text{rep}$ and a discrepancy statistic (e.g. a Freeman-Tukey or variance/mean statistic). Compute the Bayesian p-value $p_B$. What does a value far from 0.5 indicate here?</li>
- <li>Propose (in words, or as a modified <code>nimbleCode</code> block) a fix, e.g. a Poisson-lognormal random effect on $\log\lambda_i$, and explain how it would move $p_B$ toward 0.5.</li>
+ <li><p><strong>Does the model reproduce the data? A posterior predictive check, step by step.</strong> The idea is simple. If the fitted model is a good description of how these counts arose, then fake datasets simulated from it should look like the real one. If the real data have some feature the fake datasets almost never show, the model is missing something.</p>
+ <ol type="i">
+ <li><strong>Simulate fake datasets inside the model.</strong> Add a second block to your <code>nimbleCode</code> that invents a brand-new set of sites, the same size as the real data, from the same model:
+<pre><code><span class="kw">for</span> (i <span class="kw">in</span> <span class="nu">1</span>:Nsites) {
+  N.new[i] ~ <span class="fn">dpois</span>(lambda)
+  <span class="kw">for</span> (j <span class="kw">in</span> <span class="nu">1</span>:Nreps) {
+    y.new[i, j] ~ <span class="fn">dbinom</span>(prob = p, size = N.new[i])
+  }
+}</code></pre>
+ <code>N.new</code> and <code>y.new</code> have no data attached, so at every MCMC iteration NIMBLE simply simulates them from the current draw of $\lambda$ and $p$. Each saved iteration therefore gives you one complete fake dataset of 150 sites &times; 3 visits, and the spread across iterations includes your uncertainty about $\lambda$ and $p$. This collection is the <strong>posterior predictive distribution</strong> of the data. Monitor <code>y.new</code> (thinning to every 10th iteration keeps the output manageable) and give it starting values, for example <code>y.new = y</code> with <code>N.new</code> started at <code>N</code>'s starting values.</li>
+ <li><strong>Choose features you can read.</strong> Summarize any dataset of counts with three familiar numbers: the <strong>variance-to-mean ratio</strong> of all the counts (about 1 for Poisson-like counts, well above 1 when counts are more spread out than Poisson allows), the <strong>proportion of counts that are zero</strong>, and the <strong>largest count</strong>. Compute all three for the real data. Then compute them for every fake dataset: pull the <code>y.new</code> columns out of <code>as.matrix(samples)</code>, so that each row is one fake dataset, and use <code>apply(..., 1, ...)</code> to summarize each row.</li>
+ <li><strong>Compare.</strong> For each feature, draw a histogram of its values across the fake datasets and mark the real data's value with a vertical line. Report the real value, the middle 95% of the fake values, and the <strong>posterior predictive p-value</strong>: the proportion of fake datasets whose value is at least as large as the real one. A p-value near 0.5 means the real data look typical; a value near 0 (or near 1) means the real data are more extreme than almost anything the model produces.</li>
+ </ol></li>
+ <li>Which features does the model fail to reproduce, and in which direction? What does that tell you about the assumption that abundance is Poisson? Propose a fix, in words or as a modified <code>nimbleCode</code> block (for example, a random effect on $\log\lambda_i$ for each site, a Poisson-lognormal model), and say how you would expect it to change the three checks.</li>
 </ol>
 <div class="callout try" style="margin-top: 12px;"><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
 </div>
@@ -272,8 +284,8 @@ y &lt;- <span class="fn">matrix</span>(<span class="kw">NA</span>, sites, reps)
 <div class="code-label">R · simulate a rising-colonization scenario</div>
 <pre><code>set.seed(<span class="nu">10</span>)
 nS &lt;- <span class="nu">50</span>; nY &lt;- <span class="nu">6</span>; nR &lt;- <span class="nu">3</span>; p.t &lt;- <span class="nu">0.5</span>
-phi.t &lt;- <span class="fn">c</span>(<span class="nu">0.70</span>, <span class="nu">0.70</span>, <span class="nu">0.80</span>, <span class="nu">0.85</span>, <span class="nu">0.85</span>)
-gam.t &lt;- <span class="fn">c</span>(<span class="nu">0.05</span>, <span class="nu">0.15</span>, <span class="nu">0.25</span>, <span class="nu">0.30</span>, <span class="nu">0.30</span>)  <span class="cm"># rising colonization</span>
+phi.t &lt;- <span class="fn">c</span>(<span class="nu">0.70</span>, <span class="nu">0.70</span>, <span class="nu">0.80</span>, <span class="nu">0.85</span>, <span class="nu">0.85</span>)  <span class="cm"># TRUE persistence, one per transition</span>
+gam.t &lt;- <span class="fn">c</span>(<span class="nu">0.05</span>, <span class="nu">0.15</span>, <span class="nu">0.25</span>, <span class="nu">0.30</span>, <span class="nu">0.30</span>)  <span class="cm"># TRUE colonization, rising over time</span>
 z &lt;- <span class="fn">matrix</span>(<span class="kw">NA</span>, nS, nY); z[, <span class="nu">1</span>] &lt;- <span class="fn">rbinom</span>(nS, <span class="nu">1</span>, <span class="nu">0.2</span>)
 <span class="kw">for</span> (i <span class="kw">in</span> <span class="nu">1</span>:nS) <span class="kw">for</span> (t <span class="kw">in</span> <span class="nu">2</span>:nY)
   z[i,t] &lt;- <span class="fn">rbinom</span>(<span class="nu">1</span>, <span class="nu">1</span>, z[i,t-<span class="nu">1</span>]*phi.t[t-<span class="nu">1</span>] + (<span class="nu">1</span>-z[i,t-<span class="nu">1</span>])*gam.t[t-<span class="nu">1</span>])
@@ -296,13 +308,12 @@ y &lt;- <span class="fn">array</span>(<span class="kw">NA</span>, <span class="f
    <li>a trend, $\text{logit}(\gamma_t) = g_0 + g_1 \cdot \text{year}_t$, which is a reasonable
    thing to try given how you simulated the data.</li>
    </ol>
- For all three fits report the mean 95% interval width for $\gamma_t$ <em>and</em> the RMSE of the
- posterior medians against the <code>gam.t</code> you simulated. Which structure narrowed the
- intervals most? Which one estimated $\gamma_t$ most accurately? They are not the same model.</li>
- <li><strong>Now the trap.</strong> Refit once more with a covariate that is pure noise in place of
- the year index:
- <pre><code><span class="fn">set.seed</span>(<span class="nu">99</span>); noise &lt;- <span class="fn">as.numeric</span>(<span class="fn">scale</span>(<span class="fn">rnorm</span>(nY - <span class="nu">1</span>)))</code></pre>
- Report the same two numbers and compare them against (c)(ii). Then reach for the obvious defence. Is the noise covariate's slope $g_1$ credibly different from zero? Report its posterior median and 95% interval, and the same for the real trend's $g_1$. Now answer in four or five sentences. If a narrower interval was what you were hoping to achieve, what have you learned by achieving it? Given what the two slopes just did, is there anything <em>inside this fit</em> that would have told you which covariate was real, and if not, what would? Finish by saying which of the three structures you would reach for by default when you cannot be sure your covariate is real, and why it is the safe choice.</li>
+ For all three fits report two numbers for the five $\gamma_t$: the mean width of their 95% intervals (a measure of <em>precision</em>), and the <strong>RMSE</strong> of their posterior medians (a measure of <em>accuracy</em>).
+ <p><strong>What RMSE is.</strong> Because you simulated the data, you know the true colonization probabilities: they are the vector <code>gam.t</code> in the simulation code above, one value per transition. The root mean squared error measures how far the estimates sit from that truth, on average:</p>
+ <div class="eq-block">$\text{RMSE} = \sqrt{\dfrac{1}{5}\sum_{t=1}^{5}\big(\hat\gamma_t - \gamma_t^{\text{true}}\big)^2}$</div>
+ <p>Take each year's error (posterior median minus truth), square it so misses in either direction count and big misses count extra, average the five squares, and take the square root to return to the original units. An RMSE of 0.05 means the estimates are typically about 0.05 away from the true probabilities. Smaller is better, and 0 would be perfect. In R, with <code>gam.med</code> holding the five posterior medians:</p>
+<pre><code><span class="fn">sqrt</span>(<span class="fn">mean</span>((gam.med - gam.t)^<span class="nu">2</span>))</code></pre>
+ <p>You can only compute RMSE here because the truth is known; with real data it is not. Which structure narrowed the intervals most? Which estimated $\gamma_t$ most accurately? Are they the same model?</p></li>
 </ol>
 <div class="callout try" style="margin-top: 12px;"><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
 </div>

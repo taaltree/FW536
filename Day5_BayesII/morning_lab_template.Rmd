@@ -136,7 +136,10 @@ liz  <- read.csv(here::here("Day5_BayesII", "data", "IslandsLizards.csv"))  # Pr
 
 > Fit logistic regression of presence on scaled perimeter:area ratio with the
 > weakly informative prior dnorm(0, 1/2.71). Report diagnostics, the posterior
-> probability that the slope is negative, and compare to a vague-prior refit.
+> probability that the slope is negative, then refit with the vague prior
+> dnorm(0, 1e-6) on both coefficients. Plot 100 prior curves from each prior, plot
+> both fitted curves with 95% bands over the data, and explain which fit you would
+> trust to predict a new island and why.
 
 **My work:**
 

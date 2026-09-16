@@ -183,7 +183,12 @@ y        &lt;- <span class="fn">as.integer</span>(liz$presence)</code></pre>
 <ol type="a">
  <li>Fit in <span class="pill nimble">NIMBLE</span> with the weakly informative prior $a, b \sim \mathcal{N}(0, \sigma^2{=}2.71)$ (i.e. <code>dnorm(0, 1/2.71)</code>, chosen because it implies a near-uniform prior on $p$). Report R-hat and <code>heidel.diag</code> for $a$ and $b$. Use starting values near 0 (why is that a good idea here?).</li>
  <li>What is the posterior probability that the slope $b$ is negative (i.e., more edge per unit area $\Rightarrow$ lower occupancy)?</li>
- <li>Re-fit with a genuinely vague prior $a,b \sim \mathcal{N}(0, 10^6)$. With only 19 islands, does the prior visibly change the posterior of $b$? Overlay the two posterior densities.</li>
+ <li>Re-fit with the "vague" prior $a, b \sim \mathcal{N}(0, 10^6)$ on <em>both</em> coefficients, and report the posterior of $b$. This prior is nearly flat on the logit scale. The question is what it says on the <em>probability</em> scale, where occupancy lives, and what that does to the fit.
+ <ol type="i">
+ <li><strong>What each prior claims, before any data.</strong> Draw 100 pairs $(a, b)$ from each prior, turn each pair into a curve $p = \text{ilogit}(a + b\,x)$ across the range of the scaled ratio, and plot the two priors' curves side by side. What kind of occupancy curve does each prior treat as plausible? What fraction of each prior's implied $P(\text{presence})$ values at the 19 islands falls below 0.01 or above 0.99? (In R, <code>plogis()</code> is the inverse logit, and <code>outer()</code> builds $a + b\,x$ for many draws at once.)</li>
+ <li><strong>The fits against the data.</strong> Plot the 19 islands (presence as 0 or 1 against perimeter:area ratio) and overlay, for each prior, the posterior median fitted curve with its 95% band. Where do the two curves differ most? Report each fit's posterior median $P(\text{presence})$ at ratios of 30 and 40.</li>
+ <li><strong>The take-home.</strong> Which fit would you trust to predict occupancy on a new island, and why? Look at island 3 (ratio 25.9), where the lizard is present, and at how confident each curve is around that ratio. Explain the difference in terms of what the "vague" prior actually assumes on the probability scale.</li>
+ </ol></li>
 </ol>
 <div class="callout try" style="margin-top: 12px;"><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
 </div>

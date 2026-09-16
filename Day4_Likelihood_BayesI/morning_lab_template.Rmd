@@ -59,7 +59,7 @@ library(stats4)   # mle() and confint() for profile-likelihood CIs
 
 # Problem 2 · Von Bertalanffy growth from length-at-age data (vonbert.csv)
 
-> Load `data/vonbert.csv` (sex, age, length). Run a grid search for $\kappa$, fit the full 3-parameter model with `mle()`, and test for a sex effect with a likelihood-ratio test.
+> Load `data/vonbert.csv` (sex, age, length). Run a grid search for $\kappa$, fit the full 3-parameter model with `mle()`, and test whether sex-specific residual variances are supported (LRT and AIC), starting from the lab's sex-specific growth-curve model.
 
 ```{r}
 # Load exactly as in the lab:

@@ -157,12 +157,9 @@ liz  <- read.csv(here::here("Day5_BayesII", "data", "IslandsLizards.csv"))  # Pr
 > Simulate 25 years (`set.seed(7)`; $a = 5$, $b = 5000$, $\sigma = 0.3$) and fit
 > Beverton-Holt in NIMBLE with $N_\text{eq}$, $S_\text{msy}$, $H_\text{msy}$ as
 > deterministic nodes. (a) Compute the three true reference points by hand and
-> check every interval covers. (b) Which reference point survives without an
-> absolute-abundance handle? (c) Report the 5th, 10th, 25th and 50th percentiles
-> of $H_\text{msy}$ and write the risk statement. (d) Report $S_\text{msy}$ and
-> $\Pr(S_\text{msy} > 1000, 1500, 2000)$ and answer the manager. (e) Rank the
-> five quantities by CV and explain why two derived quantities are sharper than
-> the parameters they are built from.
+> check every interval covers. (b) Report the 5th, 10th, 25th and 50th percentiles
+> of $H_\text{msy}$ and write the risk statement. (c) Report $S_\text{msy}$ and
+> $\Pr(S_\text{msy} > 1000, 1500, 2000)$ and answer the manager.
 
 **My work:**
 
@@ -187,8 +184,7 @@ for (t in 1:Nyears)
 > the 5th, 50th and 95th percentiles; then substitute the percentiles of $a$ and
 > $b$ into the formula instead, and report the percentage difference at the 5th
 > percentile. (b) Explain the disagreement through `cor(a, b)`. (c) Repeat for
-> $H_\text{msy}$, where the two routes agree, and state the general rule. (d)
-> Contrast with how a frequentist fit would produce this interval.
+> $H_\text{msy}$, where the two routes agree, and state the general rule.
 
 **My work:**
 
@@ -204,7 +200,8 @@ for (t in 1:Nyears)
 # Problem 8 · Repeat-count abundance and a goodness-of-fit check
 
 > Simulate overdispersed repeat counts, fit the basic Royle N-mixture in NIMBLE
-> (remember `dbinom(prob, size)` and `N = apply(y, 1, max)`), add posterior
+> (remember `dbinom(prob, size)`, and start the latent abundances at
+> `N = apply(y, 1, max)`, the largest count at each site, so no count exceeds N), add posterior
 > predictive replicates, and compute a Bayesian p-value. Propose a fix.
 
 **My work:**

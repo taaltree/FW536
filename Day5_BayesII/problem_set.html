@@ -209,18 +209,13 @@ Nobody manages a fishery by $a$ and $b$. They manage by an escapement target and
 which are nonlinear functions of $a$ and $b$, and once those functions sit inside the model as
 deterministic nodes, NIMBLE evaluates them at every draw and hands you their full posteriors for
 free, correlations and all. The walkthrough fitted the curve; this problem is about what you can
-then <em>say</em>, and about the fact that a derived quantity does not simply inherit the uncertainty
-of the parameters underneath it.</p></div>
+then <em>say</em> to a manager with those posteriors.</p></div>
 <ol type="a">
  <li><strong>Fit, with the reference points inside the model.</strong> Monitor
  $a,b,\sigma,N_\text{eq},S_\text{msy},H_\text{msy}$. Before you look at the output, work out the
  three <em>true</em> reference points by hand, substituting $a=5$ and $b=5000$ into the formulas above. Doing that arithmetic yourself is how you sanity-check any assessment. Report posterior
  medians and 95% CIs for all six quantities next to your hand-computed truths. Does every interval
  cover?</li>
- <li><strong>Read the formulas before you read the output.</strong> $H_\text{msy} = 1-\sqrt{1/a}$
- contains no $b$ at all, while $N_\text{eq}$ and $S_\text{msy}$ both scale with it. Say what that
- means for a real assessment. Which of the three could you still estimate for a stock whose absolute
- abundance you have no handle on, and which ones collapse without it?</li>
  <li><strong>A harvest rate with a risk statement attached.</strong> The posterior median of
  $H_\text{msy}$ is, by construction, the harvest rate with a 50% chance of exceeding the true one.
  Report the 5th, 10th, 25th and 50th percentiles of the posterior. Which would you advise, and write
@@ -229,13 +224,6 @@ of the parameters underneath it.</p></div>
  compute $\Pr(S_\text{msy} &gt; 1000)$, $\Pr(S_\text{msy} &gt; 1500)$ and
  $\Pr(S_\text{msy} &gt; 2000)$. A manager asks you for &ldquo;the&rdquo; escapement target. Answer
  them in two sentences that use these numbers rather than hiding them.</li>
- <li><strong>Which quantity is best determined?</strong> Compute the coefficient of variation
- (posterior SD &divide; posterior median) for $a$, $b$, $N_\text{eq}$, $S_\text{msy}$ and
- $H_\text{msy}$, and rank them. You should find that <em>two of the derived quantities are more
- precisely determined than the parameters they are built from</em>, which sounds impossible if
- you think of uncertainty as something that only accumulates. Explain how it happens. One reason is
- visible in the shape of $1-\sqrt{1/a}$; the other you can see by computing
- <code>cor(a, b)</code> across your draws.</li>
 </ol>
 <div class="callout try" style="margin-top: 12px;"><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
 </div>
@@ -249,7 +237,6 @@ of the parameters underneath it.</p></div>
  <li>Compute $S_\text{msy} = b\sqrt{1/a} - b/a$ <strong>once per draw</strong>, then take the 5th, 50th and 95th percentiles of the result. Now do it the other way. Take the 5th, 50th and 95th percentiles of $a$ and of $b$ separately, and substitute those numbers into the formula. Report both sets of three numbers and the percentage difference at the 5th percentile.</li>
  <li>Explain why the two disagree. What does <code>cor(a, b)</code> across your draws have to do with it, and why does summarising each parameter first throw away exactly the information the derived quantity needs?</li>
  <li>Now repeat the comparison for $H_\text{msy} = 1 - \sqrt{1/a}$. The two approaches agree here, to the digit. What is different about this quantity, and what does that tell you about when the shortcut is safe? State the general rule in one sentence.</li>
- <li>In one sentence, contrast how a frequentist MLE fit would produce a precautionary interval for $S_\text{msy}$ (bootstrap or the delta method) with how Bayes produces it directly.</li>
 </ol>
 <div class="callout warn" style="margin-top:12px;"><strong>Watch out.</strong> The disagreement in (a) is not large, single-digit percentages on these data. The size is not the lesson; the reason is. A quantity built from several correlated parameters can be badly wrong this way when the correlation is strong or the function is sharply curved, and you will not get a warning.</div>
 <div class="callout try" style="margin-top: 12px;"><strong>Your answer goes in the R Markdown hand-in.</strong> Report both sets of percentiles, the percentage difference, your explanation, and the general rule from (c).</div>
@@ -269,7 +256,7 @@ N &lt;- <span class="fn">rnegbin</span>(sites, mu = lambda, theta = <span class=
 y &lt;- <span class="fn">matrix</span>(<span class="kw">NA</span>, sites, reps)
 <span class="kw">for</span> (i <span class="kw">in</span> <span class="nu">1</span>:sites) y[i, ] &lt;- <span class="fn">rbinom</span>(reps, N[i], p.true)</code></pre>
 <ol type="a">
- <li>Fit the basic (constant $\lambda$, constant $p$) N-mixture. Remember: <code>dbinom(prob, size)</code> in NIMBLE and initialise <code>N = apply(y, 1, max)</code>. Report the posteriors of $\lambda$ and $p$.</li>
+ <li>Fit the basic (constant $\lambda$, constant $p$) N-mixture. Remember that NIMBLE's binomial is <code>dbinom(prob, size)</code>, the reverse of R's argument order. Give the latent abundances starting values with <code>N = apply(y, 1, max)</code>. Here <code>y</code> is the sites &times; visits matrix of counts, the <code>1</code> means "work across each row" (each site), and <code>max</code> is R's ordinary <code>max()</code> function, so this returns the largest count seen at each site on any visit. The purpose: a binomial count can never exceed its size, so each site's true abundance $N_i$ must start at least as large as every count recorded there. Start it lower and that count is impossible, its log-probability is $-\infty$, and the sampler cannot begin from that point. (See the <a href="../apply_family.html">apply family tutorial</a> for <code>apply()</code>.) Report the posteriors of $\lambda$ and $p$.</li>
  <li>Add posterior-predictive replicates $y^\text{rep}$ and a discrepancy statistic (e.g. a Freeman-Tukey or variance/mean statistic). Compute the Bayesian p-value $p_B$. What does a value far from 0.5 indicate here?</li>
  <li>Propose (in words, or as a modified <code>nimbleCode</code> block) a fix, e.g. a Poisson-lognormal random effect on $\log\lambda_i$, and explain how it would move $p_B$ toward 0.5.</li>
 </ol>

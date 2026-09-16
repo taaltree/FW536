@@ -94,7 +94,7 @@
 
 <section class="data-card" id="data-files">
 <h2>Data files &amp; R scripts</h2>
-<p>Everything referenced in this lab's exercises lives in this folder. Click any link below to download.</p>
+<p>Everything below is included in the <a href="../FW536_R_project.zip">course R project</a>, organized by day. Open <code>FW536.Rproj</code> and the code on this page finds the data with <code>here::here()</code>. Click any link to download a single file.</p>
 <div class="data-section">
   <h3 class="data-h">Datasets</h3>
   <div class="data-row"><a href="data/sockeye_adult.csv"><code>sockeye_adult.csv</code></a><span class="data-desc">Daily sockeye salmon counts and flow-corrected eDNA (Qcorr_qPCR = qPCR eDNA concentration × stream flow) (Levi et al. 2019).</span></div>
@@ -457,7 +457,7 @@ sd(bin); sd(betbin) # 2.5 vs 5.6 — about 5x the variance</code></pre>
 <h3>Sockeye eDNA: find the right distribution</h3>
 <p>Load <code>sockeye_adult.csv</code> from this Day's <code>data/</code> folder. It is in <strong>long format</strong> (one row per <code>Sockeyetype</code> per day), so first subset to adult sockeye. The response is the daily <code>Count</code> of adult sockeye; the predictor is <code>Qcorr_qPCR</code>, the <strong>flow-corrected eDNA signal</strong>: the raw qPCR eDNA concentration multiplied by stream discharge (flow). Multiplying by flow converts a concentration into a quantity proportional to the total amount of eDNA transported past the sampler, which tracks fish abundance better than concentration alone. Build a <code>Year</code> factor from <code>Date</code> and a log-transformed eDNA predictor:</p>
 <pre><code>library(MASS)
-sock &lt;- read.csv("data/sockeye_adult.csv", stringsAsFactors = FALSE)
+sock &lt;- read.csv(here::here("Day2_GLM", "data", "sockeye_adult.csv"), stringsAsFactors = FALSE)
 table(sock$Sockeyetype)                            # confirm the adult level name
 d &lt;- subset(sock, Sockeyetype == "Sockeye_Adults")
 d$Year &lt;- factor(sub(".*/", "", d$Date))           # "15" or "16"
@@ -525,8 +525,8 @@ f_nb$deviance / f_nb$df.residual             # 48.8 / 52 = 0.94  (theta = 0.73)
 <li>Convert each class's log-odds to a probability. Compare to raw proportions.</li>
 </ol>
 <details class="answer"><summary>Reveal solution</summary><div class="answer-body">
-<pre><code>long &lt;- read.csv("data/titanic_long.csv")
-prop &lt;- read.csv("data/titanic_prop.csv")
+<pre><code>long &lt;- read.csv(here::here("Day2_GLM", "data", "titanic_long.csv"))
+prop &lt;- read.csv(here::here("Day2_GLM", "data", "titanic_prop.csv"))
 f1 &lt;- glm(survived ~ class, family=binomial, data=long)
 f2 &lt;- glm(cbind(Yes, No) ~ Class, family=binomial, data=prop)
 
@@ -555,7 +555,7 @@ tapply(prop$Yes, prop$Class, sum) / tapply(prop$Yes + prop$No, prop$Class, sum)<
 </ol>
 <details class="answer"><summary>Reveal worked solution</summary><div class="answer-body">
 <pre><code>library(effects); library(emmeans)
-long &lt;- read.csv("data/titanic_long.csv", stringsAsFactors = TRUE)
+long &lt;- read.csv(here::here("Day2_GLM", "data", "titanic_long.csv"), stringsAsFactors = TRUE)
 fit  &lt;- glm(survived ~ class * sex + age, family = binomial, data = long)
 plot(allEffects(fit))                                  # fitted probabilities
 emmeans(fit, pairwise ~ class | sex, type = "response")  # class contrasts within each sex</code></pre>

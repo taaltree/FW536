@@ -167,11 +167,12 @@ clang --version        <span class="cm"># prints the compiler version</span></co
 
 <section id="step4">
 <h2>4. Install the R packages</h2>
-<p>In the RStudio Console (same on Windows and Mac):</p>
+<p><strong>Easiest route.</strong> Download the <a href="FW536_R_project.zip">course R project</a>, unzip it, double-click <code>FW536.Rproj</code>, and run <code>source("00_install_packages.R")</code> in the Console. It installs every package the course uses that you do not already have.</p>
+<p>Or install them yourself in the RStudio Console (same on Windows and Mac):</p>
 <div class="code-label">R console</div>
 <pre><code><span class="fn">install.packages</span>(<span class="kw">c</span>(
   <span class="st">"nimble"</span>, <span class="st">"coda"</span>, <span class="st">"MCMCvis"</span>, <span class="st">"HDInterval"</span>,
-  <span class="st">"rmarkdown"</span>, <span class="st">"knitr"</span>,
+  <span class="st">"rmarkdown"</span>, <span class="st">"knitr"</span>, <span class="st">"here"</span>,
   <span class="st">"ggplot2"</span>, <span class="st">"dplyr"</span>, <span class="st">"tidyr"</span>,
   <span class="st">"lme4"</span>, <span class="st">"nlme"</span>, <span class="st">"emmeans"</span>, <span class="st">"effects"</span>,
   <span class="st">"AICcmodavg"</span>, <span class="st">"MuMIn"</span>, <span class="st">"MASS"</span>, <span class="st">"boot"</span>,

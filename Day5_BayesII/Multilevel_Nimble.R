@@ -35,7 +35,7 @@ library(tidyr)
 set.seed(10)
 
 # ----- Data ----------------------------------------------------------------
-N2OEmission <- read.csv("data/N2OEmission.csv")
+N2OEmission <- read.csv(here::here("Day5_BayesII", "data", "N2OEmission.csv"))
 head(N2OEmission)
 # Site-level summary: mean soil organic carbon (%) per site. The N2OEmission
 # file carries a `carbon` column, so we use it directly as the group-level

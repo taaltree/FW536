@@ -19,6 +19,7 @@
   .prep-box a:hover { background:#fff; }
   .prep-box a.ref { background:transparent; color:#FFE08A; border:2px solid #FFE08A; padding:6px 13px; }
   .prep-box a.ref:hover { background:#FFE08A; color:#11304A; }
+  .prep-box code { background: rgba(255,255,255,.14); color: #FFE08A; padding: 1px 6px; border-radius: 4px; }
   .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 22px; padding: 26px 60px; max-width: 1200px; margin: 0 auto; }
   .card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); border-top: 5px solid var(--osu-orange); }
   .card .day-num-link { font-family: 'Helvetica Neue', Arial, sans-serif; color: var(--osu-orange); font-size: 12px; letter-spacing: 2px; text-transform: uppercase; font-weight: 700; text-decoration: none; display: inline-block; }
@@ -72,11 +73,12 @@
 <div class="prep">
   <div class="prep-box">
     <h2>Before the course, do this first</h2>
-    <p>The Bayesian labs need a working toolchain, so install everything and confirm it runs before Day 1, and learn the R Markdown workflow every hand-in uses. Then put whatever time you have left into the two R tutorials. Nearly every lab this week reshapes data with one or both of these toolkits, and time spent on them now is time you will not spend fighting syntax while the class moves on.</p>
+    <p>The Bayesian labs need a working toolchain, so install everything and confirm it runs before Day 1. Then download the course R project, which holds every dataset, script, and template in one folder per day: unzip it, double-click <code>FW536.Rproj</code>, and run <code>00_install_packages.R</code> once. Learn the R Markdown workflow every hand-in uses. Then put whatever time you have left into the two R tutorials. Nearly every lab this week reshapes data with one or both of these toolkits, and time spent on them now is time you will not spend fighting syntax while the class moves on.</p>
     <a href="install_jags_nimble.html">1 · Install R &amp; Nimble (Windows &amp; Mac; JAGS optional)</a>
-    <a href="rmarkdown_tutorial.html">2 · R Markdown tutorial</a>
-    <a href="apply_family.html">3 · The apply family, loops the R way</a>
-    <a href="tidyverse_dplyr.html">4 · dplyr &amp; the tidyverse for data manipulation</a>
+    <a href="FW536_R_project.zip">2 · Download the course R project (data, code &amp; templates)</a>
+    <a href="rmarkdown_tutorial.html">3 · R Markdown tutorial</a>
+    <a href="apply_family.html">4 · The apply family, loops the R way</a>
+    <a href="tidyverse_dplyr.html">5 · dplyr &amp; the tidyverse for data manipulation</a>
     <a class="ref" href="syllabus.html">Syllabus · schedule, grading, policies</a>
   </div>
 </div>

@@ -56,7 +56,7 @@
 
 <section class="data-card" id="datasets">
 <h2>Datasets for this assignment</h2>
-<p>Click a file to download it, then put it in a <code>data/</code> subfolder beside your <code>.Rmd</code> so the <code>read.csv()</code> calls resolve.</p>
+<p>These files are already in the <a href="../FW536_R_project.zip">course R project</a>. Open <code>FW536.Rproj</code>, and the <code>here::here()</code> paths in the code find them. You can also click a file to download it on its own.</p>
 <div class="data-section">
   <div class="data-row"><a href="data/length_weight.csv" download><code>length_weight.csv</code></a><span class="data-desc">Length and weight per individual, grouped by subject. Used in Problem 2.</span></div>
   <div class="data-row"><a href="data/qcbs_w6_data.csv" download><code>qcbs_w6_data.csv</code></a><span class="data-desc">QCBS fish trophic position: three species across six lakes. Used in Problems 4 and 9.</span></div>
@@ -135,7 +135,7 @@ broodsize    -0.6663     0.4560  -1.461</code></pre>
 </ol>
 <p>Now back to the length&ndash;weight data from the walkthrough, where you already have <code>m1</code> and <code>m1b</code> fitted:</p>
 <div class="code-label">Setup</div>
-<pre><code>TheData &lt;- <span class="fn">read.csv</span>(<span class="st">"data/length_weight.csv"</span>)
+<pre><code>TheData &lt;- <span class="fn">read.csv</span>(<span class="fn">here::here</span>(<span class="st">"Day3_MixedModels_ModelSelection"</span>, <span class="st">"data"</span>, <span class="st">"length_weight.csv"</span>))
 LenW &lt;- <span class="fn">data.frame</span>(TheData); LenW$Subject &lt;- <span class="fn">as.factor</span>(LenW$Subject)
 
 m1  &lt;- <span class="fn">lme</span>(Weight ~ Length, data=LenW, random = ~ <span class="nu">1</span> | Subject, method=<span class="st">"REML"</span>)
@@ -213,7 +213,7 @@ fit_nlme &lt;- <span class="fn">nlme</span>(Length ~ Linf*(<span class="nu">1</s
 <p>The QCBS dataset <code>qcbs_w6_data.csv</code> gives trophic position vs body length for three fish species (<code>S1</code>, <code>S2</code>, <code>S3</code>) sampled across six lakes (<code>L1</code>&ndash;<code>L6</code>). The biological question is whether trophic position increases with body length, and does that relationship differ by species and by lake?</p>
 <p>This problem has a second purpose. One of the candidate models below asks the data for something it cannot give, and it is the model that <em>wins</em> the model-selection table. Learning to spot that is the point.</p>
 <div class="code-label">Setup &amp; z-scoring</div>
-<pre><code>dat &lt;- <span class="fn">read.csv</span>(<span class="st">"data/qcbs_w6_data.csv"</span>)
+<pre><code>dat &lt;- <span class="fn">read.csv</span>(<span class="fn">here::here</span>(<span class="st">"Day3_MixedModels_ModelSelection"</span>, <span class="st">"data"</span>, <span class="st">"qcbs_w6_data.csv"</span>))
 dat$Fish_Species &lt;- <span class="fn">as.factor</span>(dat$Fish_Species)
 dat$Lake         &lt;- <span class="fn">as.factor</span>(dat$Lake)
 dat$Z_Length     &lt;- <span class="fn">scale</span>(dat$Fish_Length)[,<span class="nu">1</span>]   <span class="cm"># z-score for numerical stability</span>
@@ -370,7 +370,7 @@ One criterion's Type I error barely moves with $n$ and one collapses. Explain bo
 <p>Return to <code>qcbs_w6_data.csv</code> from Problem 4, but now treat species and lake as ordinary fixed factors so we can rank candidate <em>fixed-effect</em> models by both an information criterion and cross-validation. The question is predictive. Which set of predictors best forecasts a fish's trophic position?</p>
 <div class="code-label">Setup &amp; candidate models</div>
 <pre><code><span class="kw">library</span>(boot); <span class="kw">library</span>(AICcmodavg)
-dat &lt;- <span class="fn">read.csv</span>(<span class="st">"data/qcbs_w6_data.csv"</span>)
+dat &lt;- <span class="fn">read.csv</span>(<span class="fn">here::here</span>(<span class="st">"Day3_MixedModels_ModelSelection"</span>, <span class="st">"data"</span>, <span class="st">"qcbs_w6_data.csv"</span>))
 dat$Fish_Species &lt;- <span class="fn">as.factor</span>(dat$Fish_Species)
 dat$Lake         &lt;- <span class="fn">as.factor</span>(dat$Lake)
 dat$Z_Length     &lt;- <span class="fn">scale</span>(dat$Fish_Length)[,<span class="nu">1</span>]

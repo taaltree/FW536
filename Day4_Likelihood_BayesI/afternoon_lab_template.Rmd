@@ -79,7 +79,7 @@ library(HDInterval)  # hdi() for highest-posterior-density intervals
 
 ```{r}
 # Load exactly as in the lab:
-# Logistic <- read.csv("data/Logistic.csv", header = TRUE)
+# Logistic <- read.csv(here::here("Day4_Likelihood_BayesI", "data", "Logistic.csv"), header = TRUE)
 # Logistic <- Logistic[order(Logistic$PopulationSize), ]
 ```
 
@@ -135,7 +135,7 @@ library(HDInterval)  # hdi() for highest-posterior-density intervals
 # different .Rmd, so nothing carries over -- reload the data here. Both Nimble
 # skeletons in problem_set.html refer to a vector called `blows`, so build it
 # with exactly that name before you run either one.
-TheData <- read.csv("data/whale.csv")   # columns: sex (1/2), blows
+TheData <- read.csv(here::here("Day4_Likelihood_BayesI", "data", "whale.csv"))   # columns: sex (1/2), blows
 blows   <- TheData$blows                # the mixture treats sex as unobserved
 length(blows)
 ```

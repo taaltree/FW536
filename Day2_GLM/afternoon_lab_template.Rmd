@@ -26,8 +26,8 @@ matching Canvas assignment.
 
 Problems 5 and 6 generate their own data in the code block that comes with each
 problem, so no data file is needed for the afternoon set. Problems 7 to 11 are
-worked from coefficient tables given in the problem statements. Keep the `.Rmd`
-in this folder anyway, so any `read.csv("data/...")` call you add resolves.
+worked from coefficient tables given in the problem statements. Open the `.Rmd`
+from inside the course project (`FW536.Rproj`), like the other templates.
 For setup help see the [R Markdown tutorial](../rmarkdown_tutorial.html).
 
 ---

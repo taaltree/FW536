@@ -28,7 +28,7 @@ library(HDInterval) # hdi() for highest-density intervals
 
 # ----- Read data ------------------------------------------------------------
 # Data file lives in the data/ subfolder of this Day's directory.
-liz <- read.csv("data/IslandsLizards.csv")
+liz <- read.csv(here::here("Day5_BayesII", "data", "IslandsLizards.csv"))
 str(liz)
 table(liz$presence)
 

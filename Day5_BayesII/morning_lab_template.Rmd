@@ -38,13 +38,13 @@ For setup help see the [R Markdown tutorial](../rmarkdown_tutorial.html).
 # Loading the data
 
 Five problems use the real datasets in this Day's `data/` folder. Load them once
-here (or inside each problem's chunk, your choice). Keep your `.Rmd` in the
-`Day5_BayesII/` folder so these relative paths resolve.
+here (or inside each problem's chunk, your choice). Open this `.Rmd` from inside
+the course project (`FW536.Rproj`) so the `here::here()` paths find the data.
 
 ```{r load-data}
-ants <- read.csv("data/ants.csv")            # Problem 1
-N2O  <- read.csv("data/N2OEmission.csv")     # Problems 3–4
-liz  <- read.csv("data/IslandsLizards.csv")  # Problems 5–6
+ants <- read.csv(here::here("Day5_BayesII", "data", "ants.csv"))            # Problem 1
+N2O  <- read.csv(here::here("Day5_BayesII", "data", "N2OEmission.csv"))     # Problems 3–4
+liz  <- read.csv(here::here("Day5_BayesII", "data", "IslandsLizards.csv"))  # Problems 5–6
 # Problems 2 and 7–10 simulate their own data (see each problem statement).
 ```
 

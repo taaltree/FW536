@@ -7,7 +7,7 @@ set.seed(10)
 
 #####Part I - Fit Poisson glm model in glm() and in Bayes. Don't scale predictors
 
-ants <- read.csv('data/ants.csv',header=TRUE)
+ants <- read.csv(here::here("Day5_BayesII", "data", "ants.csv"),header=TRUE)
 #GGally::ggpairs(ants)
 freq_glm <- glm(richness~forest+latitude+elevation,data=ants,family=poisson())$coef
 names(freq_glm) <- c('b0', 'b1', 'b2', 'b3')

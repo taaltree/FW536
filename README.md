@@ -75,6 +75,13 @@ already shows its answers).
   with its master. Run it after editing either one; it exits 1 if they have drifted.
 - `_tools/build_answer_key_review.py` builds one-page question-and-answer review pages for vetting
   exercises. It currently reads the practice labs.
+- `_tools/build_student_project.py` builds `FW536_R_project.zip`, the one-download R project students use:
+  every `Day*/data/` file, template, and R script, plus a generated `FW536.Rproj`, `00_install_packages.R`
+  (its package list is read from the course code), and `README.txt`. All course code reads data with
+  `here::here("DayN_...", "data", "file.csv")`, which works from the Console, scripts, and knitting once the
+  project is open, so keep that form in any new code. Rebuild after editing any dataset, template, or
+  script and commit the zip. `--check` writes nothing and exits 1 if the zip is stale or any `here::here()`
+  path points to a missing file.
 - `_tools/sync_key_questions.py` copies each graded question from `problem_set.html` into
   `problem_set_KEY.html`, directly above its solution, matched on the problem id. Run it after every edit to
   a problem set; re-running replaces the old copy. `--check` writes nothing and exits 1 if any key has

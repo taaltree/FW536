@@ -4,7 +4,7 @@ library(HDInterval)
 
 #install.packages("~/Dropbox/Taal/courses/quantitative and computational course/ExampleCourses/Hobbs Course/SESYNCBayes_0.6.0.tar.gz", repos = NULL, type = "source")
 
-Logistic=read.csv("data/Logistic.csv",header=T)
+Logistic=read.csv(here::here("Day4_Likelihood_BayesI", "data", "Logistic.csv"),header=T)
 
 #########################
 #Let's try least squares#

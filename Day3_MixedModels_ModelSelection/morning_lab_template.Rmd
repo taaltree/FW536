@@ -42,11 +42,11 @@ library(MuMIn)
 ```{r data}
 # Real-data problems read these files from the data/ folder.
 # Problem 2 · length-weight (length_weight.csv)
-LenW <- read.csv("data/length_weight.csv")
+LenW <- read.csv(here::here("Day3_MixedModels_ModelSelection", "data", "length_weight.csv"))
 LenW$Subject <- as.factor(LenW$Subject)
 
 # Problem 4 · trophic position (qcbs_w6_data.csv)
-dat <- read.csv("data/qcbs_w6_data.csv")
+dat <- read.csv(here::here("Day3_MixedModels_ModelSelection", "data", "qcbs_w6_data.csv"))
 dat$Fish_Species <- as.factor(dat$Fish_Species)
 dat$Lake         <- as.factor(dat$Lake)
 dat$Z_Length     <- scale(dat$Fish_Length)[, 1]

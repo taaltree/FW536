@@ -63,7 +63,7 @@
 
 <section class="data-card" id="datasets">
 <h2>Datasets for this assignment</h2>
-<p>Click a file to download it, then put it in a <code>data/</code> subfolder beside your <code>.Rmd</code> so the <code>read.csv()</code> calls resolve.</p>
+<p>These files are already in the <a href="../FW536_R_project.zip">course R project</a>. Open <code>FW536.Rproj</code>, and the <code>here::here()</code> paths in the code find them. You can also click a file to download it on its own.</p>
 <div class="data-section">
   <div class="data-row"><a href="data/sockeye_adult.csv" download><code>sockeye_adult.csv</code></a><span class="data-desc">Daily adult sockeye counts and flow-corrected eDNA (Qcorr_qPCR = qPCR eDNA concentration × stream flow), 2015&ndash;2016 (Levi et al. 2019). Long format; filter to <code>Sockeyetype == "Sockeye_Adults"</code>. Used in Problem 4 only.</span></div>
 </div>
@@ -141,7 +141,7 @@ Report the mean and variance of the hourly counts. Which distribution do those t
 <span class="ex-tag">Problem 4</span><span class="difficulty hard"> · overdispersion, Poisson vs NB · loads real data</span>
 <h3>Are the sockeye counts Poisson? Diagnose overdispersion</h3>
 <p>Load the adult sockeye counts and look at them <em>before</em> fitting any predictors. Parts (a)&ndash;(d) are about the <em>marginal</em> count distribution: every day&rsquo;s count pooled together, with nothing in the model to explain why one day differs from another. Part (e) asks what changes once a predictor enters the picture.</p>
-<pre><code>d &lt;- read.csv("data/sockeye_adult.csv", stringsAsFactors = FALSE)
+<pre><code>d &lt;- read.csv(here::here("Day2_GLM", "data", "sockeye_adult.csv"), stringsAsFactors = FALSE)
 d &lt;- subset(d, Sockeyetype == "Sockeye_Adults")
 d &lt;- d[!is.na(d$Count), ]
 mean(d$Count); var(d$Count)</code></pre>

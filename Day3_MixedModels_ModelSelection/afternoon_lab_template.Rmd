@@ -43,7 +43,7 @@ options(na.action = "na.fail")   # required by MuMIn::dredge()
 
 ```{r data}
 # Problem 9 uses the real trophic-position data (fixed factors this time).
-dat <- read.csv("data/qcbs_w6_data.csv")
+dat <- read.csv(here::here("Day3_MixedModels_ModelSelection", "data", "qcbs_w6_data.csv"))
 dat$Fish_Species <- as.factor(dat$Fish_Species)
 dat$Lake         <- as.factor(dat$Lake)
 dat$Z_Length     <- scale(dat$Fish_Length)[, 1]

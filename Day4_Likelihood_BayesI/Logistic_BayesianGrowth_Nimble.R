@@ -49,7 +49,7 @@ library(coda)
 # ---- 1. Read the data --------------------------------------------------------
 # The CSV has two columns: PopulationSize (N) and GrowthRate (per-capita 1/yr).
 # Data file lives in the data/ subfolder of this Day's directory.
-Logistic <- read.csv("data/Logistic.csv", header = TRUE)
+Logistic <- read.csv(here::here("Day4_Likelihood_BayesI", "data", "Logistic.csv"), header = TRUE)
 
 # Sort by population size so that "lines(x, ...)" plots later actually draw
 # a line, not a tangled scribble.

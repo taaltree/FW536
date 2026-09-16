@@ -63,7 +63,7 @@ library(stats4)   # mle() and confint() for profile-likelihood CIs
 
 ```{r}
 # Load exactly as in the lab:
-# TheData <- read.csv("data/vonbert.csv")
+# TheData <- read.csv(here::here("Day4_Likelihood_BayesI", "data", "vonbert.csv"))
 # Sex <- TheData$sex; Age <- TheData$age; Len <- TheData$length
 ```
 
@@ -84,7 +84,7 @@ library(stats4)   # mle() and confint() for profile-likelihood CIs
 
 ```{r}
 # Load exactly as in the lab:
-# TheData <- read.csv("data/whale.csv")
+# TheData <- read.csv(here::here("Day4_Likelihood_BayesI", "data", "whale.csv"))
 # blows <- TheData$blows
 ```
 
@@ -105,7 +105,7 @@ library(stats4)   # mle() and confint() for profile-likelihood CIs
 
 ```{r}
 # Load exactly as in the lab:
-# Logistic <- read.csv("data/Logistic.csv", header = TRUE)
+# Logistic <- read.csv(here::here("Day4_Likelihood_BayesI", "data", "Logistic.csv"), header = TRUE)
 # Logistic <- Logistic[order(Logistic$PopulationSize), ]
 #
 # For part (b), keep the control argument from the problem set when you call mle():

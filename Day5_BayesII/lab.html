@@ -88,8 +88,8 @@
 <p>Everything below is included in the <a href="../FW536_R_project.zip">course R project</a>, organized by day. Open <code>FW536.Rproj</code> and the code on this page finds the data with <code>here::here()</code>. Click any link to download a single file.</p>
 <div class="data-section">
   <h3 class="data-h">Datasets</h3>
-  <div class="data-row"><a href="data/ants.csv"><code>ants.csv</code></a><span class="data-desc">Ant species richness in 44 New England bogs (Gotelli & Ellison); covariates: forest, latitude, elevation.</span></div>
-  <div class="data-row"><a href="data/N2OEmission.csv"><code>N2OEmission.csv</code></a><span class="data-desc">N2O emissions from agricultural plots, multiple fertilizers across sites.</span></div>
+  <div class="data-row"><a href="data/ants.csv"><code>ants.csv</code></a><span class="data-desc">Ant species richness at 22 New England sites, sampled once in a bog and once in the adjacent forest (44 rows; Gotelli &amp; Ellison); covariates: forest (1 = forest, 0 = bog), latitude, elevation.</span></div>
+  <div class="data-row"><a href="data/N2OEmission.csv"><code>N2OEmission.csv</code></a><span class="data-desc">563 N2O emission measurements from 107 fertilized agricultural sites, with fertilizer amount and type and soil carbon (columns explained in section C).</span></div>
   <div class="data-row"><a href="data/IslandsLizards.csv"><code>IslandsLizards.csv</code></a><span class="data-desc">Lizard occupancy (0/1) vs perimeter:area ratio for island habitat patches.</span></div>
 </div>
 <div class="data-section">
@@ -161,7 +161,7 @@
 <h2>A. Priors on the link scale: the ant richness example</h2>
 
 <h3>Biological setup</h3>
-<p>The <code>ants.csv</code> data from Gotelli &amp; Ellison contains ant species richness measured in 44 New England bogs, with three covariates: <em>forest</em> (bog vs. forest habitat), <em>latitude</em>, and <em>elevation</em>. The natural model is Poisson regression with a log link:</p>
+<p>The <code>ants.csv</code> data from Gotelli &amp; Ellison records ant species richness, the number of ant species found, at 22 sites across New England. At each site ants were sampled twice, once in a bog and once in the forest next to it, so the file has 44 rows, one per habitat per site. The three covariates are <em>forest</em> (1 for the forest sample, 0 for the bog sample), <em>latitude</em> (degrees north), and <em>elevation</em> (m). The natural model is Poisson regression with a log link:</p>
 <div class="eq-block">$y_i \sim \text{Poisson}(\lambda_i), \quad \log \lambda_i = \beta_0 + \beta_1 \cdot \text{forest}_i + \beta_2 \cdot \text{latitude}_i + \beta_3 \cdot \text{elevation}_i$</div>
 
 <div class="callout bio">
@@ -225,7 +225,7 @@ ants[i,<span class="nu">1</span>] ~ <span class="fn">dpois</span>(lam[i])
 
 <div class="callout warn">
 <p><strong>Why does this block keep <code>tau = 1/10000</code>?</strong> Because here the prior is the one thing that must <em>not</em> change. The shipped <code>ant.priors.R</code> fits this model twice, unscaled predictors in Part I, scaled predictors in Part II, holding the prior and the inits fixed at <code>tau = 1/10000</code> both times, so that scaling is the only difference between the two runs. Change the prior at the same time and you can no longer attribute the improvement to scaling, which is the whole point of the demonstration.</p>
-<p>That does not make <code>tau = 1/10000</code> a good default. NIMBLE's <code>dnorm</code> takes a <em>precision</em>, so <code>tau = 1/10</code> would mean $\sigma^2 = 10$, i.e. $\sigma = \sqrt{10} \approx 3.2$, on the log link roughly an $e^{\pm 6}$ range of multiplicative effects, still very wide but not crazy. The truly "vague" <code>tau = 1/10000</code> ($\sigma^2 = 10000$, $\sigma = 100$) is informative in the wrong direction. It puts huge prior weight on impossible parameter values. Exercise M2(c) is where you swap it out, and it shows that once the predictors are scaled and you have 44 bogs, the posterior barely notices.</p>
+<p>That does not make <code>tau = 1/10000</code> a good default. NIMBLE's <code>dnorm</code> takes a <em>precision</em>, so <code>tau = 1/10</code> would mean $\sigma^2 = 10$, i.e. $\sigma = \sqrt{10} \approx 3.2$, on the log link roughly an $e^{\pm 6}$ range of multiplicative effects, still very wide but not crazy. The truly "vague" <code>tau = 1/10000</code> ($\sigma^2 = 10000$, $\sigma = 100$) is informative in the wrong direction. It puts huge prior weight on impossible parameter values. Exercise M2(c) is where you swap it out, and it shows that once the predictors are scaled and you have 44 samples, the posterior barely notices.</p>
 </div>
 
 <div class="callout key">
@@ -265,7 +265,7 @@ eff2 &lt;- <span class="fn">exp</span>(beta * <span class="nu">1</span>) <span c
 <p>Now standardise the coefficient. Because $\beta_2/\sigma_\beta \sim \mathcal{N}(0,1)$, divide that threshold by $\sigma_\beta$ to read it as a $z$-score, and the prior mass is just a normal two-tail:</p>
 <div class="eq-block">$\Pr\!\big(|\log_{10}(\text{effect})| > 6\big) = 2\,\Phi\!\left(-\dfrac{6\ln 10}{\sigma_\beta\,\Delta x}\right).$</div>
 <p>That is the reusable result: <strong>the prior mass beyond a million-fold effect depends only on the single product $\sigma_\beta\,\Delta x$</strong>, prior SD times predictor range. Widen the prior or stretch the range and the same formula answers it. Only now do the numbers enter. Raw latitude spans $\Delta x = 3$ degrees, so $z = 6\ln 10/(100\cdot 3) = 4.605/300 = 0.0461$ and $2\,\Phi(-0.0461) = 0.9633$. Standardising collapses the range to $\Delta x = 1$ SD, tripling the threshold on $|\beta_2|$: $z = 6\ln 10/100 = 0.138$, and the fraction still only falls to $2\,\Phi(-0.138) = 0.8901$. Standardising helped a little, but nowhere near enough, and it is worth being clear about <em>why</em>, because this is the whole point of the exercise. Both moves you could make act through the <em>same</em> product $\sigma_\beta\,\Delta x$: standardising the predictor shrinks the range $\Delta x$, and tightening the prior shrinks the SD $\sigma_\beta$. What differs is the <strong>leverage</strong>. Standardising latitude shrinks $\Delta x$ from 3&deg; to 1 SD, a factor of 3, which only triples the $z$-score threshold, from $0.046$ to $0.138$. On a $\mathcal{N}(0,1)$ both of those numbers sit almost on top of the mean, where the bell curve is flat, so tripling the threshold barely moves the tail mass ($0.963 \to 0.890$). To buy the protection that $\sigma_\beta = 2$ gives, you would have to shrink $\Delta x$ by a factor of about <strong>50</strong>, which no amount of rescaling a real predictor can do. That is the sense in which <strong>the cure is a sane prior, not standardising</strong>: at $\sigma_\beta = 2$ the scaled $z$ jumps to $6\ln 10/2 = 6.9$, and $2\,\Phi(-6.9) \approx 5\times10^{-12}$, effectively no prior mass on million-fold effects at all.</p>
-<p>One more point, because it is a common source of confusion when you reach Exercise M2. Standardising and priors solve two <em>different</em> problems, and you usually want both. Standardising centres the predictor and fixes the <strong>sampler</strong>. In Exercise M2 the raw-latitude chains stall because latitude near 42&deg; is nearly fused to the intercept, and centring breaks that. A sane prior fixes the <strong>prior-predictive</strong>: the absurd tails you just computed. They are not substitutes for each other. And a too-wide prior only actually distorts the <em>posterior</em> when the data are weak. With the 44 bogs in Exercise M2 the likelihood swamps even the $\sigma = 100$ prior, so the scaled fit lands in the right place regardless (that is exactly what Exercise M2(b) and 2(c) show). Tight priors earn their keep when data are scarce, which, in ecology, is often.</p>
+<p>One more point, because it is a common source of confusion when you reach Exercise M2. Standardising and priors solve two <em>different</em> problems, and you usually want both. Standardising centres the predictor and fixes the <strong>sampler</strong>. In Exercise M2 the raw-latitude chains stall because latitude near 42&deg; is nearly fused to the intercept, and centring breaks that. A sane prior fixes the <strong>prior-predictive</strong>: the absurd tails you just computed. They are not substitutes for each other. And a too-wide prior only actually distorts the <em>posterior</em> when the data are weak. With the 44 samples in Exercise M2 the likelihood swamps even the $\sigma = 100$ prior, so the scaled fit lands in the right place regardless (that is exactly what Exercise M2(b) and 2(c) show). Tight priors earn their keep when data are scarce, which, in ecology, is often.</p>
 <p>The takeaway is that a $\mathcal{N}(0,\ \sigma = 100)$ prior on a log-scale coefficient is almost always far too wide. Use $\mathcal{N}(0,\ \sigma \approx 2)$ or $\mathcal{N}(0,\ \sigma \approx 3)$ for standardised predictors. Tight, weakly informative priors are what most of the modern Bayesian regression literature now recommends.</p>
 </div></details>
 </div>
@@ -281,7 +281,51 @@ eff2 &lt;- <span class="fn">exp</span>(beta * <span class="nu">1</span>) <span c
 </ol>
 <details class="answer"><summary>Reveal worked solution (actual NIMBLE run)</summary><div class="answer-body">
 <p>Numbers below are from an actual run (<code>set.seed(10)</code>, 3 chains, <code>niter=10000</code>, <code>nburnin=500</code>): posterior mean [95% CI] with R-hat and effective sample size from <code>MCMCsummary</code>. Coefficients are <code>b1</code>=forest, <code>b2</code>=latitude, <code>b3</code>=elevation.</p>
-<p><strong>(a) Raw predictors, <code>dnorm(0, tau=1/10000)</code> (i.e. $\sigma=100$).</strong> The intercept and latitude are badly non-identified because raw latitude ($\approx$ 42&deg;) is far from 0 and strongly correlated with the intercept, so the posterior is a long narrow ridge the sampler cannot traverse. Even with the dispersed <code>glm()</code>-based inits from <code>ant.priors.R</code>, <code>b0</code> and <code>b2</code> come back badly unconverged, and <em>how</em> badly is itself unstable, which is the point. Over ten different seeds at these settings, R-hat for <code>b0</code> and <code>b2</code> ranged from about <strong>1.8 to 17</strong> (median &asymp; 4.6) and the effective sample size from <strong>6 to 19</strong> draws (median &asymp; 10) out of 28,500 saved iterations. Do not memorise a single number here. The honest summary is "R-hat between roughly 2 and 20, n.eff in the single or low double digits, different every run." Their posterior means are correspondingly unstable. The intercept came back anywhere from 10.0 to 27.0 across those ten seeds, and disagree with <code>glm()</code> (which gives intercept 11.94, latitude &minus;0.24). <code>b3</code> (elevation) is the milder casualty, R-hat 1.01&ndash;2.3 depending on the seed. Forest (<code>b1</code> &asymp; 0.64, R-hat 1.00) happens to mix, but the fit is broken. If you instead leave the inits at their defaults the raw chains stall outright, with NaN log densities. Longer chains help only slowly; the real fix is scaling, and note that scaling, not the choice of inits, is what does it.</p>
+<div class="code-label">R · code for this solution</div>
+<pre><code><span class="kw">library</span>(nimble); <span class="kw">library</span>(MCMCvis); <span class="kw">library</span>(coda)
+<span class="fn">set.seed</span>(<span class="nu">10</span>)
+ants &lt;- <span class="fn">read.csv</span>(here::<span class="fn">here</span>(<span class="st">"Day5_BayesII"</span>, <span class="st">"data"</span>, <span class="st">"ants.csv"</span>))
+
+antCode &lt;- <span class="fn">nimbleCode</span>({
+  <span class="kw">for</span> (i <span class="kw">in</span> <span class="nu">1</span>:n) {
+    y[i] ~ <span class="fn">dpois</span>(lam[i])
+    <span class="fn">log</span>(lam[i]) &lt;- b0 + b1 * forest[i] + b2 * latitude[i] + b3 * elevation[i]
+  }
+  b0 ~ <span class="fn">dnorm</span>(<span class="nu">0</span>, tau); b1 ~ <span class="fn">dnorm</span>(<span class="nu">0</span>, tau)
+  b2 ~ <span class="fn">dnorm</span>(<span class="nu">0</span>, tau); b3 ~ <span class="fn">dnorm</span>(<span class="nu">0</span>, tau)
+})
+
+<span class="cm"># Fit the model to a data frame with a given prior precision tau.</span>
+<span class="cm"># Inits start chain 1 at the glm() estimates and jitter the other two.</span>
+fit_ants &lt;- <span class="kw">function</span>(dat, tau) {
+  start &lt;- <span class="fn">coef</span>(<span class="fn">glm</span>(richness ~ forest + latitude + elevation, data = dat, family = poisson))
+  <span class="fn">names</span>(start) &lt;- <span class="kw">c</span>(<span class="st">"b0"</span>, <span class="st">"b1"</span>, <span class="st">"b2"</span>, <span class="st">"b3"</span>)
+  inits &lt;- <span class="kw">list</span>(<span class="fn">as.list</span>(start), <span class="fn">as.list</span>(start + <span class="fn">runif</span>(<span class="nu">4</span>, -<span class="nu">1</span>, <span class="nu">1</span>)), <span class="fn">as.list</span>(start + <span class="fn">runif</span>(<span class="nu">4</span>, -<span class="nu">1</span>, <span class="nu">1</span>)))
+  <span class="fn">nimbleMCMC</span>(antCode,
+             constants = <span class="kw">list</span>(n = <span class="fn">nrow</span>(dat), forest = dat$forest, latitude = dat$latitude,
+                              elevation = dat$elevation, tau = tau),
+             data = <span class="kw">list</span>(y = dat$richness), inits = inits,
+             monitors = <span class="kw">c</span>(<span class="st">"b0"</span>, <span class="st">"b1"</span>, <span class="st">"b2"</span>, <span class="st">"b3"</span>),
+             nchains = <span class="nu">3</span>, niter = <span class="nu">10000</span>, nburnin = <span class="nu">500</span>, samplesAsCodaMCMC = <span class="kw">TRUE</span>)
+}
+
+<span class="cm"># (a) raw predictors, sigma = 100 (tau = 1/10000)</span>
+raw &lt;- <span class="fn">fit_ants</span>(ants, tau = <span class="nu">1</span>/<span class="nu">10000</span>)
+<span class="fn">MCMCsummary</span>(raw, round = <span class="nu">2</span>)          <span class="cm"># look at the Rhat and n.eff columns</span>
+<span class="fn">MCMCtrace</span>(raw, pdf = <span class="kw">FALSE</span>)          <span class="cm"># b0 and b2 wander instead of overlapping</span>
+<span class="fn">gelman.diag</span>(raw)
+
+<span class="cm"># (b) scaled predictors, same prior</span>
+ants_s &lt;- ants
+<span class="kw">for</span> (v <span class="kw">in</span> <span class="kw">c</span>(<span class="st">"forest"</span>, <span class="st">"latitude"</span>, <span class="st">"elevation"</span>)) ants_s[[v]] &lt;- <span class="fn">as.numeric</span>(<span class="fn">scale</span>(ants[[v]]))
+scaled &lt;- <span class="fn">fit_ants</span>(ants_s, tau = <span class="nu">1</span>/<span class="nu">10000</span>)
+<span class="fn">MCMCsummary</span>(scaled, round = <span class="nu">2</span>)
+<span class="fn">round</span>(<span class="fn">coef</span>(<span class="fn">glm</span>(richness ~ forest + latitude + elevation, data = ants_s, family = poisson)), <span class="nu">2</span>)
+
+<span class="cm"># (c) scaled predictors, tight prior sigma = 2 (tau = 1/4)</span>
+tight &lt;- <span class="fn">fit_ants</span>(ants_s, tau = <span class="nu">1</span>/<span class="nu">4</span>)
+<span class="fn">MCMCsummary</span>(tight, round = <span class="nu">2</span>)</code></pre>
+<p><strong>(a) Raw predictors, <code>dnorm(0, tau=1/10000)</code> (i.e. $\sigma=100$).</strong> The intercept and latitude are badly non-identified because raw latitude ($\approx$ 42&deg;) is far from 0 and strongly correlated with the intercept, so the posterior is a long narrow ridge the sampler cannot traverse. Even with the dispersed <code>glm()</code>-based inits from <code>ant.priors.R</code>, <code>b0</code> and <code>b2</code> come back badly unconverged, and <em>how</em> badly is itself unstable, which is the point. Over ten different seeds at these settings, R-hat for <code>b0</code> and <code>b2</code> ranged from about <strong>1.8 to 17</strong> (median &asymp; 4.6) and the effective sample size from <strong>6 to about 20</strong> draws (median &asymp; 10) out of 28,500 saved iterations. The code above, at <code>set.seed(10)</code>, gives R-hat 3.4 and n.eff 21 for both. Do not memorise a single number here. The honest summary is "R-hat between roughly 2 and 20, n.eff in the single or low double digits, different every run." Their posterior means are correspondingly unstable. The intercept came back anywhere from 10.0 to 27.0 across those ten seeds, and disagree with <code>glm()</code> (which gives intercept 11.94, latitude &minus;0.24). <code>b3</code> (elevation) is the milder casualty, R-hat 1.00&ndash;2.3 depending on the seed. Forest (<code>b1</code> &asymp; 0.64, R-hat 1.00) happens to mix, but the fit is broken. If you instead leave the inits at their defaults the raw chains stall outright, with NaN log densities. Longer chains help only slowly; the real fix is scaling, and note that scaling, not the choice of inits, is what does it.</p>
 <p><strong>(b) Scaled predictors, same vague prior.</strong> Everything converges (R-hat = 1.00, n.eff &asymp; 5000&ndash;6000) and the posterior means match <code>glm()</code> to two decimals:</p>
 <table>
 <tr><th>Coefficient</th><th>Posterior mean [95% CI]</th><th>R-hat</th><th><code>glm()</code></th></tr>
@@ -290,7 +334,7 @@ eff2 &lt;- <span class="fn">exp</span>(beta * <span class="nu">1</span>) <span c
 <tr><td>b2 (latitude)</td><td>&minus;0.25 [&minus;0.39, &minus;0.13]</td><td>1.00</td><td>&minus;0.25</td></tr>
 <tr><td>b3 (elevation)</td><td>&minus;0.18 [&minus;0.30, &minus;0.07]</td><td>1.00</td><td>&minus;0.18</td></tr>
 </table>
-<p><strong>(c) Scaled predictors, tight prior <code>dnorm(0, 1/4)</code> (i.e. $\sigma=2$).</strong> The posterior is essentially unchanged, with b0 1.84 [1.71, 1.96], b1 0.32 [0.20, 0.44], b2 &minus;0.25 [&minus;0.39, &minus;0.13], b3 &minus;0.19 [&minus;0.31, &minus;0.07]. With 44 bogs the data dominate both priors, so tightening $\sigma$ from 100 to 2 moves nothing. Tight priors matter most when the data are weak.</p>
+<p><strong>(c) Scaled predictors, tight prior <code>dnorm(0, 1/4)</code> (i.e. $\sigma=2$).</strong> The posterior is essentially unchanged, with b0 1.84 [1.71, 1.96], b1 0.32 [0.20, 0.44], b2 &minus;0.25 [&minus;0.39, &minus;0.13], b3 &minus;0.19 [&minus;0.31, &minus;0.07]. With 44 samples the data dominate both priors, so tightening $\sigma$ from 100 to 2 moves nothing. Tight priors matter most when the data are weak.</p>
 </div></details>
 </div>
 
@@ -524,6 +568,20 @@ where you write the model yourself.</p>
 <p>Numbers below are from an actual run. <code>Lizards_Nimble.R</code> sets no seed, so we fixed
 <code>set.seed(2025)</code>; both fits use 3 chains, <code>niter=6000</code>,
 <code>nburnin=1000</code> on the $n=19$ islands.</p>
+<div class="code-label">R · code for this solution (sources the script, then reads the diagnostics)</div>
+<pre><code><span class="fn">set.seed</span>(<span class="nu">2025</span>)
+<span class="fn">source</span>(here::<span class="fn">here</span>(<span class="st">"Day5_BayesII"</span>, <span class="st">"Lizards_Nimble.R"</span>))
+<span class="kw">library</span>(coda)
+<span class="cm"># (a) the vague-prior fit</span>
+<span class="fn">gelman.diag</span>(samples1[, <span class="kw">c</span>(<span class="st">"a"</span>, <span class="st">"b"</span>)])
+<span class="fn">heidel.diag</span>(samples1[, <span class="kw">c</span>(<span class="st">"a"</span>, <span class="st">"b"</span>)])
+
+<span class="cm"># (b) heidel.diag returns one table per chain; line up the stationarity p-values</span>
+<span class="fn">sapply</span>(<span class="fn">heidel.diag</span>(samples1[, <span class="kw">c</span>(<span class="st">"a"</span>, <span class="st">"b"</span>)]), <span class="kw">function</span>(h) h[, <span class="st">"pvalue"</span>])
+
+<span class="cm"># (c) the tight-prior fit: stationarity passes, halfwidth flags on a</span>
+<span class="fn">heidel.diag</span>(samples2[, <span class="kw">c</span>(<span class="st">"a"</span>, <span class="st">"b"</span>)])
+<span class="fn">MCMCsummary</span>(samples2, params = <span class="kw">c</span>(<span class="st">"a"</span>, <span class="st">"b"</span>), round = <span class="nu">3</span>)   <span class="cm"># a's posterior mean is near 0</span></code></pre>
 <p><strong>(a) Convergence.</strong> For the vague-prior model <code>gelman.diag</code> returns
 R-hat = 1.00 for both $a$ and $b$ (upper C.I. 1.01), and all three chains pass the stationarity
 test for both parameters, with p-values of <strong>0.62, 0.23, 0.18</strong> for $a$ and
@@ -536,12 +594,13 @@ three makes the agreement look tighter than it is. The habit generalises. Any di
 per chain should be read across all of them, because the one that fails is the one you need to
 see.</p>
 <p><strong>(c) A flag that is not a failure.</strong> The tight-prior model converges just as well
-(R-hat = 1.00; stationarity p-values 0.83/0.19/0.89 for $a$ and 0.93/0.77/0.69 for $b$). The
+(R-hat = 1.00; stationarity p-values 0.41/0.78/0.35 for $a$ and 0.36/0.24/0.22 for $b$). The
 halfwidth test flags anyway, and the reason is arithmetic rather than sampling. That test asks
 whether the Monte Carlo error of the posterior mean is small <em>relative to the mean itself</em>. Roughly, is the half-width of the mean's confidence interval under some fraction of
-$|\hat\mu|$. Under <code>dnorm(0, 1/2.71)</code> the posterior mean of $a$ sits almost exactly at
-zero, so that denominator is near zero and the criterion is close to unsatisfiable no matter how
-long you run the chain. Stationarity is the diagnostic that answers "has it converged?"; halfwidth
+$|\hat\mu|$. Under <code>dnorm(0, 1/2.71)</code> the posterior mean of $a$ is close to zero, about &minus;0.20
+against a posterior SD of 0.58, so that denominator is small. Each chain's halfwidth is about 0.036,
+roughly 18% of $|\hat\mu|$, over the default 10% threshold, and because the target itself is near
+zero the criterion stays hard to satisfy no matter how long you run the chain. Stationarity is the diagnostic that answers "has it converged?"; halfwidth
 answers the different question "have I run it long enough for the precision I want?", and it is
 unreliable whenever the parameter is centred on zero. The right response is to ignore it here, not
 to add iterations.</p>
@@ -558,7 +617,17 @@ and neither one indicates a problem.</p>
 <h2>C. Hierarchical / multilevel models: the N2O example</h2>
 
 <h3>Biological setup</h3>
-<p>Soil nitrous-oxide ($\text{N}_2\text{O}$) emissions are measured at multiple sites across the world. Each site has multiple measurements of (nitrogen input, emission). Different sites have wildly different soil organic carbon, climate, and microbial communities, so we expect <em>site-level</em> structure.</p>
+<p>Nitrous oxide ($\text{N}_2\text{O}$) is a potent greenhouse gas, and fertilized farm soils are one of its largest sources. Adding nitrogen fertilizer generally raises emissions, but by how much differs from place to place. <code>N2OEmission.csv</code> compiles <strong>563 emission measurements from 107 sites</strong> around the world. Each row is one measurement: a fertilizer of some type, applied at some rate at one site, and the $\text{N}_2\text{O}$ emission that followed. Sites differ in soil organic carbon, climate, and microbial communities, so we expect measurements from the same site to resemble each other, which is <em>site-level</em> structure.</p>
+<table>
+<tr><th>Column</th><th>What it is</th><th>How the models use it</th></tr>
+<tr><td><code>emission</code></td><td>The N<sub>2</sub>O emission measured after the fertilizer was applied.</td><td>The response, as $y_i = \log(\text{emission})$.</td></tr>
+<tr><td><code>n.input</code></td><td>The amount of nitrogen fertilizer applied.</td><td>The predictor, as $x_i = \log(\text{n.input})$ minus its mean.</td></tr>
+<tr><td><code>group</code>, <code>group.index</code></td><td>The site (field or study location) the measurement came from. <code>group</code> is the ID from the original compilation; <code>group.index</code> renumbers the same 107 sites 1&ndash;107.</td><td><code>group.index</code> is $j$, the site index, so row $i$ uses intercept $\alpha_{j[i]}$.</td></tr>
+<tr><td><code>fertilizer</code>, <code>fert.index</code></td><td>The type of fertilizer applied, as a letter code (<code>A</code>, <code>AM</code>, <code>AN</code>, <code>M</code>, <code>N</code>, <code>U</code>, <code>UA</code>, <code>UAN</code>, <code>UM</code>, <code>unknown</code>). <code>fert.index</code> numbers the same ten types 1&ndash;10. Type is recorded per measurement, and 47 sites tested more than one type.</td><td><code>fert.index</code> is $k$, the fertilizer index. It is used only when the N-input slope is allowed to differ by fertilizer, $\beta_{k[i]}$.</td></tr>
+<tr><td><code>carbon</code></td><td>Soil organic carbon, as a percentage of soil mass. Most sites report one value; 36 report slightly different values across their measurements.</td><td>Averaged within each site to give one value $c_j$ per site, then transformed to the site-level covariate $w_j = \log\big(c_j/(100-c_j)\big)$.</td></tr>
+<tr><td><code>reps</code></td><td>A replicate count carried over from the source compilation. It is constant within a site.</td><td>Not used in any model here.</td></tr>
+</table>
+<p>The file does not record units. That matters less than it sounds: because both emission and N input are logged, the slope $\beta$ is unit-free. It is the proportional change in emission for a proportional change in N input, so $\beta = 1$ means doubling the fertilizer doubles the emission. The sites are very unevenly sampled, from 1 measurement (8 sites) to 25, which is exactly the situation where the choice of pooling matters.</p>
 
 <h3>The pooling spectrum</h3>
 <p>You face a fundamental choice on how to handle the site grouping:</p>
@@ -604,9 +673,15 @@ and neither one indicates a problem.</p>
 })</code></pre>
 
 <h3>Adding a group-level covariate: the same model, two ways to write it</h3>
-<p>So far the random intercept only told us <em>that</em> sites differ (each $\alpha_j$ is a draw from $\mathcal{N}(\mu_\alpha, \sigma_\alpha^2)$). A natural next step is to add a <strong>group-level covariate</strong> $w_j$, a predictor with one value <em>per site</em> rather than one per observation (e.g. log-soil-carbon at site $j$), to explain some of that site-to-site variation. A common way to write this is to regress the site intercept on $w_j$:</p>
+<p>So far the random intercept only told us <em>that</em> sites differ (each $\alpha_j$ is a draw from $\mathcal{N}(\mu_\alpha, \sigma_\alpha^2)$). A natural next step is to add a <strong>group-level covariate</strong> $w_j$, a predictor with one value <em>per site</em> rather than one per observation, to explain some of that site-to-site variation. In the N<sub>2</sub>O data, $w_j$ is built from the <code>carbon</code> column: average it within site $j$ to get $c_j$ (percent soil organic carbon), then take its logit, $w_j = \log\big(c_j/(100-c_j)\big)$. The logit suits a percentage, which is bounded between 0 and 100, and it spreads out the many low-carbon sites (site means range from 0.02% to 31%). A common way to write the model is to regress the site intercept on $w_j$:</p>
 <div class="eq-block">$y_i = \alpha_{j[i]} + \beta x_i + \varepsilon_i, \qquad \alpha_j \sim \mathcal{N}\!\left(\kappa + \eta\, w_j,\ \sigma_\alpha^2\right).$</div>
-<p>This is sometimes sold as a bold new "regression on the random intercepts." It is worth seeing that it is <em>not a new kind of model</em>, only a different way to write a group-level predictor. Substitute $\alpha_j = \kappa + \eta\, w_j + u_j$ with $u_j \sim \mathcal{N}(0, \sigma_\alpha^2)$, and it collapses to an ordinary random-intercept regression that simply carries $w_j$ as another term in the linear predictor:</p>
+<p>Read the second part as a small regression with one data point per site. Its response is the site intercept $\alpha_j$ (a site's typical log-emission at average N input), and its predictor is the site's soil carbon $w_j$:</p>
+<ul>
+<li>$\kappa$ (kappa) is that regression's <strong>intercept</strong>: the expected $\alpha_j$ for a site with $w_j = 0$. If you centre $w$, that is a site with average soil carbon.</li>
+<li>$\eta$ (eta) is its <strong>slope</strong>: how much a site's typical log-emission changes per one-unit increase in $w_j$. $\eta &gt; 0$ means carbon-rich soils emit more.</li>
+<li>$\sigma_\alpha$ is the <strong>scatter</strong> of the site intercepts around that line: the site-to-site variation that soil carbon does not explain.</li>
+</ul>
+<p>Without the covariate, $\kappa + \eta\, w_j$ is replaced by the single mean $\mu_\alpha$, so $\kappa$ plays the role $\mu_\alpha$ played before. This is sometimes sold as a bold new "regression on the random intercepts." It is worth seeing that it is <em>not a new kind of model</em>, only a different way to write a group-level predictor. Substitute $\alpha_j = \kappa + \eta\, w_j + u_j$ with $u_j \sim \mathcal{N}(0, \sigma_\alpha^2)$, and it collapses to an ordinary random-intercept regression that simply carries $w_j$ as another term in the linear predictor:</p>
 <div class="eq-block">$y_i = \underbrace{\kappa + \eta\, w_{j[i]} + \beta\, x_i}_{\text{fixed part (now including the group-level covariate)}} + \underbrace{u_{j[i]}}_{\text{mean-0 random intercept}} + \varepsilon_i.$</div>
 <p>The two forms have the <strong>same likelihood, the same parameters $(\kappa,\eta,\beta,\sigma_\alpha,\sigma)$, and the same predictions</strong>. Whether you place $\eta\, w_j$ "up in the hierarchy" (on the intercept's mean) or "down in the base model" (as an ordinary fixed-effect term) is a notational choice, not a modeling one. The mean-zero random intercept soaks up whatever site variation $w_j$ leaves behind, either way. The hierarchical notation is handy mainly because it generalizes cleanly to several grouping levels, but for a single group-level covariate it is exactly a fixed effect.</p>
 
@@ -638,6 +713,29 @@ now.</p>
 <p>From an actual run of <code>Multilevel_Nimble.R</code> (<code>set.seed(10)</code>; 563
 measurements across 107 sites and 10 fertilizer types; 3 chains, <code>niter=10000</code>,
 <code>nburnin=1000</code>). R-hat is 1.00 for every $\beta$ in models 1&ndash;3.</p>
+<div class="code-label">R · code for this solution</div>
+<pre><code><span class="cm"># Run models 1-3 of Multilevel_Nimble.R first (everything above the MODEL 4 header),</span>
+<span class="cm"># so samples1, samples2, samples3, group and nsites exist.</span>
+
+<span class="cm"># (a) the N-input slope beta under each pooling choice: median and 95% CI</span>
+cols &lt;- <span class="kw">c</span>(<span class="st">"50%"</span>, <span class="st">"2.5%"</span>, <span class="st">"97.5%"</span>)
+<span class="fn">rbind</span>(complete = <span class="fn">MCMCsummary</span>(samples1, params = <span class="st">"beta"</span>)[, cols],
+      none     = <span class="fn">MCMCsummary</span>(samples2, params = <span class="st">"beta"</span>)[, cols],
+      partial  = <span class="fn">MCMCsummary</span>(samples3, params = <span class="st">"beta"</span>)[, cols])
+
+<span class="cm"># (b) shrinkage: no-pooling vs partial-pooling site intercepts</span>
+a.no   &lt;- <span class="fn">MCMCpstr</span>(samples2, params = <span class="st">"alpha"</span>, func = median)$alpha
+a.part &lt;- <span class="fn">MCMCpstr</span>(samples3, params = <span class="st">"alpha"</span>, func = median)$alpha
+<span class="fn">plot</span>(a.no, a.part, pch = <span class="nu">19</span>, xlab = <span class="st">"alpha[j], no pooling"</span>, ylab = <span class="st">"alpha[j], partial pooling"</span>)
+<span class="fn">abline</span>(<span class="nu">0</span>, <span class="nu">1</span>, col = <span class="st">"grey"</span>)
+
+n_j   &lt;- <span class="fn">as.vector</span>(<span class="fn">table</span>(group))      <span class="cm"># measurements per site (group.index 1..107)</span>
+shift &lt;- <span class="fn">abs</span>(a.no - a.part)           <span class="cm"># how far each site moved</span>
+shrink &lt;- <span class="fn">data.frame</span>(site = <span class="nu">1</span>:nsites, n_j, no_pool = a.no, partial = a.part, shift)
+<span class="fn">head</span>(shrink[<span class="fn">order</span>(-shrink$shift), ], <span class="nu">5</span>)                 <span class="cm"># the biggest movers</span>
+<span class="fn">tapply</span>(shift, <span class="fn">cut</span>(n_j, <span class="kw">c</span>(<span class="nu">0</span>, <span class="nu">1</span>, <span class="nu">9</span>, <span class="kw">Inf</span>), labels = <span class="kw">c</span>(<span class="st">"1"</span>, <span class="st">"2-9"</span>, <span class="st">"10+"</span>)), mean)
+<span class="fn">cor</span>(n_j, shift)
+<span class="fn">MCMCsummary</span>(samples3, params = <span class="st">"mu_alpha"</span>, round = <span class="nu">2</span>)</code></pre>
 <p><strong>(a) The N-input slope $\beta$ is positive and barely moves across the pooling
 spectrum</strong> (posterior median [95% CI]):</p>
 <table>
@@ -792,6 +890,32 @@ rests on it.</p>
 <details class="answer"><summary>Reveal worked solution (actual NIMBLE run)</summary><div class="answer-body">
 <p>From an actual run of <code>SpawnerRecruit_Nimble.R</code> (<code>set.seed(2025)</code>; 3 chains,
 <code>niter=10000</code>, <code>nburnin=1000</code>).</p>
+<div class="code-label">R · code for this solution (sources the script, then refits at 20 and 100 years)</div>
+<pre><code><span class="fn">source</span>(here::<span class="fn">here</span>(<span class="st">"Day5_BayesII"</span>, <span class="st">"SpawnerRecruit_Nimble.R"</span>))
+<span class="cm"># (a) medians and 95% CIs against the truth (a = 5, b = 5000, sigma = 0.2)</span>
+<span class="fn">MCMCsummary</span>(samples, params = <span class="kw">c</span>(<span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"sigma"</span>), round = <span class="nu">3</span>)
+
+<span class="cm"># (b) how much of the prior's range, U(1, 10), does a's 95% interval cover?</span>
+ci_a &lt;- <span class="fn">quantile</span>(<span class="fn">as.matrix</span>(samples)[, <span class="st">"a"</span>], <span class="kw">c</span>(<span class="nu">0.025</span>, <span class="nu">0.975</span>))
+ci_a
+<span class="fn">diff</span>(ci_a) / (<span class="nu">10</span> - <span class="nu">1</span>)
+
+<span class="cm"># (c) simulate and fit a fresh dataset of any length, same truth and priors</span>
+fit_bh &lt;- <span class="kw">function</span>(Nyears) {
+  S &lt;- <span class="fn">rlnorm</span>(Nyears, meanlog = <span class="nu">7.5</span>, sdlog = <span class="nu">0.8</span>)
+  R &lt;- (a.true * S) / (<span class="nu">1</span> + (a.true / b.true) * S) * <span class="fn">exp</span>(<span class="fn">rnorm</span>(Nyears, <span class="nu">0</span>, sigma.true))
+  <span class="fn">nimbleMCMC</span>(BHcode, constants = <span class="kw">list</span>(Nyears = Nyears, S = S), data = <span class="kw">list</span>(log.R = <span class="fn">log</span>(R)),
+             inits = inits, monitors = <span class="kw">c</span>(<span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"sigma"</span>),
+             nchains = <span class="nu">3</span>, niter = <span class="nu">10000</span>, nburnin = <span class="nu">1000</span>, samplesAsCodaMCMC = <span class="kw">TRUE</span>)
+}
+width &lt;- <span class="kw">function</span>(s, par) <span class="fn">diff</span>(<span class="fn">quantile</span>(<span class="fn">as.matrix</span>(s)[, par], <span class="kw">c</span>(<span class="nu">0.025</span>, <span class="nu">0.975</span>)))
+
+<span class="fn">set.seed</span>(<span class="nu">2025</span>); fit20  &lt;- <span class="fn">fit_bh</span>(<span class="nu">20</span>)
+<span class="fn">set.seed</span>(<span class="nu">2025</span>); fit100 &lt;- <span class="fn">fit_bh</span>(<span class="nu">100</span>)
+<span class="fn">MCMCsummary</span>(fit20,  params = <span class="kw">c</span>(<span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"sigma"</span>), round = <span class="nu">3</span>)
+<span class="fn">MCMCsummary</span>(fit100, params = <span class="kw">c</span>(<span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"sigma"</span>), round = <span class="nu">3</span>)
+<span class="fn">sapply</span>(<span class="kw">c</span>(<span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"sigma"</span>), <span class="kw">function</span>(par) <span class="fn">unname</span>(<span class="fn">width</span>(fit20, par) / <span class="fn">width</span>(fit100, par)))
+<span class="fn">sqrt</span>(<span class="nu">100</span> / <span class="nu">20</span>)</code></pre>
 <p><strong>(a) Posterior medians and 95% CIs (Nyears = 20).</strong> Every interval contains the
 truth (R-hat = 1.00&ndash;1.01):</p>
 <table>
@@ -809,13 +933,13 @@ observations at low spawner abundance, the very region that identifies it. Every
 on $a$ inherits that, which is worth remembering when Problem 7 turns $a$ into a harvest rate.</p>
 <p><strong>(c) More data, tighter posterior, faster than $\sqrt{N}$.</strong> Regenerating
 from the same truth with <code>Nyears = 100</code> shrinks $a$'s 95% interval from
-[3.17, 9.19] (width <strong>6.02</strong>) to [4.63, 6.34] (width <strong>1.71</strong>), a factor of
+[3.22, 9.25] (width <strong>6.03</strong>) to [4.58, 6.28] (width <strong>1.71</strong>), a factor of
 <strong>3.5&times;</strong>. That beats the $\sqrt{100/20}\approx 2.24$ the $\sqrt N$ rule
 predicts, and (b) explains why. At 20 years the posterior is inflated by that collision with the
 prior ceiling, so it is wider than a well-identified posterior would be. The extra data do two jobs at once. They add information <em>and</em> pull the parameter into the regime where it is
 properly identified and roughly Gaussian, so the interval tightens faster than counting observations
-alone would suggest. $b$ behaves the same way (width 3269 &rarr; 878, a factor of 3.7), while
-$\sigma$, which was well identified from the start, tightens by 3.3&times;. The qualitative lesson
+alone would suggest. $b$ behaves the same way (width 3224 &rarr; 893, a factor of 3.6), while
+$\sigma$, which was well identified from the start, tightens by 3.0&times;. The qualitative lesson
 is the safe one: more data buy tighter management quantities, on the order of $\sqrt N$ once you are
 out of the badly-identified regime.</p>
 </div></details>
@@ -920,6 +1044,27 @@ zst &lt;- <span class="fn">matrix</span>(<span class="nu">1L</span>, Nsites, Nye
 </ol>
 <details class="answer"><summary>Reveal worked solution (actual NIMBLE run)</summary><div class="answer-body">
 <p>Numbers below are from actually running the script (<code>set.seed(2025)</code>: 30 sites, 8 years, 3 reps, true $p=0.6$, baseline occupancy $\approx 0.37$; 3 chains, 20000 iter, 10000 burn-in, thin 5). Across all 45 monitored parameters, <strong>R-hat is 1.00 everywhere except $\lambda_3$, which is 1.01</strong>, convergence is not the problem here.</p>
+<div class="code-label">R · code for this solution (sources the script, then compares to truth and refits with random z starts)</div>
+<pre><code><span class="fn">source</span>(here::<span class="fn">here</span>(<span class="st">"Day5_BayesII"</span>, <span class="st">"DynamicOccupancy_Nimble.R"</span>))
+cols &lt;- <span class="kw">c</span>(<span class="st">"2.5%"</span>, <span class="st">"50%"</span>, <span class="st">"97.5%"</span>)
+<span class="cm"># (a)-(c) posterior medians and 95% CIs beside the simulated truth</span>
+<span class="fn">MCMCsummary</span>(samples, params = <span class="kw">c</span>(<span class="st">"p"</span>, <span class="st">"psi"</span>), round = <span class="nu">2</span>)
+<span class="fn">cbind</span>(truth = <span class="fn">round</span>(phi.true, <span class="nu">2</span>),   <span class="fn">MCMCsummary</span>(samples, params = <span class="st">"phi"</span>,   round = <span class="nu">2</span>)[, cols])
+<span class="fn">cbind</span>(truth = <span class="fn">round</span>(gamma.true, <span class="nu">2</span>), <span class="fn">MCMCsummary</span>(samples, params = <span class="st">"gamma"</span>, round = <span class="nu">2</span>)[, cols])
+<span class="fn">cbind</span>(truth = <span class="fn">round</span>(<span class="fn">colMeans</span>(z), <span class="nu">2</span>), <span class="fn">MCMCsummary</span>(samples, params = <span class="st">"psi.t"</span>, round = <span class="nu">2</span>)[, cols])
+
+<span class="cm"># (d) refit with random 0/1 starting values for z instead of the all-ones zst</span>
+bad.init &lt;- <span class="kw">function</span>() {
+  i &lt;- <span class="fn">init.fun</span>()
+  i$z &lt;- <span class="fn">matrix</span>(<span class="fn">rbinom</span>(Nsites * Nyears, <span class="nu">1</span>, <span class="nu">0.3</span>), Nsites, Nyears)
+  i
+}
+samples.bad &lt;- <span class="fn">nimbleMCMC</span>(DynOccCode, constants = constants, data = data,
+                          inits = <span class="kw">list</span>(<span class="fn">bad.init</span>(), <span class="fn">bad.init</span>(), <span class="fn">bad.init</span>()),
+                          monitors = <span class="kw">c</span>(<span class="st">"p"</span>, <span class="st">"psi"</span>, <span class="st">"phi"</span>, <span class="st">"gamma"</span>),
+                          nchains = <span class="nu">3</span>, niter = <span class="nu">20000</span>, nburnin = <span class="nu">10000</span>, thin = <span class="nu">5</span>,
+                          samplesAsCodaMCMC = <span class="kw">TRUE</span>)
+<span class="fn">MCMCsummary</span>(samples.bad, params = <span class="kw">c</span>(<span class="st">"p"</span>, <span class="st">"psi"</span>), round = <span class="nu">2</span>)</code></pre>
 <p><strong>(a&ndash;c)</strong> The two quantities informed by <em>all</em> the data are recovered well, detection $p$ = 0.63 [0.55, 0.70] (truth 0.60) and baseline occupancy $\psi$ = 0.33 [0.18, 0.51] (truth 0.37). Year-specific persistence and colonization scatter around the 1:1 line but with <strong>very wide 95% CIs</strong>, e.g. $\phi_3$ = 0.52 [0.16, 0.89], $\phi_5$ = 0.08 [0.00, 0.36], $\gamma_1$ = 0.47 [0.26, 0.70] (its truth 0.47, recovered almost exactly; others land anywhere in their wide interval). The derived yearly occupancy $\psi_t$ tracks the true trajectory, including the dip in year 3 (true 0.13, posterior 0.18 [0.08, 0.34]).</p>
 <p><strong>(d)</strong> Replacing the all-ones <code>zst</code> with random 0/1 inits does <em>not</em> stop NIMBLE 1.4.2. Every site-year where a randomly-drawn $z=0$ collides with an observed $y=1$ is logically impossible, so each such observation starts at a $-\infty$ log-density, and NIMBLE says so, printing one <code>warning: logProb of data node y[i, j, t]: logProb is -Inf.</code> line per offending observation before it runs. It then runs to completion, and because $z$ is binary the samplers move those cells to 1 on essentially the first sweep. With a random 0/1 start the posterior comes back the same as with <code>zst</code> (detection $p$ median 0.63 either way). Run the identical model in JAGS and it <em>is</em> fatal: <code>jags.model()</code> aborts with <code>Error in node y[1,1,1]: Node inconsistent with parents</code>. The lesson to take from (d) is therefore not "it crashes" but "read the warnings". A wall of $-\infty$ log-probabilities means your initial values contradict your data; you cannot rely on the sampler rescuing you in a model with continuous latent states, and the all-ones <code>zst</code> makes the whole class of problem disappear.</p>
 <p><strong>Notice what you are left with.</strong> The intervals on the individual $\phi_t$ and $\gamma_t$ are very wide, and R-hat says that is not a convergence problem. The model is being honest about a genuinely small sample. What to do about it is <a href="problem_set.html#p10">Problem 10</a>, where you measure two different fixes and find that one of them can fool you.</p>
@@ -989,10 +1134,25 @@ zst &lt;- <span class="fn">matrix</span>(<span class="nu">1L</span>, Nsites, Nye
 </ol>
 <details class="answer"><summary>Reveal worked solution (actual NIMBLE run)</summary><div class="answer-body">
 <p>From an actual run of <code>NMixture_Nimble.R</code> (<code>set.seed(2025)</code>; 3 chains, <code>niter=10000</code>, <code>nburnin=1000</code>, thin 5). All R-hat = 1.00&ndash;1.02.</p>
+<div class="code-label">R · code for this solution (sources the script, then summarizes all four models)</div>
+<pre><code><span class="fn">source</span>(here::<span class="fn">here</span>(<span class="st">"Day5_BayesII"</span>, <span class="st">"NMixture_Nimble.R"</span>))
+<span class="cm"># (a)-(c) the three fits, against the simulated truth</span>
+<span class="fn">MCMCsummary</span>(samples1, round = <span class="nu">2</span>)   <span class="cm"># truth: lambda = 6, p = 0.8</span>
+<span class="fn">MCMCsummary</span>(samples2, round = <span class="nu">2</span>)   <span class="cm"># truth: b0 = 3, b1 = 1, p = 0.8</span>
+<span class="fn">MCMCsummary</span>(samples3, round = <span class="nu">2</span>)   <span class="cm"># truth: b0 = 3, b1 = 1, a0 = 1, a1 = 1</span>
+
+<span class="cm"># (d) the Bayesian p-value, and the picture behind it</span>
+<span class="fn">MCMCsummary</span>(samples4, params = <span class="kw">c</span>(<span class="st">"lambda"</span>, <span class="st">"p"</span>), round = <span class="nu">2</span>)
+post &lt;- <span class="fn">as.matrix</span>(samples4)
+<span class="fn">mean</span>(post[, <span class="st">"fit.pred"</span>] &gt; post[, <span class="st">"fit.data"</span>])
+<span class="fn">apply</span>(post[, <span class="kw">c</span>(<span class="st">"fit.data"</span>, <span class="st">"fit.pred"</span>)], <span class="nu">2</span>, median)
+<span class="fn">plot</span>(post[, <span class="st">"fit.data"</span>], post[, <span class="st">"fit.pred"</span>], pch = <span class="st">"."</span>,
+     xlab = <span class="st">"T(observed data)"</span>, ylab = <span class="st">"T(replicate data)"</span>)
+<span class="fn">abline</span>(<span class="nu">0</span>, <span class="nu">1</span>, col = <span class="st">"red"</span>)          <span class="cm"># a good fit scatters evenly around this line</span></code></pre>
 <p><strong>(a) Basic model (20 sites, 3 reps; truth $\lambda=6,\ p=0.8$).</strong> Recovered cleanly: $\lambda$ = 6.24 [5.06, 7.78] and $p$ = 0.80 [0.67, 0.87]. With only 20 sites the intervals are wide, but both comfortably cover truth.</p>
-<p><strong>(b) Covariate on abundance (truth $\beta_1=1$).</strong> $\beta_1$ = <strong>1.00</strong> [0.94, 1.07], credibly positive and bang on the simulated value; $\beta_0$ = 2.99 [2.91, 3.07].</p>
+<p><strong>(b) Covariate on abundance (truth $\beta_1=1$).</strong> $\beta_1$ = <strong>1.00</strong> [0.94, 1.07], credibly positive and bang on the simulated value; $\beta_0$ = 2.99 [2.91, 3.06].</p>
 <p><strong>(c) Covariate on both.</strong> Adding the detection covariate ($a_0$ = 0.92 [0.70, 1.11], $a_1$ = 1.00 [0.91, 1.09], both recovering truth 1) leaves the abundance-covariate inference essentially unchanged: $\beta_1$ moves only from 1.00 to <strong>1.04</strong> [0.97, 1.10]. Because these data are simulated clean, modeling detection heterogeneity here neither biases nor much tightens $\beta_1$; in messier data, ignoring detection structure is what would distort it.</p>
-<p><strong>(d) Overdispersion + Bayesian p-value.</strong> The 200-site data were generated from a negative binomial but fit with a Poisson N-mixture. The discrepancy sits almost entirely on one side (observed $T(\text{data})$ median 367 vs replicated $T(y^\text{rep})$ median 332), giving a <strong>Bayesian p-value of 0.008</strong>, far from 0.5. The Poisson model cannot absorb the extra variance, so it is decisively rejected; the fix is a Poisson-lognormal or negative-binomial N-mixture (Exercise M8). Note $\lambda$ = 5.81 [5.46, 6.17] still looks confident and reasonable. The GOF check is what exposes the misfit the point estimate alone would hide.</p>
+<p><strong>(d) Overdispersion + Bayesian p-value.</strong> The 200-site data were generated from a negative binomial but fit with a Poisson N-mixture. The discrepancy sits almost entirely on one side (observed $T(\text{data})$ median 367 vs replicated $T(y^\text{rep})$ median 332), giving a <strong>Bayesian p-value of 0.008</strong>, far from 0.5. The Poisson model cannot absorb the extra variance, so it is decisively rejected; the fix is a Poisson-lognormal or negative-binomial N-mixture (Exercise M8). Note $\lambda$ = 5.81 [5.46, 6.16] still looks confident and reasonable. The GOF check is what exposes the misfit the point estimate alone would hide.</p>
 </div></details>
 </div>
 

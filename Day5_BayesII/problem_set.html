@@ -61,8 +61,8 @@
 <h2>Datasets for this assignment</h2>
 <p>These files are already in the <a href="../FW536_R_project.zip">course R project</a>. Open <code>FW536.Rproj</code>, and the <code>here::here()</code> paths in the code find them. You can also click a file to download it on its own.</p>
 <div class="data-section">
-  <div class="data-row"><a href="data/ants.csv" download><code>ants.csv</code></a><span class="data-desc">Ant species richness in 44 New England bogs; covariates forest, latitude, elevation.</span></div>
-  <div class="data-row"><a href="data/N2OEmission.csv" download><code>N2OEmission.csv</code></a><span class="data-desc">N2O emissions from agricultural plots across fertilizers and sites (multilevel).</span></div>
+  <div class="data-row"><a href="data/ants.csv" download><code>ants.csv</code></a><span class="data-desc">Ant species richness at 22 New England sites, one bog and one adjacent-forest sample each (44 rows); covariates forest (1 = forest, 0 = bog), latitude, elevation.</span></div>
+  <div class="data-row"><a href="data/N2OEmission.csv" download><code>N2OEmission.csv</code></a><span class="data-desc">563 N2O emission measurements from 107 fertilized agricultural sites: fertilizer amount (<code>n.input</code>) and type (<code>fert.index</code>), site (<code>group.index</code>), and soil carbon (<code>carbon</code>). Columns are explained in Problem 3.</span></div>
   <div class="data-row"><a href="data/IslandsLizards.csv" download><code>IslandsLizards.csv</code></a><span class="data-desc">Lizard occupancy (0/1) vs perimeter:area ratio (Bayesian logistic).</span></div>
 </div>
 </section>
@@ -70,8 +70,10 @@
 <a id="morning"></a>
 <div class="exercise" id="p1">
 <span class="ex-tag">Problem 1</span><span class="difficulty medium"> · hierarchical Poisson · <code>ants.csv</code></span>
-<h3>Overdispersed ant richness with a bog-level random effect</h3>
-<p>Load the ant-richness data and fit a Poisson regression of <em>richness</em> on the three scaled covariates, but add a <strong>bog-level (observation-level) random effect</strong> $\epsilon_i$ on the log mean to absorb overdispersion:</p>
+<h3>Is there extra variation in ant richness? An observation-level random effect</h3>
+<p><strong>The data.</strong> <code>ants.csv</code> records ant species richness (the number of ant species found) at 22 sites across New England. At each site ants were sampled twice, once in a bog and once in the forest next to it, so the file has 44 rows. The covariates are <code>forest</code> (1 for the forest sample, 0 for the bog sample), <code>latitude</code>, and <code>elevation</code>. This is the dataset from section A of the lab.</p>
+<p><strong>Why this problem.</strong> A Poisson regression assumes the variance of the counts equals their mean. Raw richness does not look like that: its mean is 7.0 and its variance is 18.0. Some of that extra spread is expected, though, because habitat, latitude, and elevation shift the mean from row to row. The real question is whether any extra variation is <em>left over</em> once the covariates are in the model. If there is, a plain Poisson regression is overconfident: its standard errors and credible intervals come out too narrow.</p>
+<p>One way to find out, and to fix it if needed, is to give every row its own small random nudge on the log mean, $\epsilon_i$. You met this device in Day 3, Problem 6, as an <strong>observation-level random effect</strong>: "observation-level" because there is one $\epsilon_i$ per row of data, not one per site or group. The nudges are drawn from a Normal distribution with standard deviation $\sigma_\epsilon$, and $\sigma_\epsilon$ is the answer to the question. A $\sigma_\epsilon$ near 0 means the covariates already account for the spread and plain Poisson was fine; a clearly positive $\sigma_\epsilon$ measures how much extra variation there is.</p>
 <div class="eq-block">$y_i \sim \text{Poisson}(\lambda_i), \quad \log \lambda_i = \beta_0 + \beta_1 \text{forest}_i + \beta_2 \text{lat}_i + \beta_3 \text{elev}_i + \epsilon_i, \quad \epsilon_i \sim \mathcal{N}(0, \sigma_\epsilon^2)$</div>
 <div class="code-label">R · start from the real data</div>
 <pre><code>ants &lt;- <span class="fn">read.csv</span>(<span class="fn">here::here</span>(<span class="st">"Day5_BayesII"</span>, <span class="st">"data"</span>, <span class="st">"ants.csv"</span>))
@@ -80,7 +82,7 @@ ants$latitude  &lt;- <span class="fn">as.numeric</span>(<span class="fn">scale</
 ants$elevation &lt;- <span class="fn">as.numeric</span>(<span class="fn">scale</span>(ants$elevation))</code></pre>
 <ol type="a">
  <li>Fit the model in <span class="pill nimble">NIMBLE</span> with weakly informative priors ($\beta \sim \mathcal{N}(0, \sigma^2{=}4)$, $\sigma_\epsilon \sim \text{Uniform}(0,5)$). Report posterior medians and 95% CIs for $\beta_1,\beta_2,\beta_3$ and for $\sigma_\epsilon$.</li>
- <li>Is $\sigma_\epsilon$ credibly bounded away from 0? What does that tell you about overdispersion relative to a plain Poisson GLM?</li>
+ <li>Look at the posterior of $\sigma_\epsilon$. Does it point to meaningful leftover variation, or is it consistent with values close to 0? Check your answer against the plain Poisson <code>glm()</code> from (c): its residual deviance divided by its residual degrees of freedom should be near 1 when there is no overdispersion (Day 3, Problem 6). What do you conclude about whether the random effect was needed?</li>
  <li>Compare your $\beta$ posterior medians to the frequentist <code>glm(richness ~ forest + latitude + elevation, family = poisson)</code> fit. Where do they agree or differ, and why?</li>
 </ol>
 <div class="callout try" style="margin-top: 12px;"><strong>Your answer goes in the R Markdown hand-in.</strong> Write your reasoning, R code, numeric answer, and biological interpretation in the matching section of the .Rmd template, then knit to HTML and upload to Canvas.</div>
@@ -103,7 +105,16 @@ ants$elevation &lt;- <span class="fn">as.numeric</span>(<span class="fn">scale</
 <div class="exercise" id="p3">
 <span class="ex-tag">Problem 3</span><span class="difficulty medium"> · multilevel pooling · <code>N2OEmission.csv</code></span>
 <h3>The pooling spectrum for soil N<sub>2</sub>O emissions</h3>
-<p>Load the N<sub>2</sub>O data and model $\log(\text{emission})$ as a function of centred $\log(\text{n.input})$, with sites indexed by <code>group.index</code>.</p>
+<p><strong>The data.</strong> Nitrous oxide (N<sub>2</sub>O) is a potent greenhouse gas, and fertilized farm soils are a major source. <code>N2OEmission.csv</code> compiles 563 emission measurements from 107 sites. Each row is one measurement: a fertilizer applied at some rate at one site, and the N<sub>2</sub>O emission that followed. The question running through Problems 3 and 4 is how emissions respond to the amount of nitrogen applied, and how much that differs among sites and fertilizers.</p>
+<ul>
+<li><code>emission</code>: the N<sub>2</sub>O emission measured. The response, used as $y_i = \log(\text{emission})$.</li>
+<li><code>n.input</code>: the amount of nitrogen fertilizer applied. The predictor, used as $x_i = \log(\text{n.input})$ minus its mean. Because both are logged, the slope $\beta$ is unit-free: $\beta = 1$ means doubling the fertilizer doubles the emission.</li>
+<li><code>group.index</code>: which of the 107 sites the row comes from, numbered 1&ndash;107 (<code>group</code> holds the original site IDs). This is the site index $j$, so row $i$ belongs to site $j[i]$. Sites have between 1 and 25 measurements.</li>
+<li><code>fert.index</code>: which of 10 fertilizer types was applied, numbered 1&ndash;10 (<code>fertilizer</code> holds the original letter codes). This is the fertilizer index $k$. It is not used until Problem 4(b).</li>
+<li><code>carbon</code>: soil organic carbon at the site, as a percentage. It is not used until Problem 4.</li>
+<li><code>reps</code>: a replicate count carried over from the source compilation. Not used.</li>
+</ul>
+<p>Model $\log(\text{emission})$ as a function of centred $\log(\text{n.input})$, with sites indexed by <code>group.index</code>. Section C of the <a href="lab.html#hier">practice lab</a> has the same data and a fuller description.</p>
 <div class="code-label">R · start from the real data</div>
 <pre><code>N2O   &lt;- <span class="fn">read.csv</span>(<span class="fn">here::here</span>(<span class="st">"Day5_BayesII"</span>, <span class="st">"data"</span>, <span class="st">"N2OEmission.csv"</span>))
 y     &lt;- <span class="fn">log</span>(N2O$emission)
@@ -122,9 +133,18 @@ nsites &lt;- <span class="fn">length</span>(<span class="fn">unique</span>(group
 <div class="exercise" id="p4">
 <span class="ex-tag">Problem 4</span><span class="difficulty hard"> · group-level regression · <code>N2OEmission.csv</code></span>
 <h3>Modeling the random intercept with a site-level covariate</h3>
-<p>Extend the partial-pooling model from Problem 3 so the per-site mean intercept is itself regressed on a <strong>site-level covariate</strong> $w_j$ (a per-site summary derived from the data), and let the N-input slope vary by fertilizer type (<code>fert.index</code>):</p>
-<div class="eq-block">$\alpha_j \sim \mathcal{N}(\kappa + \eta\, w_j,\ \sigma_\alpha^2), \qquad \beta_{k} \sim \mathcal{N}(\mu_\beta, \sigma_\beta^2)$</div>
-<p>Build $w_j$ from each site's soil organic carbon (the <code>carbon</code> column, a percentage), e.g. its logit $\log\!\big(c_j/(100-c_j)\big)$, and state how you scaled it.</p>
+<p>Problem 3's partial-pooling model says <em>that</em> sites differ, through $\sigma_\alpha$, but not <em>why</em>. This problem adds two pieces of structure. They use two different columns, so keep them separate:</p>
+<ul>
+<li><strong>Part (a): explain site differences with soil carbon.</strong> The site-level covariate is $w_j$, one value per site, built from the <code>carbon</code> column. Average <code>carbon</code> within each site to get $c_j$, the site's percent soil organic carbon (36 sites report more than one value), then take its logit, $w_j = \log\big(c_j/(100-c_j)\big)$. State how you scaled $w_j$ (for example, standardized to mean 0 and SD 1).</li>
+<li><strong>Part (b): let the N-input slope differ by fertilizer type.</strong> This uses <code>fert.index</code>, not $w_j$. Fertilizer type is recorded per measurement, not per site (47 sites tested more than one type), so each row $i$ gets the slope of its own type, $\beta_{k[i]}$ with $k[i]$ = <code>fert.index</code>.</li>
+</ul>
+<p>Written out in full, with $j[i]$ = <code>group.index</code> and $k[i]$ = <code>fert.index</code> for row $i$:</p>
+<div class="eq-block">$y_i \sim \mathcal{N}\big(\alpha_{j[i]} + \beta_{k[i]}\, x_i,\ \sigma^2\big), \qquad \alpha_j \sim \mathcal{N}(\kappa + \eta\, w_j,\ \sigma_\alpha^2), \qquad \beta_{k} \sim \mathcal{N}(\mu_\beta, \sigma_\beta^2)$</div>
+<ul>
+<li>$\kappa$ (kappa) and $\eta$ (eta) are the intercept and slope of a regression of the site intercepts on soil carbon. $\kappa$ is the expected $\alpha_j$ for a site with $w_j = 0$ (average carbon, once $w$ is standardized), and it replaces Problem 3's $\mu_\alpha$. $\eta$ is how much a site's typical log-emission changes per unit of $w_j$.</li>
+<li>$\sigma_\alpha$ is the scatter of site intercepts around that line, the site variation carbon does not explain.</li>
+<li>$\mu_\beta$ is the average N-input slope across fertilizer types, and $\sigma_\beta$ is how much the ten type-specific slopes $\beta_k$ differ from it.</li>
+</ul>
 <div class="callout key" style="margin-top:12px;"><p><strong>A group-level covariate.</strong> Here the site intercept is no longer a black-box draw from $\mathcal{N}(\mu_\alpha,\sigma_\alpha^2)$ but is given a <em>group-level predictor</em> $w_j$. Writing it as a regression on the intercept, $\alpha_j \sim \mathcal{N}(\kappa+\eta\, w_j, \sigma_\alpha^2)$, is <em>the same model</em> as carrying $w_j$ as an ordinary term in the linear predictor with a mean-zero site random effect: two notations, one likelihood and one set of predictions. What the covariate buys you (versus a random intercept with <em>no</em> covariate) is real either way. It explains <em>why</em> sites differ (through the posterior of $\eta$), it sharpens shrinkage (a data-poor site is pulled toward what its own covariate predicts, not just the grand mean), and it lets you predict the baseline emission of an unsampled site from its covariate. See section C of the <a href="lab.html#hier">practice lab</a> for the worked intuition.</p></div>
 <div class="callout key" style="margin-top:12px;"><p><strong>And why let the slope vary?</strong>
 A single $\beta$ asserts that every fertilizer converts nitrogen input into emissions at the same

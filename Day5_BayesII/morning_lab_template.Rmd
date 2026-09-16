@@ -50,12 +50,13 @@ liz  <- read.csv(here::here("Day5_BayesII", "data", "IslandsLizards.csv"))  # Pr
 
 ---
 
-# Problem 1 · Overdispersed ant richness with a bog-level random effect
+# Problem 1 · Is there extra variation in ant richness? An observation-level random effect
 
 > Load `ants.csv`, scale the three predictors, and fit a Poisson regression of
-> richness on forest, latitude, and elevation with a bog-level (observation-level)
-> random effect on the log mean. Report the coefficient and $\sigma_\epsilon$
-> posteriors, judge whether overdispersion is present, and compare to `glm()`.
+> richness on forest, latitude, and elevation, adding an observation-level random
+> effect (one Normal nudge per row) on the log mean. Report the coefficient and
+> $\sigma_\epsilon$ posteriors, judge whether any extra-Poisson variation is left
+> once the covariates are in (check the glm's deviance / df too), and compare to `glm()`.
 
 **My work:**
 
@@ -108,8 +109,10 @@ liz  <- read.csv(here::here("Day5_BayesII", "data", "IslandsLizards.csv"))  # Pr
 # Problem 4 · Modeling the random intercept with a site-level covariate
 
 > Extend Problem 3 so $\alpha_j \sim \mathcal{N}(\kappa + \eta\,w_j,\ \sigma_\alpha^2)$
-> with $w_j$ built from site soil carbon (state how you scaled it), and let the
-> N-input slope vary by fertilizer type. (a) Is $\eta$ credibly different from
+> with $w_j$ the logit of each site's mean `carbon` (state how you scaled it), and
+> let the N-input slope vary by fertilizer type, $\beta_{k[i]}$ with $k$ = `fert.index`.
+> ($\kappa$ and $\eta$ are the intercept and slope of the regression of site
+> intercepts on $w_j$.) (a) Is $\eta$ credibly different from
 > 0? (b) Report $\sigma_\beta$, rank the ten types by median slope, then test the
 > ranking: across draws, how often does the top type really hold the largest
 > slope? Report that probability with the type's 95% CI and its sample size, and

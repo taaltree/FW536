@@ -205,7 +205,9 @@ for (t in 1:Nyears)
 > Then run the posterior predictive check: simulate new sites inside the model
 > (`N.new`, `y.new`), compare the real data's variance-to-mean ratio, proportion of
 > zeros and largest count with the fake datasets (histograms and p-values), and
-> say what fails, why, and how you would fix it.
+> say what fails, why, and how you would fix it. (d) Compute the chi-square-type
+> sum, sum((y - p*lambda)^2 / (p*lambda)), for the real and fake data at every draw,
+> report the Bayesian p-value, plot fake against real with a 1:1 line, and compare with (b).
 
 **My work:**
 

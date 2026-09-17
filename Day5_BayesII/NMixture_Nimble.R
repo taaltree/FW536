@@ -207,12 +207,14 @@ Nmix4Code <- nimbleCode({
       y[i, j]        ~ dbinom(prob = p, size = N[i])
       y.pred[i, j]   ~ dbinom(prob = p, size = N[i])  # posterior replicate
       e[i, j]       <- p * lambda
-      resid[i, j]      <- pow(pow(y[i, j],      0.5) - pow(e[i, j], 0.5), 2)
-      resid.pred[i, j] <- pow(pow(y.pred[i, j], 0.5) - pow(e[i, j], 0.5), 2)
+      # chi-square-type contribution: squared distance from the expected count,
+      # divided by the expected count (for counts, the variance is about the mean)
+      resid[i, j]      <- pow(y[i, j]      - e[i, j], 2) / e[i, j]
+      resid.pred[i, j] <- pow(y.pred[i, j] - e[i, j], 2) / e[i, j]
     }
   }
-  fit.data <- sum(resid[1:Nsites, 1:Nreps])
-  fit.pred <- sum(resid.pred[1:Nsites, 1:Nreps])
+  fit.data <- sum(resid[1:Nsites, 1:Nreps])        # T(y, theta)
+  fit.pred <- sum(resid.pred[1:Nsites, 1:Nreps])   # T(y.rep, theta)
 
   p      ~ dbeta(1, 1)
   # CAVEAT (see the lab's section A): dgamma(0.001, 0.001) is the classic
@@ -273,5 +275,5 @@ cat("Bayesian p-value =", round(bayes.p, 3),
 # - Build complexity additively: constant -> covariates on abundance ->
 #   covariates on both -> overdispersion. Each step is testable.
 # - The Bayesian p-value is the simplest GOF check for hierarchical models;
-#   pick a discrepancy (sum-of-squared-roots here) that you understand.
+#   pick a discrepancy (a chi-square-type sum here) that you understand.
 # =============================================================================

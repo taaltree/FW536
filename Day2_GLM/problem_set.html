@@ -26,15 +26,14 @@
  <div class="section">Afternoon · linear models & GLMs</div>
  <ul>
  <li><a href="#p5">5. Simulating with and without an interaction</a></li>
- <li><a href="#p6">6. Interactions II: link vs response scale</a></li>
- <li><a href="#p7">7. Poisson log-link interpretation</a></li>
- <li><a href="#p8">8. Interaction &amp; crossover</a></li>
- <li><a href="#p9">9. Offsets &amp; effort</a></li>
+ <li><a href="#p6">6. Poisson log-link interpretation</a></li>
+ <li><a href="#p7">7. Interaction &amp; crossover</a></li>
+ <li><a href="#p8">8. Offsets &amp; effort</a></li>
  </ul>
  <div class="section">Optional · extra credit</div>
  <ul>
- <li><a href="#p10">10. Logit threshold &amp; marginal effects</a></li>
- <li><a href="#p11">11. Back-transforming a CI</a></li>
+ <li><a href="#p9">9. Logit threshold &amp; marginal effects</a></li>
+ <li><a href="#p10">10. Back-transforming a CI</a></li>
  </ul>
  <div class="section">Day 2 docs</div>
  <ul>
@@ -67,7 +66,7 @@
 <div class="data-section">
   <div class="data-row"><a href="data/sockeye_adult.csv" download><code>sockeye_adult.csv</code></a><span class="data-desc">Daily adult sockeye counts and flow-corrected eDNA (Qcorr_qPCR = qPCR eDNA concentration × stream flow), 2015&ndash;2016 (Levi et al. 2019). Long format; filter to <code>Sockeyetype == "Sockeye_Adults"</code>. Used in Problem 4 only.</span></div>
 </div>
-<p style="margin-top:10px"><em>Problems 5 and 6 need no data file. Each generates its own data in the code given with the problem, and Problems 7&ndash;11 work from coefficient tables in the problem statement.</em></p>
+<p style="margin-top:10px"><em>Problem 5 needs no data file. It generates its own data in the code given with the problem, and Problems 6&ndash;10 work from coefficient tables in the problem statement.</em></p>
 </section>
 
 <a id="morning"></a>
@@ -168,13 +167,13 @@ Report both dispersion numbers. The first compares the variance of the pooled co
 <!-- ========================== AFTERNOON ======================= -->
 <!-- ============================================================ -->
 <a id="afternoon"></a>
-<div class="practice-banner"><div class="label">Afternoon · 20 pts</div><h3>Linear models &amp; GLMs</h3><p>Problems 5&ndash;9, plus optional extra-credit Problems 10 and 11. Write your work in <a class="hand-in" href="afternoon_lab_template.Rmd"><code>afternoon_lab_template.Rmd</code> &darr;</a></p></div>
+<div class="practice-banner"><div class="label">Afternoon · 20 pts</div><h3>Linear models &amp; GLMs</h3><p>Problems 5&ndash;8, plus optional extra-credit Problems 9 and 10. Write your work in <a class="hand-in" href="afternoon_lab_template.Rmd"><code>afternoon_lab_template.Rmd</code> &darr;</a></p></div>
 
 <!-- =========================== PROBLEM 5 =========================== -->
 <div class="exercise" id="p5">
 <span class="ex-tag">Problem 5</span><span class="difficulty medium"> · interactions I, with and without a product term</span>
 <h3>Simulating with and without an interaction</h3>
-<p>Problems 5 and 6 build one idea in two steps: <em>an interaction means the effect of one predictor depends on the value of another</em>. Everything you need is generated in the code blocks, so no data file is required. Work them in order.</p>
+<p>Problem 5 builds one idea: <em>an interaction means the effect of one predictor depends on the value of another</em>. Everything you need is generated in the code blocks, so no data file is required.</p>
 <div class="callout key"><strong>The idea, stated once.</strong> For a two-predictor model, ask what happens to the fitted response when you nudge $x_1$ up by one unit. If the answer is the same number no matter where $x_2$ sits, the predictors act independently and the model is <em>additive</em>. If the answer changes with $x_2$, they interact. That question, find the slope in $x_1$ and look for $x_2$ in the result, is the whole of what follows. You can get that slope by differentiating, or by factoring $x_1$ out of the fitted mean and reading off whatever multiplies it; part (c) shows both.</div>
 <p>Simulate two datasets with the same design and sample size. The first is built with <em>no</em> interaction and the second with a genuine product term. Then fit a model that allows an interaction to each one.</p>
 <pre><code>set.seed(123)
@@ -201,35 +200,7 @@ summary(m_int)</code></pre>
 
 <!-- =========================== PROBLEM 6 =========================== -->
 <div class="exercise" id="p6">
-<span class="ex-tag">Problem 6</span><span class="difficulty hard"> · interactions II, link scale vs response scale</span>
-<h3>The interaction you did not put in the model</h3>
-<p>Now the same idea with a binary response, which is where interactions stop being straightforward. As with <code>d_none</code> in Problem 5, the data are built with <em>no</em> interaction, and you fit a model that allows one anyway:</p>
-<pre><code>set.seed(789)
-d6 &lt;- data.frame(x1 = runif(200, -2, 2), x2 = runif(200, -2, 2))
-eta &lt;- -1 + 1.2*d6$x1 - 0.8*d6$x2      # note: no x1*x2 term
-d6$ybin &lt;- rbinom(200, 1, plogis(eta))
-
-m6 &lt;- glm(ybin ~ x1 * x2, data = d6, family = binomial)
-summary(m6)</code></pre>
-<ol type="a">
-<li>Report the four coefficients against the values used to build the data ($-1$, $1.2$, $-0.8$, and no product term). Is the <code>x1:x2</code> term distinguishable from zero? Which scale are the coefficients on, probability, odds, or log-odds?</li>
-<li>Write the full model in mathematical notation, including the link function.</li>
-<li>On the log-odds scale, the slope in $x_1$ is the same kind of formula you found in Problem 5(c). Write it down and evaluate it at $x_2 = -1$ and $x_2 = +1$. Are the two slopes close, and given how the data were built, should they be?</li>
-<li>Now refit the same data with <strong>no interaction term at all</strong>:
-<pre><code>m6add &lt;- glm(ybin ~ x1 + x2, data = d6, family = binomial)   # additive on the log-odds scale
-coef(m6add)</code></pre>
-This model is additive by construction: its log-odds are $\eta = \beta_0 + \beta_1 x_1 + \beta_2 x_2$, so on the log-odds scale the effect of $x_1$ is the single number $\partial\eta/\partial x_1 = \beta_1$, which does not involve $x_2$. On the <em>probability</em> scale it is not. The probability is $p = \text{ilogit}(\eta) = 1/(1+e^{-\eta})$, and the chain rule takes the derivative in two steps:
-$$\frac{\partial p}{\partial x_1} = \frac{dp}{d\eta}\cdot\frac{\partial \eta}{\partial x_1} = p(1-p)\,\beta_1,$$
-using the fact that the derivative of the inverse logit is $dp/d\eta = p(1-p)$. The $p(1-p)$ factor is the logistic curve's own steepness, biggest at $p = 0.5$ and shrinking toward zero at either end, so the same step on the log-odds scale moves the probability by different amounts depending on where you started. (For the interaction model <code>m6</code>, $\eta$ also contains $\beta_3 x_1 x_2$, whose derivative with respect to $x_1$ is $\beta_3 x_2$, so there $\partial p/\partial x_1 = p(1-p)(\beta_1 + \beta_3 x_2)$. The additive model simply has no $\beta_3$.) Using <code>m6add</code>'s coefficients, compute $\partial p/\partial x_1 = p(1-p)\beta_1$ at $x_1 = 0$ for $x_2 = -1$ and for $x_2 = +1$, where $p$ is the model's fitted probability at each point. Report both, and their ratio.</li>
-<li>You just found that the effect of $x_1$ on the probability depends on $x_2$, for data built with no interaction and a model containing no interaction term. Explain in three or four sentences why this happens, and what it implies for a reader who wants to know whether two predictors &ldquo;interact&rdquo; in a GLM. Your answer should distinguish clearly between the two scales.</li>
-</ol>
-<div class="callout warn"><strong>Watch out.</strong> Part (e) is the point of the whole sequence, and it is easy to state too strongly in either direction. A nonlinear link does not create an interaction in the model. The log-odds really are additive in <code>m6add</code>. What it does is make additivity on one scale disagree with additivity on the other, so &ldquo;do these predictors interact?&rdquo; is only a well-posed question once you say which scale you mean.</div>
-<div class="callout try"><strong>Your answer goes in the R Markdown hand-in.</strong> Report both coefficient tables, the log-odds slopes from (c), the two marginal effects and their ratio from (d), and your explanation in (e).</div>
-</div>
-
-<!-- =========================== PROBLEM 7 =========================== -->
-<div class="exercise" id="p7">
-<span class="ex-tag">Problem 7</span><span class="difficulty medium"> · Poisson regression, log-link interpretation</span>
+<span class="ex-tag">Problem 6</span><span class="difficulty medium"> · Poisson regression, log-link interpretation</span>
 <h3>Reading a Poisson coefficient table as biology</h3>
 <p>From 120 ten-minute point counts in oak woodland you fit</p>
 <pre><code>glm(warblers ~ canopy_oak + elev_km, family = poisson, data = pc)</code></pre>
@@ -243,9 +214,9 @@ using the fact that the derivative of the inverse logit is $dp/d\eta = p(1-p)$. 
 <div class="callout try"><strong>Your answer goes in the R Markdown hand-in.</strong> Report the intercept back-transform, the oak-canopy multiplier, the elevation half-decay, and the manuscript sentence.</div>
 </div>
 
-<!-- =========================== PROBLEM 8 =========================== -->
-<div class="exercise" id="p8">
-<span class="ex-tag">Problem 8</span><span class="difficulty hard"> · interaction, crossover on the log scale</span>
+<!-- =========================== PROBLEM 7 =========================== -->
+<div class="exercise" id="p7">
+<span class="ex-tag">Problem 7</span><span class="difficulty hard"> · interaction, crossover on the log scale</span>
 <h3>When the sign of an effect flips between groups</h3>
 <p>Macroinvertebrate counts per Surber sample from 90 collections are modeled as Poisson with predictors discharge (m&sup3;/s, continuous) and season (factor: <em>spring</em> reference, <em>fall</em>):</p>
 <pre><code>glm(macros ~ discharge * season, family = poisson, data = samps)</code></pre>
@@ -259,9 +230,9 @@ using the fact that the derivative of the inverse logit is $dp/d\eta = p(1-p)$. 
 <div class="callout try"><strong>Your answer goes in the R Markdown hand-in.</strong> Report both seasonal slopes as multiplicative effects, the fall intercept back-transform, the crossover discharge, and one sentence on why the interaction matters biologically.</div>
 </div>
 
-<!-- =========================== PROBLEM 9 =========================== -->
-<div class="exercise" id="p9">
-<span class="ex-tag">Problem 9</span><span class="difficulty hard"> · offsets and effort</span>
+<!-- =========================== PROBLEM 8 =========================== -->
+<div class="exercise" id="p8">
+<span class="ex-tag">Problem 8</span><span class="difficulty hard"> · offsets and effort</span>
 <h3>Turning counts into rates with an offset</h3>
 <p>Across 200 longline sets, the number of hooks varies from 500 to 5000. You record bycatch counts of yelloweye rockfish per set. Two analysts:</p>
 <ul>
@@ -278,11 +249,11 @@ using the fact that the derivative of the inverse logit is $dp/d\eta = p(1-p)$. 
 </div>
 
 <a id="extra-credit"></a>
-<div class="practice-banner"><div class="label">Optional · extra credit</div><h3>Extra-credit problems</h3><p>Problems 10 and 11 are optional. If you want the extra credit, answer them in the same <a class="hand-in" href="afternoon_lab_template.Rmd"><code>afternoon_lab_template.Rmd</code></a>. Skipping them costs you nothing.</p></div>
+<div class="practice-banner"><div class="label">Optional · extra credit</div><h3>Extra-credit problems</h3><p>Problems 9 and 10 are optional. If you want the extra credit, answer them in the same <a class="hand-in" href="afternoon_lab_template.Rmd"><code>afternoon_lab_template.Rmd</code></a>. Skipping them costs you nothing.</p></div>
 
-<!-- =========================== PROBLEM 10 =========================== -->
-<div class="exercise" id="p10">
-<span class="ex-tag">Problem 10</span><span class="difficulty hard"> · optional extra credit · logit threshold + marginal effects</span>
+<!-- =========================== PROBLEM 9 =========================== -->
+<div class="exercise" id="p9">
+<span class="ex-tag">Problem 9</span><span class="difficulty hard"> · optional extra credit · logit threshold + marginal effects</span>
 <h3>Occupancy thresholds and choosing a management lever</h3>
 <p>Presence/absence of hermit thrush at 300 sites is modeled as <code>glm(present ~ basal_area + shrub_cover, family = binomial)</code>, giving intercept $-3.0$, basal-area slope $+0.08$ per m&sup2;/ha, and shrub slope $+0.04$ per percent shrub.</p>
 <div class="callout key"><strong>Two tools you will need for parts (c)&ndash;(d).</strong>
@@ -299,9 +270,9 @@ using the fact that the derivative of the inverse logit is $dp/d\eta = p(1-p)$. 
 <div class="callout try"><strong>Your answer goes in the R Markdown hand-in.</strong> Report both threshold basal areas, the marginal effect at $p = 0.5$, the two intervention gains, and one management-relevant sentence.</div>
 </div>
 
-<!-- =========================== PROBLEM 11 =========================== -->
-<div class="exercise" id="p11">
-<span class="ex-tag">Problem 11</span><span class="difficulty medium"> · optional extra credit · back-transforming a coefficient and its CI</span>
+<!-- =========================== PROBLEM 10 =========================== -->
+<div class="exercise" id="p10">
+<span class="ex-tag">Problem 10</span><span class="difficulty medium"> · optional extra credit · back-transforming a coefficient and its CI</span>
 <h3>From a log-scale contrast to a percent change with uncertainty</h3>
 <p>Eelgrass above-ground biomass is regressed on sediment type (a factor with <em>medium</em> as the reference level) using a Gamma GLM with a log link. The "fine sediment vs medium sediment" contrast returns a coefficient $\hat\beta = -0.65$ with a 95% Wald CI of $(-0.95,\,-0.35)$ on the log scale.</p>
 <ol type="a">

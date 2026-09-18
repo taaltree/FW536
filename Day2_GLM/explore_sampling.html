@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Interactive: sampling distributions &amp; the CLT | FW 536 Day 2</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../_Shared/css/lab.css" />
+<script>MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] } };</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<script defer src="../_Shared/js/lab.js"></script>
+<style>
+  .widget { background:#fff; border:1px solid var(--border); border-radius:10px; padding:20px 24px; margin:24px 0; box-shadow:0 2px 10px rgba(0,0,0,.05); }
+  .distpick { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
+  .distpick button { font-family:'Helvetica Neue',Arial,sans-serif; font-size:14px; font-weight:600; border:2px solid var(--border); background:var(--panel-alt); color:var(--osu-stone); border-radius:6px; padding:6px 14px; cursor:pointer; }
+  .distpick button.active { background:var(--osu-orange); color:#fff; border-color:var(--osu-orange); }
+  .controls { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:14px 24px; margin-bottom:10px; }
+  .ctl label { font-family:'Helvetica Neue',Arial,sans-serif; font-size:13px; font-weight:600; color:var(--osu-stone); display:flex; justify-content:space-between; }
+  .ctl input[type=range]{ width:100%; accent-color:var(--osu-orange); }
+  .ctl .val { color:var(--osu-orange-dark); font-variant-numeric:tabular-nums; }
+  .btns { display:flex; gap:8px; flex-wrap:wrap; margin:8px 0; }
+  .btns button { font-family:'Helvetica Neue',Arial,sans-serif; font-size:14px; font-weight:600; border:2px solid var(--osu-orange); background:var(--osu-orange); color:#fff; border-radius:6px; padding:7px 16px; cursor:pointer; }
+  .btns button.sec { background:#fff; color:var(--osu-orange-dark); }
+  svg text { font-family:'Helvetica Neue',Arial,sans-serif; }
+  .panel-title { font-family:'Helvetica Neue',Arial,sans-serif; font-size:14px; font-weight:700; color:var(--osu-stone); margin:14px 0 2px; }
+  .panel-title .step { display:inline-block; background:var(--osu-orange); color:#fff; border-radius:50%; width:22px; height:22px; text-align:center; line-height:22px; margin-right:6px; font-size:12px; }
+  .stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:10px; margin:6px 0 4px; font-family:'Helvetica Neue',Arial,sans-serif; }
+  .stat { background:var(--panel-alt); border-radius:8px; padding:8px 12px; font-size:13px; color:var(--osu-stone); }
+  .stat b { display:block; font-size:20px; color:#1B1B1B; font-variant-numeric:tabular-nums; margin-top:2px; }
+  .stat.se { background:#FDF1EA; border:2px solid var(--osu-orange); }
+  .stat.se b { color:var(--osu-orange-dark); }
+  .stat small { display:block; font-size:11.5px; color:#6B6B6B; margin-top:2px; }
+</style>
+</head>
+<body>
+<div class="shell">
+<aside class="sidebar">
+  <p class="brand"><a href="../index.html" title="Back to course home">FW 536 · Day 2</a></p>
+  <div class="subtitle">Sampling distributions &amp; the CLT</div>
+  <nav>
+    <div class="section">This page</div>
+    <ul><li><a href="#explorer">The explorer</a></li><li><a href="#se">Standard deviation vs standard error</a></li><li><a href="#try">Things to try</a></li></ul>
+    <div class="section">Day 2</div>
+    <ul>
+      <li><a href="lab.html">Practice lab</a></li>
+      <li><a href="plain_language_summary.html">Plain-language summary</a></li>
+      <li><a href="explore_links.html">Link-function visualizer</a></li>
+      <li><a href="../index.html">Course home</a></li>
+    </ul>
+  </nav>
+</aside>
+
+<main class="content">
+<header class="lab-header">
+  <div class="eyebrow">Day 2 · Interactive</div>
+  <h1>Sampling distributions, the standard error, and the central limit theorem</h1>
+  <p class="lede">The lecture's fish example, live. A lake holds fish whose lengths have mean 300 mm and standard deviation 50 mm. You catch a sample of <em>n</em> fish and compute their mean length. Do it again and you get a different mean. Do it hundreds of times and the means pile up into a <strong>sampling distribution</strong>. Its spread is the <strong>standard error</strong>, and its shape is the <strong>central limit theorem</strong> at work.</p>
+</header>
+
+<section id="explorer">
+<div class="widget">
+  <div class="distpick" id="poppick" role="group" aria-label="Shape of the population">
+    <button data-d="normal" class="active" aria-pressed="true">Normal</button>
+    <button data-d="skew" aria-pressed="false">Right-skewed</button>
+    <button data-d="bimodal" aria-pressed="false">Two groups (bimodal)</button>
+    <button data-d="uniform" aria-pressed="false">Flat (uniform)</button>
+  </div>
+  <div class="controls">
+    <div class="ctl"><label for="n">Sample size n (fish per sample)<span class="val" id="v_n"></span></label><input id="n" type="range" min="2" max="100" step="1" value="10"></div>
+    <div class="ctl"><label>Lecture presets</label>
+      <div class="btns" style="margin:4px 0 0"><button class="sec preset" data-n="10">n = 10</button><button class="sec preset" data-n="20">n = 20</button><button class="sec preset" data-n="100">n = 100</button></div></div>
+  </div>
+  <div class="btns">
+    <button id="one">Draw 1 sample</button>
+    <button id="hundred">Draw 100 samples</button>
+    <button id="run" class="sec">▶ Keep drawing</button>
+    <button id="reset" class="sec">Reset</button>
+  </div>
+  <p style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:13px;color:var(--muted);margin:4px 0 0">Every population shape has the same mean (300 mm) and standard deviation (50 mm), so only the <em>shape</em> changes. Changing the shape or <em>n</em> starts a fresh set of samples.</p>
+
+  <div class="panel-title"><span class="step">1</span>The population: every fish in the lake</div>
+  <svg id="popchart" viewBox="0 0 720 170" width="100%" role="img" aria-label="Population distribution of fish lengths"></svg>
+
+  <div class="panel-title"><span class="step">2</span>One sample: the <span id="nlab">10</span> fish you just caught</div>
+  <svg id="sampchart" viewBox="0 0 720 150" width="100%" role="img" aria-label="The most recent sample"></svg>
+  <div class="stats">
+    <div class="stat">Sample mean $\bar x$<b id="s_mean">—</b><small>your estimate of the lake's mean, 300</small></div>
+    <div class="stat">Sample standard deviation $s$<b id="s_sd">—</b><small>spread of <em>individual fish</em>; estimates $\sigma$ = 50 at any n</small></div>
+    <div class="stat se">Estimated standard error $s/\sqrt{n}$<b id="s_se">—</b><small>how far $\bar x$ typically sits from 300, estimated from this one sample</small></div>
+  </div>
+
+  <div class="panel-title"><span class="step">3</span>The sampling distribution: the means of every sample so far</div>
+  <label style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:13px;"><input type="checkbox" id="zoom" /> Zoom in on the sample means (x-axis 300 ± 4 standard errors)</label>
+  <svg id="meanchart" viewBox="0 0 720 220" width="100%" role="img" aria-label="Histogram of sample means"></svg>
+  <div class="stats">
+    <div class="stat">Samples drawn<b id="m_k">0</b></div>
+    <div class="stat">Mean of the sample means<b id="m_mean">—</b><small>lands on the population mean, 300</small></div>
+    <div class="stat se">SD of the sample means = <strong>standard error</strong><b id="m_sd">—</b><small>the theory says $\sigma/\sqrt{n}$ = <span id="m_theory"></span></small></div>
+  </div>
+  <div class="sr-readout" id="srRead" role="status" aria-live="polite" aria-atomic="true"></div>
+  <details class="data-table-details">
+    <summary>Show the sample means as a table</summary>
+    <div class="data-table-wrap" id="meanTable"></div>
+  </details>
+</div>
+</section>
+
+<section id="se">
+<h2>Standard deviation vs standard error</h2>
+<div class="callout key">
+<p>Panels 2 and 3 show two different spreads, and the whole lesson is keeping them apart.</p>
+<ul>
+<li><strong>The standard deviation of a sample, $s$,</strong> measures how much <em>individual fish</em> differ from one another. It estimates the population's $\sigma = 50$ mm, and it does <em>not</em> shrink as you catch more fish: bigger samples just estimate it better.</li>
+<li><strong>The standard error, $\sigma/\sqrt{n}$,</strong> measures how much <em>sample means</em> differ from one sample to the next. It is the standard deviation of the sampling distribution in panel 3, and it <em>does</em> shrink as $n$ grows: 15.8 mm at $n = 10$, 11.2 mm at $n = 20$, 5.0 mm at $n = 100$.</li>
+</ul>
+<p>In practice you only ever catch one sample, so you never see panel 3. You estimate the standard error from the one sample you have, as $s/\sqrt{n}$ (the orange box in panel 2). Watch it bounce around the true value as you draw new samples: it is itself an estimate. This is the "Std. Error" column that <code>summary(lm(...))</code> reports for every coefficient.</p>
+</div>
+<div class="eq-block">$\text{mean of the } \bar x\text{'s} = \mu, \qquad \text{SD of the } \bar x\text{'s} = \text{SE} = \dfrac{\sigma}{\sqrt{n}}$</div>
+</section>
+
+<section id="try">
+<h2>Things to try</h2>
+<div class="callout key">
+<ol>
+<li><strong>The lecture's example.</strong> With the Normal population, press <em>n = 10</em>, then <em>Draw 100 samples</em>. Note the SD of the sample means. Repeat at <em>n = 20</em> and <em>n = 100</em>. The means stay centred on 300 while their spread shrinks toward 15.8, 11.2 and 5.0 mm.</li>
+<li><strong>Quadruple the data, halve the error.</strong> Compare <em>n = 25</em> and <em>n = 100</em>. Four times as many fish only halves the standard error (10 mm to 5 mm), because it shrinks with $\sqrt{n}$, not $n$.</li>
+<li><strong>The sample SD does not shrink.</strong> Draw single samples at <em>n = 10</em> and at <em>n = 100</em> and watch $s$ in panel 2. It hovers around 50 either way, just less erratically at <em>n = 100</em>. Only the standard error shrinks.</li>
+<li><strong>The central limit theorem.</strong> Choose <em>Right-skewed</em>, set <em>n = 2</em>, and keep drawing: the sample means are still skewed. Move to <em>n = 5</em>, then <em>n = 30</em>, tick <em>Zoom</em>, and watch the histogram become the Normal curve even though the population is nothing like Normal. Try it with <em>Two groups</em> and <em>Flat</em> too. This is the slide's <code>rgamma</code> exercise: a sum (and so a mean) of many draws from almost any distribution is approximately Normal.</li>
+<li><strong>A Normal population needs no CLT.</strong> With the <em>Normal</em> population the sample means are Normal even at <em>n = 2</em>, as the last slide on the theorem says.</li>
+</ol>
+</div>
+<p><a href="lab.html">← Back to the Day 2 lab</a></p>
+</section>
+</main>
+</div>
+<footer>FW 536 · Statistical Modeling for Ecology and Conservation · Oregon State University</footer>
+
+<script>
+(function(){
+const MU=300, SIG=50, XLO=100, XHI=550;
+let DIST='normal', N=10, samples=[], means=[], timer=null, ZOOM=false;
+
+// Standard normal draw (Box-Muller)
+function rnorm(){ let u=0,v=0; while(u===0)u=Math.random(); while(v===0)v=Math.random(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); }
+// Every population has mean 300 and SD 50.
+const POP={
+  normal:  { label:'Normal', draw:()=>MU+SIG*rnorm(),
+             pdf:x=>Math.exp(-0.5*((x-MU)/SIG)**2)/(SIG*Math.sqrt(2*Math.PI)) },
+  skew:    { label:'Right-skewed', // 250 + Exponential(mean 50)
+             draw:()=>250-50*Math.log(Math.random()),
+             pdf:x=> x<250?0:Math.exp(-(x-250)/50)/50 },
+  bimodal: { label:'Two groups', // 50:50 mix of N(260, 30) and N(340, 30): SD = sqrt(30^2+40^2) = 50
+             draw:()=> (Math.random()<0.5?260:340)+30*rnorm(),
+             pdf:x=>0.5*(Math.exp(-0.5*((x-260)/30)**2)+Math.exp(-0.5*((x-340)/30)**2))/(30*Math.sqrt(2*Math.PI)) },
+  uniform: { label:'Flat', // width 50*sqrt(12) = 173.2
+             draw:()=>MU+SIG*Math.sqrt(12)*(Math.random()-0.5),
+             pdf:x=> Math.abs(x-MU)<=SIG*Math.sqrt(3)?1/(SIG*Math.sqrt(12)):0 }
+};
+const SE=()=>SIG/Math.sqrt(N);
+const mean=a=>a.reduce((s,v)=>s+v,0)/a.length;
+const sd=a=>{ const m=mean(a); return Math.sqrt(a.reduce((s,v)=>s+(v-m)**2,0)/(a.length-1)); };
+const f1=v=>v.toFixed(1);
+
+function frame(W,H,ml,mr,mt,mb,lo,hi,ymax){
+  const pw=W-ml-mr, ph=H-mt-mb;
+  return { W,H,ml,mt,pw,ph, px:x=>ml+(x-lo)/(hi-lo)*pw, py:y=>mt+ph-(y/ymax)*ph,
+    axis:(ticks,lab)=>{ let v=`<line x1="${ml}" y1="${mt+ph}" x2="${ml+pw}" y2="${mt+ph}" stroke="#999"/>`;
+      ticks.forEach(t=>{ const x=ml+(t-lo)/(hi-lo)*pw; v+=`<line x1="${x}" y1="${mt+ph}" x2="${x}" y2="${mt+ph+4}" stroke="#999"/><text x="${x}" y="${mt+ph+16}" font-size="10" fill="#666" text-anchor="middle">${t}</text>`; });
+      if(lab) v+=`<text x="${ml+pw/2}" y="${H-3}" font-size="11.5" fill="#444" text-anchor="middle">${lab}</text>`; return v; } };
+}
+const TICKS=[100,150,200,250,300,350,400,450,500,550];
+
+function drawPop(){
+  const pdf=POP[DIST].pdf; let ymax=0; const pts=[];
+  for(let x=XLO;x<=XHI;x+=1){ const d=pdf(x); pts.push([x,d]); if(d>ymax)ymax=d; }
+  const F=frame(720,170,20,20,10,34,XLO,XHI,ymax*1.15);
+  let v=`<rect width="720" height="170" fill="white"/>`;
+  v+=`<path d="M${F.px(XLO)},${F.py(0)} `+pts.map(([x,d])=>`L${F.px(x)},${F.py(d)}`).join(' ')+` L${F.px(XHI)},${F.py(0)} Z" fill="#63B0A0" fill-opacity="0.35" stroke="#1F5B50" stroke-width="2"/>`;
+  v+=`<line x1="${F.px(MU)}" y1="${F.mt}" x2="${F.px(MU)}" y2="${F.mt+F.ph}" stroke="#111" stroke-dasharray="4 3"/>`;
+  v+=`<text x="${F.px(MU)+5}" y="${F.mt+12}" font-size="11" fill="#111">μ = 300 mm, σ = 50 mm</text>`;
+  v+=F.axis(TICKS,'fish length (mm)');
+  document.getElementById('popchart').innerHTML=v;
+  document.getElementById('popchart').setAttribute('aria-label',`${POP[DIST].label} population of fish lengths with mean 300 mm and standard deviation 50 mm.`);
+}
+
+function drawSample(){
+  const F=frame(720,150,20,20,10,34,XLO,XHI,1);
+  let v=`<rect width="720" height="150" fill="white"/>`;
+  v+=`<line x1="${F.px(MU)}" y1="${F.mt}" x2="${F.px(MU)}" y2="${F.mt+F.ph}" stroke="#bbb" stroke-dasharray="4 3"/>`;
+  const s=samples;
+  if(s.length){
+    // stack dots in 5-mm bins so every fish is visible
+    const bins={}; const r=Math.max(2.2, Math.min(5, 90/Math.sqrt(s.length)));
+    s.forEach(x=>{ const xc=Math.max(XLO,Math.min(XHI,x)); const b=Math.round(xc/5); bins[b]=(bins[b]||0)+1;
+      const k=bins[b]-1; v+=`<circle cx="${F.px(xc)}" cy="${F.mt+F.ph-r-1-k*(2*r+0.5)}" r="${r}" fill="#1F5B50" fill-opacity="0.75"/>`; });
+    const m=mean(s), sdv=sd(s);
+    v+=`<line x1="${F.px(m-sdv)}" y1="${F.mt+14}" x2="${F.px(m+sdv)}" y2="${F.mt+14}" stroke="#1F5B50" stroke-width="3"/>`;
+    v+=`<text x="${F.px(m+sdv)+6}" y="${F.mt+18}" font-size="11" fill="#1F5B50">x̄ ± s</text>`;
+    v+=`<line x1="${F.px(m)}" y1="${F.mt+4}" x2="${F.px(m)}" y2="${F.mt+F.ph}" stroke="#D73F09" stroke-width="3"/>`;
+    v+=`<text x="${F.px(m)+5}" y="${F.mt+32}" font-size="11" fill="#A8330A">x̄ = ${f1(m)}</text>`;
+    document.getElementById('s_mean').textContent=f1(m)+' mm';
+    document.getElementById('s_sd').textContent=f1(sdv)+' mm';
+    document.getElementById('s_se').textContent=f1(sdv/Math.sqrt(s.length))+' mm';
+  } else {
+    v+=`<text x="360" y="70" font-size="13" fill="#888" text-anchor="middle">Press "Draw 1 sample" to catch ${N} fish</text>`;
+    ['s_mean','s_sd','s_se'].forEach(id=>document.getElementById(id).textContent='—');
+  }
+  v+=F.axis(TICKS,'fish length (mm)');
+  document.getElementById('sampchart').innerHTML=v;
+  document.getElementById('sampchart').setAttribute('aria-label', s.length?`The latest sample of ${s.length} fish, mean ${f1(mean(s))} mm, standard deviation ${f1(sd(s))} mm.`:'No sample drawn yet.');
+}
+
+function drawMeans(){
+  const se=SE(), lo=ZOOM?MU-4*se:XLO, hi=ZOOM?MU+4*se:XHI;
+  const nb=ZOOM?40:90, bw=(hi-lo)/nb, counts=new Array(nb).fill(0);
+  means.forEach(m=>{ const b=Math.floor((m-lo)/bw); if(b>=0&&b<nb) counts[b]++; });
+  const K=means.length, dens=counts.map(c=>K?c/(K*bw):0);
+  const peak=1/(se*Math.sqrt(2*Math.PI));
+  const ymax=Math.max(peak*1.3, ...dens);
+  const F=frame(720,220,20,20,14,36,lo,hi,ymax);
+  let v=`<rect width="720" height="220" fill="white"/>`;
+  // shaded ±1 SE band
+  v+=`<rect x="${F.px(MU-se)}" y="${F.mt}" width="${F.px(MU+se)-F.px(MU-se)}" height="${F.ph}" fill="#D73F09" opacity="0.07"/>`;
+  for(let b=0;b<nb;b++){ if(!counts[b]) continue; const x0=F.px(lo+b*bw), w=F.px(lo+(b+1)*bw)-x0;
+    v+=`<rect x="${x0+0.5}" y="${F.py(dens[b])}" width="${Math.max(0.8,w-1)}" height="${F.mt+F.ph-F.py(dens[b])}" fill="#D73F09" fill-opacity="0.55"/>`; }
+  // theory: Normal(300, sigma/sqrt(n))
+  const pts=[]; for(let i=0;i<=300;i++){ const x=lo+(hi-lo)*i/300; pts.push(`${F.px(x)},${F.py(Math.exp(-0.5*((x-MU)/se)**2)*peak)}`); }
+  v+=`<polyline points="${pts.join(' ')}" fill="none" stroke="#111" stroke-width="2" stroke-dasharray="5 4"/>`;
+  v+=`<line x1="${F.px(MU-se)}" y1="${F.mt+10}" x2="${F.px(MU+se)}" y2="${F.mt+10}" stroke="#A8330A" stroke-width="2.5"/>`;
+  v+=`<text x="${F.px(MU+se)+6}" y="${F.mt+14}" font-size="11" fill="#A8330A">±1 standard error = ±${f1(se)} mm</text>`;
+  if(K && !ZOOM){ const last=means[K-1]; v+=`<line x1="${F.px(last)}" y1="${F.mt+F.ph-2}" x2="${F.px(last)}" y2="${F.mt+F.ph+8}" stroke="#D73F09" stroke-width="3"/>`; }
+  const ticks=ZOOM?[-4,-2,0,2,4].map(k=>Math.round(MU+k*se)):TICKS;
+  v+=F.axis(ticks, ZOOM?'sample mean x̄ (mm); dashed = Normal(300, σ/√n) predicted by the CLT':'sample mean x̄ (mm), same scale as panels 1 and 2; dashed = Normal(300, σ/√n)');
+  if(!K) v+=`<text x="360" y="100" font-size="13" fill="#888" text-anchor="middle">Each sample adds one mean here</text>`;
+  document.getElementById('meanchart').innerHTML=v;
+
+  document.getElementById('m_k').textContent=K;
+  document.getElementById('m_mean').textContent=K?f1(mean(means))+' mm':'—';
+  document.getElementById('m_sd').textContent=K>1?f1(sd(means))+' mm':'—';
+  document.getElementById('m_theory').textContent=`50/√${N} = ${f1(se)} mm`;
+  document.getElementById('meanchart').setAttribute('aria-label', K?`Histogram of ${K} sample means, each from ${N} fish. They average ${f1(mean(means))} mm`+(K>1?` with standard deviation ${f1(sd(means))} mm, against the theoretical standard error of ${f1(se)} mm.`:'.'):'No sample means yet.');
+  let rows=''; means.slice(-50).forEach((m,i)=>{ rows+=`<tr><td>${Math.max(0,K-50)+i+1}</td><td>${f1(m)}</td></tr>`; });
+  document.getElementById('meanTable').innerHTML=`<table><caption>The last ${Math.min(50,K)} of ${K} sample means (n = ${N} fish each).</caption><thead><tr><th scope="col">sample</th><th scope="col">mean length (mm)</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+function readout(){
+  const K=means.length;
+  document.getElementById('srRead').textContent = K
+    ? `${POP[DIST].label} population, samples of ${N}. Latest sample mean ${f1(mean(samples))} mm, sample SD ${f1(sd(samples))} mm, estimated standard error ${f1(sd(samples)/Math.sqrt(N))} mm. Across ${K} samples the means average ${f1(mean(means))} mm`+(K>1?` with standard deviation ${f1(sd(means))} mm; theory says ${f1(SE())}.`:'.')
+    : `${POP[DIST].label} population, samples of ${N}. No samples yet.`;
+}
+
+function drawSampleOnce(){ samples=Array.from({length:N},POP[DIST].draw); means.push(mean(samples)); }
+function redraw(){ drawSample(); drawMeans(); readout(); }
+function reset(){ stop(); samples=[]; means=[]; document.getElementById('v_n').textContent=N; document.getElementById('nlab').textContent=N; drawPop(); redraw(); }
+function stop(){ if(timer){ clearInterval(timer); timer=null; document.getElementById('run').textContent='▶ Keep drawing'; document.getElementById('srRead').setAttribute('aria-live','polite'); } }
+
+document.getElementById('one').addEventListener('click',()=>{ stop(); drawSampleOnce(); redraw(); });
+document.getElementById('hundred').addEventListener('click',()=>{ stop(); let k=0;
+  const live=document.getElementById('srRead'); live.setAttribute('aria-live','off');
+  const t=setInterval(()=>{ for(let j=0;j<4&&k<100;j++,k++) drawSampleOnce(); drawSample(); drawMeans(); if(k>=100){ clearInterval(t); live.setAttribute('aria-live','polite'); readout(); } },30); });
+document.getElementById('run').addEventListener('click',function(){
+  if(timer){ stop(); readout(); return; }
+  this.textContent='⏸ Pause'; document.getElementById('srRead').setAttribute('aria-live','off');
+  timer=setInterval(()=>{ for(let j=0;j<3;j++) drawSampleOnce(); drawSample(); drawMeans(); },50); });
+document.getElementById('reset').addEventListener('click',reset);
+document.getElementById('n').addEventListener('input',e=>{ N=+e.target.value; e.target.setAttribute('aria-valuetext',`${N} fish per sample`); reset(); });
+document.querySelectorAll('.preset').forEach(b=>b.addEventListener('click',()=>{ N=+b.dataset.n; const s=document.getElementById('n'); s.value=N; s.setAttribute('aria-valuetext',`${N} fish per sample`); reset(); }));
+document.querySelectorAll('#poppick button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('#poppick button').forEach(x=>{ x.classList.remove('active'); x.setAttribute('aria-pressed','false'); });
+  b.classList.add('active'); b.setAttribute('aria-pressed','true'); DIST=b.dataset.d; reset(); }));
+document.getElementById('zoom').addEventListener('change',e=>{ ZOOM=e.target.checked; drawMeans(); });
+reset();
+})();
+</script>
+</body>
+</html>

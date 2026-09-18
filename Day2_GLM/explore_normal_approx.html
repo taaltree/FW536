@@ -207,10 +207,16 @@ function draw(){
   const lbl = EV==='eq'?`P(X = ${A})`:EV==='le'?`P(X ≤ ${A})`:EV==='ge'?`P(X ≥ ${A})`:`P(${lo} ≤ X ≤ ${hi})`;
   const nr = EV==='eq'?`P(X = ${A}) = 0 for a continuous variable`:EV==='le'?`P(X < ${A})`:EV==='ge'?`P(X > ${A})`:`P(${lo} < X < ${hi})`;
   const nc = EV==='eq'?`P(${A-0.5} < X < ${A+0.5})`:EV==='le'?`P(X < ${A+0.5})`:EV==='ge'?`P(X > ${A-0.5})`:`P(${lo-0.5} < X < ${hi+0.5})`;
+  // the R call that gives this exact probability: d* for a single value, p* (the CDF) for the rest
+  const rcall=()=>{ const f=D==='binom'?'binom':'pois', args=D==='binom'?`, ${N}, ${P}`:`, ${L}`;
+    if(EV==='eq') return `d${f}(${A}${args})`;
+    if(EV==='le') return `p${f}(${A}${args})`;
+    if(EV==='ge') return A<=0?'1':`1 - p${f}(${A-1}${args})`;
+    return lo<=0?`p${f}(${hi}${args})`:`p${f}(${hi}${args}) - p${f}(${lo-1}${args})`; };
   const er=x=>`${x>=R.exact?'+':'−'}${(100*Math.abs(x-R.exact)).toFixed(2)} points`;
   const bestCor=Math.abs(R.cor-R.exact)<=Math.abs(R.raw-R.exact);
   document.getElementById('cmp').innerHTML=`<tr><th>${lbl}</th><th>Normal region</th><th>Probability</th><th>Error vs exact</th></tr>
-   <tr><td><strong>Exact</strong> (${D==='binom'?'dbinom':'dpois'})</td><td>sum of the orange bars</td><td><strong>${pct(R.exact)}</strong></td><td class="err">—</td></tr>
+   <tr><td><strong>Exact</strong>: <code>${rcall()}</code></td><td>sum of the orange bars</td><td><strong>${pct(R.exact)}</strong></td><td class="err">—</td></tr>
    <tr${bestCor?'':' class="best"'}><td>Normal, no correction</td><td>${nr}</td><td>${pct(R.raw)}</td><td class="err">${er(R.raw)}</td></tr>
    <tr${bestCor?' class="best"':''}><td>Normal, <strong>with continuity correction</strong></td><td>${nc}</td><td>${pct(R.cor)}</td><td class="err">${er(R.cor)}</td></tr>`;
   // worst CDF error

@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Interactive: Normal approximation &amp; continuity correction | FW 536 Day 2</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../_Shared/css/lab.css" />
+<script>MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] } };</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<script defer src="../_Shared/js/lab.js"></script>
+<style>
+  .widget { background:#fff; border:1px solid var(--border); border-radius:10px; padding:20px 24px; margin:24px 0; box-shadow:0 2px 10px rgba(0,0,0,.05); }
+  .distpick { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
+  .distpick button { font-family:'Helvetica Neue',Arial,sans-serif; font-size:14px; font-weight:600; border:2px solid var(--border); background:var(--panel-alt); color:var(--osu-stone); border-radius:6px; padding:6px 14px; cursor:pointer; }
+  .distpick button.active { background:var(--osu-orange); color:#fff; border-color:var(--osu-orange); }
+  .controls { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:14px 24px; margin-bottom:10px; }
+  .ctl label { font-family:'Helvetica Neue',Arial,sans-serif; font-size:13px; font-weight:600; color:var(--osu-stone); display:flex; justify-content:space-between; }
+  .ctl input[type=range]{ width:100%; accent-color:var(--osu-orange); }
+  .ctl select { width:100%; font-size:14px; padding:4px; }
+  .ctl .val { color:var(--osu-orange-dark); font-variant-numeric:tabular-nums; }
+  .hide { display:none !important; }
+  svg text { font-family:'Helvetica Neue',Arial,sans-serif; }
+  .rule { font-family:'Helvetica Neue',Arial,sans-serif; font-size:14px; border-radius:8px; padding:10px 14px; margin:8px 0; }
+  .rule.ok { background:#EAF4EA; border-left:5px solid #2E7D32; }
+  .rule.no { background:#FDECEA; border-left:5px solid #B3261E; }
+  .rule b { font-variant-numeric:tabular-nums; }
+  table.cmp { width:100%; border-collapse:collapse; font-family:'Helvetica Neue',Arial,sans-serif; font-size:14px; margin-top:8px; }
+  table.cmp th, table.cmp td { padding:6px 10px; border-bottom:1px solid var(--border); text-align:left; font-variant-numeric:tabular-nums; }
+  table.cmp tr.best td { background:#FDF1EA; }
+  table.cmp td.err { color:#6B6B6B; }
+</style>
+</head>
+<body>
+<div class="shell">
+<aside class="sidebar">
+  <p class="brand"><a href="../index.html" title="Back to course home">FW 536 · Day 2</a></p>
+  <div class="subtitle">Normal approximation</div>
+  <nav>
+    <div class="section">This page</div>
+    <ul><li><a href="#explorer">The explorer</a></li><li><a href="#correction">The continuity correction</a></li><li><a href="#try">Things to try</a></li></ul>
+    <div class="section">Day 2</div>
+    <ul>
+      <li><a href="lab.html">Practice lab</a></li>
+      <li><a href="plain_language_summary.html">Plain-language summary</a></li>
+      <li><a href="explore_sampling.html">Sampling &amp; CLT explorer</a></li>
+      <li><a href="explore_links.html">Link-function visualizer</a></li>
+      <li><a href="../index.html">Course home</a></li>
+    </ul>
+  </nav>
+</aside>
+
+<main class="content">
+<header class="lab-header">
+  <div class="eyebrow">Day 2 · Interactive</div>
+  <h1>When is the Normal a good stand-in for a Binomial or Poisson?</h1>
+  <p class="lede">Counts are discrete: 0, 1, 2, and so on. The Normal is continuous. Yet with enough data, the bars of a Binomial or Poisson distribution trace out a Normal curve, which is the central limit theorem again. This page shows when that works, when it fails, and why you widen each count by half a unit on either side (the <strong>continuity correction</strong>) when you use the Normal to approximate it.</p>
+</header>
+
+<section id="explorer">
+<div class="widget">
+  <div class="distpick" id="distpick" role="group" aria-label="Discrete distribution">
+    <button data-d="binom" class="active" aria-pressed="true">Binomial(n, p)</button>
+    <button data-d="pois" aria-pressed="false">Poisson(λ)</button>
+  </div>
+  <div class="controls">
+    <div class="ctl" id="c_n"><label for="n">n (number of trials)<span class="val" id="v_n"></span></label><input id="n" type="range" min="1" max="100" step="1" value="30"></div>
+    <div class="ctl" id="c_p"><label for="p">p (probability of success)<span class="val" id="v_p"></span></label><input id="p" type="range" min="0.01" max="0.99" step="0.01" value="0.25"></div>
+    <div class="ctl hide" id="c_l"><label for="lam">λ (mean count)<span class="val" id="v_l"></span></label><input id="lam" type="range" min="0.5" max="60" step="0.5" value="4"></div>
+  </div>
+  <div class="rule" id="rule"></div>
+
+  <div class="controls">
+    <div class="ctl"><label for="ev">Probability to approximate</label>
+      <select id="ev"><option value="eq">P(X = a)</option><option value="le" selected>P(X ≤ a)</option><option value="ge">P(X ≥ a)</option><option value="bt">P(a ≤ X ≤ b)</option></select></div>
+    <div class="ctl"><label for="a">a<span class="val" id="v_a"></span></label><input id="a" type="range" min="0" max="30" step="1" value="5"></div>
+    <div class="ctl hide" id="c_b"><label for="b">b<span class="val" id="v_b"></span></label><input id="b" type="range" min="0" max="30" step="1" value="10"></div>
+  </div>
+  <label style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:13px;"><input type="checkbox" id="corr" checked /> Shade the Normal area <em>with</em> the continuity correction (untick to shade it without)</label>
+
+  <div class="sr-readout" id="srRead" role="status" aria-live="polite" aria-atomic="true"></div>
+  <svg id="chart" viewBox="0 0 720 330" width="100%" role="img" aria-label="Probability mass function with Normal overlay"></svg>
+  <p style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:13px;margin:2px 0 0">
+    <span style="color:#1F5B50;font-weight:700">▮ exact probabilities (bars)</span> &nbsp;
+    <span style="color:#A8330A;font-weight:700">▮ bars in the event</span> &nbsp;
+    <span style="color:#111;font-weight:700">┅ Normal with the same mean and SD</span> &nbsp;
+    <span style="color:#D73F09;font-weight:700">▒ Normal area used as the approximation</span></p>
+
+  <table class="cmp" id="cmp"></table>
+  <p id="worst" style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:13.5px;margin-top:10px"></p>
+  <details class="data-table-details">
+    <summary>Show exact and approximate probabilities as a table</summary>
+    <div class="data-table-wrap" id="tbl"></div>
+  </details>
+</div>
+</section>
+
+<section id="correction">
+<h2>The continuity correction</h2>
+<div class="callout key">
+<p>A Binomial or Poisson puts all its probability on whole numbers. The bar for $X = 7$ has width 1 and runs from 6.5 to 7.5, so when a smooth Normal curve stands in for the bars, the matching piece of area is the strip from 6.5 to 7.5:</p>
+<div class="eq-block">$P(X = x) \approx P_N(x - 0.5 &lt; X &lt; x + 0.5)$</div>
+<p>Without the correction, $P(X = x)$ becomes the Normal probability of a single point, which is exactly 0, and $P(X \le x)$ stops at the middle of the last bar and misses half of it. The same half-unit fixes every kind of question:</p>
+<ul>
+<li>$P(X \le a) \approx P_N(X &lt; a + 0.5)$, &nbsp; $P(X \ge a) \approx P_N(X &gt; a - 0.5)$, &nbsp; $P(a \le X \le b) \approx P_N(a - 0.5 &lt; X &lt; b + 0.5)$.</li>
+</ul>
+<p>The Normal used is the one with the same mean and SD as the count:</p>
+<ul>
+<li>Binomial: mean $np$, SD $\sqrt{np(1-p)}$. The approximation is reasonable when $np \ge 5$ and $n(1-p) \ge 5$.</li>
+<li>Poisson: mean $\lambda$, SD $\sqrt{\lambda}$. The approximation is reasonable when $\lambda &gt; 10$.</li>
+</ul>
+<p>Why it works at all: a Binomial count is a sum of $n$ independent 0/1 trials, and a Poisson count with a large mean behaves like a sum of many small independent counts. Sums of many independent pieces are approximately Normal, so this is the central limit theorem from the <a href="explore_sampling.html">previous explorer</a> again. The rules of thumb say when there are "enough" pieces for the skew and the boundary at 0 to stop mattering.</p>
+</div>
+</section>
+
+<section id="try">
+<h2>Things to try</h2>
+<div class="callout key">
+<ol>
+<li><strong>The lecture's example.</strong> The page opens on Binomial(30, 0.25), as on the slide: $np = 7.5$ and $n(1-p) = 22.5$, so the rule is met. Compare the three rows of the table for $P(X \le 5)$: exact 20.3%, Normal with the correction 20.0%, Normal without it 14.6%. The correction turns a 5.7-point miss into a 0.3-point one.</li>
+<li><strong>Single values need the correction.</strong> Switch to $P(X = a)$. Without the correction the Normal gives exactly 0, since a continuous distribution puts no probability on a single point. With it, the strip from $a - 0.5$ to $a + 0.5$ closely matches the bar: for $P(X = 7)$, 16.3% against the exact 16.6%.</li>
+<li><strong>Break the rule.</strong> Set $n = 30$ and $p = 0.05$ ($np = 1.5$). The bars pile up against 0 and skew right, and the Normal spills probability below 0, where no count can be. Even with the correction, $P(X = 0)$ comes out 15.4% against an exact 21.5%, and the worst error in $P(X \le a)$ is 5.4 points, against 1.4 points for the lecture's example. Now raise $n$ to 100 ($np = 5$) and the worst error halves to 2.7 points.</li>
+<li><strong>p near 1 is the mirror image.</strong> Try $p = 0.95$: now $n(1-p)$ is the small one, and the skew runs the other way.</li>
+<li><strong>Poisson.</strong> Switch to Poisson and slide $\lambda$ from 2 to 30. Below about 10 the distribution is visibly skewed and the Normal fits poorly; above it the bars and the curve nearly coincide. The worst corrected error falls from 4.4 points at $\lambda = 2$ to 2.1 at 10 and 1.2 at 30. The slide's R check is <code>hist(rpois(10000, 50))</code> against <code>hist(rnorm(10000, 50, sqrt(50)))</code>.</li>
+<li><strong>Watch the worst error.</strong> The line under the table reports the largest error in $P(X \le a)$ over every $a$, with and without the correction. It is a quick summary of how good the approximation is for the current settings.</li>
+</ol>
+</div>
+<p><a href="lab.html">← Back to the Day 2 lab</a></p>
+</section>
+</main>
+</div>
+<footer>FW 536 · Statistical Modeling for Ecology and Conservation · Oregon State University</footer>
+
+<script>
+(function(){
+let D='binom', N=30, P=0.25, L=4, EV='le', A=5, B=10, CORR=true;
+
+function lgamma(z){const c=[0.99999999999980993,676.5203681218851,-1259.1392167224028,771.32342877765313,-176.61502916214059,12.507343278686905,-0.13857109526572012,9.9843695780195716e-6,1.5056327351493116e-7];
+  if(z<0.5)return Math.log(Math.PI/Math.sin(Math.PI*z))-lgamma(1-z); z-=1;let x=c[0];for(let i=1;i<9;i++)x+=c[i]/(z+i);const t=z+7.5;
+  return 0.5*Math.log(2*Math.PI)+(z+0.5)*Math.log(t)-t+Math.log(x);}
+function erf(x){ // Abramowitz & Stegun 7.1.26
+  const s=x<0?-1:1; x=Math.abs(x); const t=1/(1+0.3275911*x);
+  const y=1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-x*x); return s*y; }
+const pnorm=(x,m,s)=>0.5*(1+erf((x-m)/(s*Math.SQRT2)));
+const dnorm=(x,m,s)=>Math.exp(-0.5*((x-m)/s)**2)/(s*Math.sqrt(2*Math.PI));
+
+function model(){
+  if(D==='binom'){ const q=1-P, mu=N*P, sd=Math.sqrt(N*P*q), xmax=N;
+    const pmf=k=> (k<0||k>N)?0:Math.exp(lgamma(N+1)-lgamma(k+1)-lgamma(N-k+1)+(k?k*Math.log(P):0)+(N-k?(N-k)*Math.log(q):0));
+    return {mu,sd,xmax,pmf, name:`Binomial(n = ${N}, p = ${P.toFixed(2)})`}; }
+  const mu=L, sd=Math.sqrt(L), xmax=Math.ceil(L+5*Math.sqrt(L)+5);
+  return {mu,sd,xmax, pmf:k=>k<0?0:Math.exp(k*Math.log(L)-L-lgamma(k+1)), name:`Poisson(λ = ${L})`};
+}
+function range(){ if(EV==='eq') return [A,A]; if(EV==='le') return [0,A]; if(EV==='ge') return [A,Infinity]; return [Math.min(A,B),Math.max(A,B)]; }
+function probs(M){
+  const [lo,hi]=range(); let exact=0; for(let k=lo;k<=Math.min(hi,M.xmax+50);k++) exact+=M.pmf(k);
+  const F=x=>pnorm(x,M.mu,M.sd);
+  let raw, cor;
+  if(EV==='eq'){ raw=0; cor=F(A+0.5)-F(A-0.5); }
+  else if(EV==='le'){ raw=F(A); cor=F(A+0.5); }
+  else if(EV==='ge'){ raw=1-F(A); cor=1-F(A-0.5); }
+  else { raw=F(hi)-F(lo); cor=F(hi+0.5)-F(lo-0.5); }
+  const ncl = EV==='le'?[-Infinity,A+0.5]:EV==='ge'?[A-0.5,Infinity]:[lo-0.5,hi+0.5];
+  const nraw= EV==='le'?[-Infinity,A]:EV==='ge'?[A,Infinity]:[lo,hi];
+  return {exact,raw,cor,ncl,nraw};
+}
+const pct=v=>(100*v).toFixed(2)+'%';
+
+function draw(){
+  const M=model(), R=probs(M);
+  // axis range: cover the bulk of the pmf and the Normal, allow negatives to show spill-over
+  const xlo=Math.floor(Math.min(-1, M.mu-4.2*M.sd)), xhi=Math.ceil(Math.max(M.mu+4.2*M.sd, 6));
+  const top=Math.min(M.xmax, xhi);
+  let ymax=dnorm(M.mu,M.mu,M.sd); for(let k=0;k<=top;k++) ymax=Math.max(ymax,M.pmf(k)); ymax*=1.15;
+  const W=720,H=330,ml=48,mr=14,mt=14,mb=40,pw=W-ml-mr,ph=H-mt-mb;
+  const px=x=>ml+(x-xlo)/(xhi-xlo)*pw, py=y=>mt+ph-(y/ymax)*ph, bw=pw/(xhi-xlo);
+  let v=`<rect width="${W}" height="${H}" fill="white"/>`;
+  // shaded Normal area
+  const [s0,s1]=CORR?R.ncl:R.nraw, a0=Math.max(xlo,s0), a1=Math.min(xhi,s1);
+  if(a1>a0){ let d=`M${px(a0)},${py(0)}`; for(let i=0;i<=120;i++){ const x=a0+(a1-a0)*i/120; d+=` L${px(x)},${py(dnorm(x,M.mu,M.sd))}`; } d+=` L${px(a1)},${py(0)} Z`;
+    v+=`<path d="${d}" fill="#D73F09" fill-opacity="0.22" stroke="none"/>`; }
+  if(EV==='eq' && !CORR){ v+=`<line x1="${px(A)}" y1="${py(0)}" x2="${px(A)}" y2="${py(dnorm(A,M.mu,M.sd))}" stroke="#D73F09" stroke-width="1.5"/>`; }
+  // bars
+  const [lo,hi]=range();
+  for(let k=Math.max(0,Math.ceil(xlo));k<=top;k++){ const pk=M.pmf(k); if(pk<ymax*0.002 && (k<lo||k>hi)) continue;
+    const inE=k>=lo&&k<=hi; v+=`<rect x="${px(k-0.5)+bw*0.06}" y="${py(pk)}" width="${bw*0.88}" height="${py(0)-py(pk)}" fill="${inE?'#A8330A':'#1F5B50'}" fill-opacity="${inE?0.55:0.45}" stroke="${inE?'#A8330A':'#1F5B50'}" stroke-width="0.6"/>`; }
+  // normal curve
+  const pts=[]; for(let i=0;i<=400;i++){ const x=xlo+(xhi-xlo)*i/400; pts.push(`${px(x)},${py(dnorm(x,M.mu,M.sd))}`); }
+  v+=`<polyline points="${pts.join(' ')}" fill="none" stroke="#111" stroke-width="2.2" stroke-dasharray="6 4"/>`;
+  // axes
+  v+=`<line x1="${ml}" y1="${py(0)}" x2="${ml+pw}" y2="${py(0)}" stroke="#999"/>`;
+  if(xlo<0){ v+=`<line x1="${px(-0.5)}" y1="${mt}" x2="${px(-0.5)}" y2="${py(0)}" stroke="#B3261E" stroke-dasharray="2 3"/><text x="${px(-0.5)-4}" y="${mt+12}" font-size="10.5" fill="#B3261E" text-anchor="end">counts cannot go below 0</text>`; }
+  const step=Math.max(1,Math.ceil((xhi-xlo)/16)); for(let t=Math.ceil(xlo/step)*step;t<=xhi;t+=step){
+    v+=`<line x1="${px(t)}" y1="${py(0)}" x2="${px(t)}" y2="${py(0)+4}" stroke="#999"/><text x="${px(t)}" y="${py(0)+16}" font-size="10" fill="#666" text-anchor="middle">${t}</text>`; }
+  for(let i=1;i<=4;i++){ const y=ymax*i/4.6; v+=`<text x="${ml-6}" y="${py(y)+4}" font-size="10" fill="#666" text-anchor="end">${y.toFixed(3)}</text>`; }
+  v+=`<text x="${ml+pw/2}" y="${H-4}" font-size="12" fill="#444" text-anchor="middle">count x &nbsp;·&nbsp; ${M.name} vs Normal(mean ${M.mu.toFixed(2)}, SD ${M.sd.toFixed(2)})</text>`;
+  document.getElementById('chart').innerHTML=v;
+
+  // rule of thumb
+  const ruleEl=document.getElementById('rule');
+  if(D==='binom'){ const a=N*P, b=N*(1-P), ok=a>=5&&b>=5;
+    ruleEl.className='rule '+(ok?'ok':'no');
+    ruleEl.innerHTML=`Rule of thumb: <b>np = ${a.toFixed(2)}</b> and <b>n(1−p) = ${b.toFixed(2)}</b>; both should be at least 5. `+(ok?'<strong>Met</strong>: the Normal should be a reasonable approximation.':`<strong>Not met</strong>: ${a<5?'too few expected successes':'too few expected failures'}, so the distribution is skewed against ${a<5?'0':'n'} and the Normal approximation is poor.`);
+  } else { const ok=L>10; ruleEl.className='rule '+(ok?'ok':'no');
+    ruleEl.innerHTML=`Rule of thumb: <b>λ = ${L}</b> should be greater than 10. `+(ok?'<strong>Met</strong>: the Normal should be a reasonable approximation.':'<strong>Not met</strong>: the distribution is skewed against 0 and the Normal approximation is poor.'); }
+
+  // comparison table
+  const lbl = EV==='eq'?`P(X = ${A})`:EV==='le'?`P(X ≤ ${A})`:EV==='ge'?`P(X ≥ ${A})`:`P(${lo} ≤ X ≤ ${hi})`;
+  const nr = EV==='eq'?`P(X = ${A}) = 0 for a continuous variable`:EV==='le'?`P(X < ${A})`:EV==='ge'?`P(X > ${A})`:`P(${lo} < X < ${hi})`;
+  const nc = EV==='eq'?`P(${A-0.5} < X < ${A+0.5})`:EV==='le'?`P(X < ${A+0.5})`:EV==='ge'?`P(X > ${A-0.5})`:`P(${lo-0.5} < X < ${hi+0.5})`;
+  const er=x=>`${x>=R.exact?'+':'−'}${(100*Math.abs(x-R.exact)).toFixed(2)} points`;
+  const bestCor=Math.abs(R.cor-R.exact)<=Math.abs(R.raw-R.exact);
+  document.getElementById('cmp').innerHTML=`<tr><th>${lbl}</th><th>Normal region</th><th>Probability</th><th>Error vs exact</th></tr>
+   <tr><td><strong>Exact</strong> (${D==='binom'?'dbinom':'dpois'})</td><td>sum of the orange bars</td><td><strong>${pct(R.exact)}</strong></td><td class="err">—</td></tr>
+   <tr${bestCor?'':' class="best"'}><td>Normal, no correction</td><td>${nr}</td><td>${pct(R.raw)}</td><td class="err">${er(R.raw)}</td></tr>
+   <tr${bestCor?' class="best"':''}><td>Normal, <strong>with continuity correction</strong></td><td>${nc}</td><td>${pct(R.cor)}</td><td class="err">${er(R.cor)}</td></tr>`;
+  // worst CDF error
+  let wr=0, wc=0, cum=0; for(let k=0;k<=M.xmax;k++){ cum+=M.pmf(k); wr=Math.max(wr,Math.abs(pnorm(k,M.mu,M.sd)-cum)); wc=Math.max(wc,Math.abs(pnorm(k+0.5,M.mu,M.sd)-cum)); }
+  document.getElementById('worst').innerHTML=`Worst error in P(X ≤ a) over every a: <strong>${(100*wr).toFixed(1)} points</strong> without the correction, <strong>${(100*wc).toFixed(1)} points</strong> with it.`;
+
+  let rows='', c2=0; for(let k=0;k<=Math.min(M.xmax,top);k++){ const pk=M.pmf(k); c2+=pk; if(pk<1e-4&&k>M.mu) continue;
+    rows+=`<tr><td>${k}</td><td>${pk.toFixed(4)}</td><td>${(pnorm(k+0.5,M.mu,M.sd)-pnorm(k-0.5,M.mu,M.sd)).toFixed(4)}</td><td>${c2.toFixed(4)}</td><td>${pnorm(k+0.5,M.mu,M.sd).toFixed(4)}</td></tr>`; }
+  document.getElementById('tbl').innerHTML=`<table><caption>${M.name}: exact probabilities and the continuity-corrected Normal approximation.</caption><thead><tr><th scope="col">x</th><th scope="col">exact P(X = x)</th><th scope="col">Normal P(x−0.5 &lt; X &lt; x+0.5)</th><th scope="col">exact P(X ≤ x)</th><th scope="col">Normal P(X &lt; x+0.5)</th></tr></thead><tbody>${rows}</tbody></table>`;
+  document.getElementById('chart').setAttribute('aria-label',`${M.name} with a Normal curve of mean ${M.mu.toFixed(2)} and SD ${M.sd.toFixed(2)}. ${lbl}: exact ${pct(R.exact)}, Normal without correction ${pct(R.raw)}, with correction ${pct(R.cor)}.`);
+  document.getElementById('srRead').textContent=`${M.name}. ${ruleEl.textContent} ${lbl}: exact ${pct(R.exact)}, Normal without correction ${pct(R.raw)}, with continuity correction ${pct(R.cor)}.`;
+}
+
+function syncSliders(){
+  const M=model(), maxA=Math.max(1, D==='binom'?N:M.xmax);
+  ['a','b'].forEach(id=>{ const el=document.getElementById(id); el.max=maxA; });
+  A=Math.min(A,maxA); B=Math.min(B,maxA);
+  document.getElementById('a').value=A; document.getElementById('b').value=B;
+  document.getElementById('v_a').textContent=A; document.getElementById('v_b').textContent=B;
+  document.getElementById('v_n').textContent=N; document.getElementById('v_p').textContent=P.toFixed(2); document.getElementById('v_l').textContent=L;
+  document.getElementById('c_b').classList.toggle('hide', EV!=='bt');
+  [['n',`${N} trials`],['p',`p = ${P.toFixed(2)}`],['lam',`lambda = ${L}`],['a',`a = ${A}`],['b',`b = ${B}`]].forEach(([id,t])=>document.getElementById(id).setAttribute('aria-valuetext',t));
+  draw();
+}
+document.querySelectorAll('#distpick button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('#distpick button').forEach(x=>{x.classList.remove('active');x.setAttribute('aria-pressed','false');});
+  b.classList.add('active'); b.setAttribute('aria-pressed','true'); D=b.dataset.d;
+  ['c_n','c_p'].forEach(id=>document.getElementById(id).classList.toggle('hide',D!=='binom'));
+  document.getElementById('c_l').classList.toggle('hide',D!=='pois');
+  const M=model(); A=Math.max(0,Math.round(M.mu-M.sd)); B=Math.round(M.mu+M.sd); syncSliders(); }));
+document.getElementById('n').addEventListener('input',e=>{N=+e.target.value; syncSliders();});
+document.getElementById('p').addEventListener('input',e=>{P=+e.target.value; syncSliders();});
+document.getElementById('lam').addEventListener('input',e=>{L=+e.target.value; syncSliders();});
+document.getElementById('a').addEventListener('input',e=>{A=+e.target.value; syncSliders();});
+document.getElementById('b').addEventListener('input',e=>{B=+e.target.value; syncSliders();});
+document.getElementById('ev').addEventListener('change',e=>{EV=e.target.value; syncSliders();});
+document.getElementById('corr').addEventListener('change',e=>{CORR=e.target.checked; draw();});
+syncSliders();
+})();
+</script>
+</body>
+</html>

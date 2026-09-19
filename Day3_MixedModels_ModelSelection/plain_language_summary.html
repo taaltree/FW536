@@ -70,8 +70,21 @@ We tackled the fact that real ecological data are not independent. Fish are insi
 
 <ul>
 <li>A <strong>fixed effect</strong> is something whose specific value you want to know. "What is the effect of badjuice on clams?" Badjuice is a fixed effect because the slope <em>is</em> the answer to your question.</li>
-<li>A <strong>random effect</strong> is a grouping variable. Each level (beach 1, beach 2, ..., beach 10) is one draw from a larger pool of possible levels. You don't particularly need to know beach 7's specific intercept; you need to make sure that putting all 10 beaches' observations together didn't pretend they were independent when they weren't.</li>
+<li>A <strong>random effect</strong> is how the model handles a grouping variable. Each level (beach 1, beach 2, ..., beach 10) is one draw from a larger pool of possible levels. You don't particularly need to know beach 7's own numbers; you need to make sure that putting all 10 beaches' observations together didn't pretend they were independent when they weren't. What a random effect lets vary from group to group comes in two kinds, below.</li>
 </ul>
+
+<h3>Random intercepts and random slopes</h3>
+
+<p>Picture the student's data as one line per beach: clam abundance on the vertical axis, badjuice on the horizontal. A random effect lets those lines differ from beach to beach, in one of two ways.</p>
+
+<ul>
+<li><strong>A random intercept lets each beach have its own starting height.</strong> Some beaches simply hold more clams than others, whatever the badjuice level, because of sand, exposure or history. The lines are parallel: every beach shares the same badjuice slope, but each sits higher or lower. The model estimates one number for this, the among-beach standard deviation, which says how much beaches differ in their baseline abundance. In R this is <code>(1 | Beach)</code>. Its purpose is to account for the fact that measurements from the same beach resemble each other, so the model does not treat 40 measurements from 10 beaches as 40 independent pieces of evidence.</li>
+<li><strong>A random slope lets each beach have its own response to the predictor.</strong> Maybe badjuice hurts clams badly at some beaches and barely at others. Now the lines are not parallel: each beach gets its own slope, drawn from a distribution around the average slope. The model adds a second standard deviation, for how much the badjuice effect varies among beaches, and usually a correlation between each beach's intercept and its slope (for example, beaches with more clams to begin with might lose more). In R this is <code>(1 + badjuice | Beach)</code>. Its purpose is to answer a new question, "does the effect of badjuice depend on the beach?", and to keep you honest about the average effect: if beaches genuinely respond differently, a model that forces one shared slope reports that slope with too much confidence.</li>
+</ul>
+
+<div class="callout key">
+<strong>How to choose.</strong> Start from the question and the design. Almost every grouped dataset needs a random intercept, because groups nearly always differ in their baseline. Add a random slope when you have reason to think the predictor's effect differs among groups, and when the predictor actually varies <em>within</em> groups, since a beach whose badjuice never changes cannot tell you anything about its own slope. Random slopes are costly: each one adds a variance and a correlation to estimate, and with few groups or little within-group variation the fit can fail or return a correlation of exactly &plusmn;1, a sign the data cannot support that structure (this morning's trophic-position problem shows what that looks like).
+</div>
 
 <div class="callout bio">
 <strong>A useful test:</strong> ask yourself "if next year I had a brand new beach, would I want my model to be able to say anything useful about it?" If yes, beach is a random effect, and you are learning about beaches as a population. If you only care about these particular 10 beaches in this particular year, you could just use fixed effects for them.

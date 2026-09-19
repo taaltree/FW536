@@ -42,7 +42,7 @@ options(na.action = "na.fail")   # required by MuMIn::dredge()
 ```
 
 ```{r data}
-# Problem 9 uses the real trophic-position data (fixed factors this time).
+# Problem 8 uses the real trophic-position data (fixed factors this time).
 dat <- read.csv(here::here("Day3_MixedModels_ModelSelection", "data", "qcbs_w6_data.csv"))
 dat$Fish_Species <- as.factor(dat$Fish_Species)
 dat$Lake         <- as.factor(dat$Lake)
@@ -51,7 +51,7 @@ dat$Z_Length     <- scale(dat$Fish_Length)[, 1]
 
 ---
 
-# Problem 7 · How often does each criterion pick noise as "best"? (simulation)
+# Problem 6 · How often does each criterion pick noise as "best"? (simulation)
 
 > (a) Run the walkthrough loop (response unrelated to three predictors,
 > `set.seed(126)`, 500 reps) and report its four proportions. (b) Record, for
@@ -92,7 +92,7 @@ data.frame(p = mean(pstor > 0), AIC = mean(AICstor > 0),
 
 ---
 
-# Problem 8 · When BIC misses a weak-but-real effect (simulation)
+# Problem 7 · When BIC misses a weak-but-real effect (simulation)
 
 > Three predictors with known effects (strong 0.8, modest −0.4, weak 0.1;
 > `set.seed(11)`, n = 60). (a) Run the single simulation and report which
@@ -101,7 +101,7 @@ data.frame(p = mean(pstor > 0), AIC = mean(AICstor > 0),
 > (efficient: predictive accuracy) and BIC (consistent: evidence for the
 > data-generating model) to the questions "does weak improve prediction?" and
 > "is weak in the model that generated the data?", then judge how far each
-> answer can be trusted at n = 60. (d) Rerun (b) and the Problem 7 noise loop at
+> answer can be trusted at n = 60. (d) Rerun (b) and the Problem 6 noise loop at
 > n = 500, fill in the power / Type I table, explain the two behaviours from the
 > penalties 2 and ln n, and link them to consistency and efficiency.
 
@@ -122,7 +122,7 @@ dredge(m, rank = "AIC"); dredge(m, rank = "AICc"); dredge(m, rank = "BIC")
 
 ---
 
-# Problem 9 · AIC vs LOOCV on the trophic-position data (qcbs_w6_data.csv)
+# Problem 8 · AIC vs LOOCV on the trophic-position data (qcbs_w6_data.csv)
 
 > Rank the six candidate fixed-effect models by AICc and by LOOCV MSE
 > (`cv.glm`). (a) Report the table; do the two criteria agree? (b) Compute
@@ -151,7 +151,7 @@ data.frame(cv_MSE = round(cv, 4), AICc = round(aicc, 1))
 
 ---
 
-# Problem 10 · Model averaging and asking the right question
+# Problem 9 · Model averaging and asking the right question
 
 > From the four-model AICc table: (a) write the Akaike-weight formula, confirm
 > the weights, and list the models "competitive" by the 2-unit rule. (b)

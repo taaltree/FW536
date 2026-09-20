@@ -909,7 +909,7 @@ N_grid &lt;- <span class="fn">seq</span>(<span class="nu">0</span>, <span class=
  K ~ <span class="fn">dunif</span>(<span class="nu">0</span>, <span class="nu">4000</span>)
  r ~ <span class="fn">dunif</span>(<span class="nu">0</span>, <span class="nu">2</span>)
  sigma ~ <span class="fn">dunif</span>(<span class="nu">0</span>, <span class="nu">2</span>)
- tau &lt;- <span class="nu">1</span> / sigma^<span class="nu">2</span> <span class="cm"># BUGS-style precision</span>
+ tau &lt;- <span class="nu">1</span> / sigma^<span class="nu">2</span> <span class="cm"># precision = 1 / variance</span>
 
  <span class="cm"># likelihood</span>
  <span class="kw">for</span> (i <span class="kw">in</span> <span class="nu">1</span>:n) {
@@ -921,6 +921,10 @@ N_grid &lt;- <span class="fn">seq</span>(<span class="nu">0</span>, <span class=
  N_at_maxdNdt &lt;- K / <span class="nu">2</span>
  MSY &lt;- r * K / <span class="nu">4</span>
 })</code></pre>
+
+<div class="callout key">
+<p><strong>Precision, not variance.</strong> In BUGS-family languages, including Nimble, <code>dnorm()</code> takes a mean and a <strong>precision</strong>, $\tau = 1/\sigma^2$, the reciprocal of the variance. Big $\tau$ means tightly clustered data, not widely spread. That is why the model above puts the prior on <code>sigma</code>, which is on the scale you can think about, and then derives <code>tau</code> from it. Hand <code>dnorm()</code> an SD by mistake and the model still runs, silently fitting a completely different amount of noise: for $\sigma = 2$ you would be claiming a precision of 2, which is an SD of $1/\sqrt{2} = 0.71$. The same convention applies to the $\tau$ in every Nimble model in this course and the next day.</p>
+</div>
 
 <div class="callout warn">
 <strong>What a monitor costs, and the one habit that saves you.</strong> The run below keeps $3 \times (25{,}000 - 5{,}000) = 60{,}000$ draws. Each monitored quantity is therefore stored as a column of 60,000 numbers. R keeps each number in 8 bytes, so a column is about 0.46 MB. That is nothing for a scalar like <code>MSY</code>, which is why you should put scalar derived quantities straight into the model code and monitor them.

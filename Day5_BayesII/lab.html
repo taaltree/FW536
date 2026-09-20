@@ -952,6 +952,7 @@ out of the badly-identified regime.</p>
 <h2>E. Latent state models: dynamic occupancy</h2>
 
 <h3>Biological setup</h3>
+<p><strong>Occupancy with a time series.</strong> A single-season occupancy model asks where a species is now. Survey the same sites year after year and you can ask how the pattern <em>changes</em>: which occupied sites stay occupied (persistence, the complement of local extinction) and which empty sites are colonized. Those two rates are what a dynamic occupancy model estimates, and they are the quantities that separate a stable range from one that is expanding, contracting, or simply churning.</p>
 <p>You survey $N_\text{sites}$ sites in $N_\text{years}$ years with $N_\text{reps}$ replicate visits per site-year. You want to estimate the <em>true</em> occupancy of each site each year ($z[i,t] \in \{0, 1\}$), allowing for imperfect detection ($p &lt; 1$).</p>
 
 <div class="callout key">
@@ -959,6 +960,7 @@ out of the badly-identified regime.</p>
 <div class="eq-block">$z[i, t] \sim \text{Bernoulli}(z[i, t-1] \phi_{t-1} + (1 - z[i, t-1]) \gamma_{t-1})$ &nbsp; (process)</div>
 <div class="eq-block">$y[i, j, t] \sim \text{Bernoulli}(z[i, t] \cdot p)$ &nbsp; (observation)</div>
 <p>$\phi$ = site persistence (probability an occupied site stays occupied), $\gamma$ = site colonization (probability an empty site becomes occupied). Both are estimated <em>per year transition</em>.</p>
+<p>This structure scales a long way beyond the two layers here. Long-term spotted owl monitoring, for example, is analysed with <em>integrated multistate</em> dynamic occupancy models, which combine several data sources and let a site be occupied by a pair, by a single bird, or by a competitor such as the barred owl, with transitions among those states. The ideas are the ones below: a latent state that changes between years, an observation layer with imperfect detection, and transition probabilities as the parameters of interest.</p>
 </div>
 
 <h3>The z-init trick (read carefully)</h3>

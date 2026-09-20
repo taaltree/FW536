@@ -178,16 +178,16 @@ Priors are a feature, not a bug. They let you encode <em>real prior knowledge</e
 <li>return posterior samples for whatever quantities you ask to monitor.</li>
 </ul>
 
-<p>Why Nimble specifically (instead of JAGS)? Nimble's BUGS dialect is nearly identical to JAGS (most JAGS code runs unchanged inside a <code>nimbleCode({...})</code> block), but it is much more extensible. You can write custom samplers, custom distributions, and compile to fast C++ all from R. Whole subfields (ecological state-space, capture-recapture, spatial models) have migrated to Nimble for this reason.</p>
+<p>Why Nimble? Its model language is the BUGS dialect that the whole family of samplers shares, so code written for BUGS or JAGS mostly runs unchanged inside a <code>nimbleCode({...})</code> block, and it is much more extensible. You can write custom samplers, custom distributions, and compile to fast C++ all from R. Whole subfields (ecological state-space, capture-recapture, spatial models) have migrated to Nimble for this reason.</p>
 
 <div class="callout plain">
-<p><strong>JAGS → Nimble in three changes:</strong></p>
+<p><strong>What a Nimble fit looks like, in three pieces:</strong></p>
 <ol>
-<li><code>cat("model {…}", file="x.txt")</code> → <code>nimbleCode({ … })</code></li>
-<li>One <code>data</code> list → two lists: <code>constants</code> (sample sizes, indices, fixed covariates) and <code>data</code> (the observed random variables).</li>
-<li><code>jags.model()</code> + <code>update()</code> + <code>coda.samples()</code> → one call to <code>nimbleMCMC(code=, constants=, data=, inits=, monitors=, nchains=, nburnin=, niter=)</code>.</li>
+<li><code>nimbleCode({ … })</code> holds the model: priors, likelihood, and any derived quantities you want posteriors for.</li>
+<li>Two lists carry the inputs: <code>constants</code> (sample sizes, indices, fixed covariates) and <code>data</code> (the observed random variables).</li>
+<li>One call runs it: <code>nimbleMCMC(code=, constants=, data=, inits=, monitors=, nchains=, nburnin=, niter=)</code>.</li>
 </ol>
-<p>The model body (<code>dnorm</code>, <code>dunif</code>, <code>dbeta</code>, <code>dbinom</code>, <code>dpois</code>, loops, derived quantities) translates verbatim.</p>
+<p>Inside the model block, <code>dnorm</code>, <code>dunif</code>, <code>dbeta</code>, <code>dbinom</code>, <code>dpois</code>, loops and derived quantities are written exactly as in BUGS or JAGS, so published model code from either translates almost verbatim.</p>
 </div>
 </section>
 

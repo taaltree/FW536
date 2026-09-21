@@ -20,6 +20,7 @@
  <ul>
  <li><a href="#orient">Where we are</a></li>
  <li><a href="#big-picture">Plain-language overview</a></li>
+ <li><a href="#diagnostics">Model diagnostics: convergence &amp; fit</a></li>
  <li><a href="#priors">A. Priors on the link scale</a></li>
  <li><a href="#logistic">B. Bayesian logistic regression</a></li>
  <li><a href="#hier">C. Hierarchical / multilevel models</a></li>
@@ -156,6 +157,44 @@
 
 <!-- ================================================================== -->
 <a id="morning"></a>
+<section id="diagnostics">
+<h2>Before the models: did it converge, and is the model any good?</h2>
+<p>Every model today ends with two separate questions, and they need different tools. <strong>Did the chains converge?</strong> asks whether the MCMC output is a trustworthy picture of the posterior. <strong>Is the model any good?</strong> asks whether that posterior describes the data. A model can pass the first and fail the second: a perfectly converged sampler can faithfully describe a wrong model.</p>
+
+<h3>1. Did the chains converge? R-hat</h3>
+<p>Start several chains from different values. If they have all found the same posterior, the spread <em>between</em> chains should match the spread <em>within</em> a chain. R-hat (the Gelman&ndash;Rubin statistic) is the ratio of the two, roughly. An R-hat of 1.42 says the chains still disagree and you need to run longer; an R-hat of 1.00 says the chains are interchangeable.</p>
+<ul>
+<li><code>gelman.diag(samples)</code> reports it. Look for both the point estimate <em>and</em> the upper confidence limit below about 1.01 for every parameter.</li>
+<li><code>gelman.plot(samples)</code> shows R-hat shrinking as iterations accumulate, which tells you how long a run you needed.</li>
+<li>R-hat is only meaningful if the chains started from genuinely different places. Identical starting values can report 1.00 on a model that has not converged.</li>
+</ul>
+
+<h3>2. Is the chain long enough? Heidelberger&ndash;Welch</h3>
+<p><code>heidel.diag(samples)</code> runs two tests on each chain separately.</p>
+<ol>
+<li><strong>Does the chain settle down?</strong> (the <em>stationarity</em> test) It compares the start of the chain with the end. If they look like samples from the same distribution, the chain has stopped wandering. A failure means it is still drifting: discard more as burn-in, or run longer. The test doubles as an automatic burn-in finder: if the whole chain fails, it retests without the first tenth, then without the first fifth, and so on up to half. Where it first passes is your burn-in.</li>
+<li><strong>Is the mean pinned down?</strong> (the <em>halfwidth</em> test) How much would the reported posterior mean move if you re-ran the sampler with a new seed? That wobble is the <em>Monte Carlo error</em>. If it is larger than a tenth of the mean, run longer. (This test misbehaves when the mean is near zero, because a tenth of almost nothing is almost nothing; Exercise M3 shows that case.)</li>
+</ol>
+
+<div class="callout warn">
+<p><strong>Passing is necessary, not sufficient.</strong> <code>gelman.diag</code> and <code>heidel.diag</code> can only detect failure. They can never prove the sampler found the whole posterior. Clean diagnostics say the <em>chains</em> are trustworthy; posterior predictive checks say whether the <em>model</em> is.</p>
+</div>
+
+<h3>3. Is the model any good? Posterior predictive checks</h3>
+<p>If the model is any good, data simulated from it should look like the data you actually collected. The recipe has three steps.</p>
+<ol>
+<li><strong>Draw parameters.</strong> Take one posterior draw $\theta^{(s)}$: one plausible version of the world.</li>
+<li><strong>Simulate data.</strong> Run the likelihood forward with those parameters to get a fake dataset $y^\text{rep}$ of the same size as the real one.</li>
+<li><strong>Compare.</strong> Does the observed $y$ sit comfortably among the simulated datasets?</li>
+</ol>
+<p>Repeat across hundreds of draws and you get a whole distribution of datasets the model finds believable. A systematic mismatch, such as too many zeros, too much spread, or missing extremes, means the model is missing something real.</p>
+
+<h3>4. Bayesian p-values</h3>
+<p>To make the comparison concrete, summarize each dataset with one discrepancy number $T$, then ask how often the simulated $T$ is at least as extreme as the real one. A value near 0.5 says the simulated data look like the real data; a value near 0 or 1 says the model cannot reproduce that feature. <strong>This is not a hypothesis test.</strong> It is a diagnostic that tells you <em>which feature</em> fails, so choose $T$ to target what matters for your question: the number of zeros, the variance, the extremes. Section F builds one step by step for the N-mixture model, and Problem 8 has you run one yourself.</p>
+
+<p><strong>Where these appear today.</strong> Exercise M3 reads <code>gelman.diag</code> and <code>heidel.diag</code> on the lizard model, including a halfwidth flag that is not a real failure. Exercises M7 and M8 and Problem 8 use posterior predictive checks and Bayesian p-values to catch, and then fix, an N-mixture model with the wrong abundance distribution.</p>
+</section>
+
 <div class="practice-banner"><div class="label">Practice (answers visible)</div><h3>Morning practice problems</h3><p>The exercises below are walk-through practice. Your graded morning assignment uses a separate, novel problem set. <strong>Open the graded problem set below</strong> and write your answers in <code>morning_lab_template.Rmd</code>.</p><p style="margin: 8px 0 0 0;"><a class="hand-in" href="problem_set.html#morning">Open the graded morning problem set &rarr;</a> &nbsp;&nbsp; <a class="hand-in" href="morning_lab_template.Rmd" style="background:#1C638A; color:white; border-color:#1C638A;">morning_lab_template.Rmd &darr;</a></p></div>
 <section id="priors">
 <h2>A. Priors on the link scale: the ant richness example</h2>

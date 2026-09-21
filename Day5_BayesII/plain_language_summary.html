@@ -140,10 +140,11 @@ We took the Bayesian models from Day 4 (one likelihood, a small handful of param
 <p><span class="pill nimble">NIMBLE</span> uses a mix of both (and more, such as slice samplers, block samplers, Hamiltonian Monte Carlo via add-ons) and lets you customise.</p>
 
 <div class="callout warn">
-<p><strong>Two things to always check after running MCMC.</strong></p>
+<p><strong>What to check after running MCMC.</strong> Two different questions: are the chains trustworthy, and is the model any good?</p>
 <ol>
- <li><strong>Convergence.</strong> Did all chains end up in the same place? Use R-hat (<code>gelman.diag</code>), and look at the traceplots (<code>MCMCtrace</code>). They should look like horizontal fuzzy caterpillars.</li>
- <li><strong>Effective sample size.</strong> A correlated sample of 10,000 might only be worth 200 independent samples. Use <code>effectiveSize()</code>. Aim for at least a few hundred per parameter for any parameter you care about.</li>
+ <li><strong>Did the chains converge?</strong> Start several chains from different values and check they found the same posterior. R-hat (<code>gelman.diag</code>) compares the spread between chains with the spread within them; you want both its point estimate and its upper limit below about 1.01. The traceplots (<code>MCMCtrace</code>) should look like horizontal fuzzy caterpillars that overlap.</li>
+ <li><strong>Is the chain long enough?</strong> <code>heidel.diag</code> checks whether each chain has stopped drifting (and finds a burn-in for you if it has not), and whether the posterior mean is pinned down tightly enough that a re-run would not move it much. <code>effectiveSize()</code> answers a related question: a correlated sample of 10,000 might only be worth 200 independent draws, so aim for at least a few hundred for any parameter you care about.</li>
+ <li><strong>Is the model any good?</strong> Passing 1 and 2 only says the sampler described the model faithfully, not that the model describes the data. A <em>posterior predictive check</em> simulates fake datasets from the fitted model and asks whether the real data look like them. A Bayesian p-value near 0.5 on some feature (zeros, spread, extremes) says the model reproduces it; near 0 or 1 says it does not. It is a diagnostic that points at the failing feature, not a hypothesis test.</li>
 </ol>
 </div>
 </section>

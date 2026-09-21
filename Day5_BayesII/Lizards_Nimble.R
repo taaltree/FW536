@@ -103,7 +103,7 @@ samples1 <- nimbleMCMC(
 MCMCsummary(samples1, params = c("a", "b"))
 MCMCtrace(samples1, params = c("a", "b"), pdf = FALSE)
 
-gelman.diag(samples1[, c("a", "b")])     # R-hat should be <= 1.05
+gelman.diag(samples1[, c("a", "b")])     # want point estimate AND upper C.I. below ~1.01
 heidel.diag(samples1[, c("a", "b")])     # stationarity / halfwidth checks
 
 # ----- Inference & plotting -----------------------------------------------

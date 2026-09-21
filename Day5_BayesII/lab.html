@@ -655,6 +655,7 @@ and neither one indicates a problem.</p>
 <h3>NIMBLE template: partial-pooling random intercept</h3>
 <div class="code-label">R · partial pooling on alpha</div>
 <pre><code>mod3 &lt;- <span class="fn">nimbleCode</span>({
+ <span class="cm"># one intercept per SITE: j runs 1, 2, ..., 107</span>
  <span class="kw">for</span> (j <span class="kw">in</span> <span class="nu">1</span>:n.sites) {
  alpha[j] ~ <span class="fn">dnorm</span>(mu_alpha, tau_alpha)
  }
@@ -666,11 +667,29 @@ and neither one indicates a problem.</p>
  sigma ~ <span class="fn">dunif</span>(<span class="nu">0</span>, <span class="nu">100</span>)
  tau &lt;- <span class="nu">1</span> / sigma^<span class="nu">2</span>
 
+ <span class="cm"># one row of data at a time: i runs 1, 2, ..., 563</span>
  <span class="kw">for</span> (i <span class="kw">in</span> <span class="nu">1</span>:n) {
+ <span class="cm"># group[i] is the site number of row i, so alpha[group[i]] is</span>
+ <span class="cm"># that row's own site intercept (see the note below)</span>
  mu[i] &lt;- alpha[group[i]] + beta * x[i]
  y[i] ~ <span class="fn">dnorm</span>(mu[i], tau)
  }
 })</code></pre>
+
+<div class="callout key">
+<p><strong>Reading <code>alpha[group[i]]</code>: the notation that makes a random effect work.</strong> Two different counters are running in that model, and keeping them straight is the whole trick.</p>
+<ul>
+<li><strong>$i$ counts rows of data</strong>, 1 to 563. Each row is one measurement, with its own $y_i$ and $x_i$.</li>
+<li><strong>$j$ counts sites</strong>, 1 to 107. Each site has one intercept, <code>alpha[j]</code>. There are 107 of them, not 563.</li>
+</ul>
+<p>The two are linked by <code>group</code>, an ordinary integer vector of length 563 that you pass in as a constant: <code>group[i]</code> is the site number that row $i$ belongs to. So <code>alpha[group[i]]</code> reads from the inside out: take row $i$, look up its site, then use that site's intercept. If <code>group[5]</code> is 10, then row 5's mean uses <code>alpha[10]</code>. Every row from site 10 reuses that same parameter, which is exactly what "these measurements share a site" means, and is what lets 563 rows be described by 107 intercepts. In the notation used in the equations above, <code>alpha[group[i]]</code> is $\alpha_{j[i]}$.</p>
+<p>Nothing exotic is happening: this is R's ordinary vector indexing, the same as <code>alpha[c(1, 1, 2, 5, ...)]</code>, written inside a model. Two practical requirements follow.</p>
+<ul>
+<li><strong>The index must be consecutive integers starting at 1.</strong> <code>alpha</code> is a vector of length <code>n.sites</code>, so an index of 161 would look for a 161st element that does not exist. This is why the data file carries <code>group.index</code> (1&ndash;107) alongside the original site IDs, and why you would run <code>as.numeric(factor(...))</code> on any real ID column before using it here.</li>
+<li><strong>The index belongs in <code>constants</code>, not <code>data</code>.</strong> NIMBLE uses it to build the model's graph, deciding which rows connect to which parameter, before any sampling starts. It is not a random variable.</li>
+</ul>
+<p>The same pattern indexes anything else that varies by group. In the fertilizer model later, <code>beta[fertilizer[i]]</code> picks the slope belonging to row $i$'s fertilizer type, and a model can use both at once: <code>alpha[group[i]] + beta[fertilizer[i]] * x[i]</code>.</p>
+</div>
 
 <h3>Adding a group-level covariate: the same model, two ways to write it</h3>
 <p>So far the random intercept only told us <em>that</em> sites differ (each $\alpha_j$ is a draw from $\mathcal{N}(\mu_\alpha, \sigma_\alpha^2)$). A natural next step is to add a <strong>group-level covariate</strong> $w_j$, a predictor with one value <em>per site</em> rather than one per observation, to explain some of that site-to-site variation. In the N<sub>2</sub>O data, $w_j$ is built from the <code>carbon</code> column: average it within site $j$ to get $c_j$ (percent soil organic carbon), then take its logit, $w_j = \log\big(c_j/(100-c_j)\big)$. The logit suits a percentage, which is bounded between 0 and 100, and it spreads out the many low-carbon sites (site means range from 0.02% to 31%). A common way to write the model is to regress the site intercept on $w_j$:</p>

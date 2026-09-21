@@ -118,12 +118,12 @@ ants$elevation &lt;- <span class="fn">as.numeric</span>(<span class="fn">scale</
 <li><code>carbon</code>: soil organic carbon at the site, as a percentage. It is not used until Problem 4.</li>
 <li><code>reps</code>: a replicate count carried over from the source compilation. Not used.</li>
 </ul>
-<p>Model $\log(\text{emission})$ as a function of centred $\log(\text{n.input})$, with sites indexed by <code>group.index</code>. Section C of the <a href="lab.html#hier">practice lab</a> has the same data and a fuller description.</p>
+<p>Model $\log(\text{emission})$ as a function of centred $\log(\text{n.input})$, with sites indexed by <code>group.index</code>. Inside the model you will write the site intercept as <code>alpha[group[i]]</code>: <code>group[i]</code> is row $i$'s site number, so this picks out that row's own intercept from the vector of 107. Section C of the <a href="lab.html#hier">practice lab</a> explains that notation and has a fuller description of the data.</p>
 <div class="code-label">R · start from the real data</div>
 <pre><code>N2O   &lt;- <span class="fn">read.csv</span>(<span class="fn">here::here</span>(<span class="st">"Day5_BayesII"</span>, <span class="st">"data"</span>, <span class="st">"N2OEmission.csv"</span>))
 y     &lt;- <span class="fn">log</span>(N2O$emission)
 x     &lt;- <span class="fn">log</span>(N2O$n.input) - <span class="fn">mean</span>(<span class="fn">log</span>(N2O$n.input))  <span class="cm"># centred predictor</span>
-group &lt;- N2O$group.index
+group &lt;- N2O$group.index   <span class="cm"># site number of each row; use it as alpha[group[i]]</span>
 nsites &lt;- <span class="fn">length</span>(<span class="fn">unique</span>(group))</code></pre>
 <ol type="a">
  <li>Fit the <strong>complete-pooling</strong> model $\mu_i = \alpha + \beta x_i$ and the <strong>partial-pooling</strong> random-intercept model $\alpha_j \sim \mathcal{N}(\mu_\alpha, \sigma_\alpha^2)$, $\mu_i = \alpha_{j[i]} + \beta x_i$. Report the posterior of $\beta$ from each.</li>

@@ -103,6 +103,8 @@ mod2 <- nimbleCode({
   tau  <- 1 / sigma^2
 
   for (i in 1:n) {
+    # group[i] = the site number of row i, so alpha[group[i]] is that row's
+    # own site intercept. i counts the 563 rows; j counts the 107 sites.
     mu[i] <- alpha[group[i]] + beta * x[i]
     y[i]  ~ dnorm(mu[i], tau)
   }
@@ -138,6 +140,8 @@ mod3 <- nimbleCode({
   tau  <- 1 / sigma^2
 
   for (i in 1:n) {
+    # group[i] = the site number of row i, so alpha[group[i]] is that row's
+    # own site intercept. i counts the 563 rows; j counts the 107 sites.
     mu[i] <- alpha[group[i]] + beta * x[i]
     y[i]  ~ dnorm(mu[i], tau)
   }
@@ -186,6 +190,8 @@ mod4 <- nimbleCode({
     alpha[j]    ~ dnorm(mu_alpha[j], tau_alpha)
   }
   for (i in 1:n) {
+    # group[i] = the site number of row i, so alpha[group[i]] is that row's
+    # own site intercept. i counts the 563 rows; j counts the 107 sites.
     mu[i] <- alpha[group[i]] + beta * x[i]
     y[i]  ~ dnorm(mu[i], tau)
   }
@@ -226,6 +232,7 @@ mod5 <- nimbleCode({
     alpha[j]    ~ dnorm(mu_alpha[j], tau_alpha)
   }
   for (i in 1:n) {
+    # two lookups: this row's site intercept and this row's fertilizer slope
     mu[i] <- alpha[group[i]] + beta[fertilizer[i]] * x[i]
     y[i]  ~ dnorm(mu[i], tau)
   }

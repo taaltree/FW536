@@ -1147,11 +1147,30 @@ samples.bad &lt;- <span class="fn">nimbleMCMC</span>(DynOccCode, constants = con
 <span class="ex-tag">Practice Exercise M7</span><span class="difficulty medium"> · R</span>
 <h3>N-mixture: build up from basic to overdispersed</h3>
 <p>Open <code>NMixture_Nimble.R</code> and run all four models.</p>
+
+<div class="callout key">
+<p><strong>The discrepancy statistic in Model 4, and why it is built that way.</strong> Model 4 adds three lines that are easy to skim past:</p>
+<pre><code>e[i, j]          &lt;- p * lambda                          <span class="cm"># expected count on visit j to site i</span>
+resid[i, j]      &lt;- <span class="fn">pow</span>(y[i, j]      - e[i, j], <span class="nu">2</span>) / e[i, j]
+resid.pred[i, j] &lt;- <span class="fn">pow</span>(y.pred[i, j] - e[i, j], <span class="nu">2</span>) / e[i, j]</code></pre>
+<p>Summed over all counts, that is</p>
+<div class="eq-block">$T(y, \theta) \;=\; \sum_{i}\sum_{j} \dfrac{\big(y_{ij} - \mathbb{E}[y_{ij}]\big)^2}{\mathbb{E}[y_{ij}]},$</div>
+<p>a squared error divided by the expected count. The reason that denominator is the right one is that here <strong>the expected count is also the variance</strong>. If abundance is $N_i \sim \text{Poisson}(\lambda)$ and each animal is seen independently with probability $p$, then thinning a Poisson leaves a Poisson: $y_{ij} \sim \text{Poisson}(\lambda p)$, whose mean and variance are both $\lambda p$. So each term is</p>
+<div class="eq-block">$\dfrac{(\text{observed} - \text{expected})^2}{\text{variance the model predicts}} \;=\; (\text{standardized residual})^2.$</div>
+<p>Three things follow, and they are what make this a useful general-purpose statistic.</p>
+<ul>
+<li><strong>It puts every count on the same footing.</strong> Being 3 animals off matters far more at a site expected to hold 2 than at one expected to hold 30, and counts are naturally more variable where they are larger. Dividing by the variance builds that in, so no single busy site dominates the total. A raw sum of squared errors would be driven almost entirely by the largest sites.</li>
+<li><strong>It has a built-in yardstick.</strong> If the model is right, each standardized residual has an average squared value of about 1, so $T$ should land near the <em>number of counts</em>: here 200 sites &times; 3 visits = 600. A total of around 1200 says the data are about twice as far from the model's predictions as the model itself can generate. (This is the same arithmetic as the residual deviance / df check from Day 3, and as a Pearson chi-square in a GLM.)</li>
+<li><strong>It is sensitive to the failure we care about.</strong> Extra-Poisson variation in abundance inflates exactly this quantity, which is why it catches a negative-binomial world fitted with a Poisson model.</li>
+</ul>
+<p>One detail to notice in the code: $T$ depends on the parameters as well as the data, through $\mathbb{E}[y_{ij}] = p\lambda$. So it is recomputed at every MCMC iteration, once for the real counts (<code>fit.data</code>) and once for that iteration's simulated replicate (<code>fit.pred</code>), and the two are always compared at the <em>same</em> draw of $\theta$. The Bayesian p-value is then just the fraction of iterations where the replicate's $T$ exceeds the data's.</p>
+</div>
+
 <ol type="a">
  <li>Model 1 (basic): recover $\lambda$ and $p$ from 20-site / 3-rep simulated data. How close are the posteriors to truth?</li>
  <li>Model 2 (covariate on abundance): is the posterior of $\beta_1$ credibly different from 0?</li>
  <li>Model 3 (covariate on both): does adding the detection covariate change inference on the abundance covariate?</li>
- <li>Model 4 (overdispersion): what is the Bayesian p-value? What does it say about the Poisson assumption?</li>
+ <li>Model 4 (overdispersion): report the median of <code>fit.data</code> and of <code>fit.pred</code>, and compare them with the 600 counts in the dataset. Then compute the Bayesian p-value. What does it say about the Poisson assumption, and in which direction does the model fail?</li>
 </ol>
 <details class="answer"><summary>Reveal worked solution (actual NIMBLE run)</summary><div class="answer-body">
 <p>From an actual run of <code>NMixture_Nimble.R</code> (<code>set.seed(2025)</code>; 3 chains, <code>niter=10000</code>, <code>nburnin=1000</code>, thin 5). All R-hat = 1.00&ndash;1.02.</p>
@@ -1173,7 +1192,7 @@ post &lt;- <span class="fn">as.matrix</span>(samples4)
 <p><strong>(a) Basic model (20 sites, 3 reps; truth $\lambda=6,\ p=0.8$).</strong> Recovered cleanly: $\lambda$ = 6.24 [5.06, 7.78] and $p$ = 0.80 [0.67, 0.87]. With only 20 sites the intervals are wide, but both comfortably cover truth.</p>
 <p><strong>(b) Covariate on abundance (truth $\beta_1=1$).</strong> $\beta_1$ = <strong>1.00</strong> [0.94, 1.07], credibly positive and bang on the simulated value; $\beta_0$ = 2.99 [2.91, 3.06].</p>
 <p><strong>(c) Covariate on both.</strong> Adding the detection covariate ($a_0$ = 0.92 [0.70, 1.11], $a_1$ = 1.00 [0.91, 1.09], both recovering truth 1) leaves the abundance-covariate inference essentially unchanged: $\beta_1$ moves only from 1.00 to <strong>1.04</strong> [0.97, 1.10]. Because these data are simulated clean, modeling detection heterogeneity here neither biases nor much tightens $\beta_1$; in messier data, ignoring detection structure is what would distort it.</p>
-<p><strong>(d) Overdispersion + Bayesian p-value.</strong> The 200-site data were generated from a negative binomial but fit with a Poisson N-mixture. With the chi-square-type sum as the discrepancy, the real data sit consistently further from the model's expected counts than the replicates do (observed $T(\text{data})$ median 1247 vs replicated $T(y^\text{rep})$ median 1163), giving a <strong>Bayesian p-value of 0.025</strong>, far from 0.5. The Poisson model cannot absorb the extra variance, so it is rejected; the fix is a Poisson-lognormal or negative-binomial N-mixture (Exercise M8). Note $\lambda$ = 5.81 [5.46, 6.16] still looks confident and reasonable. The GOF check is what exposes the misfit the point estimate alone would hide.</p>
+<p><strong>(d) Overdispersion + Bayesian p-value.</strong> The 200-site data were generated from a negative binomial but fit with a Poisson N-mixture. With the chi-square-type sum as the discrepancy, the real data sit consistently further from the model's expected counts than the replicates do (observed $T(\text{data})$ median <strong>1247</strong> vs replicated $T(y^\text{rep})$ median <strong>1163</strong>), giving a <strong>Bayesian p-value of 0.025</strong>, far from 0.5. Both numbers are worth reading against the yardstick from the box above: with 600 counts, a model that fitted would give $T \approx 600$. The replicates come in at about twice that, because the fitted $\lambda$ and $p$ are themselves distorted by the misfit, and the real data are higher still. The direction is the one that matters: the observed counts are <em>more</em> variable than the model can produce, never less. The Poisson model cannot absorb the extra variance, so it is rejected; the fix is a Poisson-lognormal or negative-binomial N-mixture (Exercise M8). Note $\lambda$ = 5.81 [5.46, 6.16] still looks confident and reasonable. The GOF check is what exposes the misfit the point estimate alone would hide.</p>
 </div></details>
 </div>
 

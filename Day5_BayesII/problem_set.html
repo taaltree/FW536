@@ -180,7 +180,7 @@ group, which is what part (b) makes you check.</p></div>
 x.scaled &lt;- <span class="fn">as.numeric</span>(<span class="fn">scale</span>(liz$perimeterAreaRatio))
 y        &lt;- <span class="fn">as.integer</span>(liz$presence)</code></pre>
 <ol type="a">
- <li>Fit in <span class="pill nimble">NIMBLE</span> with the weakly informative prior $a, b \sim \mathcal{N}(0, \sigma^2{=}2.71)$ (i.e. <code>dnorm(0, 1/2.71)</code>, chosen because it implies a near-uniform prior on $p$). Report R-hat and <code>heidel.diag</code> for $a$ and $b$. Use starting values near 0 (why is that a good idea here?).</li>
+ <li>Fit in <span class="pill nimble">NIMBLE</span> with the weakly informative prior $a, b \sim \mathcal{N}(0, \sigma^2{=}2.71)$ (i.e. <code>dnorm(0, 1/2.71)</code>, chosen because it implies a near-uniform prior on $p$). Report R-hat for $a$ and $b$ (below 1.05 is the target; up to about 1.1 is acceptable). Use starting values near 0 (why is that a good idea here?).</li>
  <li>What is the posterior probability that the slope $b$ is negative (i.e., more edge per unit area $\Rightarrow$ lower occupancy)?</li>
  <li><strong>A management-relevant difference.</strong> Add derived quantities <em>inside</em> the model, so MCMC delivers their full posterior:
  <div class="eq-block">$p_{10} = \text{ilogit}(a + b\, x_{10}), \quad p_{20} = \text{ilogit}(a + b\, x_{20}), \quad \text{diff} = p_{20} - p_{10}$</div>
